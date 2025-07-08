@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --theme-primary: #f97316;
+  --theme-secondary: #1e40af;
+  --theme-accent: #8b5cf6;
+  --theme-background: #ffffff;
+  --theme-surface: #f8fafc;
+  --theme-text: #1f2937;
+  --theme-text-secondary: #6b7280;
+}
+
+/* Theme-aware utility classes */
+.theme-primary {
+  color: var(--theme-primary);
+}
+
+.theme-bg-primary {
+  background-color: var(--theme-primary);
+}
+
+.theme-secondary {
+  color: var(--theme-secondary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--theme-secondary);
+}
+
+.theme-text {
+  color: var(--theme-text);
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+
+.theme-surface {
+  background-color: var(--theme-surface);
+}
+
+.theme-background {
+  background-color: var(--theme-background);
+}

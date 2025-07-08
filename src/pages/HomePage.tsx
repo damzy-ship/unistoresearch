@@ -15,9 +15,11 @@ import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
 import { Toaster } from 'react-hot-toast';
+import { useTheme } from '../hooks/useTheme';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { currentTheme } = useTheme();
   const [request, setRequest] = useState("");
   const [university, setUniversity] = useState("Bingham");
   const [showResults, setShowResults] = useState(false);
@@ -147,7 +149,10 @@ export default function HomePage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-8">
+    <main 
+      className="flex min-h-screen flex-col items-center justify-center px-4 py-8 transition-colors duration-300"
+      style={{ backgroundColor: currentTheme.background }}
+    >
       <Toaster position="top-center" />
       {!showResults ? (
         <div className="w-full flex flex-col items-center justify-center">
@@ -159,8 +164,8 @@ export default function HomePage() {
           {/* UniStore Logo */}
           <div className="mb-12">
             <h1 className="text-5xl md:text-6xl text-center font-bold mb-4">
-              <span className="text-orange-500">uni</span>
-              <span className="text-blue-800">store.</span>
+              <span style={{ color: currentTheme.primary }}>uni</span>
+              <span style={{ color: currentTheme.secondary }}>store.</span>
             </h1>
             <UserGreeting 
               university={university}
@@ -170,7 +175,10 @@ export default function HomePage() {
 
           {/* Search Card */}
           <div className="w-full max-w-2xl mx-auto">
-            <div className="bg-white p-8 shadow-xl border border-gray-100 rounded-2xl">
+            <div 
+              className="p-8 shadow-xl border border-gray-100 rounded-2xl transition-colors duration-300"
+              style={{ backgroundColor: currentTheme.surface }}
+            >
               <form onSubmit={handleSearchRequest} className="space-y-6">
                 <div className="space-y-6">
                   {/* University Selection */}
@@ -182,8 +190,13 @@ export default function HomePage() {
                   {/* Request Textarea */}
                   <div className="relative">
                     <textarea
+                    // focus:ring-${currentTheme.primary} focus:border-${currentTheme.primary}
                       placeholder="I need tote bags below 5000 naira"
-                      className="w-full min-h-[120px] p-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 resize-none text-base transition-all duration-200 placeholder-gray-400"
+                      className={`focus:ring-2 focus:ring-${currentTheme.primaryTsFormat} focus:border-${currentTheme.primaryTsFormat} w-full min-h-[120px] p-4 border-2 border-gray-200 rounded-xl resize-none text-base transition-all duration-200 placeholder-gray-400`}
+                      style={{
+                        // focusBorderColor: currentTheme.primary,
+                        color: currentTheme.text
+                      }}
                       value={request}
                       onChange={(e) => setRequest(e.target.value)}
                       required
@@ -195,7 +208,7 @@ export default function HomePage() {
                 <div className="flex flex-col gap-3 pt-2">
                   <button
                     type="submit"
-                    className="flex gap-1 items-center justify-center bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium w-full"
+                    className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
                   >
                     <Send className="mr-2 h-4 w-4" />
                     Find Sellers
@@ -207,7 +220,12 @@ export default function HomePage() {
               <div className="mt-4 text-center">
                 <button
                   onClick={() => navigate('/past-requests')}
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
+                  style={{ 
+                    color: currentTheme.textSecondary,
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
+                  onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
                 >
                   <History className="w-4 h-4" />
                   View past requests
@@ -224,7 +242,7 @@ export default function HomePage() {
             {userIsAuthenticated && (
               <div className="mt-12">
                 <h3 className="text-xl font-semibold text-center mb-6">
-                  Share Your Experience
+                  Share Your Unique Experience for fellow students to see
                 </h3>
                 <ReviewForm />
               </div>
@@ -235,7 +253,8 @@ export default function HomePage() {
           <div className="mt-12 flex flex-col items-center gap-4 w-full">
             <button
               onClick={() => window.open("https://unistore.ng", "_blank")}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium underline hover:no-underline transition-all duration-200"
+              className="text-sm font-medium underline hover:no-underline transition-all duration-200"
+              style={{ color: currentTheme.secondary }}
             >
               View more products from your university vendors
             </button>
@@ -252,7 +271,8 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={handleBackToSearch}
-                className="flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium transition-colors"
+                className="flex items-center gap-2 font-medium transition-colors"
+                style={{ color: currentTheme.primary }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to search
@@ -261,7 +281,8 @@ export default function HomePage() {
               {!userIsAuthenticated && (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="text-orange-600 hover:text-orange-700 font-medium"
+                  className="font-medium transition-colors"
+                  style={{ color: currentTheme.primary }}
                 >
                   Sign In
                 </button>
@@ -270,8 +291,8 @@ export default function HomePage() {
             
             <div className="text-center">
               <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="text-orange-500">uni</span>
-                <span className="text-blue-800">store.</span>
+                <span style={{ color: currentTheme.primary }}>uni</span>
+                <span style={{ color: currentTheme.secondary }}>store.</span>
               </h1>
               <p className="text-sm text-gray-600">
                 Results for "{request}" at {university} University
@@ -291,24 +312,40 @@ export default function HomePage() {
           {/* Retry Search Prompt */}
           {showRetryPrompt && !isSearching && (
             <div className="w-full max-w-2xl mt-6">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+              <div 
+                className="rounded-2xl p-6 border transition-colors duration-300"
+                style={{ 
+                  backgroundColor: currentTheme.surface,
+                  borderColor: currentTheme.primary + '20'
+                }}
+              >
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: currentTheme.text }}
+                  >
                     Retry?
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p 
+                    className="mb-4"
+                    style={{ color: currentTheme.textSecondary }}
+                  >
                     Search results might vary with different attempts. Try rephrasing your request or searching again to potentially get better matches.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                       onClick={handleRetrySearch}
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
+                      className={`bg-gradient-to-r ${currentTheme.buttonGradient} text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105`}
                     >
                       Retry Same Search
                     </button>
                     <button
                       onClick={handleBackToSearch}
-                      className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-xl font-medium transition-colors"
+                      className="border border-gray-300 hover:bg-gray-50 px-6 py-3 rounded-xl font-medium transition-colors"
+                      style={{ 
+                        backgroundColor: currentTheme.background,
+                        color: currentTheme.text
+                      }}
                     >
                       Modify Search
                     </button>

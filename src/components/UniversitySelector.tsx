@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, Search, MapPin } from 'lucide-react';
 import { School } from '../lib/supabase';
 import { getActiveSchools } from '../lib/schoolService';
+import { useTheme } from '../hooks/useTheme';
 
 interface UniversitySelectorProps {
   selectedUniversity: string;
@@ -14,6 +15,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentTheme } = useTheme();
 
   useEffect(() => {
     const fetchSchools = async () => {
@@ -85,7 +87,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
             type="button"
             className={`flex-1 py-2 px-6 rounded-xl font-semibold text-sm uppercase tracking-wide transition-all duration-200 ${
               selectedUniversity === school.short_name
-                ? "bg-orange-500 hover:bg-orange-600 text-white shadow-lg transform hover:scale-105"
+                ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white shadow-lg transform hover:scale-105`
                 : "border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
             }`}
             onClick={() => onUniversityChange(school.short_name)}

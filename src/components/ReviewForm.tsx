@@ -3,12 +3,14 @@ import { Star, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getUserId } from '../hooks/useTracking';
 import toast from 'react-hot-toast';
+import { useTheme } from '../hooks/useTheme';
 
 export default function ReviewForm() {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { currentTheme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,10 +70,29 @@ export default function ReviewForm() {
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="text-center">
-          <p className="text-sm font-medium text-gray-700 mb-3">
+        
+          <div>
+          {/* <label className="block text-md font-bold text-gray-700 mb-2">
+            Share your experience
+          </label> */}
+          <textarea
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-${currentTheme.primaryTsFormat} focus:border-${currentTheme.primaryTsFormat} transition-colors resize-none`}
+            rows={3}
+            placeholder="Tell us about your experience with UniStore..."
+            maxLength={500}
+            disabled={submitting}
+            required
+          />
+          <div className="text-xs text-gray-500 mt-1">
+            {reviewText.length}/500 characters
+          </div>
+        </div>
+        {/* <p className="text-sm font-medium text-gray-700 my-3">
             How would you rate your experience with UniStore?
-          </p>
-          <div className="flex justify-center gap-1 mb-2">
+          </p> */}
+          <div className="flex justify-center gap-1 my-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -102,30 +123,13 @@ export default function ReviewForm() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Share your experience
-          </label>
-          <textarea
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
-            rows={3}
-            placeholder="Tell us about your experience with UniStore..."
-            maxLength={500}
-            disabled={submitting}
-            required
-          />
-          <div className="text-xs text-gray-500 mt-1">
-            {reviewText.length}/500 characters
-          </div>
-        </div>
+     
 
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <button
             type="submit"
             disabled={submitting || rating === 0 || !reviewText.trim()}
-            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+            className={`bg-gradient-to-r ${currentTheme.buttonGradient} ${currentTheme.buttonGradientHover} text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
           >
             {submitting ? (
               <>

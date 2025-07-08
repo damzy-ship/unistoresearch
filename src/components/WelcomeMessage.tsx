@@ -34,11 +34,12 @@ export default function WelcomeMessage({ className = '' }: WelcomeMessageProps) 
           .eq('auth_user_id', session.user.id)
           .single();
         
-        const name = visitorData?.full_name || session.user.user_metadata?.full_name || '';
-        setUserName(name);
+        const fullName = visitorData?.full_name || session.user.user_metadata?.full_name || '';
+        const firstName = fullName ? fullName.split(' ')[0] : '';
+        setUserName(firstName);
         
         // Generate welcome message
-        const welcomeMessage = await generateWelcomeMessage(name);
+        const welcomeMessage = await generateWelcomeMessage(firstName);
         setMessage(welcomeMessage);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -51,18 +52,17 @@ export default function WelcomeMessage({ className = '' }: WelcomeMessageProps) 
     fetchUserAndGenerateMessage();
   }, []);
   
-  const generateWelcomeMessage = async (name: string): Promise<string> => {
+  const generateWelcomeMessage = async (firstName: string): Promise<string> => {
     try {
       // Check if Gemini is available
       if (!import.meta.env.VITE_GEMINI_API_KEY) {
-        return getRandomWelcomeMessage(userName);
+        return getDefaultWelcomeMessage(firstName);
       }
       
       const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
       
       if (!API_KEY) {
-        console.warn('AI welcome message generation failed, using fallback:', result.error);
-        return getDefaultWelcomeMessage(name);
+        return getDefaultWelcomeMessage(firstName);
       }
       
       const genAI = new GoogleGenerativeAI(API_KEY);
@@ -87,7 +87,7 @@ export default function WelcomeMessage({ className = '' }: WelcomeMessageProps) 
 Generate a short, friendly welcome message for a university marketplace app user.
 Include a brief mention about searching for products.
 
-User's name: ${name || 'there'}
+User's first name: ${firstName || 'there'}
 Time of day: ${timeOfDay}
 Day of week: ${day}
 Month: ${month}
@@ -96,7 +96,7 @@ Special occasions: ${isChristmasSeason ? 'Christmas season' : isNewYear ? 'New Y
 Requirements:
 - Keep it under 15 words
 - Be warm and friendly
-- Mention the user's name if provided
+- Use ONLY the user's first name if provided
 - Reference the time of day or special occasion if relevant
 - Include a brief mention about searching for products
 - DO NOT include any placeholder text like [Name] or [Time]
@@ -118,11 +118,11 @@ Example outputs:
     } catch (error) {
       console.error('Error generating welcome message:', error);
       // Always fall back to static messages on error
-      return getDefaultWelcomeMessage(name);
+      return getDefaultWelcomeMessage(firstName);
     }
   };
   
-  const getDefaultWelcomeMessage = (name: string): string => {
+  const getDefaultWelcomeMessage = (firstName: string): string => {
     const currentTime = new Date();
     const hour = currentTime.getHours();
     
@@ -131,8 +131,8 @@ Example outputs:
     else if (hour < 18) greeting = 'Good afternoon';
     else greeting = 'Good evening';
 
-    return name 
-      ? `${greeting}, ${name}! Search for what you need.` 
+    return firstName 
+      ? `${greeting}, ${firstName}! Search for what you need.` 
       : `${greeting}! Search for what you need.`;
   };
   

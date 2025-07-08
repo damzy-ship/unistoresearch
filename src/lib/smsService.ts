@@ -1,9 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from './supabase';
 
 export class AppError extends Error {
   statusCode: number;
@@ -103,7 +98,6 @@ export const storeOTP = async (phoneNumber: string, otp: string): Promise<boolea
     expiresAt.setMinutes(expiresAt.getMinutes() + 10);
     
     // Use Supabase to store the OTP
-    // We'll use a custom table for this
     const { error } = await supabase
       .from('otp_codes')
       .upsert({
@@ -164,23 +158,24 @@ export const verifyOTP = async (phoneNumber: string, otp: string): Promise<boole
 };
 
 // Send OTP via SMS
-export const sendOTP = async (phoneNumber: string): Promise<{success: boolean; otp?: string; error?: string}> => {
+export const sendOTP = async (phoneNumber: string, customOtp?: string): Promise<{success: boolean; otp?: string; error?: string}> => {
   try {
     // Generate OTP
-    const otp = generateOTP();
+    const otp = customOtp || generateOTP();
     
-    // Store OTP
+    // Store OTP in database first
     const stored = await storeOTP(phoneNumber, otp);
     if (!stored) {
       return { success: false, error: 'Failed to store OTP' };
     }
     
-    // Send OTP via SMS
+    // Try to send OTP via SMS
     const message = `Your UniStore verification code is: ${otp}. Valid for 10 minutes.`;
     const result = await sendSMS(phoneNumber, message);
     
     if (!result.success) {
-      return { success: false, error: result.error };
+      // If SMS failed but we stored the OTP, still return success with OTP for display
+      return { success: true, otp, error: result.error };
     }
     
     // If SMS service is not configured, return the OTP to display on screen

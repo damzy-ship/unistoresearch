@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import UserMenu from './UserMenu';
 import { isAuthenticated } from '../hooks/useTracking';
+import { useTheme } from '../hooks/useTheme';
 
 interface HeaderProps {
   showAuth?: boolean;
@@ -12,6 +13,7 @@ interface HeaderProps {
 export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
   const navigate = useNavigate();
   const [userIsAuthenticated, setUserIsAuthenticated] = React.useState(false);
+  const {currentTheme} = useTheme();
   
   React.useEffect(() => {
     const checkAuth = async () => {
@@ -32,7 +34,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
         ) : (
           <button
             onClick={onAuthClick}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200"
+            className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${currentTheme.buttonGradient} hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200`}
           >
             <LogIn className="w-4 h-4" />
             Sign In

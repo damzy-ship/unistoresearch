@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useTheme } from '../hooks/useTheme';
+
 
 interface Review {
   id: string;
@@ -16,6 +18,8 @@ export default function ReviewSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+  const {currentTheme} = useTheme()
+  
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -111,7 +115,7 @@ export default function ReviewSlider() {
   if (reviews.length === 0) {
     return (
       <div className="text-center py-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">What Our Users Say</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">What students are saying...</h3>
         <p className="text-gray-600">No reviews available yet.</p>
       </div>
     );
@@ -119,7 +123,7 @@ export default function ReviewSlider() {
 
   return (
     <div className="relative overflow-hidden py-8">
-      <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">What Our Users Say</h3>
+      <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">What students are saying...</h3>
       
       <div className="relative max-w-3xl mx-auto px-4">
         {/* Navigation Arrows (only show if more than one review) */}
@@ -145,7 +149,7 @@ export default function ReviewSlider() {
         {/* Reviews Slider */}
         <div className="overflow-hidden">
           <div 
-            className="flex transition-transform duration-500 ease-in-out"
+            className=" flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
             {reviews.map((review) => (
@@ -153,9 +157,9 @@ export default function ReviewSlider() {
                 key={review.id} 
                 className="w-full flex-shrink-0 px-4"
               >
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <div  className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
                   <div className="flex flex-col items-center text-center mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3">
+                    <div className={`w-16 h-16 bg-gradient-to-br ${currentTheme.buttonGradient}  rounded-full flex items-center justify-center text-white font-bold text-xl mb-3`}>
                       {review.user_name.charAt(0).toUpperCase()}
                     </div>
                     <h4 className="text-xl font-bold text-gray-900">{review.user_name}</h4>
@@ -200,7 +204,7 @@ export default function ReviewSlider() {
                 }}
                 className={`w-2 h-2 rounded-full transition-all ${
                   index === currentIndex 
-                    ? 'bg-orange-500 w-4' 
+                    ? `bg-${currentTheme.primaryTsFormat} w-4` 
                     : 'bg-gray-300 hover:bg-gray-400'
                 }`}
                 aria-label={`Go to review ${index + 1}`}

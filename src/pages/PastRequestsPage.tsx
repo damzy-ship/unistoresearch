@@ -6,9 +6,11 @@ import { getUserId } from '../hooks/useTracking';
 import RequestViewSimple from '../components/RequestViewSimple';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import RatingPrompt from '../components/RatingPrompt';
+import { useTheme } from '../hooks/useTheme';
 
 export default function PastRequestsPage() {
   const navigate = useNavigate();
+  const { currentTheme } = useTheme();
   const [requests, setRequests] = useState<RequestLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,27 +73,46 @@ export default function PastRequestsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div 
+      className="min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: currentTheme.surface }}
+    >
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div 
+        className="shadow-sm border-b transition-colors duration-300"
+        style={{ backgroundColor: currentTheme.background }}
+      >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate('/')}
-                className="text-gray-600 hover:text-gray-800 transition-colors"
+                className="transition-colors"
+                style={{ color: currentTheme.textSecondary }}
+                onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
+                onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
               >
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Past Requests</h1>
-                <p className="text-sm text-gray-600">View your previous product searches</p>
+                <h1 
+                  className="text-xl sm:text-2xl font-bold"
+                  style={{ color: currentTheme.text }}
+                >
+                  Past Requests
+                </h1>
+                <p 
+                  className="text-sm"
+                  style={{ color: currentTheme.textSecondary }}
+                >
+                  View your previous product searches
+                </p>
               </div>
             </div>
             <div className="text-center">
               <h2 className="text-lg font-bold">
-                <span className="text-orange-500">uni</span>
-                <span className="text-blue-800">store.</span>
+                <span style={{ color: currentTheme.primary }}>uni</span>
+                <span style={{ color: currentTheme.secondary }}>store.</span>
               </h2>
             </div>
           </div>
@@ -102,13 +123,21 @@ export default function PastRequestsPage() {
         {/* Search */}
         <div className="mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: currentTheme.textSecondary }}
+            />
             <input
               type="text"
               placeholder="Search your requests..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl transition-colors"
+              style={{
+                backgroundColor: currentTheme.background,
+                color: currentTheme.text,
+                focusBorderColor: currentTheme.primary
+              }}
             />
           </div>
         </div>
@@ -116,11 +145,20 @@ export default function PastRequestsPage() {
         {/* Requests List */}
         {filteredRequests.length === 0 ? (
           <div className="text-center py-12">
-            <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <MessageSquare 
+              className="w-12 h-12 mx-auto mb-4"
+              style={{ color: currentTheme.textSecondary }}
+            />
+            <h3 
+              className="text-lg font-semibold mb-2"
+              style={{ color: currentTheme.text }}
+            >
               {searchTerm ? 'No matching requests found' : 'No requests yet'}
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p 
+              className="mb-4"
+              style={{ color: currentTheme.textSecondary }}
+            >
               {searchTerm 
                 ? 'Try adjusting your search terms' 
                 : 'Start by making your first product request'
@@ -129,7 +167,7 @@ export default function PastRequestsPage() {
             {!searchTerm && (
               <button
                 onClick={() => navigate('/')}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
+                className={`bg-gradient-to-r ${currentTheme.buttonGradient} text-white px-6 py-3 rounded-xl font-medium transition-all duration-200`}
               >
                 Make a Request
               </button>
@@ -140,13 +178,17 @@ export default function PastRequestsPage() {
             {filteredRequests.map((request) => (
               <div
                 key={request.id}
-                className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow"
+                className="rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300"
+                style={{ backgroundColor: currentTheme.background }}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
                     {/* Request Header */}
                     <div className="flex items-center gap-3 mb-3">
-                      <MessageSquare className="w-5 h-5 text-orange-500" />
+                      <MessageSquare 
+                        className="w-5 h-5"
+                        style={{ color: currentTheme.primary }}
+                      />
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         request.university === 'Bingham' 
                           ? 'bg-orange-100 text-orange-800' 
@@ -155,21 +197,30 @@ export default function PastRequestsPage() {
                         <MapPin className="w-3 h-3 mr-1" />
                         {request.university} University
                       </span>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <div 
+                        className="flex items-center gap-1 text-sm"
+                        style={{ color: currentTheme.textSecondary }}
+                      >
                         <Calendar className="w-4 h-4" />
                         {formatDate(request.created_at)}
                       </div>
                     </div>
 
                     {/* Request Text */}
-                    <p className="text-gray-900 leading-relaxed mb-3">
+                    <p 
+                      className="leading-relaxed mb-3"
+                      style={{ color: currentTheme.text }}
+                    >
                       {request.request_text}
                     </p>
 
                     {/* Matched Sellers Info */}
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <Store className="w-4 h-4 text-gray-400" />
+                        <Store 
+                          className="w-4 h-4"
+                          style={{ color: currentTheme.textSecondary }}
+                        />
                         <span className={`text-sm font-medium ${
                           (request.matched_seller_ids?.length || 0) > 0
                             ? 'text-green-600'
@@ -185,7 +236,13 @@ export default function PastRequestsPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setViewingRequest(request)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg font-medium transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+                      style={{ 
+                        backgroundColor: currentTheme.primary + '10',
+                        color: currentTheme.primary
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = currentTheme.primary + '20'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentTheme.primary + '10'}
                     >
                       <Eye className="w-4 h-4" />
                       View Details
@@ -200,29 +257,68 @@ export default function PastRequestsPage() {
         {/* Summary Stats */}
         {requests.length > 0 && (
           <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Request Summary</h3>
+            <h3 
+              className="text-lg font-semibold mb-4"
+              style={{ color: currentTheme.text }}
+            >
+              Your Request Summary
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-orange-600">{requests.length}</p>
-                <p className="text-sm text-gray-600">Total Requests</p>
+                <p 
+                  className="text-2xl font-bold"
+                  style={{ color: currentTheme.primary }}
+                >
+                  {requests.length}
+                </p>
+                <p 
+                  className="text-sm"
+                  style={{ color: currentTheme.textSecondary }}
+                >
+                  Total Requests
+                </p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">
+                <p 
+                  className="text-2xl font-bold"
+                  style={{ color: currentTheme.secondary }}
+                >
                   {requests.filter(r => r.university === 'Bingham').length}
                 </p>
-                <p className="text-sm text-gray-600">Bingham Requests</p>
+                <p 
+                  className="text-sm"
+                  style={{ color: currentTheme.textSecondary }}
+                >
+                  Bingham Requests
+                </p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">
+                <p 
+                  className="text-2xl font-bold"
+                  style={{ color: currentTheme.secondary }}
+                >
                   {requests.filter(r => r.university === 'Veritas').length}
                 </p>
-                <p className="text-sm text-gray-600">Veritas Requests</p>
+                <p 
+                  className="text-sm"
+                  style={{ color: currentTheme.textSecondary }}
+                >
+                  Veritas Requests
+                </p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">
+                <p 
+                  className="text-2xl font-bold"
+                  style={{ color: currentTheme.accent }}
+                >
                   {requests.filter(r => (r.matched_seller_ids?.length || 0) > 0).length}
                 </p>
-                <p className="text-sm text-gray-600">With Matches</p>
+                <p 
+                  className="text-sm"
+                  style={{ color: currentTheme.textSecondary }}
+                >
+                  With Matches
+                </p>
               </div>
             </div>
           </div>
