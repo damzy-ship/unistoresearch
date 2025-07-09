@@ -10,7 +10,7 @@ import { useTheme } from '../hooks/useTheme';
 
 export default function PastRequestsPage() {
   const navigate = useNavigate();
-  const { currentTheme } = useTheme();
+  const { currentTheme, backgroundTexture } = useTheme();
   const [requests, setRequests] = useState<RequestLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,9 +77,10 @@ export default function PastRequestsPage() {
       className="min-h-screen transition-colors duration-300"
       style={{ backgroundColor: currentTheme.surface }}
     >
+   
       {/* Header */}
       <div 
-        className="shadow-sm border-b transition-colors duration-300"
+        className="relative z-10 shadow-sm border-b transition-colors duration-300"
         style={{ backgroundColor: currentTheme.background }}
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,6 +122,18 @@ export default function PastRequestsPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search */}
+            {/* Background texture overlay */}
+       {backgroundTexture.id !== 'none' && (
+        <div 
+          className="fixed inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: backgroundTexture.pattern,
+            backgroundSize: backgroundTexture.id === 'grid' ? '20px 20px' : '30px 30px',
+            opacity: backgroundTexture.opacity,
+            color: currentTheme.textSecondary
+          }}
+        />
+      )}
         <div className="mb-6">
           <div className="relative">
             <Search 

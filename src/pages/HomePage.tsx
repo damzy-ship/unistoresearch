@@ -18,7 +18,7 @@ import { useTheme } from '../hooks/useTheme';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { currentTheme } = useTheme();
+  const { currentTheme, backgroundTexture } = useTheme();
   const [request, setRequest] = useState("");
   const [university, setUniversity] = useState("Bingham");
   const [showResults, setShowResults] = useState(false);
@@ -152,6 +152,18 @@ export default function HomePage() {
       className="flex min-h-screen flex-col items-center justify-center px-4 py-8 transition-colors duration-300"
       style={{ backgroundColor: currentTheme.background }}
     >
+      {/* Background texture overlay */}
+      {backgroundTexture.id !== 'none' && (
+        <div 
+          className="fixed inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: backgroundTexture.pattern,
+            backgroundSize: backgroundTexture.id === 'grid' ? '20px 20px' : '30px 30px',
+            opacity: backgroundTexture.opacity,
+            color: currentTheme.textSecondary
+          }}
+        />
+      )}
       <Toaster position="top-center" />
       {!showResults ? (
         <div className="w-full flex flex-col items-center justify-center">
@@ -173,7 +185,7 @@ export default function HomePage() {
           </div>
 
           {/* Search Card */}
-          <div className="w-full max-w-2xl mx-auto">
+          <div className="relative z-10 w-full max-w-2xl mx-auto">
             <div 
               className="p-8 shadow-xl border border-gray-100 rounded-2xl transition-colors duration-300"
               style={{ backgroundColor: currentTheme.surface }}
