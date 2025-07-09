@@ -36,12 +36,6 @@ export const backgroundTextures: BackgroundTexture[] = [
     opacity: 0
   },
   {
-    id: 'dots',
-    name: 'Dots',
-    pattern: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-    opacity: 0.1
-  },
-  {
     id: 'grid',
     name: 'Grid',
     pattern: 'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
