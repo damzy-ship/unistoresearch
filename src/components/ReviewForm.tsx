@@ -130,13 +130,13 @@ export default function ReviewForm() {
             <textarea
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
-              className="w-full px-6 py-4 border-2 rounded-2xl resize-none transition-all duration-300 focus:scale-105 transform focus:ring-2 focus:border-transparent"
+              className={`w-full px-6 py-4 border-2 rounded-2xl resize-none transition-all duration-300 focus:scale-105 transform focus:ring-2 focus:border-transparent`}
               style={{
                 backgroundColor: currentTheme.background,
                 borderColor: rating > 0 ? currentTheme.primary : currentTheme.textSecondary + '30',
                 color: currentTheme.text,
                 boxShadow: rating > 0 ? `0 0 20px ${currentTheme.primary}20` : undefined,
-                focusRingColor: currentTheme.primary
+                // focusRingColor: currentTheme.primary
               }}
               rows={4}
               placeholder="Tell us about your experience with UniStore..."

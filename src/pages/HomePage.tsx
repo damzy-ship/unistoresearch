@@ -203,10 +203,16 @@ export default function HomePage() {
                     <textarea
                     // focus:ring-${currentTheme.primary} focus:border-${currentTheme.primary}
                       placeholder="I need tote bags below 5000 naira"
-                      className={`focus:ring-2 focus:ring-${currentTheme.primaryTsFormat} focus:border-${currentTheme.primaryTsFormat} w-full min-h-[120px] p-4 border-2 border-gray-200 rounded-xl resize-none text-base transition-all duration-200 placeholder-gray-400`}
-                      style={{
-                        // focusBorderColor: currentTheme.primary,
-                        color: currentTheme.text
+                      className={`focus:ring-2 focus:ring-${currentTheme.primaryTsFormat} focus:border-${currentTheme.primaryTsFormat} w-full min-h-[120px] p-4 border-2 rounded-xl resize-none text-base transition-all duration-200 placeholder-gray-400`}
+                      // style={{
+                        //   color: currentTheme.text
+                        // }}
+                        style={{
+                          backgroundColor: currentTheme.background,
+                          borderColor: currentTheme.primary,
+                          color: currentTheme.text,
+                  
+                          // focusBorderColor: currentTheme.primary,
                       }}
                       value={request}
                       onChange={(e) => setRequest(e.target.value)}
