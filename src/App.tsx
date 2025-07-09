@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
@@ -10,6 +9,7 @@ import LandingPage from './pages/LandingPage';
 import BillingCallbackPage from './pages/BillingCallbackPage';
 import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/landing-page" element={<LandingPage />} />
         <Route path="/past-requests" element={<PastRequestsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/sellers" element={<SellersPage />} />
         <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
         <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />

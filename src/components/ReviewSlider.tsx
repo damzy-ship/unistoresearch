@@ -115,7 +115,7 @@ export default function ReviewSlider() {
   if (reviews.length === 0) {
     return (
       <div className="text-center py-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">What students are saying...</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">What your fellow students are saying...</h3>
         <p className="text-gray-600">No reviews available yet.</p>
       </div>
     );
@@ -123,7 +123,7 @@ export default function ReviewSlider() {
 
   return (
     <div className="relative overflow-hidden py-8">
-      <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">What students are saying...</h3>
+      <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">What your fellow students are saying...</h3>
       
       <div className="relative max-w-3xl mx-auto px-4">
         {/* Navigation Arrows (only show if more than one review) */}

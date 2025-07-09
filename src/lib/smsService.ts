@@ -53,6 +53,7 @@ export const sendSMS = async (phoneNumber: string, message: string): Promise<{su
     // Check if environment variables are available
     try {
       const { baseUrl, apiKey } = validateEnvVariables();
+      console.log(baseUrl, apiKey)
       
       const url = new URL("/api/sms/send", baseUrl).toString();
       const payload = constructSmsPayload(phoneNumber, message, apiKey);
