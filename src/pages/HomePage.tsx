@@ -10,7 +10,6 @@ import UniversitySelector from '../components/UniversitySelector';
 import RatingPrompt from '../components/RatingPrompt';
 import UserGreeting from '../components/UserGreeting';
 import AuthModal from '../components/AuthModal';
-import UserMenu from '../components/UserMenu';
 import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
@@ -241,7 +240,7 @@ export default function HomePage() {
             
             {userIsAuthenticated && (
               <div className="mt-12">
-                <h3 className="text-xl font-semibold text-center mb-6">
+                <h3 style={{ color: currentTheme.text }} className="text-xl font-semibold text-center mb-6">
                   Share Your Unique Experience for fellow students to see
                 </h3>
                 <ReviewForm />
