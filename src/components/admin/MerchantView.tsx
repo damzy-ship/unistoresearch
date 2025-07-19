@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Mail, User, Phone, School, FileText, Edit, Calendar, Tag, Sparkles, Star, TrendingUp, Users, MessageSquare, CreditCard, Image } from 'lucide-react';
+import { X, Mail, User, Phone, School, FileText, Edit, Calendar, Tag, Sparkles, Star, TrendingUp, Users, MessageSquare, CreditCard, Image, ImageIcon } from 'lucide-react';
 import { Merchant } from '../../lib/supabase';
 import { getMerchantCategories } from '../../lib/categoryService';
 import { getMerchantStats } from '../../lib/merchantAnalytics';
@@ -108,13 +108,13 @@ export default function MerchantView({ merchant, onClose, onEdit }: MerchantView
         </div>
 
           {/* Product Images */}
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
+          {/* <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
             <div className="flex items-center gap-2 mb-3">
               <Image className="w-5 h-5 text-purple-600" />
               <h4 className="text-sm font-medium text-purple-800">Product Images</h4>
             </div>
             <ProductGallery merchantId={merchant.id} />
-          </div>
+          </div> */}
 
         <div className="space-y-6">
           {/* Seller ID */}
