@@ -20,13 +20,15 @@ export default function PastRequestsPage() {
     const fetchUserRequests = async () => {
       setLoading(true);
       try {
-        const userId = getUserId();
-        
+        const userId = await getUserId();
+        // console.log(userId)
         const { data, error } = await supabase
           .from('request_logs')
           .select('*')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
+
+          // console.log(data)
 
         if (error) {
           console.error('Error fetching user requests:', error);
@@ -157,7 +159,7 @@ export default function PastRequestsPage() {
 
         {/* Requests List */}
         {filteredRequests.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="relative text-center py-12 z-10">
             <MessageSquare 
               className="w-12 h-12 mx-auto mb-4"
               style={{ color: currentTheme.textSecondary }}
@@ -191,7 +193,7 @@ export default function PastRequestsPage() {
             {filteredRequests.map((request) => (
               <div
                 key={request.id}
-                className="rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300"
+                className="relative rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300"
                 style={{ backgroundColor: currentTheme.background }}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -269,7 +271,7 @@ export default function PastRequestsPage() {
 
         {/* Summary Stats */}
         {requests.length > 0 && (
-          <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border">
+          <div className="relative mt-8 bg-white rounded-xl p-6 shadow-sm border">
             <h3 
               className="text-lg font-semibold mb-4"
               style={{ color: currentTheme.text }}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Mail, User, Phone, School, FileText, Edit, Calendar, Tag, Sparkles, Star, TrendingUp, Users, MessageSquare, CreditCard, Image, ImageIcon } from 'lucide-react';
+import { X, Mail, User, Phone, School, FileText, Edit, Calendar, Tag, Sparkles, Star, TrendingUp, MessageSquare, CreditCard, ImageIcon } from 'lucide-react';
 import { Merchant } from '../../lib/supabase';
 import { getMerchantCategories } from '../../lib/categoryService';
 import { getMerchantStats } from '../../lib/merchantAnalytics';

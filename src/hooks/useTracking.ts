@@ -15,6 +15,7 @@ export async function getUserId(): Promise<string> {
   if (session?.user?.id) {
     // If authenticated, use the Supabase user ID
     const userId = session.user.id;
+  // console.log(userId)
     localStorage.setItem(USER_ID_STORAGE_KEY, userId);
     return userId;
   }
