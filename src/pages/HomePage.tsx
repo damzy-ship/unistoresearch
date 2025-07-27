@@ -13,8 +13,9 @@ import AuthModal from '../components/AuthModal';
 import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
-import { Toaster } from 'react-hot-toast';
+import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
 import { useTheme } from '../hooks/useTheme';
+import { Toaster } from 'sonner';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -164,7 +165,7 @@ export default function HomePage() {
           }}
         />
       )}
-      <Toaster position="top-center" />
+      <Toaster position="top-center" richColors />
       {!showResults ? (
         <div className="w-full flex flex-col items-center justify-center">
           {/* User Menu */}
@@ -251,6 +252,11 @@ export default function HomePage() {
             </div>
           </div>
           
+          {/* Real-time Products Section */}
+          <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
+            <RealTimeSwiper className="mb-8" />
+          </div>
+
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
           

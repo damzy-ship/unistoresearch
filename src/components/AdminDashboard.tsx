@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Users, MessageSquare, Store, Tag, School, CreditCard } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, MessageSquare, Store, Tag, School, CreditCard, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, UniqueVisitor, RequestLog, Merchant } from '../lib/supabase';
 import LoginForm from './admin/LoginForm';
@@ -10,7 +10,9 @@ import MerchantsTab from './admin/MerchantsTab';
 import CategoriesTab from './admin/CategoriesTab';
 import SchoolsTab from './admin/SchoolsTab';
 import BillingTab from './admin/BillingTab';
+import RealTimeProductsTab from './admin/RealTimeProductsTab';
 import BoltBadge from './BoltBadge';
+import { Toaster } from 'sonner';
 
 interface DashboardStats {
   totalVisitors: number;
@@ -45,14 +47,14 @@ export default function AdminDashboard() {
   const [requests, setRequests] = useState<RequestLog[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'billing'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'billing' | 'real-time'>('overview');
 
   // Set active tab from URL on component mount
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
     
-    if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'billing'].includes(tabParam)) {
+    if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'billing', 'real-time'].includes(tabParam)) {
       setActiveTab(tabParam as any);
     }
   }, [location]);
@@ -154,6 +156,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster position="top-right" richColors />
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,7 +193,8 @@ export default function AdminDashboard() {
             { id: 'merchants', label: 'Merchants', icon: Store },
             { id: 'categories', label: 'Categories', icon: Tag },
             { id: 'schools', label: 'Schools', icon: School },
-            { id: 'billing', label: 'Billing', icon: CreditCard }
+            { id: 'billing', label: 'Billing', icon: CreditCard },
+            { id: 'real-time', label: 'Real-time', icon: Zap }
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id} 
@@ -220,6 +224,7 @@ export default function AdminDashboard() {
             {activeTab === 'categories' && <CategoriesTab />}
             {activeTab === 'schools' && <SchoolsTab />}
             {activeTab === 'billing' && <BillingTab />}
+            {activeTab === 'real-time' && <RealTimeProductsTab />}
           </>
         )}
       </div>
