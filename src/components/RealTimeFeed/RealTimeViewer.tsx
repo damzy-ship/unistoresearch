@@ -153,6 +153,7 @@ export default function RealTimeViewer({ product, onClose }: RealTimeViewerProps
               onPause={() => setIsPlaying(false)}
               muted={isMuted}
               loop
+              autoPlay
             />
           ) : (
             <img

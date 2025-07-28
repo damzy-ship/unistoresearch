@@ -344,6 +344,7 @@ export default function RealTimeSwiper({ className = '' }: RealTimeSwiperProps) 
                         controls
                         autoPlay
                         muted
+                        loop
                       />
                     ) : (
                       <img

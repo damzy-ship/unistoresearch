@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Upload, Camera, Video, X, Clock } from 'lucide-react';
+import { ArrowLeft, Camera, Video, X, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createRealTimeProduct } from '../lib/realTimeService';
 import { uploadRealTimeImage, uploadRealTimeVideo, validateRealTimeFile, compressImage } from '../lib/realTimeStorage';
@@ -26,7 +26,6 @@ export default function CreateRealTimeProductPage() {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
-  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,53 +51,8 @@ export default function CreateRealTimeProductPage() {
     setFormData(prev => ({ ...prev, media_type: mediaType }));
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      toast.error('Please select a file first');
-      return;
-    }
-
-    setUploading(true);
-    try {
-      // Generate a temporary product ID for file naming
-      const tempProductId = `temp_${Date.now()}`;
-      
-      let uploadResult;
-      if (formData.media_type === 'video') {
-        uploadResult = await uploadRealTimeVideo(selectedFile, tempProductId);
-      } else {
-        // Compress image before upload
-        const compressedFile = await compressImage(selectedFile);
-        uploadResult = await uploadRealTimeImage(compressedFile, tempProductId);
-      }
-
-      if (uploadResult.error) {
-        toast.error(uploadResult.error);
-        return;
-      }
-
-      setFormData(prev => ({ 
-        ...prev, 
-        media_url: uploadResult.url,
-        duration: (uploadResult as any).metadata?.duration
-      }));
-      
-      toast.success('File uploaded successfully!');
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Failed to upload file');
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.media_url) {
-      toast.error('Please upload a media file');
-      return;
-    }
 
     if (!formData.title.trim()) {
       toast.error('Please enter a title');
@@ -107,6 +61,84 @@ export default function CreateRealTimeProductPage() {
 
     if (!formData.description.trim()) {
       toast.error('Please enter a description');
+      return;
+    }
+
+    // If we have a selected file but no media_url, upload it first
+    if (selectedFile && !formData.media_url) {
+      setLoading(true);
+      try {
+        // Generate a temporary product ID for file naming
+        const tempProductId = `temp_${Date.now()}`;
+        
+        let uploadResult;
+        if (formData.media_type === 'video') {
+          uploadResult = await uploadRealTimeVideo(selectedFile, tempProductId);
+        } else {
+          // Compress image before upload
+          const compressedFile = await compressImage(selectedFile);
+          uploadResult = await uploadRealTimeImage(compressedFile, tempProductId);
+        }
+
+        if (uploadResult.error) {
+          toast.error(uploadResult.error);
+          setLoading(false);
+          return;
+        }
+
+        if (!uploadResult.url) {
+          toast.error('Failed to get upload URL');
+          setLoading(false);
+          return;
+        }
+
+        // Update form data with uploaded file URL
+        setFormData(prev => ({ 
+          ...prev, 
+          media_url: uploadResult.url,
+          duration: (uploadResult as any).metadata?.duration
+        }));
+
+        toast.success('File uploaded successfully!');
+        
+        // Continue with product creation using the updated media_url
+        const updatedProductData = {
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          media_url: uploadResult.url, // Use the uploaded URL directly
+          media_type: formData.media_type,
+          duration: (uploadResult as any).metadata?.duration
+        };
+
+        const result = await createRealTimeProduct(updatedProductData);
+        
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
+
+        toast.success('Real-time product created successfully!');
+        navigate('/real-time');
+        return;
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error('Failed to upload file');
+        setLoading(false);
+        return;
+      }
+    }
+
+    // If no file is selected at all
+    if (!selectedFile) {
+      toast.error('Please select a media file');
+      setLoading(false);
+      return;
+    }
+
+    // Final check to ensure we have a media_url
+    if (!formData.media_url) {
+      toast.error('Media file is required');
+      setLoading(false);
       return;
     }
 
@@ -202,7 +234,7 @@ export default function CreateRealTimeProductPage() {
             </label>
             
             {!previewUrl ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-orange-400 transition-colors cursor-pointer">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -210,26 +242,24 @@ export default function CreateRealTimeProductPage() {
                   onChange={handleFileSelect}
                   className="hidden"
                 />
-                <div className="space-y-4">
-                  <div className="flex justify-center space-x-4">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                    >
-                      <Camera className="w-4 h-4" />
-                      <span>Upload Image</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      <Video className="w-4 h-4" />
-                      <span>Upload Video</span>
-                    </button>
+                <div 
+                  className="space-y-4 cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="flex justify-center">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Plus className="w-8 h-8 text-orange-500" />
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500">
+                  <div>
+                    <p className="text-lg font-medium text-gray-700">
+                      Upload Photo or Video
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Click to select your media file
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-400">
                     Supported: JPEG, PNG, WebP, MP4, WebM, OGG (Max: 5MB images, 50MB videos)
                   </p>
                 </div>
@@ -260,15 +290,23 @@ export default function CreateRealTimeProductPage() {
             )}
 
             {selectedFile && !formData.media_url && (
-              <button
-                type="button"
-                onClick={handleUpload}
-                disabled={uploading}
-                className="mt-4 w-full flex items-center justify-center space-x-2 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
-              >
-                <Upload className="w-4 h-4" />
-                <span>{uploading ? 'Uploading...' : 'Upload File'}</span>
-              </button>
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  {formData.media_type === 'video' ? (
+                    <Video className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <Camera className="w-5 h-5 text-blue-600" />
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-blue-700">
+                      File selected: {selectedFile.name}
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      {formData.media_type === 'video' ? 'Video' : 'Image'} will be uploaded when you create the product
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
@@ -317,7 +355,7 @@ export default function CreateRealTimeProductPage() {
               }}
             >
               <Clock className="w-4 h-4" />
-              <span>{loading ? 'Creating...' : 'Create Real-time Product'}</span>
+              <span>{loading ? 'Creating...' : 'Create Product'}</span>
             </button>
             <p 
               className="text-xs text-center mt-2"

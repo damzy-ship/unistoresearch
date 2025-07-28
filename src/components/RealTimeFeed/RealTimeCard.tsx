@@ -66,8 +66,8 @@ export default function RealTimeCard({ product, onClick }: RealTimeCardProps) {
                   onError={handleImageError}
                 />
                 
-                {/* Video Overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                {/* Video Overlay - Only show on hover */}
+                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="bg-white bg-opacity-90 rounded-full p-2">
                     <Play className="w-6 h-6 text-gray-800 fill-current" />
                   </div>

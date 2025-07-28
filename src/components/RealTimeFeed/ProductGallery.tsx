@@ -115,6 +115,7 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
                     controls
                     autoPlay
                     muted
+                    loop
                   />
                   <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-xs backdrop-blur-sm">
                     Video

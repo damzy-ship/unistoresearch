@@ -234,6 +234,22 @@ export default function RealTimeInfiniteScroll({ className = '', onClose }: Real
               const product = products[actualIndex];
               if (product) {
                 handleProductView(product);
+                
+                // Auto-play video if it's a video product
+                if (product.media_type === 'video') {
+                  const video = entry.target.querySelector('video') as HTMLVideoElement;
+                  if (video) {
+                    video.play().catch(() => {
+                      // Ignore autoplay errors
+                    });
+                  }
+                }
+              }
+            } else {
+              // Pause video when out of view
+              const video = entry.target.querySelector('video') as HTMLVideoElement;
+              if (video) {
+                video.pause();
               }
             }
           });
@@ -344,9 +360,22 @@ export default function RealTimeInfiniteScroll({ className = '', onClose }: Real
                         className="w-full h-full object-cover"
                         muted
                         loop
-                        autoPlay={index === currentIndex}
                         onMouseEnter={(e) => (e.target as HTMLVideoElement).play()}
                         onMouseLeave={(e) => (e.target as HTMLVideoElement).pause()}
+                        onPlay={() => {
+                          // Hide any play button when video starts playing
+                          const playButton = document.querySelector(`[data-video-id="${actualProduct.id}"]`);
+                          if (playButton) {
+                            (playButton as HTMLElement).style.display = 'none';
+                          }
+                        }}
+                        onPause={() => {
+                          // Show play button when video is paused
+                          const playButton = document.querySelector(`[data-video-id="${actualProduct.id}"]`);
+                          if (playButton) {
+                            (playButton as HTMLElement).style.display = 'flex';
+                          }
+                        }}
                       />
                     ) : (
                       <img
@@ -374,9 +403,23 @@ export default function RealTimeInfiniteScroll({ className = '', onClose }: Real
                       </div>
                     )}
 
-                    {/* Play Button for Videos */}
+                    {/* Play Button for Videos - Only show when paused */}
                     {actualProduct.media_type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      <div 
+                        data-video-id={actualProduct.id}
+                        className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const video = e.currentTarget.previousElementSibling as HTMLVideoElement;
+                          if (video) {
+                            if (video.paused) {
+                              video.play();
+                            } else {
+                              video.pause();
+                            }
+                          }
+                        }}
+                      >
                         <div className="w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center">
                           <Play className="w-8 h-8 text-white ml-1" />
                         </div>

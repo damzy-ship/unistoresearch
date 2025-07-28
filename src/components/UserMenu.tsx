@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, LogOut, History, Settings } from 'lucide-react';
+import { User, LogOut, History, Settings, Plus, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
@@ -98,6 +98,28 @@ export default function UserMenu() {
                 >
                   <User className="w-4 h-4" />
                   Profile & Themes
+                </button>
+                
+                <button
+                  onClick={() => {
+                    navigate('/create-real-time-product');
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Product
+                </button>
+                
+                <button
+                  onClick={() => {
+                    navigate('/real-time');
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Zap className="w-4 h-4" />
+                  Real-time Feed
                 </button>
                 
                 <button

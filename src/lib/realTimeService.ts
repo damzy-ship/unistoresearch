@@ -4,7 +4,7 @@ import { extractProductInfoFromText } from './gemini';
 
 export interface RealTimeProduct {
   id: string;
-  merchant_id: string;
+  merchant_id: string; // UUID of the merchant
   title: string;
   description?: string;
   price?: number;
@@ -148,6 +148,84 @@ export async function getRealTimeProductsByMerchant(merchantId: string): Promise
 }
 
 /**
+ * Get or create merchant record for current user
+ */
+async function getOrCreateUserMerchant(): Promise<string | null> {
+  try {
+    const userId = await getUserId();
+    if (!userId) return null;
+
+    // First try to find existing merchant
+    const { data: existingMerchant } = await supabase
+      .from('merchants')
+      .select('id')
+      .eq('seller_id', userId)
+      .single();
+
+    if (existingMerchant) {
+      return existingMerchant.id;
+    }
+
+    // Get user info to use their actual university
+    const { data: userData } = await supabase
+      .from('unique_visitors')
+      .select('phone_number, full_name, school_name')
+      .eq('auth_user_id', userId)
+      .single();
+
+    // If no merchant exists, create one with user's actual info
+    const { data: newMerchant, error: createError } = await supabase
+      .from('merchants')
+      .insert({
+        seller_id: userId,
+        email: `${userId}@realtime.com`, // Generate email from user ID
+        full_name: userData?.full_name || 'Real-time User',
+        phone_number: userData?.phone_number || '+234000000000',
+        school_name: userData?.school_name || 'Bingham University', // Use user's actual university
+        seller_description: 'Real-time product seller',
+        is_billing_active: true
+      })
+      .select('id')
+      .single();
+
+    if (createError) {
+      console.error('Error creating merchant:', createError);
+      return null;
+    }
+
+    return newMerchant.id;
+  } catch (error) {
+    console.error('Error getting or creating merchant:', error);
+    return null;
+  }
+}
+
+/**
+ * Get user contact info from profile
+ */
+async function getUserContactInfo(): Promise<{ phone?: string; location?: string }> {
+  try {
+    const userId = await getUserId();
+    if (!userId) return {};
+
+    // Get user info from unique_visitors table
+    const { data: userData } = await supabase
+      .from('unique_visitors')
+      .select('phone_number, full_name, school_name')
+      .eq('auth_user_id', userId)
+      .single();
+
+    return {
+      phone: userData?.phone_number || undefined,
+      location: userData?.school_name || undefined
+    };
+  } catch (error) {
+    console.error('Error getting user contact info:', error);
+    return {};
+  }
+}
+
+/**
  * Create a new real-time product
  */
 export async function createRealTimeProduct(productData: CreateRealTimeProductData): Promise<{
@@ -160,6 +238,16 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
     if (!authenticated) {
       return { data: null, error: 'User must be authenticated to create real-time products' };
     }
+
+    // Get or create merchant record for current user
+    const merchantId = await getOrCreateUserMerchant();
+    if (!merchantId) {
+      return { data: null, error: 'Could not create merchant record' };
+    }
+
+    // Get user contact info
+    const userContactInfo = await getUserContactInfo();
+    console.log('User contact info:', userContactInfo);
 
     // Use Gemini to extract additional information from title and description
     let enhancedProductData = { ...productData };
@@ -175,20 +263,42 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
           // Merge extracted data with original data (only if not already provided)
           enhancedProductData = {
             ...productData,
-            price: productData.price || extractionResult.price || null,
-            location: productData.location || extractionResult.location || null,
-            category: productData.category || extractionResult.category || null,
-            contact_phone: productData.contact_phone || extractionResult.contact_phone || null
+            price: productData.price || extractionResult.price || undefined,
+            location: productData.location || extractionResult.location || userContactInfo.location || undefined,
+            category: productData.category || extractionResult.category || undefined,
+            contact_phone: productData.contact_phone || extractionResult.contact_phone || userContactInfo.phone || undefined
           };
           
           console.log('Gemini extraction successful:', extractionResult);
+          console.log('Final product data:', enhancedProductData);
         } else {
           console.warn('Gemini extraction failed:', extractionResult.error);
+          // Still use user contact info even if Gemini fails
+          enhancedProductData = {
+            ...productData,
+            location: productData.location || userContactInfo.location || undefined,
+            contact_phone: productData.contact_phone || userContactInfo.phone || undefined
+          };
+          console.log('Using user contact info (Gemini failed):', enhancedProductData);
         }
       } catch (error) {
         console.warn('Gemini extraction error:', error);
-        // Continue with original data if extraction fails
+        // Use user contact info as fallback
+        enhancedProductData = {
+          ...productData,
+          location: productData.location || userContactInfo.location || undefined,
+          contact_phone: productData.contact_phone || userContactInfo.phone || undefined
+        };
+        console.log('Using user contact info (Gemini error):', enhancedProductData);
       }
+    } else {
+      // No title/description, use user contact info
+      enhancedProductData = {
+        ...productData,
+        location: productData.location || userContactInfo.location || undefined,
+        contact_phone: productData.contact_phone || userContactInfo.phone || undefined
+      };
+      console.log('Using user contact info (no title/description):', enhancedProductData);
     }
 
     // Set expiration to 24 hours from now
@@ -199,6 +309,7 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
       .from('real_time_products')
       .insert({
         ...enhancedProductData,
+        merchant_id: merchantId,
         expires_at: expiresAt.toISOString()
       })
       .select()
