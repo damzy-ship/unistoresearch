@@ -35,7 +35,7 @@ export async function uploadRealTimeImage(
     const filePath = `real-time-products/images/${fileName}`;
 
     const { data, error } = await supabase.storage
-      .from('unistore-storage')
+      .from('product-images')
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false
@@ -48,7 +48,7 @@ export async function uploadRealTimeImage(
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('unistore-storage')
+      .from('product-images')
       .getPublicUrl(filePath);
 
     return {
@@ -88,7 +88,7 @@ export async function uploadRealTimeVideo(
     const filePath = `real-time-products/videos/${fileName}`;
 
     const { data, error } = await supabase.storage
-      .from('unistore-storage')
+      .from('product-images')
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false
@@ -101,7 +101,7 @@ export async function uploadRealTimeVideo(
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('unistore-storage')
+      .from('product-images')
       .getPublicUrl(filePath);
 
     // Get video metadata
@@ -160,7 +160,7 @@ export async function deleteRealTimeFile(filePath: string): Promise<{
 }> {
   try {
     const { error } = await supabase.storage
-      .from('unistore-storage')
+      .from('product-images')
       .remove([filePath]);
 
     if (error) {
@@ -216,7 +216,7 @@ export async function generateVideoThumbnail(
           const filePath = `real-time-products/videos/${fileName}`;
 
           const { data, error } = await supabase.storage
-            .from('unistore-storage')
+            .from('product-images')
             .upload(filePath, thumbnailFile, {
               cacheControl: '3600',
               upsert: false
@@ -230,7 +230,7 @@ export async function generateVideoThumbnail(
 
           // Get public URL
           const { data: urlData } = supabase.storage
-            .from('unistore-storage')
+            .from('product-images')
             .getPublicUrl(filePath);
 
           resolve({

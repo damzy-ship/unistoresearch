@@ -1,19 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Upload, Camera, Video, X, Clock, MapPin, Tag, DollarSign } from 'lucide-react';
+import { ArrowLeft, Upload, Camera, Video, X, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createRealTimeProduct } from '../lib/realTimeService';
 import { uploadRealTimeImage, uploadRealTimeVideo, validateRealTimeFile, compressImage } from '../lib/realTimeStorage';
 import { toast } from 'sonner';
-import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
 
 interface FormData {
   title: string;
   description: string;
-  price: string;
-  location: string;
-  contact_phone: string;
-  category: string;
   media_url: string;
   media_type: 'image' | 'video';
   duration?: number;
@@ -25,10 +20,6 @@ export default function CreateRealTimeProductPage() {
   const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
-    price: '',
-    location: '',
-    contact_phone: '',
-    category: '',
     media_url: '',
     media_type: 'image',
     duration: undefined
@@ -104,53 +95,44 @@ export default function CreateRealTimeProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check authentication
-    const authenticated = await isAuthenticated();
-    if (!authenticated) {
-      toast.error('Please log in to create real-time products');
-      return;
-    }
-
-    // Validate form
-    if (!formData.title.trim()) {
-      toast.error('Please enter a product title');
-      return;
-    }
-
     if (!formData.media_url) {
       toast.error('Please upload a media file');
       return;
     }
 
-    if (!formData.price.trim()) {
-      toast.error('Please enter a price');
+    if (!formData.title.trim()) {
+      toast.error('Please enter a title');
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast.error('Please enter a description');
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await createRealTimeProduct({
-        title: formData.title,
-        description: formData.description,
-        price: parseFloat(formData.price),
-        location: formData.location,
-        contact_phone: formData.contact_phone,
-        category: formData.category,
+      // Create product with only essential fields
+      const productData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
         media_url: formData.media_url,
         media_type: formData.media_type,
         duration: formData.duration
-      });
+      };
 
-      if (error) {
-        toast.error(error);
+      const result = await createRealTimeProduct(productData);
+      
+      if (result.error) {
+        toast.error(result.error);
         return;
       }
 
       toast.success('Real-time product created successfully!');
       navigate('/real-time');
     } catch (error) {
-      console.error('Error creating product:', error);
-      toast.error('Failed to create product');
+      console.error('Error creating real-time product:', error);
+      toast.error('Failed to create real-time product');
     } finally {
       setLoading(false);
     }
@@ -164,11 +146,6 @@ export default function CreateRealTimeProductPage() {
       fileInputRef.current.value = '';
     }
   };
-
-  const categories = [
-    'Electronics', 'Clothing', 'Books', 'Food Items', 'Accessories', 
-    'Sports', 'Beauty', 'Home & Garden', 'Automotive', 'Other'
-  ];
 
   return (
     <div 
@@ -300,13 +277,13 @@ export default function CreateRealTimeProductPage() {
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Title *
+                Title *
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="e.g., iPhone 13 Pro Max - Excellent Condition"
+                placeholder="Enter product title..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 maxLength={100}
               />
@@ -315,7 +292,7 @@ export default function CreateRealTimeProductPage() {
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                Description *
               </label>
               <textarea
                 value={formData.description}
@@ -326,85 +303,13 @@ export default function CreateRealTimeProductPage() {
                 maxLength={500}
               />
             </div>
-
-            {/* Price and Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (NGN) *
-                </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="number"
-                    value={formData.price}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="e.g., Campus Hostel, Block A"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Category and Contact */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
-                </label>
-                <div className="relative">
-                  <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Phone
-                </label>
-                <input
-                  type="tel"
-                  value={formData.contact_phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contact_phone: e.target.value }))}
-                  placeholder="+234..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-            </div>
           </div>
 
           {/* Submit Button */}
           <div className="mt-8">
             <button
               type="submit"
-              disabled={loading || !formData.media_url}
+              disabled={false}
               className="w-full flex items-center justify-center space-x-2 py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               style={{ 
                 background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.accent})`,

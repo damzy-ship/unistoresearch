@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { getUserId, isAuthenticated } from '../hooks/useTracking';
+import { extractProductInfoFromText } from './gemini';
 
 export interface RealTimeProduct {
   id: string;
@@ -160,6 +161,36 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
       return { data: null, error: 'User must be authenticated to create real-time products' };
     }
 
+    // Use Gemini to extract additional information from title and description
+    let enhancedProductData = { ...productData };
+    
+    if (productData.title && productData.description) {
+      try {
+        const extractionResult = await extractProductInfoFromText(
+          productData.title, 
+          productData.description
+        );
+        
+        if (extractionResult.success) {
+          // Merge extracted data with original data (only if not already provided)
+          enhancedProductData = {
+            ...productData,
+            price: productData.price || extractionResult.price || null,
+            location: productData.location || extractionResult.location || null,
+            category: productData.category || extractionResult.category || null,
+            contact_phone: productData.contact_phone || extractionResult.contact_phone || null
+          };
+          
+          console.log('Gemini extraction successful:', extractionResult);
+        } else {
+          console.warn('Gemini extraction failed:', extractionResult.error);
+        }
+      } catch (error) {
+        console.warn('Gemini extraction error:', error);
+        // Continue with original data if extraction fails
+      }
+    }
+
     // Set expiration to 24 hours from now
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
@@ -167,7 +198,7 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
     const { data, error } = await supabase
       .from('real_time_products')
       .insert({
-        ...productData,
+        ...enhancedProductData,
         expires_at: expiresAt.toISOString()
       })
       .select()

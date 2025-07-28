@@ -56,6 +56,15 @@ export interface MerchantMatchResult {
   error?: string;
 }
 
+export interface ProductExtractionResult {
+  price?: number;
+  location?: string;
+  category?: string;
+  contact_phone?: string;
+  success: boolean;
+  error?: string;
+}
+
 export async function generateProductCategories(sellerDescription: string): Promise<CategoryGenerationResult> {
   if (!genAI) {
     return {
@@ -739,5 +748,80 @@ async function findMerchantsByCategories(
   } catch (error) {
     console.error('Error finding merchants by categories with fair visibility:', error);
     return { merchants: [], sellerCategories: {} };
+  }
+}
+
+export async function extractProductInfoFromText(
+  title: string, 
+  description: string
+): Promise<ProductExtractionResult> {
+  if (!genAI) {
+    return {
+      success: false,
+      error: 'Gemini API key not configured'
+    };
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+    const prompt = `
+Extract product information from the following title and description. Return ONLY a JSON object with the extracted information.
+
+Title: "${title}"
+Description: "${description}"
+
+Requirements:
+- Return ONLY a JSON object with these fields:
+  - price: number (extract price in NGN, if mentioned)
+  - location: string (extract location if mentioned, e.g., "Campus Hostel", "Block A")
+  - category: string (extract product category, e.g., "Electronics", "Clothing", "Books")
+  - contact_phone: string (extract phone number if mentioned)
+
+- If a field is not found, set it to null
+- Price should be a number (remove currency symbols)
+- Category should be 1-3 words maximum
+- Location should be specific but concise
+- Phone should be in format like "+234..." or "080..."
+
+Example response format:
+{
+  "price": 50000,
+  "location": "Campus Hostel Block A",
+  "category": "Electronics",
+  "contact_phone": null
+}
+
+Extract information now:`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text().trim();
+
+    // Extract JSON from markdown code blocks if present
+    let jsonText = text;
+    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (codeBlockMatch) {
+      jsonText = codeBlockMatch[1].trim();
+    } else if (text.startsWith('```') && text.endsWith('```')) {
+      jsonText = text.slice(3, -3).trim();
+    }
+
+    // Parse JSON response
+    const extractedData = JSON.parse(jsonText);
+
+    return {
+      price: extractedData.price || null,
+      location: extractedData.location || null,
+      category: extractedData.category || null,
+      contact_phone: extractedData.contact_phone || null,
+      success: true
+    };
+  } catch (error) {
+    console.error('Error extracting product info with Gemini:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to extract product information'
+    };
   }
 }
