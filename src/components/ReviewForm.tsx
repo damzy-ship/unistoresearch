@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Star, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getUserId } from '../hooks/useTracking';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useTheme } from '../hooks/useTheme';
 
 export default function ReviewForm() {
@@ -135,8 +135,7 @@ export default function ReviewForm() {
                 backgroundColor: currentTheme.background,
                 borderColor: rating > 0 ? currentTheme.primary : currentTheme.textSecondary + '30',
                 color: currentTheme.text,
-                boxShadow: rating > 0 ? `0 0 20px ${currentTheme.primary}20` : undefined,
-                // focusRingColor: currentTheme.primary
+                boxShadow: rating > 0 ? `0 0 20px ${currentTheme.primary}20` : undefined
               }}
               rows={4}
               placeholder="Tell us about your experience with UniStore..."
@@ -241,38 +240,7 @@ export default function ReviewForm() {
         </form>
       </div>
 
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        @keyframes neon-border {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        
-        @keyframes neon-glow {
-          0%, 100% { 
-            background-position: 0% 50%;
-            transform: scale(1);
-          }
-          50% { 
-            background-position: 100% 50%;
-            transform: scale(1.02);
-          }
-        }
-        
-        @keyframes gradient-shift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        
-        @keyframes pulse-glow {
-          0%, 100% { 
-            box-shadow: 0 10px 30px ${currentTheme.primary}40;
-          }
-          50% { 
-            box-shadow: 0 15px 40px ${currentTheme.primary}60;
-          }
-        }
-      `}</style>
+
     </div>
   );
 }

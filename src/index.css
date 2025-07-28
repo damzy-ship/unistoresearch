@@ -126,6 +126,37 @@
   overflow: hidden;
 }
 
+/* Review Form Animations */
+@keyframes neon-border {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes neon-glow {
+  0%, 100% { 
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  50% { 
+    background-position: 100% 50%;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 10px 30px rgba(251, 191, 36, 0.4);
+  }
+  50% { 
+    box-shadow: 0 15px 40px rgba(251, 191, 36, 0.6);
+  }
+}
+
 .animate-neon-border {
   animation: neon-border 3s ease-in-out infinite;
 }
