@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Virtual, Navigation, Pagination } from 'swiper/modules';
-import { ChevronLeft, ChevronRight, Eye, Clock, MapPin, Tag, Play, MessageCircle, Phone, Share2, X, Heart } from 'lucide-react';
+import { Eye, Clock, MapPin, Tag, Play, MessageCircle, Phone, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getActiveRealTimeProducts, trackRealTimeProductView, formatRelativeTime, getTimeRemaining, trackRealTimeProductContact } from '../../lib/realTimeService';
 import { RealTimeProduct } from '../../lib/realTimeService';
@@ -17,17 +17,16 @@ import 'swiper/css/pagination';
 
 interface RealTimeSwiperProps {
   className?: string;
-  onProductClick?: (product: RealTimeProduct) => void;
 }
 
-export default function RealTimeSwiper({ className = '', onProductClick }: RealTimeSwiperProps) {
+export default function RealTimeSwiper({ className = '' }: RealTimeSwiperProps) {
   const [products, setProducts] = useState<RealTimeProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<RealTimeProduct | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [detailsProduct, setDetailsProduct] = useState<RealTimeProduct | null>(null);
-  const swiperRef = useRef<any>(null);
+  const swiperRef = useRef<{ slidePrev: () => void; slideNext: () => void } | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -90,25 +89,7 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
     }
   };
 
-  const handleShare = async (product: RealTimeProduct) => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: product.title,
-          text: product.description || `Check out this product: ${product.title}`,
-          url: window.location.href,
-        });
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success('Link copied to clipboard!');
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-      toast.error('Failed to share');
-    }
-  };
-
-  const handleSlideChange = (swiper: any) => {
+  const handleSlideChange = () => {
     // Optional: Track slide changes
   };
 
@@ -153,8 +134,8 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">Just In</h3>
-            <p className="text-sm text-gray-600">Latest real-time products from your campus</p>
+            <h3 className="text-2xl font-bold text-orange-500 mb-1">Just In</h3>
+            <p className="text-sm text-gray-500">Latest real-time products from your campus</p>
           </div>
           <button
             onClick={() => window.location.href = '/real-time'}
@@ -173,7 +154,7 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
           loop={true}
           virtual={true}
           onSlideChange={handleSlideChange}
-          className="h-80"
+          className="h-96"
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
@@ -203,11 +184,11 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
           {products.map((product, index) => (
             <SwiperSlide key={product.id} virtualIndex={index}>
               <div 
-                className="relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 w-full max-w-sm mx-auto group"
+                className="relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 w-full max-w-sm mx-auto group h-full"
                 onClick={() => handleProductClick(product)}
               >
                 {/* Media Container */}
-                <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                <div className="relative h-64 bg-gray-100 overflow-hidden">
                   {product.media_type === 'video' ? (
                     <div className="relative w-full h-full">
                       <img
@@ -274,10 +255,10 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
                 </div>
 
                 {/* Content */}
-                <div className="p-5">
+                <div className="p-4">
                   {/* Location */}
                   {product.location && (
-                    <div className="flex items-center space-x-1 text-gray-500 text-sm mb-3">
+                    <div className="flex items-center space-x-1 text-gray-500 text-sm mb-2">
                       <MapPin className="w-4 h-4 flex-shrink-0" />
                       <span className="truncate">{product.location}</span>
                     </div>
@@ -285,13 +266,13 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
 
                   {/* Category */}
                   {product.category && (
-                    <div className="inline-block bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full mb-3 font-medium">
+                    <div className="inline-block bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full mb-2 font-medium">
                       {product.category}
                     </div>
                   )}
 
                   {/* Stats */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                  <div className="flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center space-x-1">
                         <Eye className="w-3 h-3" />
@@ -307,51 +288,6 @@ export default function RealTimeSwiper({ className = '', onProductClick }: RealT
                     <div className="text-xs text-gray-400">
                       {formatRelativeTime(product.created_at)}
                     </div>
-                  </div>
-
-                  {/* Merchant Info */}
-                  {product.merchant && (
-                    <div className="pt-3 border-t border-gray-100">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-xs font-bold">
-                            {product.merchant.full_name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-gray-900 truncate">
-                            {product.merchant.full_name}
-                          </p>
-                          {product.merchant.average_rating && (
-                            <div className="flex items-center space-x-1">
-                              <span className="text-yellow-500 text-xs">★</span>
-                              <span className="text-xs text-gray-500">
-                                {product.merchant.average_rating.toFixed(1)} ({product.merchant.total_ratings})
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Reaction Counts */}
-                  <div className="flex items-center gap-3 mt-3 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <span className="text-red-500">❤️</span>
-                      <span>{product.reactions_count || 0}</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="text-blue-500">💬</span>
-                      <span>{product.comments_count || 0}</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="bg-white bg-opacity-90 rounded-full p-3">
-                    <Play className="w-6 h-6 text-gray-800" />
                   </div>
                 </div>
               </div>
