@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, ArrowLeft, History } from 'lucide-react';
+import { Send, ArrowLeft, History, Edit3, Camera } from 'lucide-react';
 import { useTracking, isAuthenticated } from '../hooks/useTracking';
 import { findMerchantsForRequest, MerchantWithCategories } from '../lib/gemini';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
 import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
+import CreateRealtimeModal from '../components/RealTimeFeed/CreateRealtimeModal';
 import { useTheme } from '../hooks/useTheme';
 import { Toaster } from 'sonner';
 
@@ -28,6 +29,8 @@ export default function HomePage() {
   const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
   const [showRetryPrompt, setShowRetryPrompt] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createMode, setCreateMode] = useState<'text' | 'image'>('text');
   const { trackRequest } = useTracking();
   const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
@@ -140,14 +143,6 @@ export default function HomePage() {
     handleSearchRequest({ preventDefault: () => {} } as React.FormEvent);
   };
 
-  const handleDirectWhatsApp = () => {
-    // Fallback to direct WhatsApp contact
-    const phoneNumber = "2349060859789";
-    const message = `Hi! I'm looking for the following from ${university} University: ${request}`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-  };
-
   return (
     <main 
       className="flex min-h-screen flex-col items-center justify-center px-4 py-8 transition-colors duration-300"
@@ -256,6 +251,41 @@ export default function HomePage() {
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
             <RealTimeSwiper className="mb-8" />
           </div>
+
+          {/* Floating Action Buttons - WhatsApp Style */}
+          <div className="fixed bottom-24 right-6 z-50 flex flex-col gap-3">
+            {/* Text Post Button */}
+            <button
+              onClick={() => {
+                setCreateMode('text');
+                setShowCreateModal(true);
+              }}
+              className="w-14 h-14 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+              title="Create text post"
+            >
+              <Edit3 className="w-6 h-6" />
+            </button>
+            
+            {/* Image Post Button */}
+            <button
+              onClick={() => {
+                setCreateMode('image');
+                setShowCreateModal(true);
+              }}
+              className="w-16 h-16 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+              title="Create image post"
+            >
+              <Camera className="w-7 h-7" />
+            </button>
+          </div>
+
+          {/* Create Realtime Modal */}
+          {showCreateModal && (
+            <CreateRealtimeModal
+              mode={createMode}
+              onClose={() => setShowCreateModal(false)}
+            />
+          )}
 
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">

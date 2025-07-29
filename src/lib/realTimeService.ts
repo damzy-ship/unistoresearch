@@ -22,6 +22,9 @@ export interface RealTimeProduct {
   expires_at: string;
   created_at: string;
   updated_at: string;
+  // Text post specific fields
+  text_color?: string;
+  is_text_post?: boolean;
   // Joined data
   merchant?: {
     full_name: string;
@@ -57,6 +60,8 @@ export interface CreateRealTimeProductData {
   media_url: string;
   media_type: 'image' | 'video';
   duration?: number;
+  text_color?: string;
+  is_text_post?: boolean;
 }
 
 export interface RealTimeProductReaction {
@@ -252,11 +257,11 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
     // Use Gemini to extract additional information from title and description
     let enhancedProductData = { ...productData };
     
-    if (productData.title && productData.description) {
+    if (productData.title) {
       try {
         const extractionResult = await extractProductInfoFromText(
           productData.title, 
-          productData.description
+          productData.description || '' // Use empty string if no description
         );
         
         if (extractionResult.success) {
@@ -292,13 +297,13 @@ export async function createRealTimeProduct(productData: CreateRealTimeProductDa
         console.log('Using user contact info (Gemini error):', enhancedProductData);
       }
     } else {
-      // No title/description, use user contact info
+      // No title, use user contact info
       enhancedProductData = {
         ...productData,
         location: productData.location || userContactInfo.location || undefined,
         contact_phone: productData.contact_phone || userContactInfo.phone || undefined
       };
-      console.log('Using user contact info (no title/description):', enhancedProductData);
+      console.log('Using user contact info (no title):', enhancedProductData);
     }
 
     // Set expiration to 24 hours from now

@@ -160,3 +160,31 @@
 .animate-neon-border {
   animation: neon-border 3s ease-in-out infinite;
 }
+
+/* Custom animations */
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Swiper Pagination Outside Cards */
+.swiper-pagination-outside {
+  margin-top: 1.5rem;
+}
+
+.swiper-pagination-outside .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #d1d5db;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-outside .swiper-pagination-bullet-active {
+  background: #f97316;
+  opacity: 1;
+  transform: scale(1.2);
+}

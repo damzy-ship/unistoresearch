@@ -22,23 +22,23 @@ function App() {
       className="min-h-screen transition-colors duration-300"
       style={{ backgroundColor: currentTheme.background }}
     >
-      <Router>
+    <Router>
         <Toaster position="top-center" richColors />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/landing-page" element={<LandingPage />} />
-          <Route path="/past-requests" element={<PastRequestsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/sellers" element={<SellersPage />} />
-          <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-          <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
-          <Route path="/billing/callback" element={<BillingCallbackPage />} />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/landing-page" element={<LandingPage />} />
+        <Route path="/past-requests" element={<PastRequestsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/sellers" element={<SellersPage />} />
+        <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
+        <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
+        <Route path="/billing/callback" element={<BillingCallbackPage />} />
           <Route path="/real-time" element={<RealTimePage />} />
           <Route path="/create-real-time-product" element={<CreateRealTimeProductPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/test-categories" element={<CategoryTest />} />
-        </Routes>
-      </Router>
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/test-categories" element={<CategoryTest />} />
+      </Routes>
+    </Router>
     </div>
   );
 }

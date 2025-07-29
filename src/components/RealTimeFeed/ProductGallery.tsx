@@ -225,10 +225,11 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 text-gray-700">
+              {/* Views - COMMENTED OUT FOR NOW */}
+              {/* <div className="flex items-center gap-2 text-gray-700">
                 <Eye className="w-4 h-4 text-orange-500" />
                 <span>{product.views_count} views</span>
-              </div>
+              </div> */}
             </div>
 
             {/* Merchant Info */}
@@ -275,9 +276,8 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
               </div>
             )}
 
-            {/* Reactions and Comments */}
-            <div className="space-y-4">
-              {/* Reactions */}
+            {/* Reactions and Comments - COMMENTED OUT FOR NOW */}
+            {/* <div className="space-y-4">
               <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30">
                 <h3 className="font-semibold text-gray-900 mb-3">Reactions</h3>
                 <ReactionsBar 
@@ -288,7 +288,6 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
                 />
               </div>
 
-              {/* Comments */}
               <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30">
                 <h3 className="font-semibold text-gray-900 mb-3">Comments</h3>
                 <CommentsSection 
@@ -298,7 +297,7 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
                   }}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -24,28 +24,61 @@ export default function RealTimeFeed({
 
   useEffect(() => {
     loadProducts();
+    
+    // Set up realtime polling every 10 seconds
+    const interval = setInterval(() => {
+      loadProducts(true); // Pass true for background updates
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [limit]);
 
-  const loadProducts = async () => {
+  const loadProducts = async (isBackgroundUpdate = false) => {
     try {
-      setLoading(true);
+      // Only show loading on initial load, not on background updates
+      if (!isBackgroundUpdate && products.length === 0) {
+        setLoading(true);
+      }
       setError(null);
 
-      const { data, error: fetchError } = await getActiveRealTimeProducts(limit);
+      const { data, error: fetchError } = await getActiveRealTimeProducts(50); // Get all products
 
       if (fetchError) {
         setError(fetchError);
-        toast.error('Failed to load real-time products');
+        if (!isBackgroundUpdate && products.length === 0) {
+          toast.error('Failed to load real-time products');
+        }
         return;
       }
 
-      setProducts(data || []);
+      if (data) {
+        // If this is a background update and we have existing products,
+        // only add new products without disrupting current view
+        if (isBackgroundUpdate && products.length > 0) {
+          const existingIds = new Set(products.map(p => p.id));
+          const newProducts = data.filter(p => !existingIds.has(p.id));
+          
+          if (newProducts.length > 0) {
+            // Add new products to the beginning without changing current view
+            setProducts(prev => [...newProducts, ...prev]);
+          }
+        } else {
+          // Initial load or no existing products
+          setProducts(data);
+        }
+      } else {
+        setProducts([]);
+      }
     } catch (error) {
       console.error('Error loading real-time products:', error);
       setError('Failed to load real-time products');
-      toast.error('Failed to load real-time products');
+      if (!isBackgroundUpdate && products.length === 0) {
+        toast.error('Failed to load real-time products');
+      }
     } finally {
-      setLoading(false);
+      if (!isBackgroundUpdate) {
+        setLoading(false);
+      }
     }
   };
 
@@ -142,8 +175,8 @@ export default function RealTimeFeed({
           ))}
         </div>
 
-        {/* Stats */}
-        <div className="mt-6 pt-4 border-t border-gray-100">
+        {/* Stats - COMMENTED OUT FOR NOW */}
+        {/* <div className="mt-6 pt-4 border-t border-gray-100">
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
@@ -159,7 +192,7 @@ export default function RealTimeFeed({
               Updates every minute
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Full-screen Viewer */}
