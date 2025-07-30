@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Camera, Edit3, Upload, Palette } from 'lucide-react';
+import { X, Camera, Edit3, Upload, Palette, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { createRealTimeProduct } from '../../lib/realTimeService';
 import { uploadRealTimeImage, compressImage } from '../../lib/realTimeStorage';
