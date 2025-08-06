@@ -9,9 +9,11 @@ import ProductGallery from './ProductGallery';
 
 interface RealTimeInfiniteScrollProps {
   onClose?: () => void;
+  scrollToProduct?: string;
+  selectedProduct?: RealTimeProduct;
 }
 
-export default function RealTimeInfiniteScroll({ onClose }: RealTimeInfiniteScrollProps) {
+export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selectedProduct: initialSelectedProduct }: RealTimeInfiniteScrollProps) {
   const [products, setProducts] = useState<RealTimeProduct[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -21,12 +23,46 @@ export default function RealTimeInfiniteScroll({ onClose }: RealTimeInfiniteScro
   const [heartPosition, setHeartPosition] = useState({ x: 0, y: 0 });
   const [showDetails, setShowDetails] = useState(false);
   const [detailsProduct, setDetailsProduct] = useState<RealTimeProduct | null>(null);
+  const [isFromStatusBar, setIsFromStatusBar] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastTapRef = useRef<number>(0);
 
   // Create infinite loop by duplicating products - ONLY if more than 1 product
   const infiniteProducts = products.length > 1 ? [...products, ...products, ...products] : products;
+
+  // Handle scroll to specific product when navigating from status bar
+  useEffect(() => {
+    console.log('RealTimeInfiniteScroll: scrollToProduct =', scrollToProduct, 'products.length =', products.length);
+    if (scrollToProduct && products.length > 0) {
+      const productIndex = products.findIndex(p => p.id === scrollToProduct);
+      console.log('RealTimeInfiniteScroll: Found product at index', productIndex);
+      if (productIndex !== -1) {
+        setCurrentIndex(productIndex);
+        setIsFromStatusBar(true); // Mark that we came from status bar
+        
+        // Actually scroll to the product after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          if (containerRef.current) {
+            const itemHeight = containerRef.current.clientHeight;
+            const scrollTop = productIndex * itemHeight;
+            console.log('RealTimeInfiniteScroll: Scrolling to position', scrollTop);
+            containerRef.current.scrollTo({
+              top: scrollTop,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+      }
+    }
+  }, [scrollToProduct, products]);
+
+  // Handle selected product from navigation
+  useEffect(() => {
+    if (initialSelectedProduct) {
+      setSelectedProduct(initialSelectedProduct);
+    }
+  }, [initialSelectedProduct]);
 
   useEffect(() => {
     fetchProducts();
@@ -136,9 +172,11 @@ export default function RealTimeInfiniteScroll({ onClose }: RealTimeInfiniteScro
       // Double tap detected
       handleDoubleTap({ clientX: 0, clientY: 0 } as React.MouseEvent, product);
     } else {
-      // Single tap - show details
-      setDetailsProduct(product);
-      setShowDetails(true);
+      // Single tap - show details only if NOT from status bar
+      if (!isFromStatusBar) {
+        setDetailsProduct(product);
+        setShowDetails(true);
+      }
     }
     
     lastTapRef.current = now;

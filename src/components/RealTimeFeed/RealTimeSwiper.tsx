@@ -318,7 +318,7 @@ export default function RealTimeSwiper({ className = '' }: RealTimeSwiperProps) 
 
                       {/* Category Badge */}
                       {product.category && product.category.trim() && (
-                        <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                        <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">``
                           {product.category}
                         </div>
                       )}

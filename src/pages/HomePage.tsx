@@ -14,6 +14,7 @@ import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
 import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
+import RealTimeStatusBar from '../components/RealTimeFeed/RealTimeStatusBar';
 import CreateRealtimeModal from '../components/RealTimeFeed/CreateRealtimeModal';
 import { useTheme } from '../hooks/useTheme';
 import { Toaster } from 'sonner';
@@ -166,6 +167,11 @@ export default function HomePage() {
           {/* User Menu */}
           <div className="w-full max-w-2xl mx-auto mb-8">
             <Header onAuthClick={() => setShowAuthModal(true)} />
+          </div>
+          
+          {/* Real-time Status Bar */}
+          <div className="w-full mb-4">
+            <RealTimeStatusBar />
           </div>
           
           {/* UniStore Logo */}

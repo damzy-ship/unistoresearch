@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Filter, Search, Play } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { RealTimeProduct, getActiveRealTimeProducts, trackRealTimeProductView, formatRelativeTime } from '../lib/realTimeService';
 import RealTimeInfiniteScroll from '../components/RealTimeFeed/RealTimeInfiniteScroll';
 import { useTheme } from '../hooks/useTheme';
@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 export default function RealTimePage() {
   const { currentTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [products, setProducts] = useState<RealTimeProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +18,13 @@ export default function RealTimePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+
+  // Get navigation state from status bar
+  const scrollToProduct = location.state?.scrollToProduct;
+  const selectedProductFromNav = location.state?.selectedProduct;
+  
+  console.log('RealTimePage: Navigation state =', location.state);
+  console.log('RealTimePage: scrollToProduct =', scrollToProduct);
 
   useEffect(() => {
     loadProducts();
@@ -156,6 +164,8 @@ export default function RealTimePage() {
       <RealTimeInfiniteScroll 
         className="h-screen"
         onClose={() => navigate('/')}
+        scrollToProduct={scrollToProduct}
+        selectedProduct={selectedProductFromNav}
       />
     </div>
   );
