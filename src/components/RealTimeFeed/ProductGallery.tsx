@@ -68,16 +68,18 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center">
-      {/* Blurred Background with Current Image */}
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: `url(${images[currentImageIndex]})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'blur(20px) brightness(0.3)',
-        }}
-      />
+      {/* Blurred Background with Current Image - Only for non-text posts */}
+      {!product.is_text_post && (
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: `url(${images[currentImageIndex]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(20px) brightness(0.3)',
+          }}
+        />
+      )}
       
       <div className="relative w-full max-w-4xl mx-4 bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden max-h-[90vh] z-10">
         {/* Header */}
@@ -103,9 +105,10 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
           </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row">
-          {/* Image Gallery */}
-          <div className="relative lg:w-1/2 bg-gray-100/50">
+        <div className={`flex flex-col ${product.is_text_post ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+          {/* Image Gallery - Only show for non-text posts */}
+          {!product.is_text_post && (
+            <div className="relative lg:w-1/2 bg-gray-100/50">
             <div className="relative aspect-square">
               {product.media_type === 'video' ? (
                 <div className="relative w-full h-full">
@@ -176,11 +179,12 @@ export default function ProductGallery({ product, onClose }: ProductGalleryProps
               </div>
             )}
           </div>
+          )}
 
           {/* Product Details */}
-          <div className="lg:w-1/2 p-6 overflow-y-auto bg-white/80 backdrop-blur-sm">
+          <div className={`${product.is_text_post ? 'lg:w-full' : 'lg:w-1/2'} p-6 overflow-y-auto bg-white/80 backdrop-blur-sm`}>
             {/* Title and Price */}
-            <div className="mb-6">
+            <div className={`mb-6 ${product.is_text_post ? 'text-center' : ''}`}>
               <h1 className="text-2xl font-bold text-gray-900 mb-3">{product.title}</h1>
               {product.price && (
                 <div className="text-3xl font-bold text-orange-600 mb-3">
