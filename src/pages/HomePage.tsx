@@ -254,9 +254,9 @@ export default function HomePage() {
           </div>
           
           {/* Real-time Products Section */}
-          <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
+          {/* <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
             <RealTimeSwiper className="mb-8" />
-          </div>
+          </div> */}
 
           {/* Floating Action Buttons - WhatsApp Style */}
           <div className="fixed bottom-5 right-3 z-50 flex flex-col gap-3">
