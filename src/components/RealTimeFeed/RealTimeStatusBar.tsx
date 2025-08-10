@@ -76,13 +76,13 @@ export default function RealTimeStatusBar({ onProductClick }: RealTimeStatusBarP
   }
 
   return (
-    <div className="w-full px-4 py-3">
-      <div className="max-w-2xl h-[150px] px-2 mx-auto flex items-center gap-3 overflow-x-auto scrollbar-hide">
+    <div className="w-full py-3">
+      <div className="lg:max-w-2xl h-[150px] px-2 mx-auto flex items-center gap-3 overflow-x-auto scrollbar-hide">
         {products.map((product) => (
           <button
             key={product.id}
             onClick={() => handleProductClick(product)}
-            className="flex-shrink-0 w-[120px] h-[140px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-105 cursor-pointer relative group shadow-sm"
+            className="flex-shrink-0 w-[100px] h-[140px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-105 cursor-pointer relative group shadow-sm"
           >
             {product.is_text_post ? (
               // Text post - show colored background with text

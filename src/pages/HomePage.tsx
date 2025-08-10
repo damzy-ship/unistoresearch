@@ -146,7 +146,7 @@ export default function HomePage() {
 
   return (
     <main 
-      className="flex min-h-screen flex-col items-center justify-center px-4 py-8 transition-colors duration-300"
+      className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
       style={{ backgroundColor: currentTheme.background }}
     >
       {/* Background texture overlay */}
@@ -187,7 +187,7 @@ export default function HomePage() {
           </div>
 
           {/* Search Card */}
-          <div className="relative z-10 w-full max-w-2xl mx-auto">
+          <div className="relative px-3 z-10 w-full max-w-2xl mx-auto">
             <div 
               className="p-8 shadow-xl border border-gray-100 rounded-2xl transition-colors duration-300"
               style={{ backgroundColor: currentTheme.surface }}
@@ -259,17 +259,17 @@ export default function HomePage() {
           </div>
 
           {/* Floating Action Buttons - WhatsApp Style */}
-          <div className="fixed bottom-24 right-6 z-50 flex flex-col gap-3">
+          <div className="fixed bottom-20 right-3 z-50 flex flex-col gap-3">
             {/* Text Post Button */}
             <button
               onClick={() => {
                 setCreateMode('text');
                 setShowCreateModal(true);
               }}
-              className="w-14 h-14 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+              className="w-10 h-10 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
               title="Create text post"
             >
-              <Edit3 className="w-6 h-6" />
+              <Edit3 className="w-5 h-5" />
             </button>
             
             {/* Image Post Button */}
@@ -278,10 +278,10 @@ export default function HomePage() {
                 setCreateMode('image');
                 setShowCreateModal(true);
               }}
-              className="w-16 h-16 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+              className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
               title="Create image post"
             >
-              <Camera className="w-7 h-7" />
+              <Camera className="w-5 h-5" />
             </button>
           </div>
 

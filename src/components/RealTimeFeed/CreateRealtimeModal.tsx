@@ -244,7 +244,7 @@ export default function CreateRealtimeModal({ mode, onClose }: CreateRealtimeMod
                     key={color}
                     type="button"
                     onClick={() => setSelectedColor(color)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                    className={`w-[20px] h-[20px] lg:w-[32px] lg:h-[32px] rounded-full border-2 transition-all ${
                       selectedColor === color 
                         ? 'border-gray-800 scale-110' 
                         : 'border-gray-300 hover:scale-105'
