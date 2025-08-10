@@ -34,7 +34,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
         ) : (
           <button
             onClick={onAuthClick}
-            className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${currentTheme.buttonGradient} hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200`}
+            className={`mr-4 flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${currentTheme.buttonGradient} hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200`}
           >
             <LogIn className="w-4 h-4" />
             Sign In

@@ -4,13 +4,13 @@ import { useTracking, isAuthenticated } from '../hooks/useTracking';
 import { findMerchantsForRequest, MerchantWithCategories } from '../lib/gemini';
 import { useNavigate } from 'react-router-dom';
 import SellerResults from '../components/SellerResults';
-import FloatingWhatsApp from '../components/FloatingWhatsApp';
+// import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import ReviewSlider from '../components/ReviewSlider';
 import UniversitySelector from '../components/UniversitySelector';
 import RatingPrompt from '../components/RatingPrompt';
 import UserGreeting from '../components/UserGreeting';
 import AuthModal from '../components/AuthModal';
-import BoltBadge from '../components/BoltBadge';
+// import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
 import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
@@ -259,7 +259,7 @@ export default function HomePage() {
           </div>
 
           {/* Floating Action Buttons - WhatsApp Style */}
-          <div className="fixed bottom-20 right-3 z-50 flex flex-col gap-3">
+          <div className="fixed bottom-5 right-3 z-50 flex flex-col gap-3">
             {/* Text Post Button */}
             <button
               onClick={() => {
@@ -319,8 +319,6 @@ export default function HomePage() {
             </button>
             
     
-            {/* Bolt Badge */}
-            <BoltBadge variant="minimal" />
           </div>
         </div>
       ) : (
@@ -417,7 +415,7 @@ export default function HomePage() {
       )}
       
       {/* Floating WhatsApp Button */}
-      <FloatingWhatsApp isVisible={!showResults} />
+      {/* <FloatingWhatsApp isVisible={!showResults} /> */}
       
       {/* Rating Prompt */}
       <RatingPrompt />

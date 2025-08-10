@@ -171,14 +171,14 @@ export default function RealTimeSwiper({ className = '' }: RealTimeSwiperProps) 
     <>
       <div className={`${className} relative`}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex gap-2 items-start justify-between mb-6 p-4">
           <div>
             <h3 className="text-2xl font-bold text-orange-500 mb-1">Just In</h3>
             <p className="text-sm text-gray-500">Latest real-time products from your campus</p>
           </div>
           <button
             onClick={() => window.location.href = '/real-time'}
-            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-lg"
+            className="w-24 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-lg"
           >
             View All
           </button>
