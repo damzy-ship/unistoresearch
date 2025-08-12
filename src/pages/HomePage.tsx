@@ -165,7 +165,7 @@ export default function HomePage() {
       {!showResults ? (
         <div className="w-full flex flex-col items-center justify-center">
           {/* User Menu */}
-          <div className="w-full max-w-2xl mx-auto mb-8">
+          <div className="w-full max-w-2xl mx-auto mb-4">
             <Header onAuthClick={() => setShowAuthModal(true)} />
           </div>
           
