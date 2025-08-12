@@ -354,7 +354,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
               style={{ scrollSnapAlign: 'center' }}
             >
               {/* Product Card */}
-              <div className="relative w-full max-w-md mx-auto h-[100vh] bg-white rounde overflow-hidden shadow-2xl">
+              <div className="relative w-full max-w-md mx-auto h-[80vh] bg-white rounde overflow-hidden shadow-2xl">
                 {/* Media Container - Full Height */}
                 <div
                   className="relative h-full overflow-hidden cursor-pointer"
