@@ -89,6 +89,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
       }
 
       if (result.data) {
+        console.log('Fetched products:', result.data);
         // If this is a background update and we have existing products,
         // only add new products without disrupting current view
         if (isBackgroundUpdate && products.length > 0) {
@@ -373,7 +374,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                         <div className="absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
                           <Clock className="w-3 h-3" />
                           <span>
-                            {getTimeRemaining(actualProduct.expires_at).hours === 23 ? "" : 23 - getTimeRemaining(actualProduct.expires_at).hours + 'h'} {60 - getTimeRemaining(actualProduct.expires_at).minutes}m ago
+                            {getTimeRemaining(actualProduct.expires_at).hours === 23 ? 60 - getTimeRemaining(actualProduct.expires_at).minutes + "m" : 23 - getTimeRemaining(actualProduct.expires_at).hours + 'h'} ago
                           </span>
                         </div>
                       )}
@@ -544,7 +545,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                         <div className="absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
                           <Clock className="w-3 h-3" />
                           <span>
-                            {getTimeRemaining(actualProduct.expires_at).hours === 23 ? "" : 23 - getTimeRemaining(actualProduct.expires_at).hours + 'h'} {60 - getTimeRemaining(actualProduct.expires_at).minutes}m ago
+                            {getTimeRemaining(actualProduct.expires_at).hours === 23 ? 60 - getTimeRemaining(actualProduct.expires_at).minutes + "m" : 23 - getTimeRemaining(actualProduct.expires_at).hours + 'h'} ago
                           </span>
                         </div>
                       )}
