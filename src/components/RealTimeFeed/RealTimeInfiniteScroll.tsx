@@ -354,7 +354,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
               style={{ scrollSnapAlign: 'center' }}
             >
               {/* Product Card */}
-              <div className="relative w-full max-w-md mx-auto h-[80vh] bg-white rounde overflow-hidden shadow-2xl">
+              <div className="relative w-full max-w-md mx-auto h-[95vh] bg-white rounde overflow-hidden shadow-2xl">
                 {/* Media Container - Full Height */}
                 <div
                   className="relative h-full overflow-hidden cursor-pointer"
@@ -386,7 +386,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                       </div>
 
                       {/* CONTACT BUTTON FOR TEXT */}
-                      <div className=" flex w-full justify-end space-x-2">
+                      <div className=" flex w-full justify-end space-x-2 mb-20">
                         {/* Contact Buttons - SIMPLIFIED */}
                         <button
                           onClick={(e) => {
@@ -495,7 +495,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                             </p>
                           )}
 
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between mb-20">
                             <div className="flex items-center space-x-4">
                               {actualProduct.price && actualProduct.price > 0 && (
                                 <span className="text-2xl font-bold text-orange-400">
