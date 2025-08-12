@@ -1,4 +1,3 @@
-import React from 'react';
 import { Clock, MapPin, Play } from 'lucide-react';
 import { RealTimeProduct, formatRelativeTime, getTimeRemaining } from '../../lib/realTimeService';
 

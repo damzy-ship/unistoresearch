@@ -40,7 +40,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
       if (productIndex !== -1) {
         setCurrentIndex(productIndex);
         setIsFromStatusBar(true); // Mark that we came from status bar
-        
+
         // Actually scroll to the product after a short delay to ensure DOM is ready
         setTimeout(() => {
           if (containerRef.current) {
@@ -66,12 +66,12 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
 
   useEffect(() => {
     fetchProducts();
-    
+
     // Set up realtime polling every 10 seconds
     const interval = setInterval(() => {
       fetchProducts(true); // Pass true for background updates
     }, 10000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -82,19 +82,19 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         setLoading(true);
       }
       const result = await getActiveRealTimeProducts(50);
-      
+
       if (result.error) {
         setError(result.error);
         return;
       }
-      
+
       if (result.data) {
         // If this is a background update and we have existing products,
         // only add new products without disrupting current view
         if (isBackgroundUpdate && products.length > 0) {
           const existingIds = new Set(products.map(p => p.id));
           const newProducts = result.data.filter(p => !existingIds.has(p.id));
-          
+
           if (newProducts.length > 0) {
             // Add new products to the beginning without changing current view
             setProducts(prev => [...newProducts, ...prev]);
@@ -134,10 +134,10 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
           if (entry.isIntersecting) {
             const productId = entry.target.getAttribute('data-product-id');
             const product = products.find(p => p.id === productId);
-            
+
             if (product) {
               handleProductView(product);
-              
+
               // Auto-play video if it's a video product
               if (product.media_type === 'video') {
                 const video = entry.target.querySelector('video') as HTMLVideoElement;
@@ -167,7 +167,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   const handleSingleTap = (product: RealTimeProduct) => {
     const now = Date.now();
     const timeDiff = now - lastTapRef.current;
-    
+
     if (timeDiff < 300) {
       // Double tap detected
       handleDoubleTap({ clientX: 0, clientY: 0 } as React.MouseEvent, product);
@@ -178,38 +178,38 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         setShowDetails(true);
       }
     }
-    
+
     lastTapRef.current = now;
   };
 
   const handleDoubleTap = (e: React.MouseEvent, product: RealTimeProduct) => {
     // Show heart animation
-    setHeartPosition({ x: e.clientX, y: e.clientY });
-    setShowHeart(true);
-    
-    setTimeout(() => {
-      setShowHeart(false);
-    }, 1000);
-    
-    // TODO: Add like functionality - use the product
-    console.log('Liked product:', product.title);
-    toast.success('❤️ Liked!');
+    // setHeartPosition({ x: e.clientX, y: e.clientY });
+    // setShowHeart(true);
+
+    // setTimeout(() => {
+    //   setShowHeart(false);
+    // }, 1000);
+
+    // // TODO: Add like functionality - use the product
+    // console.log('Liked product:', product.title);
+    // toast.success('❤️ Liked!');
   };
 
   const handleContact = async (method: 'whatsapp' | 'call' | 'message') => {
     if (!selectedProduct) return;
-    
+
     try {
       await trackRealTimeProductContact(selectedProduct.id, method);
-      
+
       let url = '';
       const phone = selectedProduct.contact_phone || selectedProduct.merchant?.phone_number;
-      
+
       if (!phone) {
         toast.error('No contact information available');
         return;
       }
-      
+
       switch (method) {
         case 'whatsapp':
           url = `https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I'm interested in your ${selectedProduct.title}`;
@@ -221,7 +221,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
           url = `sms:${phone}?body=Hi! I'm interested in your ${selectedProduct.title}`;
           break;
       }
-      
+
       if (url) {
         window.open(url, '_blank');
       }
@@ -236,7 +236,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     const scrollTop = container.scrollTop;
     const itemHeight = container.clientHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
-    
+
     if (newIndex !== currentIndex && newIndex < products.length) {
       setCurrentIndex(newIndex);
     }
@@ -245,10 +245,10 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   // Auto-scroll to next item
   const scrollToNext = useCallback(() => {
     if (products.length <= 1) return; // Don't scroll if only one product
-    
+
     const nextIndex = (currentIndex + 1) % products.length;
     const container = containerRef.current;
-    
+
     if (container) {
       const itemHeight = container.clientHeight;
       container.scrollTo({
@@ -261,11 +261,11 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   // Auto-scroll every 5 seconds if there are multiple products
   useEffect(() => {
     if (products.length <= 1) return; // Don't auto-scroll if only one product
-    
+
     const interval = setInterval(() => {
       scrollToNext();
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [scrollToNext, products.length]);
 
@@ -285,7 +285,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-center">
           <p className="text-white text-lg mb-4">{error}</p>
-          <button 
+          <button
             onClick={fetchProducts}
             className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
           >
@@ -301,7 +301,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-center">
           <p className="text-white text-lg mb-4">No real-time updates available</p>
-          <button 
+          <button
             onClick={fetchProducts}
             className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
           >
@@ -316,7 +316,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     <div className="fixed inset-0 bg-black z-40">
       {/* Background Blur */}
       {products[currentIndex] && (
-        <div 
+        <div
           className="fixed inset-0 z-0"
           style={{
             backgroundImage: `url(${products[currentIndex].media_url})`,
@@ -336,7 +336,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
       </div> */}
 
       {/* Main Scroll Container */}
-      <div 
+      <div
         ref={containerRef}
         className="relative z-10 h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide"
         style={{ scrollSnapType: 'y mandatory' }}
@@ -345,7 +345,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         {infiniteProducts.map((product, index) => {
           const actualIndex = index % products.length;
           const actualProduct = products[actualIndex];
-          
+
           return (
             <div
               key={`${actualProduct.id}-${index}`}
@@ -356,23 +356,59 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
               {/* Product Card */}
               <div className="relative w-full max-w-md mx-auto h-[95vh] bg-white rounde overflow-hidden shadow-2xl">
                 {/* Media Container - Full Height */}
-                <div 
+                <div
                   className="relative h-full overflow-hidden cursor-pointer"
                   onClick={() => handleSingleTap(actualProduct)}
                   onDoubleClick={(e) => handleDoubleTap(e, actualProduct)}
                 >
                   {actualProduct.is_text_post ? (
                     // Text Post - Full colored background
-                    <div 
-                      className="w-full h-full flex items-center justify-center p-8"
+                    <div
+                      className="w-full h-full flex flex-col items-center justify-center p-8"
                       style={{ backgroundColor: actualProduct.text_color || '#FF6B35' }}
                     >
+
+                      {/* Time Remaining Badge */}
+                      {!getTimeRemaining(actualProduct.expires_at).isExpired && (
+                        <div className="absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
+                          <Clock className="w-3 h-3" />
+                          <span>
+                            {getTimeRemaining(actualProduct.expires_at).hours === 23 ? "" : 23 - getTimeRemaining(actualProduct.expires_at).hours + 'h'} {60 - getTimeRemaining(actualProduct.expires_at).minutes}m ago
+                          </span>
+                        </div>
+                      )}
+
                       <div className="text-center text-white w-full h-full flex items-center justify-center max-w-sm">
-                        <h2 className={`text-2xl font-bold ${
-                          actualProduct.title.length > 50 ? 'text-left' : 'text-center'
-                        }`}>
+                        <h2 className={`text-2xl font-bold ${actualProduct.title.length > 50 ? 'text-left' : 'text-center'
+                          }`}>
                           {actualProduct.title}
                         </h2>
+                      </div>
+
+                      {/* CONTACT BUTTON FOR TEXT */}
+                      <div className=" flex w-full justify-end space-x-2">
+                        {/* Contact Buttons - SIMPLIFIED */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleContact('whatsapp');
+                          }}
+                          className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+                          title="Contact via WhatsApp"
+                        >
+                          <MessageCircle className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleContact('call');
+                          }}
+                          className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
+                          title="Call"
+                        >
+                          <Phone className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -411,7 +447,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
 
                       {/* Animated Heart on Double Tap */}
                       {showHeart && (
-                        <div 
+                        <div
                           className="absolute pointer-events-none z-50"
                           style={{
                             left: heartPosition.x - 50,
@@ -429,7 +465,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
 
                       {/* Play Button for Videos - Only show when paused */}
                       {actualProduct.media_type === 'video' && (
-                        <div 
+                        <div
                           data-video-id={actualProduct.id}
                           className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300"
                           onClick={(e) => {
@@ -452,13 +488,13 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
                         <div className="text-white">
                           <h2 className="text-xl font-bold mb-2">{actualProduct.title}</h2>
-                          
+
                           {actualProduct.description && actualProduct.description.trim() && (
                             <p className="text-sm text-gray-200 mb-3 line-clamp-2">
                               {actualProduct.description}
                             </p>
                           )}
-                          
+
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
                               {actualProduct.price && actualProduct.price > 0 && (
@@ -466,7 +502,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                   ₦{actualProduct.price.toLocaleString()}
                                 </span>
                               )}
-                              
+
                               {actualProduct.location && actualProduct.location.trim() && (
                                 <div className="flex items-center space-x-1 text-sm">
                                   <MapPin className="w-4 h-4" />
@@ -474,7 +510,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                 </div>
                               )}
                             </div>
-                            
+
                             <div className="flex items-center space-x-2">
                               {/* Contact Buttons - SIMPLIFIED */}
                               <button
@@ -487,7 +523,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                               >
                                 <MessageCircle className="w-5 h-5" />
                               </button>
-                              
+
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -508,7 +544,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                         <div className="absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
                           <Clock className="w-3 h-3" />
                           <span>
-                            {getTimeRemaining(actualProduct.expires_at).hours}h {getTimeRemaining(actualProduct.expires_at).minutes}m
+                            {getTimeRemaining(actualProduct.expires_at).hours === 23 ? "" : 23 - getTimeRemaining(actualProduct.expires_at).hours + 'h'} {60 - getTimeRemaining(actualProduct.expires_at).minutes}m ago
                           </span>
                         </div>
                       )}
@@ -552,11 +588,11 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              
+
               {detailsProduct.description && (
                 <p className="text-gray-600 mb-4">{detailsProduct.description}</p>
               )}
-              
+
               <div className="space-y-3">
                 {detailsProduct.price && (
                   <div className="flex items-center justify-between">
@@ -566,14 +602,14 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                     </span>
                   </div>
                 )}
-                
+
                 {detailsProduct.location && (
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Location:</span>
                     <span className="text-gray-900">{detailsProduct.location}</span>
                   </div>
                 )}
-                
+
                 {detailsProduct.category && (
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Category:</span>
@@ -582,13 +618,13 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                     </span>
                   </div>
                 )}
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Posted:</span>
                   <span className="text-gray-900">{formatRelativeTime(detailsProduct.created_at)}</span>
                 </div>
               </div>
-              
+
               {/* Contact Buttons */}
               <div className="flex gap-3 mt-6">
                 <button
@@ -611,13 +647,13 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         </div>
       )}
 
-      {/* Product Gallery Modal */}
-      {selectedProduct && (
+      Product Gallery Modal
+      {/* {selectedProduct && (
         <ProductGallery
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
         />
-      )}
+      )} */}
     </div>
   );
 } 

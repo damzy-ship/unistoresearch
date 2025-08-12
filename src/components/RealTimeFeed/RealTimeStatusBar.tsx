@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getActiveRealTimeProducts, RealTimeProduct } from '../../lib/realTimeService';
 import { useNavigate } from 'react-router-dom';
 
