@@ -369,6 +369,67 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                       style={{ backgroundColor: actualProduct.text_color || '#FF6B35' }}
                     >
 
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+                        <div className="text-white">
+                          {/* <h2 className="text-xl font-bold mb-2">{actualProduct.title}</h2> */}
+
+                          {/* {actualProduct.description && actualProduct.description.trim() && (
+                            <p className="text-sm text-gray-200 mb-3 line-clamp-2">
+                              {actualProduct.description}
+                            </p>
+                          )} */}
+
+                          <div className="flex items-center justify-between mb-20">
+                            <div className="flex items-center space-x-4">
+                              {actualProduct.price && actualProduct.price > 0 && (
+                                <span className="text-2xl font-bold text-orange-400">
+                                  ₦{actualProduct.price.toLocaleString()}
+                                </span>
+                              )}
+
+                              {actualProduct.location && actualProduct.location.trim() && (
+                                <div className="flex items-center space-x-1 text-sm">
+                                  <MapPin className="w-4 h-4" />
+                                  <span>{actualProduct.location}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              {/* Contact Buttons - SIMPLIFIED */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleContact('whatsapp');
+                                }}
+                                className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+                                title="Contact via WhatsApp"
+                              >
+                                <MessageCircle className="w-5 h-5" />
+                              </button>
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleContact('call');
+                                }}
+                                className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
+                                title="Call"
+                              >
+                                <Phone className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Category Badge */}
+                      {actualProduct.category && actualProduct.category.trim() && (
+                        <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs px-3 py-1 rounded-full">
+                          {actualProduct.category}
+                        </div>
+                      )}
+
                       {/* Time Remaining Badge */}
                       {!getTimeRemaining(actualProduct.expires_at).isExpired && (
                         <div className="absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
@@ -387,30 +448,8 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                       </div>
 
                       {/* CONTACT BUTTON FOR TEXT */}
-                      <div className=" flex w-full justify-end space-x-2 mb-20">
-                        {/* Contact Buttons - SIMPLIFIED */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleContact('whatsapp');
-                          }}
-                          className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
-                          title="Contact via WhatsApp"
-                        >
-                          <MessageCircle className="w-5 h-5" />
-                        </button>
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleContact('call');
-                          }}
-                          className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
-                          title="Call"
-                        >
-                          <Phone className="w-5 h-5" />
-                        </button>
-                      </div>
+
                     </div>
                   ) : (
                     // Image/Video Post
