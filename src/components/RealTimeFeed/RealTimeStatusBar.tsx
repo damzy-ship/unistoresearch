@@ -61,7 +61,7 @@ export default function RealTimeStatusBar({ onProductClick }: RealTimeStatusBarP
 
   if (loading) {
     return (
-      <div className="w-full px-4 py-3">
+      <div className="w-full px-4 py-2">
         <div className="max-w-2xl mx-auto flex items-center gap-3 overflow-x-auto">
           <div className="flex-shrink-0 w-24 h-32 bg-gray-200 rounded-xl animate-pulse"></div>
           <div className="flex-shrink-0 w-24 h-32 bg-gray-200 rounded-xl animate-pulse"></div>
@@ -76,7 +76,7 @@ export default function RealTimeStatusBar({ onProductClick }: RealTimeStatusBarP
   }
 
   return (
-    <div className="w-full py-3">
+    <div className="w-full py-2">
       <div className="lg:max-w-2xl h-[150px] px-2 mx-auto flex items-center gap-3 overflow-x-auto scrollbar-hide">
         {products.map((product) => (
           <button

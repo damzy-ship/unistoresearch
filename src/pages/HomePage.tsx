@@ -165,7 +165,7 @@ export default function HomePage() {
       {!showResults ? (
         <div className="w-full flex flex-col items-center justify-center">
           {/* User Menu */}
-          <div className="w-full max-w-2xl mx-auto mb-2">
+          <div className="w-full max-w-2xl mx-auto">
             <Header onAuthClick={() => setShowAuthModal(true)} />
           </div>
           
@@ -175,7 +175,7 @@ export default function HomePage() {
           </div>
           
           {/* UniStore Logo */}
-          <div className="mb-12">
+          <div className="mb-12 px-2">
             <h1 className="text-5xl md:text-6xl text-center font-bold mb-4">
               <span style={{ color: currentTheme.primary }}>uni</span>
               <span style={{ color: currentTheme.secondary }}>store.</span>
