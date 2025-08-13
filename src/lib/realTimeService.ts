@@ -211,18 +211,20 @@ async function getOrCreateUserMerchant(): Promise<string | null> {
 async function getUserContactInfo(): Promise<{ phone?: string; location?: string }> {
   try {
     const userId = await getUserId();
+    // console.log(userId);
     if (!userId) return {};
 
     // Get user info from unique_visitors table
     const { data: userData } = await supabase
       .from('unique_visitors')
-      .select('phone_number, full_name, school_name')
+      .select('phone_number, full_name')
       .eq('auth_user_id', userId)
       .single();
 
+      // console.log('User contact info:', userData);
     return {
       phone: userData?.phone_number || undefined,
-      location: userData?.school_name || undefined
+      // location: userData?.school_name || undefined
     };
   } catch (error) {
     console.error('Error getting user contact info:', error);
