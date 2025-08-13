@@ -543,6 +543,8 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
 
                           <div className="flex items-center justify-between mb-20">
                             <div className="flex items-center space-x-4">
+                              <div className='flex flex-col gap-1'>
+
                               {actualProduct.price && actualProduct.price > 0 && (
                                 <span className="text-2xl font-bold text-orange-400">
                                   ₦{actualProduct.price.toLocaleString()}
@@ -555,6 +557,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                   <span>{actualProduct.location}</span>
                                 </div>
                               )}
+                              </div>
                             </div>
 
                            
