@@ -6,6 +6,8 @@ import { RealTimeProduct } from '../../lib/realTimeService';
 // import ReactionsBar from './ReactionsBar';
 // import CommentsSection from './CommentsSection';
 import ProductGallery from './ProductGallery';
+import { isAuthenticated } from '../../hooks/useTracking';
+import AuthModal from '../AuthModal';
 
 interface RealTimeInfiniteScrollProps {
   onClose?: () => void;
@@ -27,6 +29,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastTapRef = useRef<number>(0);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Create infinite loop by duplicating products - ONLY if more than 1 product
   const infiniteProducts = products.length > 1 ? [...products, ...products, ...products] : products;
@@ -195,6 +198,28 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     // // TODO: Add like functionality - use the product
     // console.log('Liked product:', product.title);
     // toast.success('❤️ Liked!');
+  };
+
+  const handleAuthSuccess = () => {
+    handleContact('whatsapp');
+  };
+
+  const handleAuthClose = () => {
+    setShowAuthModal(false);
+  };
+
+
+  const handleContactSeller = async () => {
+    // Check if user is already authenticated
+    const userAuthenticated = await isAuthenticated();
+    if (!userAuthenticated) {
+
+      setShowAuthModal(true);
+      return;
+    }
+
+    // Proceed with contact
+    handleContact('whatsapp');
   };
 
   const handleContact = async (method: 'whatsapp' | 'call' | 'message') => {
@@ -395,30 +420,14 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                               )}
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                              {/* Contact Buttons - SIMPLIFIED */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleContact('whatsapp');
-                                }}
-                                className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
-                                title="Contact via WhatsApp"
-                              >
-                                <MessageCircle className="w-5 h-5" />
-                              </button>
+                            {/* CONTACT BUTTON FOR TEXT */}
+                            <button
+                              onClick={handleContactSeller}
+                              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
+                            >
+                              Buy Now
+                            </button>
 
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleContact('call');
-                                }}
-                                className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
-                                title="Call"
-                              >
-                                <Phone className="w-5 h-5" />
-                              </button>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -446,9 +455,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                           {actualProduct.title}
                         </h2>
                       </div>
-
-                      {/* CONTACT BUTTON FOR TEXT */}
-
 
                     </div>
                   ) : (
@@ -551,30 +557,15 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                               )}
                             </div>
 
-                            <div className="flex items-center space-x-2">
+                           
                               {/* Contact Buttons - SIMPLIFIED */}
                               <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleContact('whatsapp');
-                                }}
-                                className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
-                                title="Contact via WhatsApp"
+                                onClick={handleContactSeller}
+                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
                               >
-                                <MessageCircle className="w-5 h-5" />
+                                Buy Now
                               </button>
-
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleContact('call');
-                                }}
-                                className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
-                                title="Call"
-                              >
-                                <Phone className="w-5 h-5" />
-                              </button>
-                            </div>
+                          
                           </div>
                         </div>
                       </div>
@@ -686,6 +677,13 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
           </div>
         </div>
       )}
+
+      {/* Phone Authentication Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={handleAuthClose}
+        onSuccess={handleAuthSuccess}
+      />
 
       Product Gallery Modal
       {/* {selectedProduct && (
