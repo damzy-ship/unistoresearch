@@ -67,11 +67,11 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   }, [scrollToProduct, products]);
 
   // Handle selected product from navigation
-  // useEffect(() => {
-  //   if (initialSelectedProduct) {
-  //     setSelectedProduct(initialSelectedProduct);
-  //   }
-  // }, [initialSelectedProduct]);
+  useEffect(() => {
+    if (initialSelectedProduct) {
+      setSelectedProduct(initialSelectedProduct);
+    }
+  }, [initialSelectedProduct]);
 
   useEffect(() => {
     fetchProducts();
