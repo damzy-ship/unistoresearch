@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Clock, MapPin, MessageCircle, Phone, Heart, Play, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { getActiveRealTimeProducts, trackRealTimeProductView, trackRealTimeProductContact, formatRelativeTime, getTimeRemaining } from '../../lib/realTimeService';
+import { getActiveRealTimeProducts, trackRealTimeProductView, trackRealTimeProductContact, getTimeRemaining } from '../../lib/realTimeService';
 import { RealTimeProduct } from '../../lib/realTimeService';
-// import ReactionsBar from './ReactionsBar';
-// import CommentsSection from './CommentsSection';
-import ProductGallery from './ProductGallery';
 import { isAuthenticated } from '../../hooks/useTracking';
 import AuthModal from '../AuthModal';
+import BuyNowButton from '../Payment/BuyNowButton';
+import { supabase } from '../../lib/supabase';
+import { UserProfile } from '../ProfileModal';
 
 interface RealTimeInfiniteScrollProps {
   onClose?: () => void;
@@ -30,7 +30,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastTapRef = useRef<number>(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
-
+  const [customerInfo, setCustomerInfo] = useState<UserProfile | null>(null);
   // Create infinite loop by duplicating products - ONLY if more than 1 product
   const infiniteProducts = products.length > 1 ? [...products, ...products, ...products] : products;
 
@@ -48,7 +48,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         setTimeout(() => {
           if (containerRef.current) {
             const itemHeight = containerRef.current.clientHeight;
-            const scrollTop = productIndex * itemHeight;
+            const scrollTop = currentIndex * itemHeight;
             console.log('RealTimeInfiniteScroll: Scrolling to position', scrollTop);
             containerRef.current.scrollTo({
               top: scrollTop,
@@ -61,11 +61,11 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   }, [scrollToProduct, products]);
 
   // Handle selected product from navigation
-  useEffect(() => {
-    if (initialSelectedProduct) {
-      setSelectedProduct(initialSelectedProduct);
-    }
-  }, [initialSelectedProduct]);
+  // useEffect(() => {
+  //   if (initialSelectedProduct) {
+  //     setSelectedProduct(initialSelectedProduct);
+  //   }
+  // }, [initialSelectedProduct]);
 
   useEffect(() => {
     fetchProducts();
@@ -77,6 +77,42 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+
+    const getUserData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: visitorData, error } = await supabase
+            .from('unique_visitors')
+            .select('*')
+            .eq('auth_user_id', session.user.id)
+            .single();
+          if (error) {
+            console.error('Error fetching profile:', error);
+          } else if (visitorData) {
+            const profileData: UserProfile = {
+              user_id: visitorData.auth_user_id, 
+              full_name: visitorData.full_name || 'User',
+              phone_number: visitorData.phone_number || '',
+              // email: session.user.email || '',
+              created_at: visitorData.created_at,
+              visit_count: visitorData.visit_count || 0
+            };
+            setCustomerInfo(profileData);
+          }
+        }
+      }
+      catch (err) {
+        console.log(err);
+      }
+    }
+
+    getUserData();
+
+  }, [])
+
 
   const fetchProducts = async (isBackgroundUpdate = false) => {
     try {
@@ -168,38 +204,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     };
   }, [products]);
 
-  const handleSingleTap = (product: RealTimeProduct) => {
-    const now = Date.now();
-    const timeDiff = now - lastTapRef.current;
-
-    if (timeDiff < 300) {
-      // Double tap detected
-      handleDoubleTap({ clientX: 0, clientY: 0 } as React.MouseEvent, product);
-    } else {
-      // Single tap - show details only if NOT from status bar
-      if (!isFromStatusBar) {
-        setDetailsProduct(product);
-        setShowDetails(true);
-      }
-    }
-
-    lastTapRef.current = now;
-  };
-
-  const handleDoubleTap = (e: React.MouseEvent, product: RealTimeProduct) => {
-    // Show heart animation
-    // setHeartPosition({ x: e.clientX, y: e.clientY });
-    // setShowHeart(true);
-
-    // setTimeout(() => {
-    //   setShowHeart(false);
-    // }, 1000);
-
-    // // TODO: Add like functionality - use the product
-    // console.log('Liked product:', product.title);
-    // toast.success('❤️ Liked!');
-  };
-
   const handleAuthSuccess = () => {
     handleContact('whatsapp');
   };
@@ -208,19 +212,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     setShowAuthModal(false);
   };
 
-
-  const handleContactSeller = async () => {
-    // Check if user is already authenticated
-    const userAuthenticated = await isAuthenticated();
-    if (!userAuthenticated) {
-
-      setShowAuthModal(true);
-      return;
-    }
-
-    // Proceed with contact
-    handleContact('whatsapp');
-  };
 
   const handleContact = async (method: 'whatsapp' | 'call' | 'message') => {
     if (!selectedProduct) return;
@@ -263,37 +254,12 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     const itemHeight = container.clientHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
 
+    console.log(newIndex, currentIndex, products.length);
     if (newIndex !== currentIndex && newIndex < products.length) {
       setCurrentIndex(newIndex);
     }
   }, [currentIndex, products.length]);
 
-  // Auto-scroll to next item
-  const scrollToNext = useCallback(() => {
-    if (products.length <= 1) return; // Don't scroll if only one product
-
-    const nextIndex = (currentIndex + 1) % products.length;
-    const container = containerRef.current;
-
-    if (container) {
-      const itemHeight = container.clientHeight;
-      container.scrollTo({
-        top: nextIndex * itemHeight,
-        behavior: 'smooth'
-      });
-    }
-  }, [currentIndex, products.length]);
-
-  // Auto-scroll every 5 seconds if there are multiple products
-  useEffect(() => {
-    if (products.length <= 1) return; // Don't auto-scroll if only one product
-
-    const interval = setInterval(() => {
-      scrollToNext();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [scrollToNext, products.length]);
 
   if (loading) {
     return (
@@ -384,8 +350,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                 {/* Media Container - Full Height */}
                 <div
                   className="relative h-full overflow-hidden cursor-pointer"
-                  onClick={() => handleSingleTap(actualProduct)}
-                  onDoubleClick={(e) => handleDoubleTap(e, actualProduct)}
                 >
                   {actualProduct.is_text_post ? (
                     // Text Post - Full colored background
@@ -407,27 +371,31 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                           <div className="flex items-center justify-between mb-20">
                             <div className="flex items-center space-x-4">
                               <div className='flex flex-col gap-1'>
-                              {actualProduct.price && actualProduct.price > 0 && (
-                                <span className="text-2xl font-bold text-orange-400">
-                                  ₦{actualProduct.price.toLocaleString()}
-                                </span>
-                              )}
+                                {actualProduct.price && actualProduct.price > 0 && (
+                                  <span className="text-2xl font-bold text-orange-400">
+                                    ₦{actualProduct.price.toLocaleString()}
+                                  </span>
+                                )}
 
-                              {actualProduct.location && actualProduct.location.trim() && (
-                                <div className="flex items-center space-x-1 text-sm">
-                                  <MapPin className="w-4 h-4" />
-                                  <span>{actualProduct.location}</span>
-                                </div>
-                              )}
+                                {actualProduct.location && actualProduct.location.trim() && (
+                                  <div className="flex items-center space-x-1 text-sm">
+                                    <MapPin className="w-4 h-4" />
+                                    <span>{actualProduct.location}</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                             {/* CONTACT BUTTON FOR TEXT */}
-                            <button
+                            <BuyNowButton
+                              productData={actualProduct}
+                              userData={customerInfo}
+                            />
+                            {/* <button
                               onClick={handleContactSeller}
                               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
                             >
                               Buy Now
-                            </button>
+                            </button> */}
 
                           </div>
                         </div>
@@ -546,30 +514,34 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                             <div className="flex items-center space-x-4">
                               <div className='flex flex-col gap-1'>
 
-                              {actualProduct.price && actualProduct.price > 0 && (
-                                <span className="text-2xl font-bold text-orange-400">
-                                  ₦{actualProduct.price.toLocaleString()}
-                                </span>
-                              )}
+                                {actualProduct.price && actualProduct.price > 0 && (
+                                  <span className="text-2xl font-bold text-orange-400">
+                                    ₦{actualProduct.price.toLocaleString()}
+                                  </span>
+                                )}
 
-                              {actualProduct.location && actualProduct.location.trim() && (
-                                <div className="flex items-center space-x-1 text-sm">
-                                  <MapPin className="w-4 h-4" />
-                                  <span>{actualProduct.location}</span>
-                                </div>
-                              )}
+                                {actualProduct.location && actualProduct.location.trim() && (
+                                  <div className="flex items-center space-x-1 text-sm">
+                                    <MapPin className="w-4 h-4" />
+                                    <span>{actualProduct.location}</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
 
-                           
-                              {/* Contact Buttons - SIMPLIFIED */}
-                              <button
-                                onClick={handleContactSeller}
-                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
-                              >
-                                Buy Now
-                              </button>
-                          
+                            <BuyNowButton
+                              productData={actualProduct}
+                              userData={customerInfo}
+                            />
+
+                            {/* Contact Buttons - SIMPLIFIED
+                            <button
+                              onClick={handleContactSeller}
+                              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
+                            >
+                              Buy Now
+                            </button> */}
+
                           </div>
                         </div>
                       </div>
@@ -609,78 +581,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         </button>
       )}
 
-      {/* Details Modal */}
-      {showDetails && detailsProduct && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">{detailsProduct.title}</h2>
-                <button
-                  onClick={() => setShowDetails(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {detailsProduct.description && (
-                <p className="text-gray-600 mb-4">{detailsProduct.description}</p>
-              )}
-
-              <div className="space-y-3">
-                {detailsProduct.price && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Price:</span>
-                    <span className="text-2xl font-bold text-orange-500">
-                      ₦{detailsProduct.price.toLocaleString()}
-                    </span>
-                  </div>
-                )}
-
-                {detailsProduct.location && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Location:</span>
-                    <span className="text-gray-900">{detailsProduct.location}</span>
-                  </div>
-                )}
-
-                {detailsProduct.category && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Category:</span>
-                    <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-sm">
-                      {detailsProduct.category}
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Posted:</span>
-                  <span className="text-gray-900">{formatRelativeTime(detailsProduct.created_at)}</span>
-                </div>
-              </div>
-
-              {/* Contact Buttons */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => handleContact('whatsapp')}
-                  className="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  WhatsApp
-                </button>
-                <button
-                  onClick={() => handleContact('call')}
-                  className="flex-1 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Phone Authentication Modal */}
       <AuthModal
@@ -688,14 +588,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         onClose={handleAuthClose}
         onSuccess={handleAuthSuccess}
       />
-
-      Product Gallery Modal
-      {/* {selectedProduct && (
-        <ProductGallery
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )} */}
     </div>
   );
 } 

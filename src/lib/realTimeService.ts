@@ -95,12 +95,10 @@ export async function getActiveRealTimeProducts(limit: number = 20): Promise<{
       .from('real_time_products')
       .select(`
         *,
-        merchant:merchants(
+        merchant:unique_visitors(
           full_name,
-          seller_id,
-          phone_number,
-          average_rating,
-          total_ratings
+          user_id,
+          phone_number
         )
       `)
       .gt('expires_at', new Date().toISOString())
@@ -168,7 +166,7 @@ async function getOrCreateUserMerchant(): Promise<string | null> {
       .single();
 
     if (existingMerchant) {
-      return existingMerchant.id;
+      return userId;
     }
 
     // Get user info to use their actual university

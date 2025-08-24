@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { X, User, Phone, Mail, Calendar, Edit2, Save, Palette } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, User, Phone, Calendar, Edit2, Save, Palette } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getUserId } from '../hooks/useTracking';
 import ThemeSelector from './ThemeSelector';
 import AuthInput from './auth/AuthInput';
 import AuthButton from './auth/AuthButton';
@@ -12,7 +11,8 @@ interface ProfileModalProps {
   onClose: () => void;
 }
 
-interface UserProfile {
+export interface UserProfile {
+  user_id?: string;
   full_name: string;
   phone_number: string;
   email?: string;
@@ -41,7 +41,6 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const userId = await getUserId();
       
       // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
