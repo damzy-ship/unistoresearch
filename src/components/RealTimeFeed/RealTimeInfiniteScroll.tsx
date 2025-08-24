@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Clock, MapPin, MessageCircle, Phone, Heart, Play, X } from 'lucide-react';
+import { Clock, MapPin, Heart, Play, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getActiveRealTimeProducts, trackRealTimeProductView, trackRealTimeProductContact, getTimeRemaining } from '../../lib/realTimeService';
 import { RealTimeProduct } from '../../lib/realTimeService';
-import { isAuthenticated } from '../../hooks/useTracking';
 import AuthModal from '../AuthModal';
 import BuyNowButton from '../Payment/BuyNowButton';
 import { supabase } from '../../lib/supabase';
@@ -383,6 +382,13 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                     <span>{actualProduct.location}</span>
                                   </div>
                                 )}
+
+                                {actualProduct.merchant && actualProduct.merchant.full_name.trim() && (
+                                  <div className="flex items-center space-x-1 text-sm">
+                                    <span>Post by</span>
+                                    <span>{actualProduct.merchant.full_name}</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                             {/* CONTACT BUTTON FOR TEXT */}
@@ -524,6 +530,12 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                   <div className="flex items-center space-x-1 text-sm">
                                     <MapPin className="w-4 h-4" />
                                     <span>{actualProduct.location}</span>
+                                  </div>
+                                )}
+                                {actualProduct.merchant?.full_name && actualProduct.merchant?.full_name.trim() && (
+                                  <div className="flex items-center space-x-1 text-sm">
+                                    <span>Post by</span>
+                                    <span>{actualProduct.merchant?.full_name}</span>
                                   </div>
                                 )}
                               </div>
