@@ -37,33 +37,33 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   // Handle scroll to specific product when navigating from status bar
   useEffect(() => {
 
+    if (!hasScrolledFirstTime) {
+      console.log('RealTimeInfiniteScroll: scrollToProduct =', scrollToProduct, 'products.length =', products.length);
+      if (scrollToProduct && products.length > 0) {
+        const productIndex = products.findIndex(p => p.id === scrollToProduct);
+        console.log('RealTimeInfiniteScroll: Found product at index', productIndex);
+        if (productIndex !== -1) {
+          setCurrentIndex(productIndex);
+          setIsFromStatusBar(true); // Mark that we came from status bar
 
-    console.log('RealTimeInfiniteScroll: scrollToProduct =', scrollToProduct, 'products.length =', products.length);
-    if (scrollToProduct && products.length > 0) {
-      const productIndex = products.findIndex(p => p.id === scrollToProduct);
-      console.log('RealTimeInfiniteScroll: Found product at index', productIndex);
-      if (productIndex !== -1) {
-        setCurrentIndex(productIndex);
-        setIsFromStatusBar(true); // Mark that we came from status bar
+          // Actually scroll to the product after a short delay to ensure DOM is ready
 
-        // Actually scroll to the product after a short delay to ensure DOM is ready
+          setTimeout(() => {
+            if (containerRef.current) {
+              const itemHeight = containerRef.current.clientHeight;
+              const scrollTop = productIndex * itemHeight;
+              console.log('RealTimeInfiniteScroll: Scrolling to position', scrollTop);
+              containerRef.current.scrollTo({
+                top: scrollTop,
+                behavior: 'smooth'
+              });
+            }
+          }, 100);
 
-        setTimeout(() => {
-          if (containerRef.current) {
-            const itemHeight = containerRef.current.clientHeight;
-            const scrollTop = currentIndex * itemHeight;
-            console.log('RealTimeInfiniteScroll: Scrolling to position', scrollTop);
-            containerRef.current.scrollTo({
-              top: scrollTop,
-              behavior: 'smooth'
-            });
-          }
-        }, 100);
-
+        }
       }
+
     }
-
-
   }, [scrollToProduct, products]);
 
   // Handle selected product from navigation
