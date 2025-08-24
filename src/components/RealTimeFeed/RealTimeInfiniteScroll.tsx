@@ -30,11 +30,14 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   const lastTapRef = useRef<number>(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<UserProfile | null>(null);
+  const [hasScrolledFirstTime, setHasScrolledFirstTime] = useState(false);
   // Create infinite loop by duplicating products - ONLY if more than 1 product
   const infiniteProducts = products.length > 1 ? [...products, ...products, ...products] : products;
 
   // Handle scroll to specific product when navigating from status bar
   useEffect(() => {
+
+
     console.log('RealTimeInfiniteScroll: scrollToProduct =', scrollToProduct, 'products.length =', products.length);
     if (scrollToProduct && products.length > 0) {
       const productIndex = products.findIndex(p => p.id === scrollToProduct);
@@ -44,6 +47,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
         setIsFromStatusBar(true); // Mark that we came from status bar
 
         // Actually scroll to the product after a short delay to ensure DOM is ready
+
         setTimeout(() => {
           if (containerRef.current) {
             const itemHeight = containerRef.current.clientHeight;
@@ -55,8 +59,11 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
             });
           }
         }, 100);
+
       }
     }
+
+
   }, [scrollToProduct, products]);
 
   // Handle selected product from navigation
@@ -92,7 +99,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
             console.error('Error fetching profile:', error);
           } else if (visitorData) {
             const profileData: UserProfile = {
-              user_id: visitorData.auth_user_id, 
+              user_id: visitorData.auth_user_id,
               full_name: visitorData.full_name || 'User',
               phone_number: visitorData.phone_number || '',
               // email: session.user.email || '',
