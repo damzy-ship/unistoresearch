@@ -38,7 +38,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   useEffect(() => {
 
     console.log('RealTimeInfiniteScroll: scrollToProduct =', scrollToProduct, 'products.length =', products.length);
-    // console.log(scrollToProduct)
+    
     if (scrollToProduct && products.length > 0 && hasNotScrolled) {
       const productIndex = products.findIndex(p => p.id === scrollToProduct);
       console.log('RealTimeInfiniteScroll: Found product at index', productIndex);
