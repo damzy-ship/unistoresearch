@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
 import ProfileModal from './ProfileModal';
 import { useTheme } from '../hooks/useTheme';
+import PaymentModal from './Payment/PaymentModal';
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -13,7 +14,9 @@ export default function UserMenu() {
   const [userName, setUserName] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {currentTheme} = useTheme();
-  
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -26,7 +29,8 @@ export default function UserMenu() {
           .select('full_name')
           .eq('auth_user_id', session.user.id)
           .single();
-        
+
+        setUserId(session.user.id);
         const name = visitorData?.full_name || session.user.user_metadata?.full_name || '';
         setUserName(name);
       }
@@ -145,6 +149,14 @@ export default function UserMenu() {
           </>
         )}
       </div>
+      
+      {isAuthenticated && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          userId={userId || ''}
+        />
+      )}
     </>
   );
 }

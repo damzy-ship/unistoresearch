@@ -13,11 +13,13 @@ import AuthModal from '../components/AuthModal';
 // import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
-import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
+// import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
 import RealTimeStatusBar from '../components/RealTimeFeed/RealTimeStatusBar';
 import CreateRealtimeModal from '../components/RealTimeFeed/CreateRealtimeModal';
 import { useTheme } from '../hooks/useTheme';
 import { Toaster } from 'sonner';
+import { supabase } from '../lib/supabase';
+import PaymentModal from '../components/Payment/PaymentModal';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -31,17 +33,29 @@ export default function HomePage() {
   const [showRetryPrompt, setShowRetryPrompt] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [createMode, setCreateMode] = useState<'text' | 'image'>('text');
   const { trackRequest } = useTracking();
   const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
+  const [session, setSession] = useState<any>(null);
+
   React.useEffect(() => {
     const checkAuth = async () => {
-      const authenticated = await isAuthenticated();
-      setUserIsAuthenticated(authenticated);
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      setUserIsAuthenticated(!!currentSession);
     };
     
     checkAuth();
+
+    // Listen for payment modal open event
+    const handlePaymentModalOpen = () => setShowPaymentModal(true);
+    window.addEventListener('open-payment-modal', handlePaymentModalOpen);
+
+    return () => {
+      window.removeEventListener('open-payment-modal', handlePaymentModalOpen);
+    };
   }, []);
 
   const handleSearchRequest = async (e: React.FormEvent) => {
@@ -426,6 +440,14 @@ export default function HomePage() {
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleAuthSuccess}
       />
+
+      {userIsAuthenticated && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          userId={session?.user?.id || ''}
+        />
+      )}
     </main>
   );
 }

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { isAuthenticated } from '../../hooks/useTracking';
-import AuthModal from '../AuthModal';
-import { RealTimeProduct } from '../../lib/realTimeService';
-import { UserProfile } from '../ProfileModal';
+// import { isAuthenticated } from '../../hooks/useTracking';
+// import AuthModal from '../AuthModal';
 import { useTheme } from '../../hooks/useTheme';
 import { supabase } from '../../lib/supabase';
 
@@ -10,21 +8,23 @@ const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
 // Define the shape of the product data using a TypeScript interface
 
-interface InvoiceDataProps {
-    product_id: string;
-    merchant_id: string;
-    customer_id: string | null;
-    payment_reference: string;
-}
 
-// Define the props for the BuyNowButton component.
-interface BuyNowButtonProps {
-    productData: RealTimeProduct;
-    userData: UserProfile | null;
+
+export interface InvoiceDataProps {
+    merchant_name: string;
+    merchant_number: string;
+    merchant_id: string;
+    customer_email?: string;
+    customer_name: string;
+    customer_number: string;
+    customer_id: string;
+    invoice_amount: number;
+    invoice_status?: string;
+    payment_reference?: string;
 }
 
 // The reusable BuyNowButton component
-const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) => {
+const BuyNowButton: React.FC<InvoiceDataProps> = (InvoiceData) => {
     // State for controlling the modal's visibility.
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     // State for the user's email input.';
@@ -34,7 +34,7 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
     // State for messages to the user.
     const [message, setMessage] = useState<string>('');
 
-    const [showAuthModal, setShowAuthModal] = useState(false);
+    // const [showAuthModal, setShowAuthModal] = useState(false);
 
     const { currentTheme } = useTheme();
 
@@ -57,23 +57,23 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
     }, []);
 
 
-    const handleAuthSuccess = () => {
-        setIsModalOpen(true);
-    };
+    // const handleAuthSuccess = () => {
+    //     setIsModalOpen(true);
+    // };
 
-    const handleAuthClose = () => {
-        setShowAuthModal(false);
-    };
+    // const handleAuthClose = () => {
+    //     setShowAuthModal(false);
+    // };
 
 
-    const isAuthenticatedBeforeTriggerModal = async () => {
-        const userAuthenticated = await isAuthenticated();
-        if (!userAuthenticated) {
-            setShowAuthModal(true);
-            return;
-        }
-        setIsModalOpen(true);
-    };
+    // const isAuthenticatedBeforeTriggerModal = async () => {
+    //     const userAuthenticated = await isAuthenticated();
+    //     if (!userAuthenticated) {
+    //         setShowAuthModal(true);
+    //         return;
+    //     }
+    //     setIsModalOpen(true);
+    // };
 
     // Function to handle the payment process after the user enters their email.
     const handlePayment = async () => {
@@ -95,31 +95,26 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
         const handler = window.PaystackPop.setup({
             key: PAYSTACK_PUBLIC_KEY,
             email: email,
-            name: userData?.full_name || 'Guest User',
-            phone: userData?.phone_number || 'Not Provided',
-            amount: productData.price * 100, // Paystack expects the amount in kobo (1 NGN = 100 kobo)
+            name: InvoiceData?.customer_name || 'Guest User',
+            phone: InvoiceData?.customer_number || 'Not Provided',
+            amount: InvoiceData?.invoice_amount * 100, // Paystack expects the amount in kobo (1 NGN = 100 kobo)
             currency: 'NGN',
             metadata: {
                 custom_fields: [
                     {
                         display_name: 'Name',
                         variable_name: 'name',
-                        value: userData?.full_name,
+                        value: InvoiceData?.customer_name,
                     },
                     {
                         display_name: 'Phone',
                         variable_name: 'phone',
-                        value: userData?.phone_number || 'Not Provided',
-                    },
-                    {
-                        display_name: 'Description',
-                        variable_name: 'description',
-                        value: productData?.title,
+                        value: InvoiceData?.customer_number || 'Not Provided',
                     },
                     {
                         display_name: 'Merchant',
                         variable_name: 'merchant',
-                        value: productData?.merchant,
+                        value: InvoiceData?.merchant_name,
                     },
                 ],
             },
@@ -131,9 +126,9 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
                 const storeInvoiceData = async () => {
 
                     const invoiceData: InvoiceDataProps = {
-                        product_id: productData?.id,
-                        merchant_id: productData?.merchant_id,
-                        customer_id: userData?.user_id || null,
+                        ...InvoiceData,
+                        customer_email: email,
+                        invoice_status: 'paid',
                         payment_reference: response.reference,
                     };
 
@@ -149,9 +144,8 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
                         console.log('Invoice record created:', newInvoice);
                     }
 
-                    // Log the product data to the console only on a successful transaction.
-                    console.log('Payment successful. Here is the product data:');
-                    console.log(productData);
+                    console.log('Payment successful. Here is the invoice data:');
+                    console.log(newInvoice);
                     setMessage(`Payment successful! Reference: ${response.reference}`);
                     setIsModalOpen(false);
                 }
@@ -169,10 +163,10 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
         <div className="flex justify-center items-center">
             {/* The main Buy Now button with custom styling. */}
             <button
-                onClick={isAuthenticatedBeforeTriggerModal}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit"
+                onClick={() => setIsModalOpen(true)}
+                className={`w-full py-3 px-4 rounded-lg font-medium bg-gradient-to-r ${currentTheme.buttonGradient} text-white transition-all duration-200 hover:shadow-lg`}
             >
-                Buy Now
+                Continue
             </button>
 
             {/* The modal overlay and content. */}
@@ -203,7 +197,7 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
 
                         <button
                             onClick={handlePayment}
-                            className="w-full bg-green-500 text-white p-3 rounded-lg font-bold hover:bg-green-600 transition-colors"
+                            className={`w-full py-3 px-4 rounded-lg font-medium bg-gradient-to-r ${currentTheme.buttonGradient} text-white transition-all duration-200 hover:shadow-lg`}
                         >
                             Proceed to Payment
                         </button>
@@ -222,11 +216,11 @@ const BuyNowButton: React.FC<BuyNowButtonProps> = ({ productData, userData }) =>
                 </div>
 
             )}
-            <AuthModal
+            {/* <AuthModal
                 isOpen={showAuthModal}
                 onClose={handleAuthClose}
                 onSuccess={handleAuthSuccess}
-            />
+            /> */}
         </div>
     );
 };

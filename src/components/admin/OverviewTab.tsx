@@ -1,4 +1,3 @@
-import React from 'react';
 import { Users, MessageSquare, Calendar, Store, Star } from 'lucide-react';
 
 interface DashboardStats {

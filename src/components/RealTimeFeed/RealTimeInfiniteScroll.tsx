@@ -7,6 +7,9 @@ import AuthModal from '../AuthModal';
 import BuyNowButton from '../Payment/BuyNowButton';
 import { supabase } from '../../lib/supabase';
 import { UserProfile } from '../ProfileModal';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { useRealtime } from '../../hooks/useRealtime';
+import { isAuthenticated } from '../../hooks/useTracking';
 
 interface RealTimeInfiniteScrollProps {
   onClose?: () => void;
@@ -22,23 +25,20 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
   const [selectedProduct, setSelectedProduct] = useState<RealTimeProduct | null>(null);
   const [showHeart, setShowHeart] = useState(false);
   const [heartPosition, setHeartPosition] = useState({ x: 0, y: 0 });
-  const [showDetails, setShowDetails] = useState(false);
-  const [detailsProduct, setDetailsProduct] = useState<RealTimeProduct | null>(null);
   const [isFromStatusBar, setIsFromStatusBar] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const lastTapRef = useRef<number>(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<UserProfile | null>(null);
   const [hasNotScrolled, setHasNotScrolled] = useState(true);
-  // Create infinite loop by duplicating products - ONLY if more than 1 product
+
   const infiniteProducts = products.length > 1 ? [...products, ...products, ...products] : products;
 
   // Handle scroll to specific product when navigating from status bar
   useEffect(() => {
 
     console.log('RealTimeInfiniteScroll: scrollToProduct =', scrollToProduct, 'products.length =', products.length);
-    
+
     if (scrollToProduct && products.length > 0 && hasNotScrolled) {
       const productIndex = products.findIndex(p => p.id === scrollToProduct);
       console.log('RealTimeInfiniteScroll: Found product at index', productIndex);
@@ -69,6 +69,9 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
       setSelectedProduct(initialSelectedProduct);
     }
   }, [initialSelectedProduct]);
+
+
+
 
   useEffect(() => {
     fetchProducts();
@@ -115,7 +118,6 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     getUserData();
 
   }, [])
-
 
   const fetchProducts = async (isBackgroundUpdate = false) => {
     try {
@@ -215,6 +217,19 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
     setShowAuthModal(false);
   };
 
+  
+  const handleContactSeller = async () => {
+    // Check if user is already authenticated
+    const userAuthenticated = await isAuthenticated();
+    if (!userAuthenticated) {
+
+      setShowAuthModal(true);
+      return;
+    }
+
+    // Proceed with contact
+    handleContact('whatsapp');
+  };
 
   const handleContact = async (method: 'whatsapp' | 'call' | 'message') => {
     if (!selectedProduct) return;
@@ -253,7 +268,7 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setHasNotScrolled(false);
-    
+
     const container = e.currentTarget;
     const scrollTop = container.scrollTop;
     const itemHeight = container.clientHeight;
@@ -392,22 +407,22 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                 {actualProduct.merchant && actualProduct.merchant.full_name.trim() && (
                                   <div className="flex items-center space-x-1 text-sm">
                                     <span>Post by</span>
-                                    <span>{actualProduct.merchant.full_name}</span>
+                                    <span className='font-bold'>{actualProduct.merchant.full_name}</span>
                                   </div>
                                 )}
                               </div>
                             </div>
                             {/* CONTACT BUTTON FOR TEXT */}
-                            <BuyNowButton
+                            {/* <BuyNowButton
                               productData={actualProduct}
                               userData={customerInfo}
-                            />
-                            {/* <button
+                            /> */}
+                            <button
                               onClick={handleContactSeller}
                               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
                             >
-                              Buy Now
-                            </button> */}
+                              Get Now
+                            </button>
 
                           </div>
                         </div>
@@ -541,24 +556,24 @@ export default function RealTimeInfiniteScroll({ onClose, scrollToProduct, selec
                                 {actualProduct.merchant?.full_name && actualProduct.merchant?.full_name.trim() && (
                                   <div className="flex items-center space-x-1 text-sm">
                                     <span>Post by</span>
-                                    <span>{actualProduct.merchant?.full_name}</span>
+                                    <span className='font-bold'>{actualProduct.merchant?.full_name}</span>
                                   </div>
                                 )}
                               </div>
                             </div>
 
-                            <BuyNowButton
+                            {/* <BuyNowButton
                               productData={actualProduct}
                               userData={customerInfo}
-                            />
+                            /> */}
 
-                            {/* Contact Buttons - SIMPLIFIED
+                            {/* Contact Buttons - SIMPLIFIED */}
                             <button
                               onClick={handleContactSeller}
                               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg w-fit order-1 sm:order-2"
                             >
-                              Buy Now
-                            </button> */}
+                              Get Now
+                            </button>
 
                           </div>
                         </div>

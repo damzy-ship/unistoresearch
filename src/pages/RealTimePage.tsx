@@ -26,6 +26,7 @@ export default function RealTimePage() {
   console.log('RealTimePage: Navigation state =', location.state);
   console.log('RealTimePage: scrollToProduct =', scrollToProduct);
 
+
   useEffect(() => {
     loadProducts();
     // Set up realtime polling every 10 seconds
