@@ -14,6 +14,7 @@ import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
+import InvoicesPage from './pages/InvoicesPage';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -39,6 +40,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/test-categories" element={<CategoryTest />} />
         <Route path="/payment/:merchantId" element={<PaymentPage />} />
+  <Route path="/invoices" element={<InvoicesPage />} />
       </Routes>
     </Router>
     </div>

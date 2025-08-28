@@ -160,67 +160,63 @@ const BuyNowButton: React.FC<InvoiceDataProps> = (InvoiceData) => {
 
     return (
         // Main container for the button and modal.
-        <div className="flex justify-center items-center">
-            {/* The main Buy Now button with custom styling. */}
-            <button
-                onClick={() => setIsModalOpen(true)}
-                className={`w-full py-3 px-4 rounded-lg font-medium bg-gradient-to-r ${currentTheme.buttonGradient} text-white transition-all duration-200 hover:shadow-lg`}
-            >
-                Continue
-            </button>
+        <div className="w-full">
+            {/* The main Buy Now button with improved responsive styling. */}
+            <div className="w-full flex">
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className={`w-full md:w-auto md:px-8 py-3 rounded-full text-sm md:text-base font-semibold bg-gradient-to-r ${currentTheme.buttonGradient} text-white shadow-md hover:shadow-xl transition transform active:scale-95`}
+                    style={{ boxShadow: '0 6px 18px rgba(0,0,0,0.08)' }}
+                >
+                    Continue to Pay
+                </button>
+            </div>
 
             {/* The modal overlay and content. */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg p-8 shadow-2xl max-w-sm w-full relative">
-                        <h2 className="text-2xl font-bold mb-4 text-gray-800">Enter Your Email</h2>
-                        <p className="text-sm text-gray-600 mb-6">A receipt will be sent to this email address.</p>
+                <div className="fixed inset-0 flex items-center justify-center p-4 z-50" style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}>
+                    <div className="w-full max-w-md mx-auto rounded-2xl shadow-2xl overflow-hidden" style={{ backgroundColor: currentTheme.surface }}>
+                        <div className="px-6 py-5 border-b" style={{ borderColor: currentTheme.primary + '20' }}>
+                            <h2 className="text-lg font-bold" style={{ color: currentTheme.text }}>Enter your email</h2>
+                            <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>A receipt will be sent to this email address.</p>
+                        </div>
 
-                        <input
-                            type="email"
-                            placeholder="e.g., jane.doe@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="focus:ring-2 focus:ring-${currentTheme.primaryTsFormat} focus:border-${currentTheme.primaryTsFormat} w-full mb-4 p-4 border-2 rounded-xl resize-none text-base transition-all duration-200 placeholder-gray-400"
-                            style={{
-                                backgroundColor: currentTheme.background,
-                                borderColor: currentTheme.primary,
-                                color: currentTheme.text,
+                        <div className="p-6">
+                            <input
+                                type="email"
+                                placeholder="e.g., jane.doe@example.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full mb-4 p-3 rounded-xl text-sm border"
+                                style={{
+                                    backgroundColor: currentTheme.background,
+                                    borderColor: currentTheme.primary + '20',
+                                    color: currentTheme.text
+                                }}
+                            />
 
-                                // focusBorderColor: currentTheme.primary,
-                            }}
-                        />
+                            {message && (
+                                <p className="text-sm mb-4" style={{ color: '#E02424' }}>{message}</p>
+                            )}
 
-                        {message && (
-                            <p className="text-red-500 text-sm mb-4">{message}</p>
-                        )}
+                            <button
+                                onClick={handlePayment}
+                                className={`w-full py-3 rounded-full text-sm font-semibold bg-gradient-to-r ${currentTheme.buttonGradient} text-white transition-all duration-200`}
+                            >
+                                Pay {InvoiceData?.invoice_amount ? `• ₦${InvoiceData.invoice_amount}` : ''}
+                            </button>
 
-                        <button
-                            onClick={handlePayment}
-                            className={`w-full py-3 px-4 rounded-lg font-medium bg-gradient-to-r ${currentTheme.buttonGradient} text-white transition-all duration-200 hover:shadow-lg`}
-                        >
-                            Proceed to Payment
-                        </button>
-
-                        {/* Close button for the modal. */}
-                        <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="mt-3 w-full text-sm py-3 rounded-lg border"
+                                style={{ color: currentTheme.text, borderColor: currentTheme.primary + '20', backgroundColor: currentTheme.background }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
-
                 </div>
-
             )}
-            {/* <AuthModal
-                isOpen={showAuthModal}
-                onClose={handleAuthClose}
-                onSuccess={handleAuthSuccess}
-            /> */}
         </div>
     );
 };

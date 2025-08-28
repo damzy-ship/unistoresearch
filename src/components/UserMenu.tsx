@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { User, LogOut, History, Settings, Plus, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, LogOut, History } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
-import ProfileModal from './ProfileModal';
 import { useTheme } from '../hooks/useTheme';
 import PaymentModal from './Payment/PaymentModal';
 
 export default function UserMenu() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const [userName, setUserName] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {currentTheme} = useTheme();
@@ -106,25 +104,16 @@ export default function UserMenu() {
                 
                 <button
                   onClick={() => {
-                    navigate('/create-real-time-product');
+                    navigate('/invoices');
                     setIsOpen(false);
                   }}
                   className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <Plus className="w-4 h-4" />
-                  Create Product
+                  <History className="w-4 h-4" />
+                  Invoices
                 </button>
                 
-                <button
-                  onClick={() => {
-                    navigate('/real-time');
-                    setIsOpen(false);
-                  }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Zap className="w-4 h-4" />
-                  Real-time Feed
-                </button>
+                {/* Real-time and Create Product menu items removed per request */}
                 
                 <button
                   onClick={() => {

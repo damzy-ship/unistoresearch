@@ -170,8 +170,6 @@ export default function PaymentPage() {
                     className="rounded-xl shadow-lg p-8"
                     style={{ backgroundColor: currentTheme.surface }}
                 >
-                    
-
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {isAuthenticated ? (
                             <>

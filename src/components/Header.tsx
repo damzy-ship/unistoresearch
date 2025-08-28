@@ -25,14 +25,17 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
   }, []);
 
   return (
-    <div className="w-full flex justify-end items-center gap-4">
+    <div className="w-full flex justify-end items-center">
       {userIsAuthenticated && (
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('open-payment-modal'))}
-          className="flex items-center gap-2 px-4 py-2 text-orange-600 hover:bg-orange-50 rounded-lg font-medium transition-all duration-200"
+          aria-label="Open accept payment modal"
+          title="Accept Payment"
+          className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
         >
           <DollarSign className="w-4 h-4" />
           <span className="hidden sm:inline">Accept Payment</span>
+          <span className="inline sm:hidden">Accept</span>
         </button>
       )}
       
