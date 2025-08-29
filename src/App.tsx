@@ -15,34 +15,36 @@ import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
 import InvoicesPage from './pages/InvoicesPage';
+import ViewInvoicePage from './pages/ViewInvoicePage';
 
 function App() {
   const { currentTheme } = useTheme();
-  
+
   return (
-    <div 
+    <div
       className="min-h-screen transition-colors duration-300"
       style={{ backgroundColor: currentTheme.background }}
     >
-    <Router>
+      <Router>
         <Toaster position="top-center" richColors />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/landing-page" element={<LandingPage />} />
-        <Route path="/past-requests" element={<PastRequestsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/sellers" element={<SellersPage />} />
-        <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-        <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
-        <Route path="/billing/callback" element={<BillingCallbackPage />} />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/landing-page" element={<LandingPage />} />
+          <Route path="/past-requests" element={<PastRequestsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/sellers" element={<SellersPage />} />
+          <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
+          <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
+          <Route path="/billing/callback" element={<BillingCallbackPage />} />
           <Route path="/real-time" element={<RealTimePage />} />
           <Route path="/create-real-time-product" element={<CreateRealTimeProductPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/test-categories" element={<CategoryTest />} />
-        <Route path="/payment/:merchantId" element={<PaymentPage />} />
-  <Route path="/invoices" element={<InvoicesPage />} />
-      </Routes>
-    </Router>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/test-categories" element={<CategoryTest />} />
+          <Route path="/payment/:merchantId" element={<PaymentPage />} />
+          <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
+        </Routes>
+      </Router>
     </div>
   );
 }

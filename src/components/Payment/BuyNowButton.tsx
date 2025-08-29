@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import { isAuthenticated } from '../../hooks/useTracking';
 // import AuthModal from '../AuthModal';
 import { useTheme } from '../../hooks/useTheme';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
@@ -76,6 +77,8 @@ const BuyNowButton: React.FC<InvoiceDataProps> = (InvoiceData) => {
     // };
 
     // Function to handle the payment process after the user enters their email.
+    const navigate = useNavigate();
+
     const handlePayment = async () => {
 
 
@@ -142,6 +145,13 @@ const BuyNowButton: React.FC<InvoiceDataProps> = (InvoiceData) => {
                         console.error('Error creating invoice record:', insertError);
                     } else if (newInvoice) {
                         console.log('Invoice record created:', newInvoice);
+                        // redirect to the view invoice page using the new record id
+                        try {
+                            const newId = (newInvoice as any).id;
+                            if (newId) navigate(`/view-invoice/${newId}`);
+                        } catch (err) {
+                            console.error('Failed to navigate to view invoice page', err);
+                        }
                     }
 
                     console.log('Payment successful. Here is the invoice data:');
