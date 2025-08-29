@@ -1,165 +1,237 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
+// --- INTERFACES AND TYPES ---
 interface InvoiceData {
   merchant_name: string;
   merchant_number: string;
-  merchant_Id: string;
+  merchant_id: string;
   customer_email?: string;
   customer_name: string;
   customer_number?: string;
-  customer_Id: string;
+  customer_id: string;
   invoice_amount: number | string;
   invoice_status: string;
   created_at?: string;
 }
 
+type GroupedInvoices = {
+  [key: string]: InvoiceData[];
+};
+
+
+// --- SVG ICONS ---
+const ArrowDownIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+  </svg>
+);
+
+const ArrowUpIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+  </svg>
+);
+
+const ClockIcon = () => (
+  // replaced clock SVG with a check-circle SVG
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
+  </svg>
+);
+
+
+// --- MAIN COMPONENT ---
 export default function InvoicesPage() {
-  const { currentTheme } = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [invoices, setInvoices] = useState<InvoiceData[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [totalCredit, setTotalCredit] = useState<number>(0);
+  
+  const [userId, setUserId] = useState<string | null>(null);
+  const [groupedInvoices, setGroupedInvoices] = useState<GroupedInvoices>({});
   const [totalCollected, setTotalCollected] = useState<number>(0);
+  const [totalPaid, setTotalPaid] = useState<number>(0);
 
   useEffect(() => {
-    const load = async () => {
+
+
+    const loadInvoices = async () => {
       setLoading(true);
       setError(null);
 
       const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
+      const currentUserId = session?.user?.id;
 
-      if (!userId) {
+      if (!currentUserId) {
         navigate('/');
         return;
       }
+      setUserId(currentUserId);
 
       try {
-        // Fetch invoices where the user is either the merchant or the customer
         const { data, error } = await supabase
           .from('invoices')
           .select('*')
-          .or(`merchant_id.eq.${userId},customer_id.eq.${userId}`)
+          .or(`merchant_id.eq.${currentUserId},customer_id.eq.${currentUserId}`)
           .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching invoices:', error);
-          setError('Failed to load invoices');
+          setError('Failed to load your invoices.');
         } else if (data) {
           const rows = data as InvoiceData[];
-          setInvoices(rows);
 
-          // compute totals for the currently authenticated merchant
-          const totalPaid = rows
-            .filter(r => (r.merchant_Id === userId || r.merchant_Id === (r.merchant_Id)) && (r.invoice_status || '').toLowerCase() === 'paid')
-            .reduce((s, r) => s + (Number(r.invoice_amount) || 0), 0);
+          // Calculate user-centric totals
+          const userTotalCollected = rows
+            .filter(r => r.merchant_id === currentUserId && (r.invoice_status || '').toLowerCase() === 'collected')
+            .reduce((sum, r) => sum + Number(r.invoice_amount || 0), 0);
+          
+          const userTotalPaid = rows
+            .filter(r => r.merchant_id === currentUserId && (r.invoice_status || '').toLowerCase() === 'paid')
+            .reduce((sum, r) => sum + Number(r.invoice_amount || 0), 0);
 
-          const totalCollected = rows
-            .filter(r => (r.merchant_Id === userId || r.merchant_Id === (r.merchant_Id)) && (r.invoice_status || '').toLowerCase() === 'collected')
-            .reduce((s, r) => s + (Number(r.invoice_amount) || 0), 0);
+          setTotalCollected(userTotalCollected);
+          setTotalPaid(userTotalPaid);
 
-          setTotalCredit(totalPaid);
-          setTotalCollected(totalCollected);
+          // Group invoices by month
+          const grouped = rows.reduce((acc: GroupedInvoices, inv) => {
+            const date = new Date(inv.created_at || new Date());
+            const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            if (!acc[monthYear]) {
+              acc[monthYear] = [];
+            }
+            acc[monthYear].push(inv);
+            return acc;
+          }, {});
+
+          setGroupedInvoices(grouped);
         }
       } catch (err) {
-        console.error(err);
-        setError('An unexpected error occurred');
+        console.error('An unexpected error occurred:', err);
+        setError('An unexpected error occurred while fetching data.');
       } finally {
         setLoading(false);
       }
     };
 
-    load();
+    loadInvoices();
   }, [navigate]);
 
   const formatAmount = (amount: number | string) => {
-    const num = typeof amount === 'number' ? amount : Number(amount || 0);
-    try {
-      return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(num);
-    } catch {
-      return `₦${num}`;
-    }
+    const num = Number(amount || 0);
+    return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(num);
   };
-  
 
   return (
-    <div className="min-h-screen py-12 px-4 transition-colors duration-300" style={{ backgroundColor: currentTheme.background }}>
+    <div className="bg-gray-50 text-gray-800 min-h-screen font-sans p-4 sm:p-6 lg:p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="flex flex-col items-center justify-center mb-8">
-          <h1 className="text-5xl md:text-6xl text-center font-bold mb-2">
-            <span style={{ color: currentTheme.primary }}>uni</span>
-            <span style={{ color: currentTheme.secondary }}>store.</span>
-          </h1>
-          <h3 className="text-lg font-bold mb-6 bg-gradient-to-r from-orange-500 to-blue-600 bg-clip-text text-transparent">
-            Your Invoices
-          </h3>
-        </div>
+        <header className="text-center mb-8">
+            <h1 className="text-5xl md:text-6xl font-bold">
+                <span className="text-orange-500">uni</span>
+                <span className="text-blue-500">store.</span>
+            </h1>
+            <h3 className="text-lg font-semibold text-gray-500 mt-2">
+                Your Invoices
+            </h3>
+        </header>
 
-        <div className="rounded-xl shadow-lg p-6" style={{ backgroundColor: currentTheme.surface }}>
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl" style={{ backgroundColor: currentTheme.background, border: `1px solid ${currentTheme.primary}20` }}>
-              <p className="text-sm font-medium" style={{ color: currentTheme.textSecondary }}>Total credit</p>
-              <p className="text-2xl font-bold mt-2" style={{ color: currentTheme.text }}>{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(totalCredit)}</p>
+        <main className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+            <div className="border-b border-gray-200 pb-4 mb-4">
+                 <h2 className="text-xl font-bold text-gray-900">All Transactions</h2>
+                 <div className="flex justify-between items-center mt-2 text-sm">
+                    <p className="text-gray-600">Total Income: <span className="font-semibold text-yellow-600">{formatAmount(totalPaid)}</span></p>
+                    <p className="text-gray-600">Total Collected: <span className="font-semibold text-green-600">{formatAmount(totalCollected)}</span></p>
+                 </div>
             </div>
+            
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-600">{error}</p>
+              </div>
+            ) : Object.keys(groupedInvoices).length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-800 text-lg">No invoices found.</p>
+                <p className="text-sm mt-2 text-gray-500">Create or receive payments to see invoices here.</p>
+              </div>
+            ) : (
+                <div className="flow-root">
+                    {Object.entries(groupedInvoices).map(([monthYear, invoices]) => (
+                        <div key={monthYear}>
+                            <h4 className="text-sm font-semibold text-gray-500 my-4 px-2">{monthYear}</h4>
+                            <ul className="space-y-3">
+                                {invoices.map((inv, idx) => {
+                                    const isMerchant = inv.merchant_id === userId;
+                                    const isCustomer = inv.customer_id === userId;
+                                    const status = (inv.invoice_status || '').toLowerCase();
 
-            <div className="p-4 rounded-xl" style={{ backgroundColor: currentTheme.background, border: `1px solid ${currentTheme.primary}20` }}>
-              <p className="text-sm font-medium" style={{ color: currentTheme.textSecondary }}>Total collected</p>
-              <p className="text-2xl font-bold mt-2" style={{ color: currentTheme.text }}>{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(totalCollected)}</p>
-            </div>
-          </div>
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: currentTheme.primary }} />
-            </div>
-          ) : error ? (
-            <div className="text-center py-8">
-              <p style={{ color: currentTheme.text }}>{error}</p>
-            </div>
-          ) : invoices.length === 0 ? (
-            <div className="text-center py-8">
-              <p style={{ color: currentTheme.text }}>No invoices found.</p>
-              <p className="text-sm mt-2" style={{ color: currentTheme.textSecondary }}>You can create or receive payments to see invoices here.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-                <div className="grid gap-4">
-                {invoices.map((inv, idx) => (
-                  <div key={idx} className="p-4 rounded-xl shadow-sm flex justify-between gap-4" style={{ backgroundColor: currentTheme.background, border: `1px solid ${currentTheme.primary}20` }}>
-                    <div>
-                      <p className="text-xs font-medium" style={{ color: currentTheme.textSecondary }}>Merchant</p>
-                      <p className="font-semibold text-base" style={{ color: currentTheme.text }}>{inv.merchant_name || inv.merchant_number}</p>
-
-                      <p className="text-xs font-medium mt-3" style={{ color: currentTheme.textSecondary }}>Customer</p>
-                      <p className="font-semibold text-sm" style={{ color: currentTheme.text }}>{inv.customer_name || inv.customer_number}</p>
-                    </div>
-
-                    <div className="flex flex-col items-start sm:items-end justify-center">
-                      <p className="font-bold text-lg" style={{ color: currentTheme.text }}>{formatAmount(inv.invoice_amount)}</p>
-                      <div className="mt-2">
-                        {inv.invoice_status && (inv.invoice_status.toLowerCase() === 'collected' ? (
-                          <span className="inline-block px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#E6FFFA', color: '#0F766E' }}>Collected</span>
-                        ) : inv.invoice_status.toLowerCase() === 'paid' ? (
-                          <span className="inline-block px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#ECFEFF', color: '#0369A1' }}>Paid</span>
-                        ) : (
-                          <span className="inline-block px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>{inv.invoice_status}</span>
-                        ))}
-                      </div>
-
-                      {inv.created_at && (
-                        <p className="text-xs mt-2" style={{ color: currentTheme.textSecondary }}>{new Date(inv.created_at).toLocaleString()}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                                    let icon, title, amountPrefix = '', amountColor = 'text-gray-800', subtext;
+                                    
+                                    // Determine transaction type from the user's perspective
+                                    if (isMerchant && status === 'collected') {
+                                        icon = <ArrowDownIcon />;
+                                        title = `Payment from ${inv.customer_name || inv.customer_number}`;
+                                        subtext = 'Invoice Collected';
+                                        amountPrefix = '+';
+                                        amountColor = 'text-green-600';
+                                    }
+                                    else if (isCustomer && status === 'returned') {
+                                        icon = <ArrowDownIcon />;
+                                        title = `Payment to ${inv.merchant_name || inv.merchant_number}`;
+                                        subtext = 'Invoice Returned';
+                                        amountPrefix = '+';
+                                        amountColor = 'text-green-600';
+                                    }
+                                     else if (isCustomer && status === 'paid') {
+                                        icon = <ArrowUpIcon />;
+                                        title = `Payment to ${inv.merchant_name || inv.merchant_number}`;
+                                        subtext = 'Invoice Paid';
+                                        amountPrefix = '-';
+                                        amountColor = 'text-red-600';
+                                    } else if (isCustomer && status === 'collected') {
+                                        icon = <ArrowUpIcon />;
+                                        title = `Payment to ${inv.merchant_name || inv.merchant_number}`;
+                                        subtext = 'Invoice Collected';
+                                        amountPrefix = '-';
+                                        amountColor = 'text-red-600';
+                                    } else {
+                                        icon = <ClockIcon />;
+                                        title = isMerchant 
+                                            ? `Payment from ${inv.customer_name || inv.customer_number}` 
+                                            : `Payment to ${inv.merchant_name || inv.merchant_number}`;
+                                        subtext = `Status: ${inv.invoice_status}`;
+                                        amountColor = 'text-yellow-600';
+                                    }
+                                    
+                                    return (
+                                        <li key={`${inv.customer_id}-${inv.created_at}-${idx}`} className="p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center space-x-4">
+                                            <div className="flex-shrink-0 bg-gray-200 rounded-full h-10 w-10 flex items-center justify-center">
+                                                {icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-gray-900 truncate">{title}</p>
+                                                <p className="text-xs text-gray-500 truncate">{new Date(inv.created_at || '').toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-right flex-shrink-0">
+                                                <p className={`text-sm font-bold ${amountColor}`}>{amountPrefix}{formatAmount(inv.invoice_amount)}</p>
+                                                <p className="text-xs text-gray-500">{subtext}</p>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
-            </div>
-          )}
-        </div>
+            )}
+        </main>
       </div>
     </div>
   );
 }
+

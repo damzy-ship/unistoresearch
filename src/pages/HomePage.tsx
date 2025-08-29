@@ -10,7 +10,6 @@ import UniversitySelector from '../components/UniversitySelector';
 import RatingPrompt from '../components/RatingPrompt';
 import UserGreeting from '../components/UserGreeting';
 import AuthModal from '../components/AuthModal';
-// import BoltBadge from '../components/BoltBadge';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
 // import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';

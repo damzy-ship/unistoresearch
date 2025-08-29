@@ -4,7 +4,6 @@ import CategoriesTab from './CategoriesTab';
 import SchoolsTab from './SchoolsTab';
 import BillingTab from './BillingTab';
 import ReviewsTab from './ReviewsTab';
-import BoltBadge from './BoltBadge';
 import { Toaster } from 'react-hot-toast';
 
 interface DashboardStats {

@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { getMerchantCategories } from '../lib/categoryService';
 import { getActiveSchools } from '../lib/schoolService';
 import StarRating from '../components/StarRating';
-import BoltBadge from '../components/BoltBadge';
+
 
 interface SellerWithCategories {
   id: string;
@@ -205,7 +205,6 @@ export default function SellersPage() {
             </div>
             <div className="flex items-center gap-4">
               <h1 className="text-xl font-semibold text-gray-900">Sellers Directory</h1>
-              <BoltBadge variant="minimal" />
             </div>
           </div>
         </div>

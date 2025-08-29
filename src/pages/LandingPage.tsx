@@ -1,8 +1,6 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Star, ArrowRight, MessageSquare, Store, Award, CheckCircle } from 'lucide-react';
+import { Search, Users, Star, ArrowRight, MessageSquare, CheckCircle } from 'lucide-react';
 import ReviewSlider from '../components/ReviewSlider';
-import BoltBadge from '../components/BoltBadge';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -273,7 +271,6 @@ export default function LandingPage() {
               <p className="text-gray-400 mb-4 max-w-md">
                 Connecting university students with trusted local sellers through AI-powered search and direct communication.
               </p>
-              <BoltBadge variant="footer" className="mb-4" />
             </div>
             
             <div>

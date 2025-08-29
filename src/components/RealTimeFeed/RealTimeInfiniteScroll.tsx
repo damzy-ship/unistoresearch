@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import { getActiveRealTimeProducts, trackRealTimeProductView, trackRealTimeProductContact, getTimeRemaining } from '../../lib/realTimeService';
 import { RealTimeProduct } from '../../lib/realTimeService';
 import AuthModal from '../AuthModal';
-import BuyNowButton from '../Payment/BuyNowButton';
 import { supabase } from '../../lib/supabase';
 import { UserProfile } from '../ProfileModal';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';

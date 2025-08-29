@@ -11,7 +11,8 @@ import CategoriesTab from './admin/CategoriesTab';
 import SchoolsTab from './admin/SchoolsTab';
 import BillingTab from './admin/BillingTab';
 import RealTimeProductsTab from './admin/RealTimeProductsTab';
-import BoltBadge from './BoltBadge';
+import InvoicesTab from './admin/InvoicesTab';
+
 import { Toaster } from 'sonner';
 
 interface DashboardStats {
@@ -24,6 +25,8 @@ interface DashboardStats {
   totalMerchants: number;
   averageRating: number;
   totalRatings: number;
+  invoicePaidTotal?: number;
+  invoiceCollectedTotal?: number;
 }
 
 export default function AdminDashboard() {
@@ -47,15 +50,16 @@ export default function AdminDashboard() {
   const [requests, setRequests] = useState<RequestLog[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'billing' | 'real-time'>('overview');
+  type TabId = 'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'billing' | 'real-time' | 'invoices';
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   // Set active tab from URL on component mount
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
     
-    if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'billing', 'real-time'].includes(tabParam)) {
-      setActiveTab(tabParam as any);
+    if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'billing', 'real-time', 'invoices'].includes(tabParam)) {
+      setActiveTab(tabParam as TabId);
     }
   }, [location]);
 
@@ -70,8 +74,8 @@ export default function AdminDashboard() {
     localStorage.removeItem('admin_authenticated');
   };
 
-  const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId as any);
+  const handleTabChange = (tabId: TabId) => {
+    setActiveTab(tabId);
     navigate(`/admin?tab=${tabId}`);
   };
 
@@ -119,12 +123,33 @@ export default function AdminDashboard() {
       const veritasRequests = requestsData?.filter(r => r.university === 'Veritas').length || 0;
 
       // Calculate overall rating stats
-      const merchantsWithRatings = merchantsData?.filter((m: any) => (m.total_ratings || 0) > 0) || [];
       const totalRatings = merchantsData?.reduce((sum: number, m: any) => sum + (m.total_ratings || 0), 0) || 0;
       const weightedRatingSum = merchantsData?.reduce((sum: number, m: any) => {
         return sum + ((m.average_rating || 0) * (m.total_ratings || 0));
       }, 0) || 0;
       const averageRating = totalRatings > 0 ? weightedRatingSum / totalRatings : 0;
+
+      // Calculate invoice totals (paid and collected)
+      type InvoiceRow = { invoice_amount?: number | string };
+      const getAmt = (row: unknown) => {
+        try {
+          const a = (row as InvoiceRow)?.invoice_amount;
+          return Number(a) || 0;
+        } catch { return 0; }
+      };
+      
+      const { data: paidData } = await supabase
+        .from('invoices')
+        .select('invoice_amount', { count: 'exact' })
+        .eq('invoice_status', 'paid');
+
+      const { data: collectedData } = await supabase
+        .from('invoices')
+        .select('invoice_amount', { count: 'exact' })
+        .eq('invoice_status', 'collected');
+
+  const invoicePaidTotal = (paidData || []).reduce((s: number, r: unknown) => s + getAmt(r), 0);
+  const invoiceCollectedTotal = (collectedData || []).reduce((s: number, r: unknown) => s + getAmt(r), 0);
       setStats({
         totalVisitors: visitorsData?.length || 0,
         totalRequests: requestsData?.length || 0,
@@ -134,7 +159,9 @@ export default function AdminDashboard() {
         todayRequests,
         totalMerchants: merchantsData?.length || 0,
         averageRating,
-        totalRatings
+  totalRatings,
+  invoicePaidTotal,
+  invoiceCollectedTotal
       });
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -171,7 +198,6 @@ export default function AdminDashboard() {
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">UniStore Analytics</h1>
             </div>
             <div className="flex items-center gap-4">
-              <BoltBadge variant="minimal" />
               <button
                 onClick={handleLogout}
                 className="text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
@@ -186,19 +212,20 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Navigation Tabs */}
         <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl mb-6 sm:mb-8 overflow-x-auto">
-          {[
+            {[
             { id: 'overview', label: 'Overview', icon: TrendingUp },
             { id: 'visitors', label: 'Visitors', icon: Users },
             { id: 'requests', label: 'Requests', icon: MessageSquare },
             { id: 'merchants', label: 'Merchants', icon: Store },
             { id: 'categories', label: 'Categories', icon: Tag },
             { id: 'schools', label: 'Schools', icon: School },
-            { id: 'billing', label: 'Billing', icon: CreditCard },
-            { id: 'real-time', label: 'Real-time', icon: Zap }
+              { id: 'billing', label: 'Billing', icon: CreditCard },
+              { id: 'invoices', label: 'Invoices', icon: CreditCard },
+              { id: 'real-time', label: 'Real-time', icon: Zap }
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id} 
-              onClick={() => handleTabChange(id)}
+              onClick={() => handleTabChange(id as TabId)}
               className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
                 activeTab === id
                   ? 'bg-white text-orange-600 shadow-sm'
@@ -224,6 +251,7 @@ export default function AdminDashboard() {
             {activeTab === 'categories' && <CategoriesTab />}
             {activeTab === 'schools' && <SchoolsTab />}
             {activeTab === 'billing' && <BillingTab />}
+            {activeTab === 'invoices' && <InvoicesTab />}
             {activeTab === 'real-time' && <RealTimeProductsTab />}
           </>
         )}
