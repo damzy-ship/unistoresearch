@@ -37,7 +37,9 @@ export default function HomePage() {
   const { trackRequest } = useTracking();
   const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null);
+  const [userType, setUserType] = useState<string | null>(null);
 
   React.useEffect(() => {
     const checkAuth = async () => {
@@ -47,6 +49,27 @@ export default function HomePage() {
     };
     
     checkAuth();
+
+    const fetchUserType = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: visitor } = await supabase
+            .from('unique_visitors')
+            .select('user_type')
+            .eq('auth_user_id', session.user.id)
+            .single();
+          setUserType((visitor as { user_type?: string } | null)?.user_type || null);
+        } else {
+          setUserType(null);
+        }
+      } catch (err) {
+        console.error('Error fetching user_type:', err);
+        setUserType(null);
+      }
+    };
+
+    fetchUserType();
 
     // Listen for payment modal open event
     const handlePaymentModalOpen = () => setShowPaymentModal(true);
@@ -274,28 +297,32 @@ export default function HomePage() {
           {/* Floating Action Buttons - WhatsApp Style */}
           <div className="fixed bottom-5 right-3 z-50 flex flex-col gap-3">
             {/* Text Post Button */}
-            <button
-              onClick={() => {
-                setCreateMode('text');
-                setShowCreateModal(true);
-              }}
-              className="w-10 h-10 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-              title="Create text post"
-            >
-              <Edit3 className="w-5 h-5" />
-            </button>
-            
-            {/* Image Post Button */}
-            <button
-              onClick={() => {
-                setCreateMode('image');
-                setShowCreateModal(true);
-              }}
-              className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-              title="Create image post"
-            >
-              <Camera className="w-5 h-5" />
-            </button>
+            {userType === 'merchant' && (
+              <>
+                <button
+                  onClick={() => {
+                    setCreateMode('text');
+                    setShowCreateModal(true);
+                  }}
+                  className="w-10 h-10 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                  title="Create text post"
+                >
+                  <Edit3 className="w-5 h-5" />
+                </button>
+                
+                {/* Image Post Button */}
+                <button
+                  onClick={() => {
+                    setCreateMode('image');
+                    setShowCreateModal(true);
+                  }}
+                  className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                  title="Create image post"
+                >
+                  <Camera className="w-5 h-5" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Create Realtime Modal */}
@@ -376,7 +403,7 @@ export default function HomePage() {
             isLoading={isSearching}
             requestText={request}
             university={university}
-            requestId={currentRequestId}
+            requestId={currentRequestId ?? undefined}
           />
 
           {/* Retry Search Prompt */}

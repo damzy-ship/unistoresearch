@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { UniqueVisitor } from '../../lib/supabase';
+import { useEffect, useState } from 'react';
+import { UniqueVisitor, supabase } from '../../lib/supabase';
 import { Search, Filter, X, Calendar, Phone } from 'lucide-react';
 
 interface VisitorsTabProps {
@@ -11,6 +11,13 @@ export default function VisitorsTab({ visitors }: VisitorsTabProps) {
   const [phoneFilter, setPhoneFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  // local copy so we can optimistically update UI when user_type changes
+  const [localVisitors, setLocalVisitors] = useState<UniqueVisitor[]>(visitors);
+  const [updatingIds, setUpdatingIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setLocalVisitors(visitors);
+  }, [visitors]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
@@ -21,7 +28,7 @@ export default function VisitorsTab({ visitors }: VisitorsTabProps) {
   };
 
   // Filter visitors based on search and filters
-  const filteredVisitors = visitors.filter(visitor => {
+  const filteredVisitors = localVisitors.filter(visitor => {
     const matchesSearch = !searchTerm || 
       visitor.user_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (visitor.phone_number && visitor.phone_number.includes(searchTerm));
@@ -148,6 +155,9 @@ export default function VisitorsTab({ visitors }: VisitorsTabProps) {
                   User ID
                 </th>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Full Name
                 </th>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -170,6 +180,51 @@ export default function VisitorsTab({ visitors }: VisitorsTabProps) {
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-mono text-gray-900">
                     {visitor.user_id}
                   </td>
+                    {/* Role selector */}
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm">
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={visitor.user_type || 'visitor'}
+                          onChange={async (e) => {
+                            const newType = e.target.value;
+                            // mark updating
+                            setUpdatingIds((s) => [...s, visitor.id]);
+                            // clear any previous error state (not tracked locally)
+                            try {
+                              const { error } = await supabase
+                                .from('unique_visitors')
+                                .update({ user_type: newType })
+                                .eq('id', visitor.id);
+                              if (error) {
+                                console.error('Error updating user_type:', error);
+                                // error logged; no local error UI
+                              } else {
+                                // update local state
+                                setLocalVisitors((list) =>
+                                  list.map((v) => (v.id === visitor.id ? { ...v, user_type: newType } : v))
+                                );
+                              }
+                            } catch (err) {
+                              console.error('Unexpected error updating user_type:', err);
+                            } finally {
+                              setUpdatingIds((s) => s.filter((id) => id !== visitor.id));
+                            }
+                          }}
+                          className="px-2 py-1 border border-gray-300 rounded-lg text-sm bg-white"
+                          disabled={updatingIds.includes(visitor.id)}
+                        >
+                          <option value="visitor">Visitor</option>
+                          <option value="user">User</option>
+                          <option value="merchant">Merchant</option>
+                        </select>
+                        {updatingIds.includes(visitor.id) && (
+                          <span className="text-xs text-gray-500">Updating…</span>
+                        )}
+                        {!updatingIds.includes(visitor.id) && visitor.user_type === 'merchant' && (
+                          <span className="text-xs text-green-700 px-2 py-0.5 bg-green-100 rounded-full">M</span>
+                        )}
+                      </div>
+                    </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600">
                     {visitor.full_name || <span className="text-gray-400">Not provided</span>}
                   </td>

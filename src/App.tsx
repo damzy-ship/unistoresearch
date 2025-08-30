@@ -16,6 +16,7 @@ import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
 import InvoicesPage from './pages/InvoicesPage';
 import ViewInvoicePage from './pages/ViewInvoicePage';
+import PayMerchantPage from './pages/PayMerchantPage';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -42,6 +43,7 @@ function App() {
           <Route path="/test-categories" element={<CategoryTest />} />
           <Route path="/payment/:merchantId" element={<PaymentPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/pay-merchant" element={<PayMerchantPage />} />
           <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
         </Routes>
       </Router>
