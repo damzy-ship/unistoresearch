@@ -242,7 +242,7 @@ export default function PayMerchantPage() {
                                             setFormData(prev => ({ ...prev, phoneNumber: value }));
                                             if (!validatePhoneNumber(value) && value !== '') {
                                                 setErrors(prev => ({ ...prev, phoneNumber: 'Please enter a valid Nigerian phone number' }));
-                                            } else {
+                                            } else { 
                                                 setErrors(prev => ({ ...prev, phoneNumber: '' }));
                                             }
                                         }}
@@ -275,8 +275,6 @@ export default function PayMerchantPage() {
                                     required
                                 />
                             </div>
-
-
 
                             <div>
                                 {selectedMerchant && validateAmount(formData.amount) && (isAuthenticated || validatePhoneNumber(formData.phoneNumber)) ? (

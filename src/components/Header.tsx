@@ -70,10 +70,10 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
         className={`flex items-center gap-2 mr-3 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
       >
         <CreditCard className="w-4 h-4" />
-        <span className="hidden sm:inline">Pay Merchant</span>
-        <span className="inline sm:hidden">Pay</span>
+        <span className="hidden sm:inline">Make Payment</span>
+        <span className="inline sm:hidden">Make Payment</span>
       </button>
-  {userIsAuthenticated && userType === 'merchant' && (
+  {/* {userIsAuthenticated && userType === 'merchant' && (
          <button
            onClick={() => window.dispatchEvent(new CustomEvent('open-payment-modal'))}
            aria-label="Open accept payment modal"
@@ -84,7 +84,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
            <span className="hidden sm:inline">Accept Payment</span>
            <span className="inline sm:hidden">Accept</span>
          </button>
-       )}
+       )} */}
        
        {showAuth && (
          userIsAuthenticated ? (

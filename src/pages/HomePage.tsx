@@ -82,7 +82,6 @@ export default function HomePage() {
 
   const handleSearchRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!request.trim()) return;
 
     // Check if user is authenticated
