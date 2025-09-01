@@ -67,7 +67,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
         onClick={() => navigate('/pay-merchant')}
         aria-label="Pay a merchant"
         title="Pay Merchant"
-        className={`flex items-center gap-2 mr-3 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
+        className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
       >
         <CreditCard className="w-4 h-4" />
         <span className="hidden sm:inline">Make Payment</span>
