@@ -188,3 +188,37 @@
   opacity: 1;
   transform: scale(1.2);
 }
+
+/* AnnouncementBar.css */
+.announcement-bar-container {
+  background-color: #ffcc00; /* Yellow background */
+  color: #333; /* Dark text color */
+  padding: 10px 15px;
+  text-align: center;
+  overflow: hidden; /* Hide overflowing text */
+  white-space: nowrap; /* Prevent text from wrapping */
+  position: relative;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.announcement-bar-content {
+  display: inline-block;
+}
+
+/* Sliding text animation for mobile */
+@media (max-width: 768px) {
+  .sliding-text {
+    animation: slideText 15s linear infinite; /* Adjust duration as needed */
+  }
+
+  @keyframes slideText {
+    0% {
+      transform: translateX(100%); /* Start off-screen right */
+    }
+    100% {
+      transform: translateX(-100%); /* End off-screen left */
+    }
+  }
+}

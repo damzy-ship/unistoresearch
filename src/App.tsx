@@ -17,6 +17,7 @@ import PaymentPage from './pages/PaymentPage';
 import InvoicesPage from './pages/InvoicesPage';
 import ViewInvoicePage from './pages/ViewInvoicePage';
 import PayMerchantPage from './pages/PayMerchantPage';
+import AnnouncementBar from './components/AnnouncementBar';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -28,6 +29,7 @@ function App() {
     >
       <Router>
         <Toaster position="top-center" richColors />
+        <AnnouncementBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/landing-page" element={<LandingPage />} />

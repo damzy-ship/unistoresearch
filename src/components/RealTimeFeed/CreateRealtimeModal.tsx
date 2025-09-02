@@ -96,8 +96,7 @@ export default function CreateRealtimeModal({ mode, onClose }: CreateRealtimeMod
         media_url: mediaUrl,
         media_type: mode === 'image' ? 'image' : 'image',
         text_color: mode === 'text' ? selectedColor : undefined,
-        is_text_post: mode === 'text',
-        price: 100
+        is_text_post: mode === 'text'
       };
 
       const result = await createRealTimeProduct(productData);
