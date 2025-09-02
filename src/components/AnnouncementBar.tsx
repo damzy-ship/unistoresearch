@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 
 const AnnouncementBar = () => {
-  const message = "Do not pay to merchant's direct account number, pay using Unistore payment to ensure you get your product before merchant is credited.";
+  const message = "Do not pay to merchant's account number, pay using Unistore payment to ensure you get your product before merchant is credited.";
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
