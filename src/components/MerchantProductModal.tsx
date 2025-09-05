@@ -120,16 +120,16 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
     setNewFiles([]);
     setEditingProduct(null);
     setError(null);
-    // setShowAddProductForm(false);
+    setShowAddProductForm(false);
   };
-  const onCancelFrom = () => {
+  const resetAndShowForm = () => {
     setProductDescription('');
     setProductPrice('');
     setIsAvailable(true);
     setNewFiles([]);
     setEditingProduct(null);
     setError(null);
-    setShowAddProductForm(false);
+    // setShowAddProductForm(false);
   };
   
   const handleAddProduct = async (e: React.FormEvent) => {
@@ -380,7 +380,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={onCancelFrom}
+                  onClick={resetForm}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                   disabled={loading || uploadingImages}
                 >
@@ -405,7 +405,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
             <h3 className="text-lg font-semibold text-gray-800">Products ({products.length})</h3>
             {!showAddProductForm && (
               <button
-                onClick={() => { setShowAddProductForm(true); resetForm(); }}
+                onClick={() => { setShowAddProductForm(true); resetAndShowForm(); }}
                 className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> Add New Product
