@@ -122,6 +122,15 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
     setError(null);
     // setShowAddProductForm(false);
   };
+  const onCancelFrom = () => {
+    setProductDescription('');
+    setProductPrice('');
+    setIsAvailable(true);
+    setNewFiles([]);
+    setEditingProduct(null);
+    setError(null);
+    setShowAddProductForm(false);
+  };
   
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -371,7 +380,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={resetForm}
+                  onClick={onCancelFrom}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                   disabled={loading || uploadingImages}
                 >
