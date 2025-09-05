@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   const [requests, setRequests] = useState<RequestLog[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [loading, setLoading] = useState(false);
-  type TabId = 'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'billing' | 'real-time' | 'invoices';
+  type TabId = 'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'real-time' | 'invoices';
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   // Set active tab from URL on component mount
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
     
-    if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'billing', 'real-time', 'invoices'].includes(tabParam)) {
+    if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'real-time', 'invoices'].includes(tabParam)) {
       setActiveTab(tabParam as TabId);
     }
   }, [location]);
@@ -219,7 +219,6 @@ export default function AdminDashboard() {
             { id: 'merchants', label: 'Merchants', icon: Store },
             { id: 'categories', label: 'Categories', icon: Tag },
             { id: 'schools', label: 'Schools', icon: School },
-              { id: 'billing', label: 'Billing', icon: CreditCard },
               { id: 'invoices', label: 'Invoices', icon: CreditCard },
               { id: 'real-time', label: 'Real-time', icon: Zap }
           ].map(({ id, label, icon: Icon }) => (
@@ -250,7 +249,6 @@ export default function AdminDashboard() {
             {activeTab === 'merchants' && <MerchantsTab merchants={merchants} onRefresh={fetchData} />}
             {activeTab === 'categories' && <CategoriesTab />}
             {activeTab === 'schools' && <SchoolsTab />}
-            {activeTab === 'billing' && <BillingTab />}
             {activeTab === 'invoices' && <InvoicesTab />}
             {activeTab === 'real-time' && <RealTimeProductsTab />}
           </>

@@ -8,11 +8,6 @@ if (!API_KEY) {
   console.warn('VITE_GEMINI_API_KEY not found. Category generation will be disabled.');
 }
 
-// Validate API key format (basic check)
-if (API_KEY && !API_KEY.startsWith('AIza')) {
-  console.error('Invalid Gemini API key format. API keys should start with "AIza"');
-}
-
 const genAI = API_KEY && API_KEY.startsWith('AIza') ? new GoogleGenerativeAI(API_KEY) : null;
 
 export interface CategoryGenerationResult {

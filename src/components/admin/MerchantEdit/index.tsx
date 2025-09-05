@@ -312,13 +312,7 @@ export default function MerchantEdit({ merchant, onClose, onSuccess }: MerchantE
             setCategorySearchTerm={setCategorySearchTerm}
             setShowCategorySelector={setShowCategorySelector}
           />
-
-          {/* Product Gallery */}
-          <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-            <h4 className="text-sm font-medium text-purple-800 mb-3">Product Images</h4>
-            <ProductGallery merchantId={merchant.id} editable={true} />
-          </div>
-
+          
           {/* Product Gallery */}
           <ProductGallery merchantId={merchant.id} />
 

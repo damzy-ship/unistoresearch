@@ -348,7 +348,7 @@ export default function HomePage() {
           </div>
 
           {/* Bottom Links */}
-          <div className="mt-12 flex flex-col items-center gap-4 w-full">
+          {/* <div className="mt-12 flex flex-col items-center gap-4 w-full">
             <button
               onClick={() => window.open("https://unistore.ng", "_blank")}
               className="text-sm font-medium underline hover:no-underline transition-all duration-200"
@@ -358,7 +358,7 @@ export default function HomePage() {
             </button>
             
     
-          </div>
+          </div> */}
         </div>
       ) : (
         <>

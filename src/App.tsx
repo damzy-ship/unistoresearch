@@ -6,6 +6,7 @@ import PastRequestsPage from './pages/PastRequestsPage';
 import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
 import SellerDetailsPage from './pages/SellerDetailsPage';
+import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
 import BillingCallbackPage from './pages/BillingCallbackPage';
 import RealTimePage from './pages/RealTimePage';
@@ -36,6 +37,7 @@ function App() {
           <Route path="/past-requests" element={<PastRequestsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/sellers" element={<SellersPage />} />
+          <Route path="/merchants" element={<PublicMerchantsPage />} />
           <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
           <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
           <Route path="/billing/callback" element={<BillingCallbackPage />} />
