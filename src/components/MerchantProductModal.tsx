@@ -285,7 +285,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold text-gray-800">Manage Products for {merchantName}</h2>
+          <h2 className="text-md sm:text-xl font-semibold text-gray-800">Manage Products for {merchantName}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="w-6 h-6" />
           </button>
@@ -402,7 +402,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
         {/* Product List */}
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Current Products ({products.length})</h3>
+            <h3 className="text-lg font-semibold text-gray-800">Products ({products.length})</h3>
             {!showAddProductForm && (
               <button
                 onClick={() => { setShowAddProductForm(true); resetForm(); }}
