@@ -6,6 +6,7 @@ interface Product {
   product_price: string;
   is_available: boolean;
   image_urls: string[];
+  merchant_id: string;
 }
 
 function ProductSearchComponent() {

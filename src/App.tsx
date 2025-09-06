@@ -19,6 +19,7 @@ import InvoicesPage from './pages/InvoicesPage';
 import ViewInvoicePage from './pages/ViewInvoicePage';
 import PayMerchantPage from './pages/PayMerchantPage';
 import AnnouncementBar from './components/AnnouncementBar';
+import ProductSearchPage from './pages/ProductSearchPage';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -45,6 +46,7 @@ function App() {
           <Route path="/create-real-time-product" element={<CreateRealTimeProductPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/test-categories" element={<CategoryTest />} />
+          <Route path="/product-search" element={<ProductSearchPage />} />
           <Route path="/payment/:merchantId" element={<PaymentPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/pay-merchant" element={<PayMerchantPage />} />
