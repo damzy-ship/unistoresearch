@@ -2,6 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+// import { supabase } from '../lib/supabase'; already present
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(API_KEY);
+
+
+// Add this new async function inside your component, before the return statement.
+const getProductEmbedding = async (description: string) => {
+    try {
+        const embeddingModel = genAI.getGenerativeModel({ model: 'embedding-001' });
+        const result = await embeddingModel.embedContent(description);
+        return result.embedding.values;
+    } catch (error) {
+        console.error('Error generating embedding:', error);
+        throw new Error('Failed to generate product embedding.');
+    }
+};
+
 // Reusable function to handle image upload, inspired by ProductGallery
 const uploadImageToSupabase = async (file, merchantId) => {
     const fileExt = file.name.split('.').pop();
@@ -52,6 +70,7 @@ interface Product {
     is_available: boolean;
     created_at: string;
     image_urls: string[];
+    embedding: number[]; // New field for the embedding vector
 }
 
 interface MerchantProductModalProps {
@@ -132,88 +151,104 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
         // setShowAddProductForm(false);
     };
 
-    const handleAddProduct = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!productDescription || !productPrice) {
-            setError('Product description and price are required.');
-            return;
+// Modify handleAddProduct
+const handleAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productDescription || !productPrice) {
+        setError('Product description and price are required.');
+        return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+        // 1. Generate the embedding
+        const embedding = await getProductEmbedding(productDescription);
+
+        // 2. Upload images
+        setUploadingImages(true);
+        const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId))) : [];
+        setUploadingImages(false);
+
+        // 3. Insert the new product with the embedding
+        const { error } = await supabase
+            .from('merchant_products')
+            .insert({
+                merchant_id: merchantId,
+                product_description: productDescription,
+                product_price: productPrice,
+                is_available: isAvailable,
+                image_urls: imageUrls,
+                embedding: embedding // Store the embedding
+            });
+
+        if (error) {
+            throw error;
         }
 
-        setLoading(true);
-        setError(null);
+        resetForm();
+        fetchProducts();
+    } catch (err) {
+        console.error('Error adding product:', err);
+        setUploadingImages(false);
+        setError(err instanceof Error ? err.message : 'Failed to add product');
+    } finally {
+        setLoading(false);
+    }
+};
 
-        try {
-            setUploadingImages(true);
-            const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId))) : [];
-            setUploadingImages(false);
+// Modify handleEditProduct
+const handleEditProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct || !productDescription || !productPrice) {
+        setError('Product description and price are required.');
+        return;
+    }
 
-            const { error } = await supabase
-                .from('merchant_products')
-                .insert({
-                    merchant_id: merchantId,
-                    product_description: productDescription,
-                    product_price: productPrice,
-                    is_available: isAvailable,
-                    image_urls: imageUrls,
-                });
+    setLoading(true);
+    setError(null);
 
-            if (error) {
-                throw error;
-            }
-
-            resetForm();
-            fetchProducts();
-        } catch (err) {
-            console.error('Error adding product:', err);
-            setUploadingImages(false);
-            setError(err instanceof Error ? err.message : 'Failed to add product');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleEditProduct = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!editingProduct || !productDescription || !productPrice) {
-            setError('Product description and price are required.');
-            return;
+    try {
+        // 1. Generate a new embedding if the description changed
+        let newEmbedding = editingProduct.embedding;
+        if (productDescription !== editingProduct.product_description) {
+            newEmbedding = await getProductEmbedding(productDescription);
         }
 
-        setLoading(true);
-        setError(null);
+        // 2. Upload new images
+        setUploadingImages(true);
+        const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId))) : [];
+        setUploadingImages(false);
 
-        try {
-            setUploadingImages(true);
-            const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId))) : [];
-            setUploadingImages(false);
+        const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newUrls];
 
-            const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newUrls];
+        // 3. Update the product record with the new embedding and image URLs
+        const { error } = await supabase
+            .from('merchant_products')
+            .update({
+                product_description: productDescription,
+                product_price: productPrice,
+                is_available: isAvailable,
+                image_urls: updatedImageUrls,
+                embedding: newEmbedding // Store the updated embedding
+            })
+            .eq('id', editingProduct.id);
 
-            const { error } = await supabase
-                .from('merchant_products')
-                .update({
-                    product_description: productDescription,
-                    product_price: productPrice,
-                    is_available: isAvailable,
-                    image_urls: updatedImageUrls,
-                })
-                .eq('id', editingProduct.id);
-
-            if (error) {
-                throw error;
-            }
-
-            resetForm();
-            fetchProducts();
-        } catch (err) {
-            console.error('Error editing product:', err);
-            setUploadingImages(false);
-            setError(err instanceof Error ? err.message : 'Failed to edit product');
-        } finally {
-            setLoading(false);
+        if (error) {
+            throw error;
         }
-    };
 
+        resetForm();
+        fetchProducts();
+    } catch (err) {
+        console.error('Error editing product:', err);
+        setUploadingImages(false);
+        setError(err instanceof Error ? err.message : 'Failed to edit product');
+    } finally {
+        setLoading(false);
+    }
+};
     const handleDeleteProduct = async (productId: string, imageUrls: string[]) => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
 

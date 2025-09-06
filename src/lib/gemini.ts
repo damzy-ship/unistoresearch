@@ -114,7 +114,7 @@ Generate categories now:`;
       }
       
       categories = categories
-        .map(cat => cat.trim())
+        .map(cat => cat.trim()) 
         .filter(cat => cat.length > 0)
         .slice(0, 5);
         

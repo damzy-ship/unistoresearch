@@ -3,6 +3,8 @@ import { Search, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, UniqueVisitor } from '../lib/supabase';
 import MerchantProductModal from '../components/MerchantProductModal';
+// import { generateProductEmbeddings } from '../lib/generateEmbedding';
+// import ProductSearchComponent from '../components/ProductSearchComponent';
 
 
 export default function PublicMerchantsPage() {
@@ -83,6 +85,12 @@ export default function PublicMerchantsPage() {
           </div>
         </div>
       </div>
+
+      {/* <button onClick={generateProductEmbeddings}>
+        <h1>Populate</h1>
+      </button>
+
+      <ProductSearchComponent /> */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
