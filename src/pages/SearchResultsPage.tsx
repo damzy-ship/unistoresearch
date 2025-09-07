@@ -4,6 +4,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import { useTheme } from '../hooks/useTheme';
 
 interface Product {
   product_description: string;
@@ -16,6 +17,7 @@ interface Product {
 
 function SearchResultsPage() {
   const location = useLocation();
+  const { currentTheme } = useTheme();
   const { products, searchQuery } = location.state as { products: Product[], searchQuery: string };
 
   const getWhatsappLink = (phoneNumber: string | undefined): string => {
@@ -25,11 +27,15 @@ function SearchResultsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 sm:p-8 font-sans">
+    <div className="min-h-screen p-6 sm:p-8 font-sans"
+      style={{ background: currentTheme.background }}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-2 tracking-tight animate-fade-in">Search Results</h1>
-          <p className="text-lg text-gray-600 font-medium animate-slide-up">for <span className="text-gray-900 font-semibold">"{searchQuery}"</span></p>
+          <h1 className="text-2xl font-extrabold mb-2 tracking-tight animate-fade-in"
+            style={{ color: currentTheme.text }}>Search Results</h1>
+          <p className="text-lg font-medium animate-slide-up"
+            style={{ color: currentTheme.text }}>for <span style={{ color: currentTheme.text }} className="text-gray-900 font-semibold">"{searchQuery}"</span></p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -52,8 +58,12 @@ function SearchResultsPage() {
                 </Swiper>
 
                 <div className="p-6 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2 truncate">{product.product_description}</h3>
-                  <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
+                  <h3 className="text-xl font-bold mb-2 truncate"
+                    style={{ color: currentTheme.text }}
+                  >{product.product_description}</h3>
+                  <p className="text-3xl text-green-600 font-black mb-2"
+                  
+                  >₦{product.product_price}</p>
                   {product.full_name && (
                     <p className="text-sm text-gray-500 mb-2">
                       <span className="font-semibold text-gray-700">{product.full_name}</span>
@@ -67,7 +77,7 @@ function SearchResultsPage() {
                       href={getWhatsappLink(product.phone_number)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto flex items-center justify-center bg-green-500 text-white font-bold py-3 px-4 rounded-full hover:bg-green-600 transition-colors duration-300 shadow-md hover:shadow-lg"
+                      className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
                     >
                       Get Now
                     </a>
