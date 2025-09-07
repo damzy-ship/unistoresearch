@@ -5,6 +5,7 @@ import { useTheme } from '../hooks/useTheme';
 import type { RealTimeProduct } from '../lib/realTimeService';
 import { supabase } from '../lib/supabase';
 import type { Merchant } from '../lib/supabase';
+import ProductSearchComponent from '../components/ProductSearchComponent';
 
 // Partial merchant shape returned by lightweight select
 interface MerchantPartial {
@@ -124,6 +125,7 @@ function ProductSearchComponentWithCallback({ onResults }: { onResults: (r: Prod
   };
 
   return (
+    <>
     <form onSubmit={handleSearch} className="space-y-4">
       <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search products..." className="w-full p-3 rounded border" />
       <div className="flex gap-2">
@@ -132,5 +134,8 @@ function ProductSearchComponentWithCallback({ onResults }: { onResults: (r: Prod
       </div>
       {error && <p className="text-red-500">{error}</p>}
     </form>
+
+    <ProductSearchComponent />
+    </>
   );
 }

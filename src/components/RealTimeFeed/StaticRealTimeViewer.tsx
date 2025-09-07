@@ -9,11 +9,6 @@ interface Props {
   onClose?: () => void;
 }
 
-interface MerchantPartial {
-  id: string;
-  full_name?: string;
-}
-
 export default function StaticRealTimeViewer({ products, onClose }: Props) {
   const { currentTheme } = useTheme();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -85,10 +80,10 @@ export default function StaticRealTimeViewer({ products, onClose }: Props) {
                                 </div>
                               )}
 
-                              {product.merchant && (product.merchant as MerchantPartial).full_name && (
+                              {product.merchant && product.merchant.full_name && (
                                 <div className="flex items-center space-x-1 text-sm">
                                   <span>Post by</span>
-                                  <span className='font-bold'>{(product.merchant as MerchantPartial).full_name}</span>
+                                  <span className='font-bold'>{product.merchant.full_name}</span>
                                 </div>
                               )}
                             </div>
@@ -114,7 +109,7 @@ export default function StaticRealTimeViewer({ products, onClose }: Props) {
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
                       <div className="text-white">
                         <h2 className="text-xl font-bold mb-2">{product.title}</h2>
-                        {product.description && <p className="text-sm text-gray-200 mb-3 line-clamp-2">{product.description}</p>}
+                        {/* {product.description && <p className="text-sm text-gray-200 mb-3 line-clamp-2">{product.description}</p>} */}
 
                         <div className="flex items-center justify-between mb-20">
                           <div className="flex items-center space-x-4">
@@ -130,10 +125,10 @@ export default function StaticRealTimeViewer({ products, onClose }: Props) {
                                 </div>
                               )}
 
-                              {product.merchant && (product.merchant as MerchantPartial).full_name && (
+                              {product.merchant && product.merchant.full_name && (
                                 <div className="flex items-center space-x-1 text-sm">
                                   <span>Post by</span>
-                                  <span className='font-bold'>{(product.merchant as MerchantPartial).full_name}</span>
+                                  <span className='font-bold'>{product.merchant.full_name}</span>
                                 </div>
                               )}
                             </div>

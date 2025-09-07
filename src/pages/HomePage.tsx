@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
-import { Send, ArrowLeft, History, Edit3, Camera } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useTracking, isAuthenticated } from '../hooks/useTracking';
 import { findMerchantsForRequest, MerchantWithCategories } from '../lib/gemini';
-import { useNavigate } from 'react-router-dom';
-import SellerResults from '../components/SellerResults';
+// import { useNavigate } from 'react-router-dom';
+// import SellerResults from '../components/SellerResults';
 // import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import ReviewSlider from '../components/ReviewSlider';
-import UniversitySelector from '../components/UniversitySelector';
+// import UniversitySelector from '../components/UniversitySelector';
 import RatingPrompt from '../components/RatingPrompt';
 import UserGreeting from '../components/UserGreeting';
 import AuthModal from '../components/AuthModal';
 import Header from '../components/Header';
 import ReviewForm from '../components/ReviewForm';
 // import RealTimeSwiper from '../components/RealTimeFeed/RealTimeSwiper';
-import RealTimeStatusBar from '../components/RealTimeFeed/RealTimeStatusBar';
-import CreateRealtimeModal from '../components/RealTimeFeed/CreateRealtimeModal';
+// import RealTimeStatusBar from '../components/RealTimeFeed/RealTimeStatusBar';
+// import CreateRealtimeModal from '../components/RealTimeFeed/CreateRealtimeModal';
 import { useTheme } from '../hooks/useTheme';
 import { Toaster } from 'sonner';
 import { supabase } from '../lib/supabase';
 import PaymentModal from '../components/Payment/PaymentModal';
+import ProductSearchComponent from '../components/ProductSearchComponent';
 
 export default function HomePage() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { currentTheme, backgroundTexture } = useTheme();
   const [request, setRequest] = useState("");
   const [university, setUniversity] = useState("Bingham");
@@ -31,9 +32,9 @@ export default function HomePage() {
   const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
   const [showRetryPrompt, setShowRetryPrompt] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  // const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [createMode, setCreateMode] = useState<'text' | 'image'>('text');
+  // const [createMode, setCreateMode] = useState<'text' | 'image'>('text');
   const { trackRequest } = useTracking();
   const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
@@ -204,10 +205,6 @@ export default function HomePage() {
             <Header onAuthClick={() => setShowAuthModal(true)} />
           </div>
           
-          {/* Real-time Status Bar */}
-          <div className="w-full mb-4">
-            <RealTimeStatusBar />
-          </div>
           
           {/* UniStore Logo */}
           <div className="mb-12 px-2">
@@ -222,115 +219,7 @@ export default function HomePage() {
           </div>
 
           {/* Search Card */}
-          <div className="relative px-3 z-10 w-full max-w-2xl mx-auto">
-            <div 
-              className="p-8 shadow-xl border border-gray-100 rounded-2xl transition-colors duration-300"
-              style={{ backgroundColor: currentTheme.surface }}
-            >
-              <form onSubmit={handleSearchRequest} className="space-y-6">
-                <div className="space-y-6">
-                  {/* University Selection */}
-                  <UniversitySelector
-                    selectedUniversity={university}
-                    onUniversityChange={setUniversity}
-                  />
-
-                  {/* Request Textarea */}
-                  <div className="relative">
-                    <textarea
-                    // focus:ring-${currentTheme.primary} focus:border-${currentTheme.primary}
-                      placeholder="I need tote bags below 5000 naira"
-                      className={`focus:ring-2 focus:ring-${currentTheme.primaryTsFormat} focus:border-${currentTheme.primaryTsFormat} w-full min-h-[120px] p-4 border-2 rounded-xl resize-none text-base transition-all duration-200 placeholder-gray-400`}
-                      // style={{
-                        //   color: currentTheme.text
-                        // }}
-                        style={{
-                          backgroundColor: currentTheme.background,
-                          borderColor: currentTheme.primary,
-                          color: currentTheme.text,
-                  
-                          // focusBorderColor: currentTheme.primary,
-                      }}
-                      value={request}
-                      onChange={(e) => setRequest(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex flex-col gap-3 pt-2">
-                  <button
-                    type="submit"
-                    className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
-                  >
-                    <Send className="mr-2 h-4 w-4" />
-                    Find Sellers
-                  </button>
-                </div>
-              </form>
-              
-              {/* Past Requests Link */}
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => navigate('/past-requests')}
-                  className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
-                  style={{ 
-                    color: currentTheme.textSecondary,
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
-                  onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
-                >
-                  <History className="w-4 h-4" />
-                  View past requests
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Real-time Products Section */}
-          {/* <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
-            <RealTimeSwiper className="mb-8" />
-          </div> */}
-
-          {/* Floating Action Buttons - WhatsApp Style */}
-          <div className="fixed bottom-5 right-3 z-50 flex flex-col gap-3">
-            {/* Text Post Button */}
-            {userType === 'merchant' && (
-              <>
-                <button
-                  onClick={() => {
-                    setCreateMode('text');
-                    setShowCreateModal(true);
-                  }}
-                  className="w-10 h-10 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-                  title="Create text post"
-                >
-                  <Edit3 className="w-5 h-5" />
-                </button>
-                
-                {/* Image Post Button */}
-                <button
-                  onClick={() => {
-                    setCreateMode('image');
-                    setShowCreateModal(true);
-                  }}
-                  className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-                  title="Create image post"
-                >
-                  <Camera className="w-5 h-5" />
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Create Realtime Modal */}
-          {showCreateModal && (
-            <CreateRealtimeModal
-              mode={createMode}
-              onClose={() => setShowCreateModal(false)}
-            />
-          )}
+         <ProductSearchComponent />
 
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
@@ -396,14 +285,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Seller Results */}
+          {/* Seller Results
           <SellerResults 
             sellers={matchedSellers}
             isLoading={isSearching}
             requestText={request}
             university={university}
             requestId={currentRequestId ?? undefined}
-          />
+          /> */}
 
           {/* Retry Search Prompt */}
           {showRetryPrompt && !isSearching && (
