@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Plus, Loader, CheckCircle, AlertCircle, Image, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { useTheme } from '../hooks/useTheme';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
@@ -88,6 +89,7 @@ export default function MerchantProductPage() {
     const [newFiles, setNewFiles] = useState<File[]>([]); // New state for files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
 
+    const { currentTheme } = useTheme();
     useEffect(() => {
         if (merchantId) {
             fetchProducts();
@@ -306,8 +308,10 @@ export default function MerchantProductPage() {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto my-8 p-6">
-            <div className="flex justify-between items-center pb-4 border-b">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto my-8 p-6"
+        
+        >
+            <div className="flex justify-between items-center pb-4">
                 <h2 className="text-md sm:text-xl font-semibold text-gray-800">
                     Manage Products for {merchantName}
                 </h2>
@@ -321,7 +325,7 @@ export default function MerchantProductPage() {
             )}
 
             {showAddProductForm ? (
-                <div className="py-4 border-b bg-gray-50">
+                <div className="py-4 bg-white rounded-lg mb-6">
                     <h3 className="text-lg font-semibold mb-4">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
                     <form onSubmit={editingProduct ? handleEditProduct : handleAddProduct} className="space-y-4">
                         <div>
@@ -407,7 +411,7 @@ export default function MerchantProductPage() {
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center gap-2"
+                                className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-md shadow-md transition-all duration-200 font-medium`}
                                 disabled={loading || uploadingImages}
                             >
                                 {(loading || uploadingImages) && <Loader className="w-4 h-4 animate-spin" />}
@@ -422,7 +426,7 @@ export default function MerchantProductPage() {
                         <h3 className="text-lg font-semibold text-gray-800">Products ({products.length})</h3>
                         <button
                             onClick={() => resetAndShowForm()}
-                            className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center gap-2"
+                            className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-md shadow-md transition-all duration-200 font-medium`}
                         >
                             <Plus className="w-4 h-4" /> Add New Product
                         </button>
@@ -437,7 +441,7 @@ export default function MerchantProductPage() {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {products.map((product) => (
-                                <div key={product.id} className="border border-gray-200 rounded-lg p-4 flex flex-col items-center text-center">
+                                <div key={product.id} className="border bg-white border-gray-200 rounded-lg p-4 flex flex-col items-center text-center">
                                     <div className="w-full h-40 bg-gray-100 rounded-md overflow-hidden flex items-center justify-center mb-4">
                                         {product.image_urls && product.image_urls.length > 0 ? (
                                             <img src={product.image_urls[0]} alt={product.product_description} className="w-full h-full object-cover" />
@@ -455,7 +459,7 @@ export default function MerchantProductPage() {
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
-                                        <div className="flex flex-col gap-2 mt-4 w-full">
+                                        <div className="flex gap-2 mt-4 w-full">
                                             <button
                                                 onClick={() => startEditProduct(product)}
                                                 className="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
