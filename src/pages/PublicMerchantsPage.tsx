@@ -67,7 +67,7 @@ export default function PublicMerchantsPage() {
   const handleShareOnWhatsApp = (merchant: UniqueVisitor) => {
     const baseUrl = window.location.origin;
     const merchantLink = `${baseUrl}/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
-    const message = `Check out my products on unistore: ${merchantLink}`;
+    const message = `Manage your products at: ${merchantLink}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${merchant.phone_number}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
