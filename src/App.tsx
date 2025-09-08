@@ -21,6 +21,7 @@ import PayMerchantPage from './pages/PayMerchantPage';
 import AnnouncementBar from './components/AnnouncementBar';
 import ProductSearchPage from './pages/ProductSearchPage';
 import SearchResultsPage from './pages/SearchResultsPage';
+import MerchantProductPage from './pages/MerchantProductPage';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -53,6 +54,7 @@ function App() {
           <Route path="/pay-merchant" element={<PayMerchantPage />} />
           <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
           <Route path="/search-results" element={<SearchResultsPage />} />
+          <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
         </Routes>
       </Router>
     </div>

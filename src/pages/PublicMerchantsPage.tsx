@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Search, Eye } from 'lucide-react';
+import { Search, Eye, Link, Share2, Clipboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, UniqueVisitor } from '../lib/supabase';
 import MerchantProductModal from '../components/MerchantProductModal';
-// import { generateProductEmbeddings } from '../lib/generateEmbedding';
-// import ProductSearchComponent from '../components/ProductSearchComponent';
-
 
 export default function PublicMerchantsPage() {
   const navigate = useNavigate();
   const [merchants, setMerchants] = useState<UniqueVisitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  // 👈 State for the modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
 
@@ -53,13 +49,30 @@ export default function PublicMerchantsPage() {
     );
   });
 
-  // 👈 New function to handle row clicks
   const handleViewProducts = (merchant: UniqueVisitor) => {
-    setSelectedMerchant(merchant);
-    setIsModalOpen(true);
+    navigate(`/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`);
   };
 
-  // 👈 New function to close the modal
+  const handleCopyLink = (merchant: UniqueVisitor) => {
+    const baseUrl = window.location.origin;
+    const merchantLink = `${baseUrl}/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
+    navigator.clipboard.writeText(merchantLink).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy link:', err);
+      alert('Failed to copy link. Please try again.');
+    });
+  };
+
+  const handleShareOnWhatsApp = (merchant: UniqueVisitor) => {
+    const baseUrl = window.location.origin;
+    const merchantLink = `${baseUrl}/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
+    const message = `Check out my products on unistore: ${merchantLink}`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${merchant.phone_number}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMerchant(null);
@@ -85,12 +98,6 @@ export default function PublicMerchantsPage() {
           </div>
         </div>
       </div>
-
-      {/* <button onClick={generateProductEmbeddings}>
-        <h1>Populate</h1>
-      </button>
-
-      <ProductSearchComponent /> */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
@@ -119,40 +126,44 @@ export default function PublicMerchantsPage() {
                   <tr>
                     <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
                     <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filtered.map((m) => (
-                    // 👈 Add onClick handler to the entire row
-                    <tr 
-                      key={m.id} 
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleViewProducts(m)}
+                    <tr
+                      key={m.id}
+                      className="hover:bg-gray-50"
                     >
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">{m.full_name || <span className="text-gray-400">Not provided</span>}</td>
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600">{m.phone_number || <span className="text-gray-400">Not provided</span>}</td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-mono text-gray-900">{m.user_id}</td>
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600">
-                        {/* The button below is now redundant since the entire row is clickable. 
-                          You can remove this block if you only want to use the row click. 
-                          If you want both, remove the onClick from the <tr> and keep the button.
-                        */}
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={(e) => {
-                                // 👈 Stop event propagation to prevent the row's onClick from firing
-                                e.stopPropagation(); 
-                                navigate(`/seller/${m.user_id}`);
-                            }}
-                            className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="View Details"
+                            onClick={() => handleViewProducts(m)}
+                            className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
+                            title="View Products"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4" /> View
+                          </button>
+                          <button
+                            onClick={() => handleCopyLink(m)}
+                            className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-1"
+                            title="Copy Link"
+                          >
+                            <Clipboard className="w-4 h-4" /> Copy
+                          </button>
+                          <button
+                            onClick={() => handleShareOnWhatsApp(m)}
+                            className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+                            title="Share on WhatsApp"
+                          >
+                            <Share2 className="w-4 h-4" /> Share
                           </button>
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-mono text-gray-900">{m.user_id}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -168,7 +179,6 @@ export default function PublicMerchantsPage() {
         </div>
       </div>
 
-      {/* 👈 Conditionally render the modal */}
       {isModalOpen && selectedMerchant && (
         <MerchantProductModal
           merchantId={selectedMerchant.user_id}

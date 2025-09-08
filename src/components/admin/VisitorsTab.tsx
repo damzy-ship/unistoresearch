@@ -29,7 +29,7 @@ export default function VisitorsTab({ visitors }: VisitorsTabProps) {
       if (error) {
         console.error('Error fetching schools:', error);
       } else {
-        setSchools(data || []);
+        setSchools((data || []) as School[]);
       }
     }
 
