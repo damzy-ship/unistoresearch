@@ -1,26 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
-// import { supabase } from '../lib/supabase'; already present
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
 
-
-// Add this new async function inside your component, before the return statement.
-const getProductEmbedding = async (description: string) => {
-    try {
-        const embeddingModel = genAI.getGenerativeModel({ model: 'embedding-001' });
-
-        const result = await embeddingModel.embedContent(description);
-        return result.embedding.values;
-    } catch (error) {
-        console.error('Error generating embedding:', error);
-        throw new Error('Failed to generate product embedding.');
-    }
-};
 
 // Reusable function to handle image upload, inspired by ProductGallery
 const uploadImageToSupabase = async (file, merchantId) => {
@@ -73,6 +55,7 @@ interface Product {
     created_at: string;
     image_urls: string[];
     embedding: number[]; // New field for the embedding vector
+    search_description: string;
 }
 
 interface MerchantProductModalProps {
@@ -90,7 +73,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
 
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
-    // const [productPrice, setProductPrice] = useState('');
+    const [productPrice, setProductPrice] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
     const [newFiles, setNewFiles] = useState<File[]>([]); // New state for files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
