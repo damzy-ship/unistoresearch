@@ -59,7 +59,7 @@ function SearchResultsPage() {
   };
 
   const handleAuthSuccess = () => {
-    
+
     if (pendingContactProduct) {
       contactSeller(pendingContactProduct);
       setPendingContactProduct(null);
@@ -137,7 +137,7 @@ function SearchResultsPage() {
         isOpen={showAuthModal}
         onClose={handleAuthClose}
         onSuccess={handleAuthSuccess}
-      />F
+      />
     </div>
   );
 }

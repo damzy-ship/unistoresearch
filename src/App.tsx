@@ -22,6 +22,7 @@ import AnnouncementBar from './components/AnnouncementBar';
 import ProductSearchPage from './pages/ProductSearchPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
+import AllProductsPage from './pages/AllProductsPage';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -55,6 +56,7 @@ function App() {
           <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
           <Route path="/search-results" element={<SearchResultsPage />} />
           <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
+          <Route path="/all-products" element={<AllProductsPage />} />
         </Routes>
       </Router>
     </div>

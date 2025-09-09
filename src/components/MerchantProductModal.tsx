@@ -12,6 +12,7 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 const getProductEmbedding = async (description: string) => {
     try {
         const embeddingModel = genAI.getGenerativeModel({ model: 'embedding-001' });
+        
         const result = await embeddingModel.embedContent(description);
         return result.embedding.values;
     } catch (error) {
@@ -88,7 +89,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
 
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
-    const [productPrice, setProductPrice] = useState('');
+    // const [productPrice, setProductPrice] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
     const [newFiles, setNewFiles] = useState<File[]>([]); // New state for files to upload
     const [uploadingImages, setUploadingImages] = useState(false);

@@ -20,6 +20,7 @@ import { Toaster } from 'sonner';
 import { supabase } from '../lib/supabase';
 import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
+import { generateProductEmbeddings } from '../lib/generateEmbedding';
 
 export default function HomePage() {
   // const navigate = useNavigate();
@@ -204,6 +205,10 @@ export default function HomePage() {
           <div className="w-full max-w-2xl mx-auto">
             <Header onAuthClick={() => setShowAuthModal(true)} />
           </div>
+
+          <button onClick={generateProductEmbeddings}>
+            <h1>Generate Embeddings</h1>
+          </button>
           
           
           {/* UniStore Logo */}

@@ -8,7 +8,7 @@ if (!API_KEY) {
   console.warn('VITE_GEMINI_API_KEY not found. Category generation will be disabled.');
 }
 
-const genAI = API_KEY && API_KEY.startsWith('AIza') ? new GoogleGenerativeAI(API_KEY) : null;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export interface CategoryGenerationResult {
   categories: string[];
