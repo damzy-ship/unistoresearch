@@ -705,7 +705,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
               {view === 'signup' && (
                 <>
-                  {loading ? 'Creating Account...' : 'Create Account'}
+                  {loading ? 'Creating Account...' : 'Create'}
                   {!loading && <UserPlus className="w-4 h-4 ml-2" />}
                 </>
               )}

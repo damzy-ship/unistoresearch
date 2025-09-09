@@ -3,7 +3,6 @@ import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from '
 import { supabase } from '../lib/supabase';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 
-
 // Reusable function to handle image upload, inspired by ProductGallery
 const uploadImageToSupabase = async (file, merchantId) => {
     const fileExt = file.name.split('.').pop();
