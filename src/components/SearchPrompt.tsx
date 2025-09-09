@@ -37,7 +37,7 @@ export default function SearchPrompt({ className = '', university = '' }: Search
       }
       
       const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       
       const prompt = `
 Generate a short, compelling prompt to encourage university students to search for products on a marketplace app.

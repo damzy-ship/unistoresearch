@@ -5,6 +5,7 @@ import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not
 import UniversitySelector from './UniversitySelector';
 import { useTheme } from '../hooks/useTheme';
 import { History } from 'lucide-react';
+import { transformDescriptionForEmbedding } from '../lib/generateEmbedding';
 
 // Product interface remains the same
 interface Product {
@@ -34,10 +35,12 @@ function ProductSearchComponent() {
     setLoading(true);
     setError(null);
 
+    const enhancedDescription = await transformDescriptionForEmbedding(searchQuery);
+
     try {
       // Step 1: Call the Supabase Edge Function to get products
       const { data, error: functionError } = await supabase.functions.invoke('semantic-search', {
-        body: { request_text: searchQuery, school_id: university },
+        body: { request_text: enhancedDescription, school_id: university },
       });
 
       if (functionError) {
