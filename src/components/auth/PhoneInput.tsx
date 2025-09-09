@@ -54,9 +54,6 @@ export default function PhoneInput({
           disabled={disabled}
         />
       </div>
-      <p className="text-xs text-gray-500 mt-1">
-        Nigerian phone number format: +234XXXXXXXXX
-      </p>
     </div>
   );
 }

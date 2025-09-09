@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, LogIn, UserPlus, Send, Briefcase } from 'lucide-react';
+import { User, Lock, LogIn, UserPlus, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { setUserId, setPhoneAuthenticated } from '../hooks/useTracking';
 import { sendOTP, verifyOTP } from '../lib/smsService';
@@ -9,7 +9,6 @@ import AuthInput from './auth/AuthInput';
 import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
 import OTPInput from './auth/OTPInput';
-import SchoolDropdown from './ScoolDropdown';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,13 +17,6 @@ interface AuthModalProps {
 }
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'verify-otp' | 'reset-password';
-type UserType = 'user' | 'merchant';
-
-// Define an interface for the schools data
-interface School {
-  id: string;
-  short_name: string;
-}
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [view, setView] = useState<AuthView>('login');
@@ -38,11 +30,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [error, setError] = useState('');
   const [forgotPasswordPhone, setForgotPasswordPhone] = useState('+234');
 
-  // New state for user type and schools
-  const [userType, setUserType] = useState<UserType>('user');
-  const [schools, setSchools] = useState<School[]>([]);
-  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
-
   useEffect(() => {
     if (isOpen) {
       // Reset form when modal opens
@@ -55,32 +42,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setDisplayOtp(null);
       setError('');
       setForgotPasswordPhone('+234');
-      setUserType('user'); // Reset user type on modal open
-      setSelectedSchoolId(null);
-      fetchSchools(); // Fetch schools when modal opens
     }
   }, [isOpen]);
-
-  // Function to fetch schools from Supabase
-  const fetchSchools = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('id, short_name')
-        .order('short_name', { ascending: true });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data) {
-        setSchools(data);
-      }
-    } catch (error) {
-      console.error('Error fetching schools:', error);
-      toast.error('Failed to load schools. Please try again.');
-    }
-  };
 
   const validateInputs = () => {
     if (phoneNumber.length < 14) {
@@ -95,12 +58,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     if (view === 'signup' && !fullName.trim()) {
       setError('Please enter your full name');
-      return false;
-    }
-
-    // New validation for merchant type
-    if (view === 'signup' && userType === 'merchant' && !selectedSchoolId) {
-      setError('Please select your school');
       return false;
     }
 
@@ -130,21 +87,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     try {
       // Create a unique email from the phone number for Supabase Auth
       const phoneEmail = `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
-
-      // Prepare user metadata
-      const userMetadata = {
-        full_name: fullName,
-        phone_number: phoneNumber,
-        user_type: userType, // Save user type to auth metadata
-        ...(userType === 'merchant' && { school_id: selectedSchoolId }) // Conditionally add school_id
-      };
-
+      
       // Sign up with Supabase Auth using the generated email
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: phoneEmail,
         password: password,
         options: {
-          data: userMetadata
+          data: {
+            full_name: fullName,
+            phone_number: phoneNumber
+          }
         }
       });
 
@@ -169,9 +121,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           phone_number: phoneNumber,
           full_name: fullName,
           last_visit: new Date().toISOString(),
-          visit_count: 1,
-          user_type: userType, // Save user user_type
-          ...(userType === 'merchant' && { school_id: selectedSchoolId }) // Conditionally add school ID
+          visit_count: 1
         });
 
       if (visitorError) {
@@ -182,16 +132,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           .select('id')
           .eq('auth_user_id', authData.user.id)
           .single();
-
+          
         if (existingVisitor) {
           await supabase
             .from('unique_visitors')
             .update({
               phone_number: phoneNumber,
               full_name: fullName,
-              last_visit: new Date().toISOString(),
-              user_type: userType,
-              ...(userType === 'merchant' && { school_id: selectedSchoolId })
+              last_visit: new Date().toISOString()
             })
             .eq('id', existingVisitor.id);
         }
@@ -200,7 +148,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       // Set user as authenticated
       setUserId(authData.user.id);
       setPhoneAuthenticated(true);
-
+      
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -220,7 +168,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     try {
       // Create a unique email from the phone number for Supabase Auth
       const phoneEmail = `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
-
+      
       // Sign in with Supabase Auth using the generated email
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: phoneEmail,
@@ -306,7 +254,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     setLoading(true);
     setError('');
-
+    
     try {
       // Check if user exists
       const { data: userData, error: userError } = await supabase
@@ -314,22 +262,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         .select('auth_user_id')
         .eq('phone_number', forgotPasswordPhone)
         .maybeSingle();
-
+      
       if (userError || !userData?.auth_user_id) {
         setError('No account found with this phone number');
         setLoading(false);
         return;
       }
-
+      
       // Send OTP via SMS service
       const result = await sendOTP(forgotPasswordPhone);
-
+      
       if (!result.success) {
         setError(result.error || 'Failed to send OTP');
         setLoading(false);
         return;
       }
-
+      
       // If SMS service is not configured, show OTP on screen
       if (result.otp) {
         setDisplayOtp(result.otp);
@@ -337,10 +285,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       } else {
         toast.success('OTP sent to your phone number');
       }
-
+      
       // Move to verification view
       setView('verify-otp');
-
+      
     } catch (error: any) {
       console.error('Error sending OTP:', error);
       setError('Failed to send OTP. Please try again.');
@@ -357,20 +305,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     setLoading(true);
     setError('');
-
+    
     try {
       // Verify OTP using the SMS service
       const isValid = await verifyOTP(forgotPasswordPhone, otp);
-
+      
       if (!isValid) {
         setError('Invalid or expired OTP. Please try again.');
         setLoading(false);
         return;
       }
-
+      
       // Move to reset password view
       setView('reset-password');
-
+      
     } catch (error: any) {
       console.error('Error verifying OTP:', error);
       setError('Failed to verify OTP. Please try again.');
@@ -384,17 +332,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     setLoading(true);
     setError('');
-
+    
     try {
       // Create a unique email from the phone number for Supabase Auth
       const phoneEmail = `${forgotPasswordPhone.replace(/\+/g, '')}@phone.unistore.local`;
-
+      
       // Sign in with the phone email to get the session
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: phoneEmail,
         password: 'temp_password_for_reset' // This will fail but we need the user context
       });
-
+      
       // Since we can't use admin functions, we'll update via the auth API
       const { error: updateError } = await supabase.auth.updateUser({
         password: password
@@ -403,37 +351,37 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       if (updateError) {
         // If direct update fails, try alternative approach
         console.error('Direct password update failed:', updateError);
-
+        
         // Get user data to verify they exist
         const { data: userData } = await supabase
           .from('unique_visitors')
           .select('auth_user_id')
           .eq('phone_number', forgotPasswordPhone)
           .single();
-
+        
         if (!userData?.auth_user_id) {
           setError('User not found');
           setLoading(false);
           return;
         }
-
+        
         // For now, we'll show success but the password reset might need manual intervention
         console.warn('Password reset may require manual intervention');
       }
-
+      
       // Show success message
       toast.success('Password reset successfully! Please sign in with your new password.');
-
+      
       // Reset view to login
       setView('login');
       setPassword('');
       setConfirmPassword('');
       setOtp('');
-
+      
     } catch (error: any) {
       console.error('Error resetting password:', error);
       setError('Password reset completed. Please try signing in with your new password.');
-
+      
       // Reset to login view even if there was an "error"
       setTimeout(() => {
         setView('login');
@@ -550,30 +498,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* User Type Tabs (Sign Up only) */}
-          {view === 'signup' && (
-            <div className="flex bg-gray-100 rounded-xl p-1 mb-4">
-              <button
-                type="button"
-                onClick={() => setUserType('user')}
-                disabled={loading}
-                className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${userType === 'user' ? 'bg-white shadow text-orange-600' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                <User className="w-4 h-4 mr-2" />
-                User
-              </button>
-              <button
-                type="button"
-                onClick={() => setUserType('merchant')}
-                disabled={loading}
-                className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${userType === 'merchant' ? 'bg-white shadow text-orange-600' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                <Briefcase className="w-4 h-4 mr-2" />
-                Merchant
-              </button>
-            </div>
-          )}
-
           {/* Full Name (Sign Up only) */}
           {view === 'signup' && (
             <AuthInput
@@ -587,17 +511,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             />
           )}
 
-          {/* School Dropdown (Merchant Sign Up only) */}
-          {view === 'signup' && userType === 'merchant' && (
-            <SchoolDropdown
-              schools={schools}
-              selectedSchoolId={selectedSchoolId}
-              onChange={setSelectedSchoolId}
-              disabled={loading}
-            />
-          )}
-
-
           {/* Phone Number */}
           {(view === 'login' || view === 'signup') && (
             <PhoneInput
@@ -607,7 +520,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               required
             />
           )}
-
 
           {/* Forgot Password Phone */}
           {view === 'forgot-password' && (
@@ -640,8 +552,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               icon={<Lock className="w-4 h-4" />}
               showPasswordToggle
               helpText={
-                (view === 'signup' || view === 'reset-password')
-                  ? 'Password must be at least 6 characters'
+                (view === 'signup' || view === 'reset-password') 
+                  ? 'Password must be at least 6 characters' 
                   : undefined
               }
             />
@@ -693,7 +605,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <AuthButton
               type="submit"
               variant="primary"
-              disabled={loading || (view === 'signup' && userType === 'merchant' && !selectedSchoolId)}
+              disabled={loading}
               loading={loading}
               fullWidth
             >
@@ -736,7 +648,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               </button>
             </p>
           )}
-
+          
           {view === 'signup' && (
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
