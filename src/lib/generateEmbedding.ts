@@ -21,7 +21,7 @@ const genAI = new GoogleGenerativeAI(API_KEY);
  * @returns {Promise<string>} - The newly formatted and enhanced description.
  */
 export async function transformDescriptionForEmbedding(originalText: string): Promise<string> {
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Step 1: Generate categories and features from the original text
   const extractionPrompt = `
@@ -66,7 +66,7 @@ export async function transformDescriptionForEmbedding(originalText: string): Pr
   const categoriesText = categories.length > 0 ? `Categories: ${categories.join(', ')}` : '';
   const featuresText = Object.keys(features).length > 0 ? `Features: ${Object.entries(features).map(([key, value]) => `${key}: ${value}`).join(', ')}` : '';
 
-const descriptionPrompt = `
+  const descriptionPrompt = `
   Please act as a friendly guide describing a product to someone who cannot see it, like a child or a person who is blind. The description should be simple, clear, and focused on helping them understand what the product is and what it's for.
 
   Your description should:
@@ -92,7 +92,7 @@ const descriptionPrompt = `
 
   Please ensure the output is only the new description text and nothing else.
  `;
- 
+
   try {
     const result = await generativeModel.generateContent(descriptionPrompt);
     const newDescription = result.response.text();
@@ -179,11 +179,13 @@ export async function generateProductEmbeddings() {
  * @returns {Promise<{ embedding: number[], enhancedDescription: string }>} - An object containing the generated embedding vector and the enhanced description.
  * @throws {Error} if the embedding generation fails.
  */
-export async function generateAndEmbedSingleProduct(description: string): Promise<{ embedding: number[], enhancedDescription: string }> {
+export async function generateAndEmbedSingleProduct(description: string, keepExisting: boolean = false): Promise<{ embedding: number[], enhancedDescription: string }> {
   try {
+    let enhancedDescription = description;
     // Use the new helper function to transform the description
-    const enhancedDescription = await transformDescriptionForEmbedding(description);
-
+    if (!keepExisting) {
+      enhancedDescription = await transformDescriptionForEmbedding(description);
+    }
     // Generate the embedding from the enhanced description
     const embeddingModel = genAI.getGenerativeModel({ model: 'embedding-001' });
     const result = await embeddingModel.embedContent(enhancedDescription);

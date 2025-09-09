@@ -280,15 +280,20 @@ export default function AllProductsPage() {
 
     const handleSearchDescriptionChange = async (productId: string, newDescription: string) => {
         try {
+            const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(newDescription, true);
+         
             const { error: updateError } = await supabase
                 .from('merchant_products')
-                .update({ search_description: newDescription })
+                .update({
+                    embedding: embedding,
+                    search_description: enhancedDescription
+                })
                 .eq('id', productId);
 
             if (updateError) {
                 throw updateError;
             }
-
+            console.log('Updated search description and embedding for product ID:', productId, embedding, enhancedDescription);
             setAllProducts(allProducts.map(p =>
                 p.id === productId ? { ...p, search_description: newDescription } : p
             ));
