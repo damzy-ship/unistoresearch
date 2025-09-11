@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from './supabase'; // Assuming this path is correct
+import predefinedCategories from '../data/product_categories.json';
+import predefinedFeatures from '../data/product_features.json';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -11,6 +13,60 @@ if (!API_KEY) {
   })();
 }
 
+
+
+// Define the interfaces for your product data
+interface MerchantProductAttributes {
+  id: string;
+  product_categories: string[];
+  product_features: string[];
+}
+
+/**
+ * Updates the 'product_categories' and 'product_features' for a list of merchant products.
+ * @param productsToUpdate An array of objects, each containing the product ID and the new categories and features.
+ * @returns A promise that resolves to an array of objects indicating the result of each update.
+ */
+export async function updateMerchantProductAttributes(productsToUpdate: MerchantProductAttributes[]) {
+  console.log(`Starting to update ${productsToUpdate.length} products...`);
+  const results = [];
+
+  for (const product of productsToUpdate) {
+    try {
+      const { id, product_categories, product_features } = product;
+
+      if (!id) {
+        console.warn('Skipping product with missing ID:', product);
+        results.push({ id: 'N/A', status: 'skipped', reason: 'Missing ID' });
+        continue;
+      }
+
+      console.log(`Updating product ID: ${id}`);
+      const { error } = await supabase
+        .from('merchant_products')
+        .update({
+          product_categories: product_categories,
+          product_features: product_features,
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error(`Error updating product ${id}:`, error.message);
+        results.push({ id, status: 'failed', error: error.message });
+      } else {
+        console.log(`Successfully updated product ${id}.`);
+        results.push({ id, status: 'success' });
+      }
+    } catch (err) {
+      console.error(`Unexpected error for product ${product.id}:`, err);
+      results.push({ id: product.id, status: 'error', error: 'Unexpected error' });
+    }
+  }
+  console.log('All updates complete.');
+  return results;
+}
+
+
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
@@ -20,8 +76,10 @@ const genAI = new GoogleGenerativeAI(API_KEY);
  * @param {string} originalText - The original product description or user query.
  * @returns {Promise<string>} - The newly formatted and enhanced description.
  */
+
+
 export async function transformDescriptionForEmbedding(originalText: string): Promise<string> {
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
   // Step 1: Generate categories and features from the original text
   const extractionPrompt = `
@@ -197,4 +255,68 @@ export async function generateAndEmbedSingleProduct(description: string, keepExi
     console.error('Error generating embedding for a single product:', error);
     throw new Error('Failed to generate product embedding.');
   }
+}
+
+export async function getMatchingCategoriesAndFeatures(originalText: string): Promise<{ categories: string[], features: string[] }> {
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+  // Step 1: Generate categories and features from the original text
+  const extractionPrompt = `
+    Analyze the following product description.
+    - **Categories**: Extract the most relevant categories and match them against this provided list: ${JSON.stringify(predefinedCategories)}. Limit the output to the top 5 most relevant categories.
+    - **Features**: Extract key features (like color, size, material) and also include gender-based categories as a feature (e.g., gender: "men's", "women's"). Match features against this provided list: ${JSON.stringify(predefinedFeatures)}.
+
+    Return the results as a single JSON object with two keys: "categories" and "features". Both values should be arrays of strings in "key: value" format.
+
+    Product Description: "${originalText}"
+
+    Example output format:
+    {
+      "categories": [
+        "clothing",
+        "luxury fashion"
+      ],
+      "features": [
+        "blue",
+        "cotton",
+        "women's"
+      ]
+    }
+`;
+
+  let categories = [];
+  let features = [];
+
+  try {
+    const extractionResult = await generativeModel.generateContent({
+      contents: [{ parts: [{ text: extractionPrompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const extractionData = JSON.parse(extractionResult.response.text());
+    if (extractionData.categories) {
+      categories = extractionData.categories;
+    }
+    if (extractionData.features) {
+      features = extractionData.features;
+    }
+
+    // Optional: You might want to process the 'features' array to convert
+    // it back to a key-value object if needed for other parts of your code.
+    // Example:
+    // const featuresObject = features.reduce((acc, current) => {
+    // const [key, value] = current.split(': ');
+    // acc[key] = value;
+    // return acc;
+    // }, {});
+
+  } catch (error) {
+    console.error("Error generating or parsing content:", error);
+  }
+  console.log("Extracted Categories:", categories);
+  console.log("Extracted Features:", features);
+  return { categories, features };
+
 }

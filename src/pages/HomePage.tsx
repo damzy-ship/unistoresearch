@@ -20,7 +20,11 @@ import { Toaster } from 'sonner';
 import { supabase } from '../lib/supabase';
 import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
+import { getMatchingCategoriesAndFeatures, updateMerchantProductAttributes } from '../lib/generateEmbedding';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
+import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
+
+
 
 export default function HomePage() {
   // const navigate = useNavigate();
@@ -49,7 +53,7 @@ export default function HomePage() {
       setSession(currentSession);
       setUserIsAuthenticated(!!currentSession);
     };
-    
+
     checkAuth();
 
     const fetchUserType = async () => {
@@ -99,12 +103,12 @@ export default function HomePage() {
 
     try {
       // Use AI-powered merchant matching from Gemini
-      const universityName = university === "Bingham" ? "Bingham University" : 
-                            university === "Veritas" ? "Veritas University" : 
-                            `${university} University`;
-      
+      const universityName = university === "Bingham" ? "Bingham University" :
+        university === "Veritas" ? "Veritas University" :
+          `${university} University`;
+
       const matchResult = await findMerchantsForRequest(request, universityName, 5);
-      
+
       if (!matchResult.success) {
         console.log('AI merchant matching failed:', matchResult.error);
         setMatchedSellers([]);
@@ -119,13 +123,13 @@ export default function HomePage() {
         setShowRetryPrompt(true);
         return;
       }
-      
+
       const sellers = matchResult.merchants;
       const matchedSellerIds = sellers.map(seller => seller.seller_id);
       const sellerRankingOrder = sellers.map(seller => seller.seller_id);
-      
+
       console.log('Found sellers:', sellers.length, 'Matched seller IDs:', matchedSellerIds);
-      
+
       // Track the request with matched seller IDs
       const requestResult = await trackRequest(university, request, matchedSellerIds, {
         generatedCategories: matchResult.generatedCategories || [],
@@ -134,7 +138,7 @@ export default function HomePage() {
         sellerRankingOrder
       });
       setCurrentRequestId(requestResult?.id || null);
-      
+
       // Track merchant matches in analytics
       if (requestResult?.id && sellers.length > 0) {
         const { trackMerchantMatch } = await import('../lib/merchantAnalytics');
@@ -142,10 +146,10 @@ export default function HomePage() {
           await trackMerchantMatch(seller.id, requestResult.id);
         }
       }
-      
+
       setMatchedSellers(sellers);
       setShowRetryPrompt(true);
-      
+
     } catch (error) {
       console.error('Error searching for sellers:', error);
       setMatchedSellers([]);
@@ -173,22 +177,22 @@ export default function HomePage() {
   const handleRetrySearch = () => {
     setIsSearching(true);
     setShowRetryPrompt(false);
-    handleSearchRequest({ preventDefault: () => {} } as React.FormEvent);
+    handleSearchRequest({ preventDefault: () => { } } as React.FormEvent);
   };
 
   const handleAuthSuccess = () => {
     // After successful authentication, proceed with the search
-    handleSearchRequest({ preventDefault: () => {} } as React.FormEvent);
+    handleSearchRequest({ preventDefault: () => { } } as React.FormEvent);
   };
 
   return (
-    <main 
+    <main
       className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
       style={{ backgroundColor: currentTheme.background }}
     >
       {/* Background texture overlay */}
       {backgroundTexture.id !== 'none' && (
-        <div 
+        <div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
             backgroundImage: backgroundTexture.pattern,
@@ -205,28 +209,33 @@ export default function HomePage() {
           <div className="w-full max-w-2xl mx-auto">
             <Header onAuthClick={() => setShowAuthModal(true)} />
           </div>
-          
-          
+
+          <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
+            <h1>Get Matching Categories and Features</h1>
+          </button>
+
           {/* UniStore Logo */}
           <div className="mb-12 px-2">
-            <h1 className="text-5xl md:text-6xl text-center font-bold mb-4">
+            <h1 className="text-5xl md:text-6xl text-center font-bold mb-4 mt-2">
               <span style={{ color: currentTheme.primary }}>uni</span>
               <span style={{ color: currentTheme.secondary }}>store.</span>
             </h1>
-            <UserGreeting 
+            <UserGreeting
               university={university}
               className="text-center max-w-md mx-auto"
             />
           </div>
 
+
+
           {/* Search Card */}
-         <ProductSearchComponent />
+          <ProductSearchComponent />
 
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
-          
+
             <ReviewSlider />
-            
+
             {userIsAuthenticated && (
               <div className="mt-12">
                 <h3 style={{ color: currentTheme.text }} className="text-xl font-semibold text-center mb-6">
@@ -263,7 +272,7 @@ export default function HomePage() {
                 <ArrowLeft className="w-4 h-4" />
                 Back to search
               </button>
-              
+
               {!userIsAuthenticated && (
                 <button
                   onClick={() => setShowAuthModal(true)}
@@ -274,7 +283,7 @@ export default function HomePage() {
                 </button>
               )}
             </div>
-            
+
             <div className="text-center">
               <h1 className="text-2xl md:text-3xl font-bold mb-2">
                 <span style={{ color: currentTheme.primary }}>uni</span>
@@ -298,21 +307,21 @@ export default function HomePage() {
           {/* Retry Search Prompt */}
           {showRetryPrompt && !isSearching && (
             <div className="w-full max-w-2xl mt-6">
-              <div 
+              <div
                 className="rounded-2xl p-6 border transition-colors duration-300"
-                style={{ 
+                style={{
                   backgroundColor: currentTheme.surface,
                   borderColor: currentTheme.primary + '20'
                 }}
               >
                 <div className="text-center">
-                  <h3 
+                  <h3
                     className="text-lg font-semibold mb-2"
                     style={{ color: currentTheme.text }}
                   >
                     Retry?
                   </h3>
-                  <p 
+                  <p
                     className="mb-4"
                     style={{ color: currentTheme.textSecondary }}
                   >
@@ -328,7 +337,7 @@ export default function HomePage() {
                     <button
                       onClick={handleBackToSearch}
                       className="border border-gray-300 hover:bg-gray-50 px-6 py-3 rounded-xl font-medium transition-colors"
-                      style={{ 
+                      style={{
                         backgroundColor: currentTheme.background,
                         color: currentTheme.text
                       }}
@@ -342,13 +351,13 @@ export default function HomePage() {
           )}
         </>
       )}
-      
+
       {/* Floating WhatsApp Button */}
       {/* <FloatingWhatsApp isVisible={!showResults} /> */}
-      
+
       {/* Rating Prompt */}
       <RatingPrompt />
-      
+
       {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
