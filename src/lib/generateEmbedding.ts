@@ -79,7 +79,7 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 
 export async function transformDescriptionForEmbedding(originalText: string): Promise<string> {
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Step 1: Generate categories and features from the original text
   const extractionPrompt = `
@@ -258,7 +258,7 @@ export async function generateAndEmbedSingleProduct(description: string, keepExi
 }
 
 export async function getMatchingCategoriesAndFeatures(originalText: string): Promise<{ categories: string[], features: string[] }> {
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Step 1: Generate categories and features from the original text
   const extractionPrompt = `

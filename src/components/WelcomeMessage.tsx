@@ -66,7 +66,7 @@ export default function WelcomeMessage({ className = '' }: WelcomeMessageProps) 
       }
       
       const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       
       const currentTime = new Date();
       const hour = currentTime.getHours();

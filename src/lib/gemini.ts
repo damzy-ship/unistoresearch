@@ -70,7 +70,7 @@ export async function generateProductCategories(sellerDescription: string): Prom
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
 Based on the following seller description, generate relevant product categories that this seller might offer.
@@ -152,7 +152,7 @@ export async function generateCategoriesFromRequest(requestText: string): Promis
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
 You are a product categorization expert. Given a user's product request, generate the most likely product categories that would contain the items they're looking for.
@@ -260,7 +260,7 @@ async function findSemanticMatches(generatedCategories: string[], catalogCategor
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
 You are a semantic matching expert. Given generated categories and a catalog of existing categories, find semantic matches.
@@ -758,7 +758,7 @@ export async function extractProductInfoFromText(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
 Extract product information from the following title and description. Return ONLY a JSON object with the extracted information.
