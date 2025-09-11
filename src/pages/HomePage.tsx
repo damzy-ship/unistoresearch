@@ -22,7 +22,7 @@ import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
 import { getMatchingCategoriesAndFeatures, updateMerchantProductAttributes } from '../lib/generateEmbedding';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
-import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
+// import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
 
 
 
@@ -210,9 +210,9 @@ export default function HomePage() {
             <Header onAuthClick={() => setShowAuthModal(true)} />
           </div>
 
-          <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
+          {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
             <h1>Get Matching Categories and Features</h1>
-          </button>
+          </button> */}
 
           {/* UniStore Logo */}
           <div className="mb-12 px-2">
