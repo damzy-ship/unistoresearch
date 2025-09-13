@@ -1,357 +1,307 @@
 [
   {
-    "id": "efcff1cb-8804-4aa9-adcc-1ac37977fbfc",
-    "product_categories": ["Electronics", "Mobile Phones", "Smartphones", "Unisex Tech", "Communication Devices"],
-    "product_features": ["Talk to people", "Send messages", "Play games", "Handheld device", "Electronic"]
+    "id": "00aa9242-ec38-4c08-b1f7-ba896d98b238",
+    "product_categories": ["Women's Wigs", "Human Hair Wigs", "Bob Wigs", "Hair Extensions", "Beauty Accessories"],
+    "product_features": ["Real Human Hair", "Short Bob Cut", "Stylish", "Headwear"]
   },
   {
-    "id": "5f665f25-b757-432f-9de7-905c4e3db0df",
-    "product_categories": ["Women's Clothing", "Dresses", "Crochet Clothing", "Fashion Apparel", "Handmade Garments"],
-    "product_features": ["Crochet material", "Pretty patterns", "Special yarn", "Fashionable", "Woven"]
+    "id": "5bf4b739-fbb1-4fd9-942a-13c7701cefd0",
+    "product_categories": ["Women's Trousers", "African Clothing", "Baggy Pants", "Ankara Print", "Cultural Wear"],
+    "product_features": ["Loose Fit", "Colorful Patterns", "Comfortable", "Ankara Fabric"]
   },
   {
-    "id": "d8132995-4f7c-4fde-9f55-f1976488d22f",
-    "product_categories": ["Women's Accessories", "Wigs", "Synthetic Hair", "Beauty Products", "Hairpieces"],
-    "product_features": ["4x4 closure", "Pixie curls", "Short hairstyle", "Bouncy", "Wearable hairpiece"]
+    "id": "131cb0a8-75c8-440e-8f27-610c3ce430fa",
+    "product_categories": ["Women's Trousers", "African Fashion", "Baggy Pants", "Ankara Print", "Cultural Clothing"],
+    "product_features": ["Loose Fit", "Ankara Pattern", "Comfortable", "Legwear"]
   },
   {
-    "id": "2c1bb625-7ac8-4ca1-8f57-938c967b2476",
-    "product_categories": ["Electronics", "Mobile Phones", "Smartphones", "Unisex Tech", "Android Phones"],
-    "product_features": ["Internet access", "Talk to people", "Send messages", "Handheld mini-computer", "Electronic device"]
+    "id": "b4de531f-a14c-403a-b5d7-a5e42725ac7b",
+    "product_categories": ["Women's Trousers", "African Attire", "Baggy Pants", "Ankara Style", "Traditional Wear"],
+    "product_features": ["Loose Fit", "Unique Ankara Style", "Comfortable", "Legwear"]
   },
   {
-    "id": "be14c6a1-a16e-46ec-a225-f62117da3094",
-    "product_categories": ["Food", "Fast Food", "Middle Eastern Cuisine", "Beef Dishes", "Street Food"],
-    "product_features": ["Beef", "Sausage", "Served in wrap", "Warm", "Delicious"]
+    "id": "879589c4-6031-49d5-9ba6-9bcbda0dd38e",
+    "product_categories": ["Women's Trousers", "African Fashion", "Baggy Pants", "Ankara Style", "Cultural Clothing"],
+    "product_features": ["Loose-Fitting", "Ankara Design", "Comfortable", "Legwear"]
   },
   {
-    "id": "456ee746-17cc-4ec5-a2ca-aa47c58ac4df",
-    "product_categories": ["Women's Clothing", "Tops", "Crochet Clothing", "Shrugs", "Fashion Apparel"],
-    "product_features": ["Crochet style", "Open front", "Small cover-up", "Decorative", "Worn over outfits"]
+    "id": "b450a067-bbb7-4032-89d4-124de66e7a70",
+    "product_categories": ["Women's Trousers", "African Clothing", "Baggy Pants", "Ankara Fabric", "Traditional Wear"],
+    "product_features": ["Loose-Fitting", "Colorful Ankara", "Comfortable", "Legwear"]
   },
   {
-    "id": "b1e0d7c8-bb43-45aa-8de4-ea0bb9862693",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Everyday wear", "Upper body garment", "Casual style", "Relaxed fit"]
+    "id": "8541c90d-437e-495b-a6c8-1a48c0b7a559",
+    "product_categories": ["Women's Trousers", "African Fashion", "Baggy Pants", "Ankara Print", "Cultural Attire"],
+    "product_features": ["Loose Fit", "Colorful Ankara", "Comfortable", "Legwear"]
   },
   {
-    "id": "1d7097ee-ba4b-46ce-90b6-959e538f3a63",
-    "product_categories": ["Women's Accessories", "Wigs", "Human Hair Blend", "Beauty Products", "Hairpieces"],
-    "product_features": ["5x5 closure", "Human hair blend", "Wavy style", "Bouncy", "Natural look"]
+    "id": "fe4b0b38-cf0e-4e8e-860b-b06521af2eb4",
+    "product_categories": ["Women's Trousers", "African Clothing", "Baggy Pants", "Ankara Design", "Traditional Wear"],
+    "product_features": ["Very Loose", "Colorful Design", "Comfortable", "Legwear"]
   },
   {
-    "id": "def1e56b-6b37-435f-8fd1-0719b1565367",
-    "product_categories": ["Women's Accessories", "Wigs", "Beauty Products", "Hairpieces", "Fashion Accessories"],
-    "product_features": ["5x5 size", "New hairstyle", "Head accessory", "Synthetic or human hair", "Versatile"]
+    "id": "a52c6d37-ed53-4a0a-8b82-f54562fb5134",
+    "product_categories": ["Women's Trousers", "African Fashion", "Baggy Pants", "Ankara Fabric", "Cultural Clothing"],
+    "product_features": ["Loose Fit", "Special Ankara Fabric", "Comfortable", "Legwear"]
   },
   {
-    "id": "3de314a8-3276-4111-9604-eaa35005a417",
-    "product_categories": ["Women's Accessories", "Hair Extensions", "Human Hair", "Beauty Products", "Hair Volumizers"],
-    "product_features": ["Double drawn", "100% human hair", "Adds length", "Adds fullness", "High quality"]
+    "id": "703acc58-1604-4853-abb2-641b7694bf93",
+    "product_categories": ["Women's Accessories", "Beaded Handbags", "Evening Bags", "Fashion Bags", "Artisanal Accessories"],
+    "product_features": ["Beaded Texture", "Small Items Carrier", "Decorative", "Bumpy Surface"]
   },
   {
-    "id": "6dcb894a-b884-4b7f-b0c3-f730a11c0fbd",
-    "product_categories": ["Phone Accessories", "Unisex Accessories", "Phone Cases", "Protective Covers", "Customizable Gifts"],
-    "product_features": ["Holds phone", "Protective", "Customizable design", "Safe carrying", "Personalizable"]
+    "id": "85fe9a63-a8aa-420a-b3c4-015211271221",
+    "product_categories": ["Women's Accessories", "Beaded Bags", "Fashion Handbags", "Evening Purses", "Artisanal Products"],
+    "product_features": ["Tiny Beads", "Special Items Carrier", "Decorative", "Fashion Accessory"]
   },
   {
-    "id": "38421f80-ffc2-4015-91fa-d85a1b962cae",
-    "product_categories": ["Women's Clothing", "Tops", "Crochet Clothing", "Tank Tops", "Summer Apparel"],
-    "product_features": ["Crochet style", "Lacy design", "Open pattern", "Sleeveless", "Beautiful"]
+    "id": "e7ea8283-5121-471a-bbf5-d2dab2dc97f5",
+    "product_categories": ["Men's Tops", "Casual Shirts", "Male Fashion", "Everyday Wear", "Men's Clothing"],
+    "product_features": ["Relaxed Style", "Casual Wear", "Upper Body Clothing", "Male Apparel"]
   },
   {
-    "id": "a933911a-2e74-4c59-b8af-8970b63381ec",
-    "product_categories": ["Women's Accessories", "Hairpieces", "Bun Extensions", "Beauty Products", "Hair Styling"],
-    "product_features": ["Frontal piece", "Creates messy bun", "Natural-looking", "Quick hairstyle", "Hair accessory"]
+    "id": "56b723ee-ae53-4835-a353-a24346de7c96",
+    "product_categories": ["Women's Wigs", "Hair Extensions", "Bob Wigs", "Beauty Products", "Hair Accessories"],
+    "product_features": ["Hair Extension", "Short Bob Style", "Headwear", "Stylish"]
   },
   {
-    "id": "9086659f-2a54-4e21-9537-92f7ff4adbbb",
-    "product_categories": ["Women's Accessories", "Handbags", "Crochet Items", "Summer Bags", "Fashion Bags"],
-    "product_features": ["Crochet material", "Pink color", "Carry items", "Soft yarn", "Woven"]
+    "id": "9464535f-1d69-4a1f-87e5-5f65ccc8fa56",
+    "product_categories": ["Men's Jewelry", "Jewelry Sets", "Male Accessories", "Gold Jewelry", "Black Jewelry"],
+    "product_features": ["Matching Set", "Gold Option", "Black Option", "Male Accessories"]
   },
   {
-    "id": "83b0a105-ba9c-4f0d-9f82-8142929bb612",
-    "product_categories": ["Women's Clothing", "Dresses", "African Fashion", "Traditional Gowns", "Bubu Gowns"],
-    "product_features": ["Adire pattern", "Flowing", "Comfortable", "Unique design", "Traditional wear"]
+    "id": "01179ad2-5733-456f-b062-f07b94e583d1",
+    "product_categories": ["Hair Care", "Beauty Products", "Hair Treatment", "Mint Scented", "Concentrated Formula"],
+    "product_features": ["Mint Scent", "Concentrated", "Hair Strength", "Fresh Formula"]
   },
   {
-    "id": "79c99c76-607d-4eaa-92d9-95e43d70398d",
-    "product_categories": ["Women's Jewelry", "Necklaces", "Fashion Jewelry", "Gold Jewelry", "Silver Jewelry"],
-    "product_features": ["Flower chain", "Gold or silver", "Decorative", "Worn around neck", "Jewelry piece"]
+    "id": "e1a76c2f-e42f-4442-9ccc-504186ce69fc",
+    "product_categories": ["Men's Jeans", "Baggy Denim", "Casual Pants", "Male Clothing", "Streetwear"],
+    "product_features": ["Loose Fit", "Baggy Style", "Multiple Sizes", "Denim Material"]
   },
   {
-    "id": "a6ff2398-5916-44e1-a1dd-d0a0fe4a5fe9",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Sleeveless Tops", "Summer Tops"],
-    "product_features": ["Sleeveless", "Casual wear", "Comfortable", "Free arms", "Upper body garment"]
+    "id": "a1561bc3-c60e-4b75-8ba1-a101f7f19017",
+    "product_categories": ["Men's T-Shirts", "Graphic Tees", "Casual Tops", "Male Fashion", "Everyday Wear"],
+    "product_features": ["Printed Design", "Black/White Options", "Multiple Sizes", "Casual Wear"]
   },
   {
-    "id": "1046f2ca-100e-4478-94d5-183ebc2c091f",
-    "product_categories": ["Women's Clothing", "Swimwear", "Bikinis", "Crochet Clothing", "Beachwear"],
-    "product_features": ["Crochet material", "Two-piece set", "For swimming", "Swimwear", "Beach apparel"]
+    "id": "a5bb57e8-320f-4f59-8cfe-7c86f49809fb",
+    "product_categories": ["Men's T-Shirts", "Graphic Tees", "Casual Wear", "Male Clothing", "Printed Tops"],
+    "product_features": ["Black/White Options", "Various Sizes", "Casual Style", "Upper Body Clothing"]
   },
   {
-    "id": "e816385f-998d-4cb4-8589-a78f18c719aa",
-    "product_categories": ["Women's Accessories", "Headbands", "Hair Accessories", "Crochet Items", "Girly Accessories"],
-    "product_features": ["Crochet material", "With bow", "Soft", "Keeps hair back", "Decorative"]
+    "id": "a470c062-ba1f-42b3-bbc9-9efeb157ad5a",
+    "product_categories": ["Men's T-Shirts", "Graphic Tees", "Printed Tops", "Male Fashion", "Casual Wear"],
+    "product_features": ["Fun Designs", "Black/White Options", "Pictures/Graphics", "Casual Style"]
   },
   {
-    "id": "6fd99755-6717-4f8c-a3fc-b5f0daeb8fd8",
-    "product_categories": ["Women's Accessories", "Hair Extensions", "Human Hair Blend", "Beauty Products", "Wigs"],
-    "product_features": ["Human hair blend", "For styling", "Adds volume", "Natural look", "Hair product"]
+    "id": "d72679a7-8489-48fd-93ff-e34d2cc23387",
+    "product_categories": ["Men's T-Shirts", "Graphic Tees", "Printed Tops", "Male Clothing", "Casual Apparel"],
+    "product_features": ["Interesting Designs", "Black/White Options", "Upper Body Wear", "Printed Graphics"]
   },
   {
-    "id": "f27095e6-4c02-444c-9c65-4c35064bf983",
-    "product_categories": ["Electronics", "Mobile Phones", "Smartphones", "Unisex Tech", "Budget Phones"],
-    "product_features": ["Talk to people", "Send messages", "Use apps", "Handheld", "Electronic device"]
+    "id": "f0b2d12f-db55-46e4-94b4-432b5803b933",
+    "product_categories": ["Men's T-Shirts", "Graphic Tees", "Printed Tops", "Male Fashion", "Casual Wear"],
+    "product_features": ["Picture/Design Printed", "Black/White Options", "Upper Body Clothing", "Casual Style"]
   },
   {
-    "id": "b57201a1-034a-4b83-806e-633510a22a0e",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Strapless Tops", "Summer Tops"],
-    "product_features": ["Strapless", "No shoulder straps", "Casual wear", "Upper body garment", "Comfortable"]
+    "id": "bd2d8cb2-797e-4e8c-bf95-777a48d2daec",
+    "product_categories": ["Women's Accessories", "Beaded Handbags", "Evening Bags", "Green Bags", "Artisanal Products"],
+    "product_features": ["Green Beads", "Shiny Material", "Small Items Carrier", "Decorative"]
   },
   {
-    "id": "43c001d4-7548-41ec-84a6-eb35c1bb1a5f",
-    "product_categories": ["Phone Accessories", "Unisex Accessories", "Phone Cases", "Protective Pouches", "Customizable Gifts"],
-    "product_features": ["Soft holder", "Protects phone", "Customizable design", "Safe carrying", "Personalizable"]
+    "id": "9b355953-d785-440d-a783-6187e9b2eb08",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Occasion", "Handmade Decor"],
+    "product_features": ["Decorative", "Special Occasion", "Head Accessory", "Handmade"]
   },
   {
-    "id": "819ab316-febf-4e45-a06a-6d8dbe3961e8",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Everyday style", "Upper body garment", "Casual", "Relaxed fit"]
+    "id": "170cd86b-097f-4a27-ac6a-c86e42a26e58",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Events", "Handmade Decor"],
+    "product_features": ["Fancy Hat", "Handmade", "Hair Decoration", "Special Occasion"]
   },
   {
-    "id": "e7f86910-94c2-40ed-bc98-63f5461f8ca0",
-    "product_categories": ["Women's Jewelry", "Body Jewelry", "Waist Chains", "Fashion Accessories", "Belly Chains"],
-    "product_features": ["Thin chain", "Worn around waist", "Decorative", "Fashion accessory", "Metallic"]
+    "id": "0f59723d-76f4-4d59-b9cc-091b008a3f19",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Occasion", "Handmade Items"],
+    "product_features": ["Hair Decoration", "Handmade", "Special Events", "Decorative"]
   },
   {
-    "id": "f33e084c-65df-4834-a5dd-db6725485123",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Relaxed occasions", "Shirts", "Upper body garment", "Casual style"]
+    "id": "0ed66590-1c62-4652-a908-532a9e09391e",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Events", "Handmade Decor"],
+    "product_features": ["Decorative Item", "Handmade", "Head Accessory", "Special Occasion"]
   },
   {
-    "id": "5c2545ae-2f24-4f4a-9ed1-518054aa81ef",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Everyday comfort", "Upper body garment", "Comfortable", "Casual", "Shirt"]
+    "id": "09928e63-05d6-46fa-946b-69e6d4206005",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Occasion", "Decorative Accessories"],
+    "product_features": ["Decorative", "Extra Fancy", "Head Accessory", "Special Events"]
   },
   {
-    "id": "2908279c-56f3-4275-b9d2-1bc34c457169",
-    "product_categories": ["Toys & Games", "Inflatable Bouncers", "Kids Play Equipment", "Outdoor Toys", "Recreational Structures"],
-    "product_features": ["Bouncy structure", "For jumping", "Recreational", "Inflatable", "Fun for kids"]
+    "id": "b9e0a76d-ad4a-4858-b78f-cc02fc59ee00",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Events", "Handmade Items"],
+    "product_features": ["Decorative", "Handmade", "Head Accessory", "Special Occasion"]
   },
   {
-    "id": "c3718593-5278-4108-9758-e74b18fd0feb",
-    "product_categories": ["Women's Accessories", "Hair Extensions", "Human Hair", "Burmese Curly Hair", "Beauty Products"],
-    "product_features": ["5x5 closure", "Burmese curls", "Adds volume", "Changes look", "Human hair"]
+    "id": "e4c9b336-8503-4eee-b7ea-563907f0525e",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Occasion", "Decorative Hats"],
+    "product_features": ["Small Decorative", "Fancy Hat Style", "Special Look", "Head Accessory"]
   },
   {
-    "id": "20d7e8bc-14cc-4448-99b6-e2f96236ae88",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Long Sleeve Tops", "Everyday Apparel"],
-    "product_features": ["Long sleeves", "Comfortable", "Everyday wear", "Upper body garment", "Casual style"]
+    "id": "8762ef85-0993-4a6a-a99d-e5a401bf4a01",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Occasion", "Handmade Decor"],
+    "product_features": ["Small Decorative", "Handmade", "Head Piece", "Carefully Crafted"]
   },
   {
-    "id": "176ab2db-c3f6-405d-a9cb-82b1fd693886",
-    "product_categories": ["Women's Jewelry", "Necklaces", "Silver Jewelry", "Fashion Jewelry", "Pendant Necklaces"],
-    "product_features": ["Silver", "With jewel", "Shiny", "Worn around neck", "Beautiful"]
+    "id": "08c0dc3f-e824-4b0c-8fd9-bbe285a28b11",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Events", "Handmade Items"],
+    "product_features": ["Small Decorative", "Handmade", "Head Accessory", "Special Occasion"]
   },
   {
-    "id": "07b7a3a7-a896-4ea8-9f36-88c28111047f",
-    "product_categories": ["Women's Clothing", "Sweaters", "Crochet Clothing", "Shrugs", "Clothing Sets"],
-    "product_features": ["Two-piece set", "Half sweater", "Matching shrug", "Crochet material", "Style and comfort"]
+    "id": "d76d09aa-fcd7-47a0-ae40-6481a8185185",
+    "product_categories": ["Women's Accessories", "Headwear", "Fascinators", "Special Occasion", "Pink Accessories"],
+    "product_features": ["Pink Color", "Handmade", "Small Decorative", "Head Accessory"]
   },
   {
-    "id": "1cd7bd6e-461c-400b-af2f-49beaa1f5afd",
-    "product_categories": ["Electronics", "Mobile Phones", "Smartphones", "Unisex Tech", "Budget Phones"],
-    "product_features": ["Talk", "Play", "Learn", "Handheld device", "Made by Infinix"]
+    "id": "509da82c-c100-41a9-860a-8f89b7951312",
+    "product_categories": ["Men's Clothing", "Sports Apparel", "Jerseys", "Team Support", "Athletic Wear"],
+    "product_features": ["Sports Wear", "Team Support", "Athletic Clothing", "Casual Sportswear"]
   },
   {
-    "id": "c2963d10-2d12-4f8c-8f64-f75a5ec3bfd1",
-    "product_categories": ["Women's Clothing", "Dresses", "African Fashion", "Traditional Gowns", "Bubu Gowns"],
-    "product_features": ["Adire style", "Beautiful", "Flowing", "Traditional", "Perfect for events"]
+    "id": "5fa1f150-6702-44ab-8598-9cb4fb11fa2d",
+    "product_categories": ["Men's Clothing", "Sports Apparel", "Jerseys", "Team Support", "Athletic Wear"],
+    "product_features": ["Sports Clothing", "Team Support", "Athletic Wear", "Casual Sportswear"]
   },
   {
-    "id": "77b6aba5-a175-464a-abcb-c5a91db3b20a",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Off-Shoulder Tops", "Long Sleeve Tops"],
-    "product_features": ["Long sleeves", "Off-shoulder design", "Casual", "Upper body garment", "Fashionable"]
+    "id": "c3f5e535-c40d-4c48-bb89-d2d7394bfef7",
+    "product_categories": ["Men's Clothing", "Sports Apparel", "Jerseys", "Team Support", "Athletic Wear"],
+    "product_features": ["Sports Wear", "Team Support", "Athletic Clothing", "Casual Sportswear"]
   },
   {
-    "id": "cf8615fc-aaee-478a-af56-156d01b98204",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Casual", "Everyday", "Upper body garment", "Regular fit"]
+    "id": "25218415-992d-40f9-9be6-34c829072efb",
+    "product_categories": ["Men's Clothing", "Sports Apparel", "Jerseys", "Team Support", "Athletic Wear"],
+    "product_features": ["Sports Clothing", "Team Support", "Athletic Wear", "Casual Sportswear"]
   },
   {
-    "id": "88c211fc-ccfa-400d-b84f-f83ba24de29e",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Everyday wear", "Like a shirt", "Upper body garment", "Relaxed"]
+    "id": "2b8b3ed3-2e3f-45e0-a713-55b35eed9e68",
+    "product_categories": ["Men's Clothing", "Sports Apparel", "Jerseys", "Team Support", "Fan Wear"],
+    "product_features": ["Sports Shirt", "Fan Clothing", "Athletic Wear", "Team Support"]
   },
   {
-    "id": "4201048f-d1c1-4863-8e59-2b904abe05ab",
-    "product_categories": ["Women's Accessories", "Hair Extensions", "Human Hair Blend", "Premium Hair", "Beauty Products"],
-    "product_features": ["Premium quality", "Human hair blend", "200 grams", "5x5 closure", "Natural look"]
+    "id": "2e574e29-58e3-4ac0-92ec-b55dcffd3ee8",
+    "product_categories": ["Men's Clothing", "Sports Apparel", "Jerseys", "Team Support", "Fan Wear"],
+    "product_features": ["Special Shirt", "Fan Support", "Sports Wear", "Team Clothing"]
   },
   {
-    "id": "828b5728-83ed-41d1-93e7-3de54cf33215",
-    "product_categories": ["Women's Accessories", "Wigs", "Human Hair", "Bob Wigs", "Beauty Products"],
-    "product_features": ["Bob style", "14 inches long", "4x4 closure", "100% human hair", "Changes look"]
+    "id": "e47cfa51-dc45-4e3c-8ba0-5674488e68a9",
+    "product_categories": ["Men's Accessories", "Jewelry Sets", "Watch Sets", "Leather Accessories", "Male Jewelry"],
+    "product_features": ["Leather Watch", "Matching Bracelet", "Time Telling", "Male Accessories"]
   },
   {
-    "id": "0293e62d-2172-4fdd-96c0-50336efc2755",
-    "product_categories": ["Women's Clothing", "Clothing Sets", "Crochet Clothing", "Crop Tops", "Mini Skirts"],
-    "product_features": ["Matching set", "Crochet material", "Crop top", "Mini skirt", "Two-piece outfit"]
+    "id": "b581b6e7-bd91-40ab-9037-366ed571a20f",
+    "product_categories": ["Men's Shorts", "Casual Shorts", "Knicker Shorts", "Male Bottomwear", "Casual Wear"],
+    "product_features": ["Multiple Colors", "Graded Design", "Legwear", "Casual Shorts"]
   },
   {
-    "id": "359795dd-143c-49a0-9500-a432c40b1c0a",
-    "product_categories": ["Women's Clothing", "Dresses", "African Fashion", "Traditional Gowns", "Bubu Gowns"],
-    "product_features": ["Adire pattern", "Flowing dress", "Special African pattern", "Beautiful", "Perfect for wearing"]
+    "id": "12b2cdbe-1c30-4dc9-a8c5-b28b0ebc688a",
+    "product_categories": ["Hair Care", "Beauty Products", "Hair Treatment", "Hair Booster", "Hair Strength"],
+    "product_features": ["Hair Strength", "Healthy Hair", "Booster Formula", "Hair Treatment"]
   },
   {
-    "id": "7e7cd79d-82e3-429f-b2b2-a4f43c482f7b",
-    "product_categories": ["Women's Accessories", "Wigs", "Beauty Products", "Closure Wigs", "Hairpieces"],
-    "product_features": ["5x5 closure", "Natural-looking part", "Cap of hair", "Wearable", "New hairstyle"]
+    "id": "58257426-ad7e-420c-b153-35a26224860c",
+    "product_categories": ["Women's Dresses", "Evening Gowns", "Outing Wear", "Formal Dresses", "Special Occasion"],
+    "product_features": ["Beautiful Design", "Outing Wear", "Special Occasion", "Formal Attire"]
   },
   {
-    "id": "7c97db09-72f8-41e9-90fc-c9747dcff063",
-    "product_categories": ["Women's Clothing", "Tops", "Vintage Fashion", "Blouses", "Crepe Shirts"],
-    "product_features": ["Vintage style", "Crepe fabric", "Soft", "Flowy", "Classic design"]
+    "id": "7120347e-909a-4439-9174-0b3a65abf200",
+    "product_categories": ["Women's Dresses", "Evening Gowns", "Outing Wear", "Formal Dresses", "Special Occasion"],
+    "product_features": ["Special Outings", "Formal Wear", "Evening Attire", "Dress"]
   },
   {
-    "id": "96286833-c971-499b-a2a0-306798065555",
-    "product_categories": ["Women's Jewelry", "Bracelets", "Gold Jewelry", "Fashion Jewelry", "Wrist Accessories"],
-    "product_features": ["Gold", "Lovely", "Worn on wrist", "Makes you feel special", "Jewelry piece"]
+    "id": "43aba422-10f1-4653-bcfc-edeeb814b73c",
+    "product_categories": ["Women's Dresses", "Evening Gowns", "Outing Wear", "Formal Dresses", "Special Occasion"],
+    "product_features": ["Outing Wear", "Formal Attire", "Special Occasion", "Gown"]
   },
   {
-    "id": "c852ac33-53ef-4e01-b1eb-b6c67822b0d7",
-    "product_categories": ["Women's Accessories", "Hairpieces", "Closures", "Hair Blend", "Beauty Products"],
-    "product_features": ["Closure piece", "With bangs (fringe)", "Blends with natural hair", "Small section", "Styling"]
+    "id": "36b04dbd-cdd4-4dc6-9de0-5661cdaa7ede",
+    "product_categories": ["Women's Dresses", "Evening Gowns", "Outing Wear", "Formal Dresses", "Special Occasion"],
+    "product_features": ["Fancy Dress", "Outing Wear", "Special Occasion", "Formal Attire"]
   },
   {
-    "id": "006dd2e4-7909-4e67-bd55-259f39bc6948",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Everyday style", "Upper body garment", "Casual", "Shirt"]
+    "id": "050ec5e8-026d-43dc-bc62-44d5b6c42b5a",
+    "product_categories": ["Women's Dresses", "Evening Gowns", "Outing Wear", "Formal Dresses", "Special Occasion"],
+    "product_features": ["Outing Wear", "Formal Attire", "Special Occasion", "Gown"]
   },
   {
-    "id": "b841868c-7ba7-4430-a5a5-ddbb8539f141",
-    "product_categories": ["Women's Accessories", "Wig Accessories", "Skull Caps", "Beauty Products", "Hair Basics"],
-    "product_features": ["Skull cap", "100% human hair", "Snug fit", "Wig base", "Headwear"]
+    "id": "38f9c482-0efd-47d3-8761-04f20b2eea9f",
+    "product_categories": ["Women's Dresses", "Evening Gowns", "Outing Wear", "Formal Dresses", "Special Occasion"],
+    "product_features": ["Special Occasions", "Outing Wear", "Formal Attire", "Gown"]
   },
   {
-    "id": "c8cb3bfd-fbb1-4f25-abe8-99ffc40bba4f",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Long Sleeve Tops", "Everyday Apparel"],
-    "product_features": ["Long sleeves", "Comfortable", "Casual wear", "Everyday", "Upper body garment"]
+    "id": "524ba3d1-9103-4b8b-9277-b21f76848b66",
+    "product_categories": ["Women's Jewelry", "Pearl Accessories", "Jewelry Sets", "Evening Accessories", "Matching Sets"],
+    "product_features": ["Pearl Earrings", "Matching Necklace", "Coordinating Bag", "Complete Set"]
   },
   {
-    "id": "314fde3e-ebf3-4c5a-b3e3-5351013ba29c",
-    "product_categories": ["Women's Accessories", "Hair Extensions", "Human Hair", "Water Curls", "Beauty Products"],
-    "product_features": ["Low grade hair", "Human hair", "Water curls", "Adds length", "Adds fullness"]
+    "id": "80a8a589-49cd-4569-89ae-15ffdb2789c9",
+    "product_categories": ["Women's Accessories", "Beaded Handbags", "Purple Bags", "Evening Bags", "Artisanal Products"],
+    "product_features": ["Purple Beads", "Small Items Carrier", "Decorative", "Special Things Carrier"]
   },
   {
-    "id": "259afa30-705e-44d2-b1f8-5f3ed7796ed6",
-    "product_categories": ["Women's Clothing", "Bottoms", "Skirts", "Crochet Clothing", "Mini Skirts"],
-    "product_features": ["Crochet style", "Short skirt", "Looped yarn", "Worn on lower body", "Decorative"]
+    "id": "4436e2d1-e523-4901-8635-2b2d8dddfa8c",
+    "product_categories": ["Women's Accessories", "Beaded Handbags", "Blue Bags", "Evening Bags", "Royal Blue Accessories"],
+    "product_features": ["Royal Blue Color", "Tiny Beads", "Handbag", "Items Carrier"]
   },
   {
-    "id": "2716cb42-c9b9-4e64-9edf-bd48a7123fe9",
-    "product_categories": ["Women's Accessories", "Hair Accessories", "Crochet Items", "Bows", "Girly Accessories"],
-    "product_features": ["Crochet material", "Bow shape", "Regular size", "Hair decoration", "Pretty"]
+    "id": "57e7a16e-9b73-4637-a5b4-44f346e03069",
+    "product_categories": ["Electronics", "Smart Watches", "Wearable Technology", "Tech Accessories", "Wireless Earbuds"],
+    "product_features": ["Smart Watch", "Wireless Earbuds", "Watch Straps", "Electronic Devices"]
   },
   {
-    "id": "b085c19f-e2c7-4cf1-9b2e-95f730156e42",
-    "product_categories": ["Food", "Fast Food", "Burgers", "American Cuisine", "Quick Meals"],
-    "product_features": ["Delicious", "Fast-food meal", "Ready to eat", "Popular", "Tasty"]
+    "id": "eea85170-615b-4906-b64a-ca8fe17044b2",
+    "product_categories": ["Electronics", "Smart Watches", "Wearable Technology", "Health Tracking", "Tech Accessories"],
+    "product_features": ["Health Tracking", "Time Telling", "Extra Bands", "Charger Included"]
   },
   {
-    "id": "16e6d87e-3795-4f61-871f-fe3ea7a614bb",
-    "product_categories": ["Women's Accessories", "Hair Extensions", "Closures", "Budget Hair", "Pixie Cut"],
-    "product_features": ["2x4 closure", "Budget option", "Pixie curls hairstyle", "Small piece", "Short style"]
+    "id": "d6a8f714-7790-4a29-877e-a4f34128e69e",
+    "product_categories": ["Electronics", "Smart Watches", "Wearable Technology", "Tech Bundles", "Gadget Sets"],
+    "product_features": ["Mini Fan", "Extra Straps", "Wireless Earbuds", "Charger Included"]
   },
   {
-    "id": "1f38ac0f-e6dd-4424-a69f-0e777a982882",
-    "product_categories": ["Women's Accessories", "Headbands", "Hair Accessories", "Crochet Items", "Hair Management"],
-    "product_features": ["Crochet material", "Worn on head", "Keeps hair back", "For decoration", "Soft"]
+    "id": "b9c17362-ac9a-40f3-a7a6-fcfb4ee6d7db",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Large Sizes"],
+    "product_features": ["Thick Fabric", "Round Neck", "Large Sizes", "Comfortable"]
   },
   {
-    "id": "e23154d3-52a3-41f6-a908-546a46bc4e01",
-    "product_categories": ["Women's Jewelry", "Body Jewelry", "Waist Chains", "Fashion Accessories", "Gold and Silver"],
-    "product_features": ["Worn around waist", "For decoration", "Available in gold", "Available in silver", "Chain"]
+    "id": "839c6bd8-4a50-41e7-b2f7-c15f74de0743",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Large Sizes"],
+    "product_features": ["Thick Material", "Round Neck", "Large Sizes", "Upper Body Wear"]
   },
   {
-    "id": "797ffee3-4699-4ae3-bc24-2a1177706ca4",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Everyday wear", "Perfect for casual use", "Upper body garment", "Relaxed"]
+    "id": "64184cf4-36de-42d4-92bc-e28599a6ab85",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Comfort Wear"],
+    "product_features": ["Comfortable", "Thick Fabric", "Round Neck", "Large Sizes"]
   },
   {
-    "id": "7c78ff26-ba98-4c0c-bf63-d01e5f9af187",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Relaxed", "For upper body", "Everyday style", "Shirts"]
+    "id": "41876082-f900-4fa5-bff8-1d93c7cc7e98",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Comfort Wear"],
+    "product_features": ["Thick Material", "Comfortable", "Round Neck", "Multiple Sizes"]
   },
   {
-    "id": "7c78ff26-ba98-4c0c-bf63-d01e5f9af187",
-    "product_categories": ["Women's Clothing", "Tops", "Casual Wear", "Everyday Apparel", "Blouses"],
-    "product_features": ["Comfortable", "Relaxed", "For upper body", "Everyday style", "Shirts"]
+    "id": "6179e1ca-3260-4948-8829-af4dafe5615e",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Large Sizes"],
+    "product_features": ["Thick Material", "Comfortable", "Round Neck", "Large Sizes"]
   },
   {
-    "id": "ea600b55-0e80-4d5a-813b-ac3a9b4b0d02",
-    "product_categories": ["Women's Clothing", "Bottoms", "Skirts", "Crochet Clothing", "Mini Skirts"],
-    "product_features": ["Crochet style", "Short skirt", "Looping design", "Lower body garment", "Decorative"]
+    "id": "4d154e5d-bfba-4aed-abdf-c01245bd6eea",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Large Sizes"],
+    "product_features": ["Thick Fabric", "Round Neck", "Large/XL/2XL Sizes", "Upper Body Wear"]
   },
   {
-    "id": "5573b3e6-9cc2-4384-aff2-e44e69f3cf2d",
-    "product_categories": ["Electronics", "Mobile Phones", "Smartphones", "Unisex Tech", "5G Phones"],
-    "product_features": ["5G connectivity", "Talk to people", "Send messages", "Do many things", "Samsung brand"]
+    "id": "71d3dd2d-ca45-4480-96b0-af9ea69acea8",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Comfort Wear"],
+    "product_features": ["Thick Feel", "Round Neck", "Upper Body Clothing", "Comfortable"]
   },
   {
-    "id": "ffc0c358-8092-4f83-b945-a566765cb2b3",
-    "product_categories": ["Women's Accessories", "Handbags", "Crochet Items", "Summer Bags", "Tote Bags"],
-    "product_features": ["Crochet material", "Woven style", "Carry items", "Beautiful", "Perfect for essentials"]
-  },
-  {
-    "id": "5f868996-2482-4e2b-94f8-9a178822ce23",
-    "product_categories": ["Women's Accessories", "Hair Accessories", "Bows", "Mesh Material", "Big Size Bows"],
-    "product_features": ["Mesh material", "Big size", "Soft", "Hair decoration", "Decorative"]
-  },
-  {
-    "id": "48273a3c-0754-400d-8a8d-547a99d3513b",
-    "product_categories": ["Women's Accessories", "Hair Accessories", "Scrunchies", "Crochet Items", "Hair Ties"],
-    "product_features": ["Crochet material", "Ties hair back", "Soft", "Scrunchie style", "Hair management"]
-  },
-  {
-    "id": "f7e70cb3-5f26-4bf1-a12f-efa0a4f3ec81",
-    "product_categories": ["Women's Clothing", "Bottoms", "Skirts", "Crochet Clothing", "Mini Skirts"],
-    "product_features": ["Crochet material", "Mini length", "Short skirt", "Lower body garment", "Woven"]
-  },
-  {
-    "id": "4cc4b0a0-299c-4c05-ab97-e47c48e3419b",
-    "product_categories": ["Food", "Fast Food", "Sandwiches", "Quick Meals", "Lunch Snacks"],
-    "product_features": ["Tasty", "Quick meal", "Lunch", "Snack", "Ready to eat"]
-  },
-  {
-    "id": "26700e1d-86fc-463d-99df-77315a7e49a4",
-    "product_categories": ["Phone Accessories", "Unisex Accessories", "Phone Cases", "Protective Pouches", "Customizable Gifts"],
-    "product_features": ["Soft pouch", "Holds phone safely", "Customizable look", "Makes it special", "Protective"]
-  },
-  {
-    "id": "336ceca7-836f-4056-a710-50571721c151",
-    "product_categories": ["Women's Jewelry", "Bracelets", "Fashion Jewelry", "Jewelry Sets", "Wrist Accessories"],
-    "product_features": ["4 pieces", "Worn on wrist", "Set of bracelets", "Decorative", "Jewelry"]
-  },
-  {
-    "id": "dbe1295d-171b-4013-889f-afe566d1daa8",
-    "product_categories": ["Women's Accessories", "Wigs", "Human Hair", "Bob Wigs", "Beauty Products"],
-    "product_features": ["4x4 closure", "Bob style", "100% human hair", "Changes hairstyle", "Enhances look"]
-  },
-  {
-    "id": "db070d86-1ee6-4895-a499-a8bfa89eb758",
-    "product_categories": ["Food", "Fast Food", "Middle Eastern Cuisine", "Chicken Dishes", "Street Food"],
-    "product_features": ["Chicken", "Sausage", "Tasty", "Ready to enjoy", "Shawarma dish"]
-  },
-  {
-    "id": "cc77a457-f7e2-45c3-832b-9eb0409ab08a",
-    "product_categories": ["Sports & Recreation", "Trampolines", "Outdoor Equipment", "Kids Toys", "Bouncers"],
-    "product_features": ["5x5-foot surface", "For jumping", "For bouncing", "Recreational equipment", "Generous size"]
-  },
-  {
-    "id": "3d5d9871-c365-44aa-b371-3802e6d6936b",
-    "product_categories": ["Women's Clothing", "Tops", "Crochet Clothing", "Fashion Apparel", "Summer Tops"],
-    "product_features": ["Crochet material", "Beautiful", "Special looped yarn", "Upper body garment", "Woven"]
+    "id": "3e2dcdc1-3473-44fb-83a7-5d5bc2544710",
+    "product_categories": ["Men's T-Shirts", "Casual Tops", "Round Neck Tees", "Thick Shirts", "Large Sizes"],
+    "product_features": ["Thick Material", "Comfortable", "Round Neck", "Larger Sizes"]
   }
 ]
