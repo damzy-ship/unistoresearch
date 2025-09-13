@@ -22,7 +22,7 @@ import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
 import { getMatchingCategoriesAndFeatures, updateMerchantProductAttributes } from '../lib/generateEmbedding';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
-import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
+// import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
 
 
 
