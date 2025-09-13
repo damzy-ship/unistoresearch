@@ -45,6 +45,8 @@ export interface UniqueVisitor {
   last_visit: string;
   visit_count: number;
   created_at: string;
+  user_type: string;
+  school_id: string;
 }
 
 export interface RequestLog {

@@ -50,7 +50,7 @@ export function setPhoneAuthenticated(authenticated: boolean): void {
 
 export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
-  localStorage.removeItem(AUTH_SESSION_KEY);
+  localStorage.clear();
 }
 
 export async function getUserRequestCount(): Promise<number> {

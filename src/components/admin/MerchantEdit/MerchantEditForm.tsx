@@ -1,4 +1,3 @@
-import React from 'react';
 import { Mail, User, Phone, School, FileText } from 'lucide-react';
 import { School as SchoolType } from '../../../lib/supabase';
 import BillingDateManager from './BillingDateManager';

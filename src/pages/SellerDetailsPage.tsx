@@ -13,6 +13,7 @@ import {
   CheckCircle,
   CreditCard,
   Image,
+  ImageIcon,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import {

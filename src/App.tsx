@@ -1,33 +1,65 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
+import { useTheme } from './hooks/useTheme';
 import HomePage from './pages/HomePage';
 import PastRequestsPage from './pages/PastRequestsPage';
 import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
 import SellerDetailsPage from './pages/SellerDetailsPage';
+import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
 import BillingCallbackPage from './pages/BillingCallbackPage';
+import RealTimePage from './pages/RealTimePage';
+import CreateRealTimeProductPage from './pages/CreateRealTimeProductPage';
 import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
+import PaymentPage from './pages/PaymentPage';
+import InvoicesPage from './pages/InvoicesPage';
+import ViewInvoicePage from './pages/ViewInvoicePage';
+import PayMerchantPage from './pages/PayMerchantPage';
+import AnnouncementBar from './components/AnnouncementBar';
+import ProductSearchPage from './pages/ProductSearchPage';
+import SearchResultsPage from './pages/SearchResultsPage';
+import MerchantProductPage from './pages/MerchantProductPage';
+import AllProductsPage from './pages/AllProductsPage';
 
 function App() {
+  const { currentTheme } = useTheme();
+
   return (
-    <Router>
-      <Toaster position="top-center" />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/landing-page" element={<LandingPage />} />
-        <Route path="/past-requests" element={<PastRequestsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/sellers" element={<SellersPage />} />
-        <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-        <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
-        <Route path="/billing/callback" element={<BillingCallbackPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/test-categories" element={<CategoryTest />} />
-      </Routes>
-    </Router>
+    <div
+      className="min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: currentTheme.background }}
+    >
+      <Router>
+        <Toaster position="top-center" richColors />
+        <AnnouncementBar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/landing-page" element={<LandingPage />} />
+          <Route path="/past-requests" element={<PastRequestsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/sellers" element={<SellersPage />} />
+          <Route path="/merchants" element={<PublicMerchantsPage />} />
+          <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
+          <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
+          <Route path="/billing/callback" element={<BillingCallbackPage />} />
+          <Route path="/real-time" element={<RealTimePage />} />
+          <Route path="/create-real-time-product" element={<CreateRealTimeProductPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/test-categories" element={<CategoryTest />} />
+          <Route path="/product-search" element={<ProductSearchPage />} />
+          <Route path="/payment/:merchantId" element={<PaymentPage />} />
+          <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/pay-merchant" element={<PayMerchantPage />} />
+          <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
+          <Route path="/search-results" element={<SearchResultsPage />} />
+          <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
+          <Route path="/all-products" element={<AllProductsPage />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

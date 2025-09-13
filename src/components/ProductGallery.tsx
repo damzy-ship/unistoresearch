@@ -41,7 +41,6 @@ export default function ProductGallery({ merchantId, editable = false, className
       if (error) {
         throw error;
       }
-
       setImages(data || []);
     } catch (err) {
       console.error('Error fetching product images:', err);

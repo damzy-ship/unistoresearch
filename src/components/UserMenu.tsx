@@ -1,50 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { User, LogOut, History, Settings } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+import { User, LogOut, History, Receipt, Package, FileText, Box } from 'lucide-react';
+import { supabase, UniqueVisitor } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
-import ProfileModal from './ProfileModal';
 import { useTheme } from '../hooks/useTheme';
+import PaymentModal from './Payment/PaymentModal';
 
 export default function UserMenu() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const [userName, setUserName] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const {currentTheme} = useTheme();
-  
+  const { currentTheme } = useTheme();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userType, setUserType] = useState<string | null>(null);
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session?.user);
-      
+
       if (session?.user) {
         // Get user details from unique_visitors
         const { data: visitorData } = await supabase
           .from('unique_visitors')
-          .select('full_name')
+          .select('user_type, full_name, auth_user_id')
           .eq('auth_user_id', session.user.id)
           .single();
-        
+
+        setUserId(session.user.id);
+        // console.log('Visitor Data:', visitorData);
+        setUserType((visitorData as { user_type?: string } | null)?.user_type || null);
         const name = visitorData?.full_name || session.user.user_metadata?.full_name || '';
         setUserName(name);
       }
     };
-    
+
     checkAuth();
-    
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session?.user);
       checkAuth();
     });
-    
+
     return () => {
       subscription.unsubscribe();
     };
   }, []);
-  
+
   const handleSignOut = async () => {
     await signOut();
     setIsOpen(false);
@@ -54,11 +59,16 @@ export default function UserMenu() {
   const getFirstName = (fullName: string) => {
     return fullName.split(' ')[0];
   };
-  
+
   if (!isAuthenticated) {
     return null;
   }
-  
+
+  const handleViewProducts = () => {
+    setIsOpen(false);
+    navigate(`/merchant/${userId}/${encodeURIComponent(userName || 'Merchant')}`);
+  };
+
   return (
     <>
       <div className="relative">
@@ -73,21 +83,21 @@ export default function UserMenu() {
             {userName ? getFirstName(userName) : 'User'}
           </span>
         </button>
-        
+
         {isOpen && (
           <>
-            <div 
+            <div
               className="fixed inset-0 z-10"
               onClick={() => setIsOpen(false)}
             />
-            
+
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-20">
               <div className="p-3 border-b border-gray-100">
                 <p className="font-medium text-gray-900 truncate">
                   {userName ? getFirstName(userName) : 'User'}
                 </p>
               </div>
-              
+
               <div className="p-2">
                 <button
                   onClick={() => {
@@ -99,7 +109,29 @@ export default function UserMenu() {
                   <User className="w-4 h-4" />
                   Profile & Themes
                 </button>
-                
+
+                <button
+                  onClick={() => {
+                    navigate('/invoices');
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Invoices
+                </button>
+
+                {userType === 'merchant' && (<button
+                  onClick={handleViewProducts}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Box className="w-4 h-4" />
+                  Manage Products
+                </button>)}
+
+
+                {/* Real-time and Create Product menu items removed per request */}
+
                 <button
                   onClick={() => {
                     navigate('/past-requests');
@@ -110,7 +142,7 @@ export default function UserMenu() {
                   <History className="w-4 h-4" />
                   Past Requests
                 </button>
-                
+
                 <button
                   onClick={handleSignOut}
                   className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -123,6 +155,14 @@ export default function UserMenu() {
           </>
         )}
       </div>
+
+      {isAuthenticated && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          userId={userId || ''}
+        />
+      )}
     </>
   );
 }

@@ -51,7 +51,7 @@
 }
 
 .bg-texture::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image: var(--bg-texture-pattern);
@@ -69,24 +69,48 @@
 
 /* Enhanced animations */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes bounce-in {
-  0% { transform: scale(0.8) translateY(10px); opacity: 0; }
-  50% { transform: scale(1.05) translateY(-5px); }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+  0% {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
-  50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.6); }
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+  }
 }
 
 @keyframes neon-border {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .animate-fade-in {
@@ -101,6 +125,155 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+/* Scrollbar hiding */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Line clamping */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Review Form Animations */
+@keyframes neon-border {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes neon-glow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 10px 30px rgba(251, 191, 36, 0.4);
+  }
+  50% {
+    box-shadow: 0 15px 40px rgba(251, 191, 36, 0.6);
+  }
+}
+
 .animate-neon-border {
   animation: neon-border 3s ease-in-out infinite;
+}
+
+/* Custom animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Swiper Pagination Outside Cards */
+.swiper-pagination-outside {
+  margin-top: 1.5rem;
+}
+
+.swiper-pagination-outside .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #d1d5db;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-outside .swiper-pagination-bullet-active {
+  background: #f97316;
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* AnnouncementBar.css */
+.announcement-bar-container {
+  background-color: #ffcc00; /* Yellow background */
+  color: #333; /* Dark text color */
+  padding: 10px 15px;
+  text-align: center;
+  overflow: hidden; /* Hide overflowing text */
+  white-space: nowrap; /* Prevent text from wrapping */
+  position: relative;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.announcement-bar-content {
+  display: inline-block;
+}
+
+.swiper-pagination {
+  bottom: 12px !important;
+}
+
+.swiper-pagination-bullet {
+  margin: 0 4px !important;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Sliding text animation for mobile */
+@media (max-width: 768px) {
+  .sliding-text {
+    animation: slideText 15s linear infinite; /* Adjust duration as needed */
+  }
+
+  @keyframes slideText {
+    0% {
+      transform: translateX(100%); /* Start off-screen right */
+    }
+    100% {
+      transform: translateX(-100%); /* End off-screen left */
+    }
+  }
 }

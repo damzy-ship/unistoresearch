@@ -1,4 +1,3 @@
-import React from 'react';
 import WelcomeMessage from './WelcomeMessage';
 
 interface UserGreetingProps {

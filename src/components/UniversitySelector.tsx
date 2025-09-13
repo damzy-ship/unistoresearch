@@ -26,7 +26,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
         
         // If no university is selected and we have schools, select the first one
         if (!selectedUniversity && activeSchools.length > 0) {
-          onUniversityChange(activeSchools[0].short_name);
+          onUniversityChange(activeSchools[0].id);
         } else if (activeSchools.length === 0) {
           setError('No schools available. Please check your connection.');
         }
@@ -46,10 +46,10 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
     school.short_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const selectedSchool = schools.find(school => school.short_name === selectedUniversity);
+  const selectedSchool = schools.find(school => school.id === selectedUniversity);
 
   const handleSelectSchool = (school: School) => {
-    onUniversityChange(school.short_name);
+    onUniversityChange(school.id);
     setIsOpen(false);
     setSearchTerm('');
   };
@@ -86,11 +86,11 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
             key={school.id}
             type="button"
             className={`flex-1 py-2 px-6 rounded-xl font-semibold text-sm uppercase tracking-wide transition-all duration-200 ${
-              selectedUniversity === school.short_name
+              selectedUniversity === school.id
                 ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white shadow-lg transform hover:scale-105`
                 : "border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
             }`}
-            onClick={() => onUniversityChange(school.short_name)}
+            onClick={() => onUniversityChange(school.id)}
           >
             {school.short_name}
           </button>
@@ -111,7 +111,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-gray-500" />
           <span className="text-gray-900 font-medium">
-            {loading ? 'Loading...' : selectedSchool ? selectedSchool.name : 'Select University'}
+            {loading ? 'Loading...' : selectedSchool ? selectedSchool.id : 'Select University'}
           </span>
         </div>
         <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -143,7 +143,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
                   type="button"
                   onClick={() => handleSelectSchool(school)}
                   className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0 ${
-                    selectedUniversity === school.short_name ? 'bg-orange-50 text-orange-700' : 'text-gray-900'
+                    selectedUniversity === school.id ? 'bg-orange-50 text-orange-700' : 'text-gray-900'
                   }`}
                 >
                   <div className="font-medium">{school.name}</div>
