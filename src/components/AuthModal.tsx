@@ -10,6 +10,7 @@ import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
 import OTPInput from './auth/OTPInput';
 import SchoolDropdown from './ScoolDropdown';
+import UniversitySelector from './UniversitySelector';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   // New state for user type and schools
   const [userType, setUserType] = useState<UserType>('user');
   const [schools, setSchools] = useState<School[]>([]);
-  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
+  const [selectedSchoolId, setSelectedSchoolId] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
 
   useEffect(() => {
     if (isOpen) {
@@ -589,12 +590,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
           {/* School Dropdown (Merchant Sign Up only) */}
           {view === 'signup' && (
-            <SchoolDropdown
-              schools={schools}
-              selectedSchoolId={selectedSchoolId}
-              onChange={setSelectedSchoolId}
-              disabled={loading}
+
+            <UniversitySelector
+              selectedUniversity={selectedSchoolId}
+              onUniversityChange={setSelectedSchoolId}
             />
+
+            // <SchoolDropdown
+            //   schools={schools}
+            //   selectedSchoolId={selectedSchoolId}
+            //   onChange={setSelectedSchoolId}
+            //   disabled={loading}
+            // />
           )}
 
 
