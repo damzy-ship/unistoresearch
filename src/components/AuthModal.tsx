@@ -10,6 +10,7 @@ import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
 import OTPInput from './auth/OTPInput';
 import SchoolDropdown from './ScoolDropdown';
+import UniversitySelector from './UniversitySelector';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   // New state for user type and schools
   const [userType, setUserType] = useState<UserType>('user');
   const [schools, setSchools] = useState<School[]>([]);
-  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
+  const [selectedSchoolId, setSelectedSchoolId] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
 
   useEffect(() => {
     if (isOpen) {
@@ -171,7 +172,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           last_visit: new Date().toISOString(),
           visit_count: 1,
           user_type: userType, // Save user user_type
-          ...(userType === 'merchant' && { school_id: selectedSchoolId }) // Conditionally add school ID
+          school_id: selectedSchoolId // Conditionally add school ID
         });
 
       if (visitorError) {
@@ -191,7 +192,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               full_name: fullName,
               last_visit: new Date().toISOString(),
               user_type: userType,
-              ...(userType === 'merchant' && { school_id: selectedSchoolId })
+              school_id: selectedSchoolId
             })
             .eq('id', existingVisitor.id);
         }
@@ -588,13 +589,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
 
           {/* School Dropdown (Merchant Sign Up only) */}
-          {view === 'signup' && userType === 'merchant' && (
-            <SchoolDropdown
-              schools={schools}
-              selectedSchoolId={selectedSchoolId}
-              onChange={setSelectedSchoolId}
-              disabled={loading}
+          {view === 'signup' && (
+
+            <UniversitySelector
+              selectedUniversity={selectedSchoolId}
+              onUniversityChange={setSelectedSchoolId}
             />
+
+            // <SchoolDropdown
+            //   schools={schools}
+            //   selectedSchoolId={selectedSchoolId}
+            //   onChange={setSelectedSchoolId}
+            //   disabled={loading}
+            // />
           )}
 
 

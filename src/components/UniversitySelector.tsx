@@ -111,7 +111,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-gray-500" />
           <span className="text-gray-900 font-medium">
-            {loading ? 'Loading...' : selectedSchool ? selectedSchool.id : 'Select University'}
+            {loading ? 'Loading...' : selectedSchool ? selectedSchool.short_name : 'Select University'}
           </span>
         </div>
         <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
