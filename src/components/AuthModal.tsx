@@ -171,7 +171,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           last_visit: new Date().toISOString(),
           visit_count: 1,
           user_type: userType, // Save user user_type
-          ...(userType === 'merchant' && { school_id: selectedSchoolId }) // Conditionally add school ID
+          school_id: selectedSchoolId // Conditionally add school ID
         });
 
       if (visitorError) {
@@ -191,7 +191,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               full_name: fullName,
               last_visit: new Date().toISOString(),
               user_type: userType,
-              ...(userType === 'merchant' && { school_id: selectedSchoolId })
+              school_id: selectedSchoolId
             })
             .eq('id', existingVisitor.id);
         }
@@ -588,7 +588,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
 
           {/* School Dropdown (Merchant Sign Up only) */}
-          {view === 'signup' && userType === 'merchant' && (
+          {view === 'signup' && (
             <SchoolDropdown
               schools={schools}
               selectedSchoolId={selectedSchoolId}
