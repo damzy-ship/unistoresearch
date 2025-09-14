@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import BuyNowButton from '../components/Payment/BuyNowButton';
+import MerchantSelector from '../components/MerchantSelector';
 
 interface Merchant {
     id?: number;
@@ -139,7 +140,7 @@ export default function PayMerchantPage() {
                 <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: currentTheme.surface }}>
                     <div className="space-y-4">
                         {/* The new custom dropdown component, inspired by the select tag */}
-                        <div className="relative" ref={dropdownRef}>
+                        {/* <div className="relative" ref={dropdownRef}>
                             <label htmlFor="merchant_id" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textSecondary }}>
                                 Select Merchant
                             </label>
@@ -225,7 +226,14 @@ export default function PayMerchantPage() {
                                     )}
                                 </div>
                             )}
-                        </div>
+                        </div> */}
+
+                        <MerchantSelector
+                            merchants={merchants}
+                            loading={loading}
+                            selectedMerchant={selectedMerchant}
+                            onMerchantChange={setSelectedMerchant}
+                        />
 
                         <div className="space-y-4">
 
