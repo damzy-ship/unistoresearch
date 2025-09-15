@@ -23,6 +23,7 @@ import ProductSearchPage from './pages/ProductSearchPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
 import AllProductsPage from './pages/AllProductsPage';
+import CategoryProductsPage from './pages/CategoryProductsPage';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -57,6 +58,7 @@ function App() {
           <Route path="/search-results" element={<SearchResultsPage />} />
           <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
           <Route path="/all-products" element={<AllProductsPage />} />
+          <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
         </Routes>
       </Router>
     </div>

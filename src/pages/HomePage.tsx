@@ -21,6 +21,7 @@ import { supabase } from '../lib/supabase';
 import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
 import { getMatchingCategoriesAndFeatures, updateMerchantProductAttributes } from '../lib/generateEmbedding';
+import MerchantCategoriesGrid from '../components/MerchantCategoriesGrid';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
 
@@ -46,6 +47,40 @@ export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null);
   const [userType, setUserType] = useState<string | null>(null);
+
+  // React.useEffect(() => {
+  //   try {
+  //     const fetchProductsByCategory = async () => {
+  //       // Call the Supabase Edge Function to get products by category
+  //       const { data, error: functionError } = await supabase.functions.invoke('smooth-service', {
+  //         body: {
+  //           category_id: '43e1caed-5165-4e66-b60e-c705279fa689', // Pass the category ID here
+  //           school_id: '1724171a-6664-44fd-aa1e-f509b124ab51' // Assuming 'university' is in scope
+  //         },
+
+
+  //       });
+
+  //       if (functionError) {
+  //         throw functionError;
+  //       }
+
+  //       const products = data?.results || [];
+  //       console.log('Products in category:', products);
+
+  //       // Store results and navigate
+  //       // navigate('/search-results', { state: { products } });
+  //     };
+
+  //     fetchProductsByCategory();
+  //   } catch (err) {
+  //     console.error('Error during category search:', err);
+  //     // setError('An error occurred while fetching category results. Please try again.');
+  //   } finally {
+  //     // setLoading(false);
+  //   }
+  // }, []);
+
 
   React.useEffect(() => {
     const checkAuth = async () => {
@@ -234,6 +269,8 @@ export default function HomePage() {
           {/* Search Card */}
           <ProductSearchComponent />
 
+
+          <MerchantCategoriesGrid />
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
 
