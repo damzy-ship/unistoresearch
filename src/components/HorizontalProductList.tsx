@@ -5,6 +5,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import { useNavigate } from 'react-router-dom';
 
 // Define a type for your product data
 interface Product {
@@ -28,6 +29,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProductsByCategory = async () => {
@@ -86,20 +88,17 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
             <div className="mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-6 sm:mb-8">
                     <div>
-                        <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                            Products
-                        </h2>
-                        <p className="mt-1 text-lg font-medium text-gray-500">
-                            in <span className="font-semibold text-indigo-600">{categoryName}</span>
+                        <p className="text-lg font-medium text-gray-500">
+                            <span className="font-semibold text-indigo-600">{categoryName}</span>
                         </p>
                     </div>
                     {products.length > 0 && (
-                        <a
-                            href="#"
+                        <button
+                            onClick={() => { navigate(`/categories/${categoryId}/products?schoolId=${schoolId}&categoryName=${encodeURIComponent(categoryName)}`); window.scrollTo(0, 0); }}
                             className="text-base font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
                         >
                             View All <span aria-hidden="true">&rarr;</span>
-                        </a>
+                        </button>
                     )}
                 </div>
 
@@ -108,15 +107,15 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 ) : (
                     <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide">
                         {products.map((product) => (
-                            <div key={product.id} className="w-52 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
+                            <div key={product.id} className="w-48 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
                                 <Swiper
                                     modules={[Pagination, Navigation]}
                                     spaceBetween={10}
                                     slidesPerView={1}
                                     pagination={{ clickable: true }}
                                     navigation
-                                    className="w-full h-44 md:h-48"
-                                    
+                                    className="w-full h-32 md:h-32"
+
                                 >
                                     {product.image_urls.map((url, imgIndex) => (
                                         <SwiperSlide key={imgIndex}>
@@ -128,7 +127,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                     {/* <h3 className="text-xl font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
                                     <p className="text-xl text-indigo-600 font-extrabold mb-1 truncate">{product.product_price}</p>
                                     {product.full_name && (
-                                        <p className="text-sm text-gray-500 mb-3">
+                                        <p className="text-sm text-gray-500 mb-2">
                                             <span className="font-medium text-gray-700">{product.full_name}</span>
                                         </p>
                                     )}
