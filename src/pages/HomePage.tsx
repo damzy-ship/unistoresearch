@@ -22,6 +22,7 @@ import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
 import { getMatchingCategoriesAndFeatures, updateMerchantProductAttributes } from '../lib/generateEmbedding';
 import MerchantCategoriesGrid from '../components/MerchantCategoriesGrid';
+import HorizontalProductList from '../components/HorizontalProductList';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
 
@@ -271,6 +272,13 @@ export default function HomePage() {
 
 
           <MerchantCategoriesGrid />
+
+          <HorizontalProductList
+            categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
+            schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
+            categoryName="Apparel & Clothing" />
+
+          <MerchantCategoriesGrid showFirst={false} />
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
 

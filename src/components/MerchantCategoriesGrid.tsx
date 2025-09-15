@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { getUserId } from '../hooks/useTracking';
+// import { getUserId } from '../hooks/useTracking';
 
 // Define the types for your data
 interface Category {
@@ -10,7 +10,7 @@ interface Category {
   category_image: string;
 }
 
-const MerchantCategoriesGrid: React.FC = () => {
+const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean }> = ({ showFirst = true }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,8 +28,11 @@ const MerchantCategoriesGrid: React.FC = () => {
           .select('id, category_name, category_image');
 
         if (error) throw error;
-
-        setCategories(data || []);
+        if (showFirst) {
+          setCategories(data.slice(0, 6) || []);
+        } else {
+          setCategories(data.slice(6, 12) || []);
+        }
       } catch (err: any) {
         console.error('Error fetching categories:', err.message);
         setError('Failed to load categories.');
@@ -62,7 +65,7 @@ const MerchantCategoriesGrid: React.FC = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 mt-3"> {/* Adjust padding for better spacing */}
+    <div className="mx-auto p-4 sm:p-6 md:p-8 mt-3"> {/* Adjust padding for better spacing */}
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-700">Product Categories</h1> {/* Hide the main heading as per the image */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6">
         {categories.map((category) => (
