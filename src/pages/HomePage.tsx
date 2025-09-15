@@ -279,6 +279,11 @@ export default function HomePage() {
             categoryName="Apparel & Clothing" />
 
           <MerchantCategoriesGrid showFirst={false} />
+
+          <HorizontalProductList
+            categoryId="09e9cc32-b75e-4138-9aa6-7dbf6bb7a756"
+            schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
+            categoryName="Bags & Luggage" />
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
 

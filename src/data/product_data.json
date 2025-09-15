@@ -1,477 +1,312 @@
 [
   {
-    "id": "9cf2a6c6-e149-4418-b750-29d4ba3653d6",
-    "product_categories": ["tote bags", "fashion bags", "beach bags", "women's bags", "unisex bags"],
-    "product_features": ["carry things", "stylish carry", "easy carry", "shoulder carry", "casual bags"]
+    "id": "5cdab9b5-fa17-4518-be4e-6dcf2621e05f",
+    "product_categories": ["Hair Accessories", "Women's Accessories", "beauty accessories", "soft hair accessories", "decorative accessories"],
+    "product_features": ["Holds phone safely", "Decorative", "gentle hold", "beautiful", "cute design"]
   },
   {
-    "id": "3578f27f-509f-4960-8edb-168371f14516",
-    "product_categories": ["desserts", "cakes", "celebration cakes", "baked goods", "sweet treats"],
-    "product_features": ["sweet treat", "ready to enjoy", "giftable", "tasty", "chocolate"]
+    "id": "958737c7-69b6-42f7-8f56-7ddc533b7f60",
+    "product_categories": ["key holders", "Men's Accessories", "Women's Accessories", "unisex accessories", "decorative accessories"],
+    "product_features": ["key holding", "cute design", "Decorative", "carry little things", "pretty"]
   },
   {
-    "id": "4d20664e-b81d-47e9-8731-bb2db562cba3",
-    "product_categories": ["desserts", "baked goods", "sweet treats", "cakes", "Food"],
-    "product_features": ["sweet treat", "tasty", "ready to enjoy", "chocolate", "enjoy"]
+    "id": "a3828058-8fad-468e-b84b-4a660996bb0d",
+    "product_categories": ["Bracelets", "Women's Jewelry", "fashion jewelry", "ankle bracelets", "decorative jewelry"],
+    "product_features": ["color variety", "color options", "beautiful", "ankle length", "Decorative"]
   },
   {
-    "id": "cb5f8bbd-3359-426e-880d-ac8df6b50882",
-    "product_categories": ["fitness accessories", "sports equipment", "exercise wear", "men's sportswear", "unisex sportswear"],
-    "product_features": ["exercising", "body help", "sports playing", "comfortable", "athletic"]
+    "id": "51b6c42c-ca04-4e7b-84ae-1697f08e3b47",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "Bob Wigs", "hair replacements"],
+    "product_features": ["Bob style", "Short hairstyle", "Wearable hairpiece", "Changes hairstyle", "look change"]
   },
   {
-    "id": "3eb828f4-c8dc-4a69-b7f8-ad4c7f5ea379",
-    "product_categories": ["perfumes", "mini fragrances", "women's fragrances", "luxury perfumes", "fashion fragrances"],
-    "product_features": ["long-lasting scent", "nice scent", "luxury scent", "mini size", "feminine scents"]
+    "id": "b366423d-4394-403d-bbef-011b12c3d392",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "Human Hair", "hair replacements"],
+    "product_features": ["100% human hair", "long length", "Wearable hairpiece", "Changes hairstyle", "look change"]
   },
   {
-    "id": "522ae700-476d-494e-b9ea-4edf165fff62",
-    "product_categories": ["desserts", "cakes", "sweet treats", "celebration cakes", "Food"],
-    "product_features": ["sweet treat", "tasty", "ready to enjoy", "chocolate", "cream flavor"]
+    "id": "24a7fbc7-0026-4c29-9195-6945ddb6e329",
+    "product_categories": ["Hair Extensions", "Women's Accessories", "hair replacements", "hair styling", "beauty accessories"],
+    "product_features": ["4x4 closure", "Bouncy", "clip-in", "natural addition", "look change"]
   },
   {
-    "id": "a6ba0395-0e42-48c9-8969-68d009658026",
-    "product_categories": ["desserts", "cakes", "sweet treats", "baked goods", "Food"],
-    "product_features": ["sweet treat", "tasty", "ready to enjoy", "layering", "special treat"]
+    "id": "c2eb18b7-ee7c-4891-a3d8-27d3f886a0f1",
+    "product_categories": ["stationery", "office supplies", "writing materials", "gift items", "unisex accessories"],
+    "product_features": ["writing", "Decorative", "giftable", "item organization", "carry little things"]
   },
   {
-    "id": "929a52d2-7cf6-4b61-9faa-b303b923f06d",
-    "product_categories": ["desserts", "cakes", "baked goods", "sweet treats", "mini cakes"],
-    "product_features": ["sweet treat", "tasty", "ready to enjoy", "mini size", "giftable"]
+    "id": "d8fde7d9-098d-48d1-ae83-c449d3cd3187",
+    "product_categories": ["recreational equipment", "outdoor furniture", "children's products", "play equipment", "unisex"],
+    "product_features": ["Bouncy", "big size", "play", "outdoor protection", "exercise/play"]
   },
   {
-    "id": "b5f3f835-8f84-479b-a829-cba7d6323da2",
-    "product_categories": ["Fast Food", "Street Food", "snacks", "Food", "sweet treats"],
-    "product_features": ["tasty", "ready to enjoy", "chewy treats", "snack", "enjoy"]
+    "id": "7997afdc-3258-4711-9a08-6e0a9bb75d87",
+    "product_categories": ["necklaces", "Women's Jewelry", "fashion jewelry", "Evening Accessories", "elegant accessories"],
+    "product_features": ["neck decoration", "pretty", "elegant", "special occasions", "beautiful"]
   },
   {
-    "id": "4eb922fc-c64e-4323-8574-4f2adfc730df",
-    "product_categories": ["Men's Jewelry", "Male Jewelry", "Bracelets", "men's accessories", "wrist jewelry"],
-    "product_features": ["wrist jewelry", "wrist accessory", "male design", "hand decoration", "stylish"]
+    "id": "4d994439-e9f7-4e5a-8823-600743f9fb62",
+    "product_categories": ["football shoes", "Men's Footwear", "sports shoes", "athletic footwear", "Nike brand"],
+    "product_features": ["Nike brand", "Air Zoom technology", "run/kick better", "good grip", "comfortable walk"]
   },
   {
-    "id": "21145993-6ac9-4635-a63c-180a4ebdbade",
-    "product_categories": ["LED decorations", "home decor", "lighting", "Electronics", "room enhancement"],
-    "product_features": ["LED glow", "color variety", "room lighting", "decorative", "electronic"]
+    "id": "9693e4c6-86c1-41e5-8051-ac790d6d078a",
+    "product_categories": ["Men's Jeans", "Women's Clothing", "casual jeans", "comfort jeans", "unisex clothing"],
+    "product_features": ["denim material", "size variety", "comfortable", "casual wear", "daily wear"]
   },
   {
-    "id": "7092311b-f69f-4b07-92ac-ea21c88835d1",
-    "product_categories": ["tote bags", "beach bags", "fashion bags", "women's bags", "summer clothing"],
-    "product_features": ["carry things", "stylish carry", "easy carry", "beach carry", "casual bags"]
+    "id": "d89b007b-47d3-4e33-abbd-4373aa4a4bd6",
+    "product_categories": ["Phone Cases", "Phone Accessories", "Women's Accessories", "protective covers", "unisex accessories"],
+    "product_features": ["Holds phone safely", "phone protection", "soft pouch", "carry with you", "pretty"]
   },
   {
-    "id": "b027cd9a-01cd-4883-b179-d97ee897de89",
-    "product_categories": ["desserts", "cakes", "sweet treats", "baked goods", "Food"],
-    "product_features": ["sweet treat", "tasty", "ready to enjoy", "chocolate", "special treat"]
+    "id": "830cf369-eb52-4026-8d19-a4478e51c781",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "hair replacements", "hair styling"],
+    "product_features": ["Bouncy", "two colors", "long length", "Wearable hairpiece", "look change"]
   },
   {
-    "id": "21430c8f-688f-4f0a-9515-67653b65fc5b",
-    "product_categories": ["Hair Accessories", "hair bows", "women's accessories", "hair decorations", "beauty accessories"],
-    "product_features": ["hair decoration", "pretty bow", "decorative", "feminine", "style addition"]
+    "id": "ac52dff2-43bc-43a3-b37d-563d9e75f16e",
+    "product_categories": ["fashion accessories", "Women's Accessories", "clothing accessories", "decorative accessories", "Artisanal Accessories"],
+    "product_features": ["Decorative", "flowy", "pretty", "style addition", "fancy look"]
   },
   {
-    "id": "84f0dd86-a54f-47b2-a99f-f64d13e859b4",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "all-day scent"],
-    "product_features": ["long-lasting scent", "nice scent", "luxury scent", "feminine scents", "special bottle"]
+    "id": "78691445-4b7c-4d81-ad9e-82a98a574332",
+    "product_categories": ["football shoes", "soccer shoes", "Adidas brand", "Men's Footwear", "sports footwear"],
+    "product_features": ["Adidas brand", "run/kick better", "good grip", "soccer specific", "comfortable walk"]
   },
   {
-    "id": "96104b02-ba9b-4751-b483-13b9e053654e",
-    "product_categories": ["candy", "sweet treats", "mints", "Food", "health supplements"],
-    "product_features": ["sweet treat", "fresh feel", "tasty", "dental", "enjoy"]
+    "id": "9328fbab-a6a9-4d33-b954-2813cc846845",
+    "product_categories": ["Wigs", "Women's Wigs", "Human Hair Wigs", "hair replacements", "hair styling"],
+    "product_features": ["Wearable hairpiece", "Changes hairstyle", "long length", "Bouncy", "look good"]
   },
   {
-    "id": "dee384bb-dec5-49e2-a47a-d5a17cad763a",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "oil perfumes"],
-    "product_features": ["long-lasting scent", "nice scent", "luxury scent", "oil-based", "special collection"]
+    "id": "5f2d0210-5c7d-4dc1-8b68-18a80bb59bc8",
+    "product_categories": ["Jewelry Sets", "Women's Jewelry", "fashion jewelry", "Evening Accessories", "gift items"],
+    "product_features": ["set", "gold color", "silver color", "special occasions", "pretty"]
   },
   {
-    "id": "4e82be78-c32c-4b03-ade0-e7c91faeeded",
-    "product_categories": ["tote bags", "designer handbags", "fashion bags", "women's bags", "luxury bags"],
-    "product_features": ["carry things", "stylish carry", "branded", "luxury brand", "fashionable"]
+    "id": "326a6018-3949-4b14-82db-f23ebc5f65ad",
+    "product_categories": ["Hair Accessories", "Women's Accessories", "hair holders", "ponytail holders", "beauty accessories"],
+    "product_features": ["hair tying", "ponytail", "gentle holding", "soft feel", "neat keep"]
   },
   {
-    "id": "1a129a14-68f8-4eb0-9c76-33b72205b6aa",
-    "product_categories": ["desserts", "cakes", "baked goods", "sweet treats", "mini cakes"],
-    "product_features": ["sweet treat", "tasty", "ready to enjoy", "giftable", "special occasions"]
+    "id": "e28ec229-8566-4f74-8a6b-92f41b831d7c",
+    "product_categories": ["earrings", "Women's Jewelry", "fashion jewelry", "Evening Accessories", "gift items"],
+    "product_features": ["ear decoration", "gold color", "silver color", "special occasions", "pretty"]
   },
   {
-    "id": "c9537f08-dd77-4265-a5c8-5b378f2b3924",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "everyday shoes", "comfort shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "foot protection"]
+    "id": "00fff80a-dd82-4342-bc72-8d91f8fd8339",
+    "product_categories": ["Hair Care", "beauty tools", "wig care", "hair care products", "Women's Health"],
+    "product_features": ["gentle cleaning", "hair protection", "removable", "professional application", "care kit"]
   },
   {
-    "id": "7cf3dfa7-9a69-4625-a681-3f801aa4afba",
-    "product_categories": ["fashion bags", "tote bags", "women's bags", "branded bags", "everyday bags"],
-    "product_features": ["carry things", "stylish carry", "branded", "quality material", "fashionable"]
+    "id": "dd6a96b1-da18-447a-aec6-f7350491ae5c",
+    "product_categories": ["football shoes", "sports shoes", "Men's Footwear", "athletic footwear", "soccer shoes"],
+    "product_features": ["run/kick better", "good grip", "ground grip", "sports playing", "comfortable walk"]
   },
   {
-    "id": "ec0f00b8-2931-43e5-9ec5-9992eaa18784",
-    "product_categories": ["Street Food", "Fast Food", "snacks", "Food", "appetizers"],
-    "product_features": ["tasty", "ready to enjoy", "crispy", "snack", "enjoy"]
+    "id": "7b98489d-b08a-4779-b0f8-06ec3abb668a",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "Bob Wigs", "hair replacements"],
+    "product_features": ["100% human hair", "Bob style", "Short hairstyle", "Wearable hairpiece", "Changes hairstyle"]
   },
   {
-    "id": "d88b112a-33ab-4e9c-9161-82a9c6a1f692",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "Female Apparel"],
-    "product_features": ["comfy top", "special look", "feminine", "casual wear", "upper body wear"]
+    "id": "b4a67cc4-9d16-4d95-be12-1fb758423746",
+    "product_categories": ["Dresses", "Women's Dresses", "Evening Gowns", "African Fashion", "Cultural Attire"],
+    "product_features": ["long length", "flowy", "pretty", "special occasions", "dressy occasions"]
   },
   {
-    "id": "8793c58e-76d0-41a4-8ec5-0bda3333b55b",
-    "product_categories": ["tote bags", "fashion bags", "women's bags", "Evening Bags", "designer handbags"],
-    "product_features": ["carry things", "stylish carry", "fancy look", "special occasions", "fashionable"]
+    "id": "248b9e61-cf33-41b6-9fdd-9badadc4797f",
+    "product_categories": ["wellness products", "aroma therapy", "self-care products", "home relaxation", "Women's Health"],
+    "product_features": ["relaxing", "nice scent", "home use", "fresh feel", "emotional"]
   },
   {
-    "id": "07aa1307-bfc1-49f4-989e-c7483f9ac458",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "all-day wear"]
+    "id": "c4dd0133-b4c6-4b6f-93ff-ac5fa5eb24d3",
+    "product_categories": ["watches", "Bracelets", "Men's Jewelry", "Women's Jewelry", "unisex jewelry"],
+    "product_features": ["time telling", "wrist jewelry", "set", "stylish", "daily wear"]
   },
   {
-    "id": "b77fa010-1aea-40a2-8dcc-b241c276e458",
-    "product_categories": ["tote bags", "fashion bags", "women's bags", "casual bags", "unisex bags"],
-    "product_features": ["carry things", "stylish carry", "two colors", "casual bags", "checkerboard pattern"]
+    "id": "a5c5fa19-e890-4c2d-b2d3-e81a0caa2c34",
+    "product_categories": ["nail art", "beauty tools", "cosmetic accessories", "makeup accessories", "Women's Accessories"],
+    "product_features": ["Decorative", "photo enhancement", "pretty", "small size", "special occasions"]
   },
   {
-    "id": "e0a170de-67ea-490e-a3f5-553059ec32c7",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "outdoor walking"]
+    "id": "6bed6412-3612-43c2-b72c-3fccaf178199",
+    "product_categories": ["Hair Accessories", "claw clips", "Women's Accessories", "hair holders", "beauty accessories"],
+    "product_features": ["hair holding", "gentle hold", "secure", "neat keep", "clip"]
   },
   {
-    "id": "26b83929-affd-4ca4-9f59-6df91d68369a",
-    "product_categories": ["perfumes", "mini fragrances", "women's fragrances", "luxury perfumes", "travel perfumes"],
-    "product_features": ["long-lasting scent", "nice scent", "luxury scent", "mini size", "feminine scents"]
+    "id": "03abc74e-1b34-4c93-b236-50b3d7ffaf6c",
+    "product_categories": ["Wigs", "Women's Wigs", "Human Hair Wigs", "hair replacements", "hair styling"],
+    "product_features": ["long length", "Wearable hairpiece", "Changes hairstyle", "Bouncy", "look change"]
   },
   {
-    "id": "310e9234-c7cb-4d8b-82b9-6f729d4dd8e8",
-    "product_categories": ["Hair Accessories", "hair bands", "women's accessories", "hair holders", "beauty accessories"],
-    "product_features": ["hair tying", "hair back", "gentle hold", "feminine", "practical"]
+    "id": "fa739695-bdeb-4081-9bc7-502cc46034a4",
+    "product_categories": ["anklets", "Women's Jewelry", "fashion jewelry", "versatile jewelry", "Artisanal Accessories"],
+    "product_features": ["3-in-1 design", "ankle length", "versatile use", "pretty", "changeable design"]
   },
   {
-    "id": "40ede96a-34cb-4cbb-a567-6f925e970662",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "summer clothing"],
-    "product_features": ["breathable", "lightweight", "casual wear", "upper body wear", "comfy top"]
+    "id": "257a4d42-6f5b-4e0f-b3e2-d75b6f2e4977",
+    "product_categories": ["decorative items", "home decor", "gift items", "interior design", "unisex"],
+    "product_features": ["color variety", "Decorative", "home use", "beautiful decoration", "room enhancement"]
   },
   {
-    "id": "41d3adbf-05be-4767-9517-5920cb49bce3",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "Female Apparel"],
-    "product_features": ["short length", "casual wear", "feminine", "upper body wear", "stylish"]
+    "id": "fd4bae86-ce80-457e-a197-40429273cf58",
+    "product_categories": ["Hair Extensions", "Women's Accessories", "hair replacements", "hair styling", "curly hair"],
+    "product_features": ["4x4 closure", "Bouncy", "clip-in", "natural addition", "look change"]
   },
   {
-    "id": "c8573693-494d-4d97-9370-64dfba33e517",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "Printed Tops"],
-    "product_features": ["orange color", "casual wear", "feminine", "upper body wear", "colorful"]
+    "id": "c74a4ce0-21b5-4b1f-8fa5-b37e87a824ef",
+    "product_categories": ["decorative items", "gift items", "home decor", "Artisanal Products", "unisex"],
+    "product_features": ["color variety", "Decorative", "versatile use", "beautiful", "giftable"]
   },
   {
-    "id": "334a1dfe-b271-4ffe-85d3-8a3e033c32cc",
-    "product_categories": ["perfumes", "women's fragrances", "floral perfumes", "fashion fragrances", "luxury perfumes"],
-    "product_features": ["floral scent", "nice scent", "feminine scents", "long-lasting scent", "luxury scent"]
+    "id": "70adb9c2-8276-4187-a8bb-bbb1da39dce6",
+    "product_categories": ["earrings", "Women's Jewelry", "fashion jewelry", "Evening Accessories", "gift items"],
+    "product_features": ["ear decoration", "pretty", "special occasions", "beautiful", "noticeable design"]
   },
   {
-    "id": "8c0b373d-b139-4854-b3f1-d9dffe5315f6",
-    "product_categories": ["handbags", "women's bags", "fashion bags", "Evening Bags", "designer handbags"],
-    "product_features": ["carry little things", "stylish carry", "fancy look", "special occasions", "fashionable"]
+    "id": "3e311bb2-8687-41f7-93f0-cc13a01d10a4",
+    "product_categories": ["Hair Extensions", "Women's Accessories", "hair replacements", "closure pieces", "hair styling"],
+    "product_features": ["clip-in", "long length", "natural addition", "look change", "color options"]
   },
   {
-    "id": "d402c4e6-1e06-4200-ba78-3a06c0160f8c",
-    "product_categories": ["tote bags", "convertible bags", "fashion bags", "women's bags", "multi-purpose bags"],
-    "product_features": ["two-in-one", "versatile use", "changeable design", "stylish carry", "functional"]
+    "id": "104acba4-0e8a-4f34-83dd-68ac836fd32d",
+    "product_categories": ["bangles", "Women's Jewelry", "fashion jewelry", "Bracelets", "gift items"],
+    "product_features": ["wrist jewelry", "flower shape", "pretty", "set of bracelets", "special occasions"]
   },
   {
-    "id": "c423f6d1-de9e-44b4-97e3-42251987b1ba",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "Female Apparel"],
-    "product_features": ["special look", "feminine", "casual wear", "upper body wear", "stylish"]
+    "id": "35ba1f4c-70c9-4f7f-aeb0-f0397769f3db",
+    "product_categories": ["Hair Extensions", "Women's Accessories", "hair replacements", "closure pieces", "Bob Wigs"],
+    "product_features": ["Bob style", "Short hairstyle", "clip-in", "natural addition", "look change"]
   },
   {
-    "id": "406dc281-9535-4ccb-8f9e-1d172e0da3f0",
-    "product_categories": ["shoulder bags", "handbags", "women's bags", "fashion bags", "everyday bags"],
-    "product_features": ["shoulder carry", "carry little things", "stylish carry", "casual bags", "fashionable"]
+    "id": "7982facb-7315-43a6-a4dc-4ed99e342d6a",
+    "product_categories": ["stationery", "office supplies", "writing materials", "gift items", "customizable jewelry"],
+    "product_features": ["writing", "Customizable look", "giftable", "personalized look", "Decorative"]
   },
   {
-    "id": "d85f9420-4d03-423c-b2bb-69688ca06b8b",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "Printed Tops"],
-    "product_features": ["colorful", "casual wear", "feminine", "upper body wear", "color variety"]
+    "id": "c4afba40-9d52-4605-ac5e-f5911ccee92e",
+    "product_categories": ["Hair Care", "wig care", "beauty products", "hair treatment", "Women's Health"],
+    "product_features": ["hair protection", "healthy hair", "care kit", "professional application", "gentle cleaning"]
   },
   {
-    "id": "cd253ef3-32f3-4317-aa3e-1b858515510a",
-    "product_categories": ["LED decorations", "lighting", "home decor", "Electronics", "room enhancement"],
-    "product_features": ["LED glow", "bright look", "room lighting", "decorative", "electronic"]
+    "id": "690b6c90-32be-4f90-b3fd-aa79e0c063a6",
+    "product_categories": ["Men's Jeans", "Women's Clothing", "casual jeans", "comfort jeans", "unisex clothing"],
+    "product_features": ["denim material", "size variety", "comfortable", "casual wear", "daily wear"]
   },
   {
-    "id": "61885d96-ae9f-47f7-902c-2e393b93b32d",
-    "product_categories": ["shoulder bags", "handbags", "women's bags", "fashion bags", "casual bags"],
-    "product_features": ["shoulder carry", "carry things", "easy carry", "casual bags", "stylish carry"]
+    "id": "8b89073b-014a-4241-b269-317cf2bce370",
+    "product_categories": ["Crochet Clothing", "unisex clothing", "Men's Clothing", "Women's Clothing", "casual shirts"],
+    "product_features": ["Crochet material", "colorful", "comfy top", "casual style", "anyone can wear"]
   },
   {
-    "id": "3ddba85a-7384-4f07-8de2-b237f7140c84",
-    "product_categories": ["perfumes", "women's fragrances", "sweet perfumes", "fashion fragrances", "luxury perfumes"],
-    "product_features": ["sweet scent", "nice scent", "feminine scents", "long-lasting scent", "luxury scent"]
+    "id": "264ffa38-2df5-4e0b-a22e-2daba55bc53c",
+    "product_categories": ["Jewelry Sets", "Women's Jewelry", "fashion jewelry", "Evening Accessories", "gift sets"],
+    "product_features": ["set", "matching set", "special occasions", "pretty", "gift pack"]
   },
   {
-    "id": "8f240418-a2aa-485c-8392-95eb89a26da5",
-    "product_categories": ["health supplements", "weight loss", "Women's Health", "dietary supplements", "wellness products"],
-    "product_features": ["body help", "tummy fat", "abdominal comfort", "health supplements", "weight management"]
+    "id": "ca51716d-d714-42df-823f-824af9741f44",
+    "product_categories": ["Hair Accessories", "hair clips", "Women's Accessories", "beauty accessories", "decorative accessories"],
+    "product_features": ["hair decoration", "flower shape", "clip", "pretty", "gentle hold"]
   },
   {
-    "id": "7bf446bb-e358-4dba-899c-817c1a011e1e",
-    "product_categories": ["maxi gowns", "long skirts", "women's clothing", "fashion skirts", "Casual Wear"],
-    "product_features": ["long length", "flowy", "feminine", "ankle-length", "comfortable"]
+    "id": "4eae3ecc-eab4-479f-b176-08ab5283a1b0",
+    "product_categories": ["earrings", "Women's Jewelry", "fashion jewelry", "statement earrings", "unique designs"],
+    "product_features": ["ear decoration", "noticeable design", "special look", "pretty", "unique designs"]
   },
   {
-    "id": "cff05f1a-fed9-4e87-b51d-ac490f1a064c",
-    "product_categories": ["lip care", "skincare", "beauty products", "women's health", "self-care products"],
-    "product_features": ["smooth lips", "hydrating", "moisturizing", "beauty enhancement", "facial treatment"]
+    "id": "0783eea0-a5ee-4a72-ab01-e65a34b03bd8",
+    "product_categories": ["Mobile Phones", "Smartphones", "Electronics", "Communication Devices", "unisex tech"],
+    "product_features": ["Apple brand", "calls", "Send messages", "camera", "apps"]
   },
   {
-    "id": "6769560e-9111-4e35-9117-006c7afaeb5d",
-    "product_categories": ["African Fashion", "Cultural Wear", "women's trousers", "Printed Tops", "Traditional Wear"],
-    "product_features": ["colorful", "printed design", "cultural", "comfortable", "leg coverage"]
+    "id": "ce106815-27f0-40f5-8532-264d874402ff",
+    "product_categories": ["Wigs", "Women's Wigs", "Human Hair Wigs", "braided wigs", "hair replacements"],
+    "product_features": ["Wearable hairpiece", "Changes hairstyle", "braided style", "look change", "long-lasting"]
   },
   {
-    "id": "e3192569-c57c-428e-be16-6dfecdcbe0fc",
-    "product_categories": ["perfumes", "women's fragrances", "luxury perfumes", "fashion fragrances", "all-day scent"],
-    "product_features": ["nice scent", "feminine scents", "long-lasting scent", "luxury scent", "special bottle"]
+    "id": "26c83e9d-eba1-42ff-9b90-855579691941",
+    "product_categories": ["Hair Extensions", "Women's Accessories", "hair replacements", "braided hair", "hair styling"],
+    "product_features": ["natural addition", "look change", "braided style", "clip-in", "long length"]
   },
   {
-    "id": "475164ab-9045-4b7b-b741-8ae0a369036d",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "outdoor walking"]
+    "id": "cd02f9be-3186-46e0-8d69-0aeafde5bd71",
+    "product_categories": ["Women's Clothing", "skirts", "fashion skirts", "casual wear", "Summer Clothing"],
+    "product_features": ["color variety", "flowy", "leg coverage", "pretty", "casual style"]
   },
   {
-    "id": "d59521e1-806e-483f-902f-28ccc88cae21",
-    "product_categories": ["men's fragrances", "perfumes", "Male Accessories", "luxury perfumes", "fashion fragrances"],
-    "product_features": ["nice scent", "long-lasting scent", "male design", "luxury scent", "men's design"]
+    "id": "44712880-f6b8-4e22-96ab-ee1e12b5b69e",
+    "product_categories": ["Mobile Phones", "Smartphones", "Electronics", "Communication Devices", "unisex tech"],
+    "product_features": ["Apple brand", "calls", "Send messages", "camera", "apps"]
   },
   {
-    "id": "9a3091c6-407c-45fd-91d4-8c8e9f431b5c",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "all-day wear"]
+    "id": "3dc1d5d2-ceb3-4e3d-aa26-95523181ed5c",
+    "product_categories": ["Jewelry Sets", "Women's Jewelry", "fashion jewelry", "nail art", "beauty accessories"],
+    "product_features": ["set", "ring", "nail decoration", "special occasions", "pretty"]
   },
   {
-    "id": "ce016663-1374-4b5d-abb1-4854c3cf5a9a",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "unisex fragrances", "MOUSUF brand"],
-    "product_features": ["nice scent", "long-lasting scent", "luxury scent", "MOUSUF perfume", "special bottle"]
+    "id": "afdab08b-0f2f-4fca-9331-7f26b438e078",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "Bob Wigs", "hair replacements"],
+    "product_features": ["100% human hair", "Bob style", "Short hairstyle", "Wearable hairpiece", "Changes hairstyle"]
   },
   {
-    "id": "ce69d16f-96bb-4a5e-ac7d-2393b54fd797",
-    "product_categories": ["health supplements", "men's health", "nutrition supplements", "wellness products", "fitness accessories"],
-    "product_features": ["body help", "health supplements", "weight gain", "nutrition", "fitness"]
+    "id": "f1bb9a8b-6587-4dd7-b5c2-b71a27bef92d",
+    "product_categories": ["watches", "Women's Accessories", "Men's Accessories", "fashion accessories", "luxury watches"],
+    "product_features": ["time telling", "wrist jewelry", "chain design", "stylish", "branded"]
   },
   {
-    "id": "e4628e9a-56b8-4737-9942-8149b037cc8e",
-    "product_categories": ["tote bags", "fashion bags", "women's bags", "casual bags", "unisex bags"],
-    "product_features": ["carry things", "stylish carry", "easy carry", "casual bags", "shoulder carry"]
+    "id": "3b299840-468a-4d50-96b7-75fd93eea66f",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "hair replacements", "hair styling"],
+    "product_features": ["100% human hair", "long length", "Wearable hairpiece", "Changes hairstyle", "wave style"]
   },
   {
-    "id": "e571c312-bc1f-402f-b77b-0cc1a9a28b81",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "unisex fragrances", "MOUSUF brand"],
-    "product_features": ["nice scent", "long-lasting scent", "luxury scent", "MOUSUF perfume", "special bottle"]
+    "id": "37cbb32b-7e4d-4edf-9b69-ac40a0c44339",
+    "product_categories": ["Electronics", "Tech Accessories", "communication tools", "internet devices", "unisex tech"],
+    "product_features": ["Electronic", "wireless", "portable", "modern technology", "connectivity"]
   },
   {
-    "id": "a5d00600-62bb-4ade-9b0a-90debb7d998f",
-    "product_categories": ["health supplements", "Women's Health", "gummies", "wellness products", "vitamin supplements"],
-    "product_features": ["health supplements", "vitamins", "chewy treats", "body help", "nutrition"]
+    "id": "83c0f6dc-7faa-4af2-9829-345102252eb0",
+    "product_categories": ["Crochet Clothing", "Women's Clothing", "shrugs", "outerwear", "layering piece"],
+    "product_features": ["Crochet material", "shoulder cover", "open-front", "light jacket", "pretty patterns"]
   },
   {
-    "id": "b75bd8d3-391b-44fe-8492-fdfe94f3c8f5",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "all-day scent"],
-    "product_features": ["nice scent", "long-lasting scent", "luxury scent", "feminine scents", "special bottle"]
+    "id": "867220f8-f91d-46a3-a3f8-dad60d6fa48b",
+    "product_categories": ["key holders", "Women's Accessories", "Men's Accessories", "unisex accessories", "decorative accessories"],
+    "product_features": ["key holding", "bow decoration", "Decorative", "carry little things", "cute design"]
   },
   {
-    "id": "8a3a80dc-2c02-45c9-8bb5-545ce73dad73",
-    "product_categories": ["health supplements", "gummies", "vitamin supplements", "wellness products", "self-care products"],
-    "product_features": ["health supplements", "vitamins", "chewy treats", "body help", "nutrition"]
+    "id": "2c75191f-70b4-485b-9783-9ebbd0010bb1",
+    "product_categories": ["necklaces", "Women's Jewelry", "Jewelry Sets", "fashion jewelry", "Evening Accessories"],
+    "product_features": ["neck decoration", "set", "pretty", "special occasions", "beautiful"]
   },
   {
-    "id": "5ea14191-8f02-4dd7-9ded-ec7d92472b05",
-    "product_categories": ["men's health", "health supplements", "sexual wellness", "Male Apparel", "wellness products"],
-    "product_features": ["body help", "health supplements", "men's design", "confidence", "male design"]
+    "id": "9579f668-611e-4704-9812-64d9044adf5b",
+    "product_categories": ["decorative items", "home decor", "gift items", "Artisanal Products", "unisex"],
+    "product_features": ["color variety", "Decorative", "versatile use", "beautiful", "giftable"]
   },
   {
-    "id": "2e4824d7-0838-4f7d-a4b3-312b648ee201",
-    "product_categories": ["skincare", "body lotion", "personal care", "women's health", "beauty products"],
-    "product_features": ["skin softening", "moisturizing", "oil form", "body care", "beauty enhancement"]
+    "id": "3480f635-9670-4c8d-af11-3ba8ca5bf3e0",
+    "product_categories": ["Wigs", "Women's Wigs", "braided wigs", "hair replacements", "hair styling"],
+    "product_features": ["Wearable hairpiece", "Changes hairstyle", "braided style", "zigzag pattern", "look change"]
   },
   {
-    "id": "5f72ae3e-9bc0-40b8-bb05-e49f2f45a2ee",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "all-day wear"]
+    "id": "d09e8aaf-eb8c-4894-96a1-58458dca6d51",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "curly wigs", "hair replacements"],
+    "product_features": ["100% human hair", "curl style", "Wearable hairpiece", "Changes hairstyle", "Bouncy"]
   },
   {
-    "id": "c4593d21-75b9-42eb-84b3-000c24ef9f7a",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "all-day scent"],
-    "product_features": ["nice scent", "long-lasting scent", "luxury scent", "feminine scents", "special bottle"]
+    "id": "e3e33bfc-004b-4a4e-96e2-3c492aa066b3",
+    "product_categories": ["necklaces", "Women's Jewelry", "fashion jewelry", "Evening Accessories", "gift items"],
+    "product_features": ["neck decoration", "pretty", "special occasions", "beautiful", "elegant"]
   },
   {
-    "id": "7aa97f3b-903d-4ba4-bc54-fc242625b288",
-    "product_categories": ["tote bags", "designer handbags", "fashion bags", "women's bags", "branded bags"],
-    "product_features": ["carry things", "stylish carry", "branded", "luxury brand", "fashionable"]
+    "id": "d12a3608-7ff9-4069-98d2-a5831ad6aeda",
+    "product_categories": ["Wigs", "Women's Wigs", "braided wigs", "hair replacements", "hair styling"],
+    "product_features": ["Wearable hairpiece", "Changes hairstyle", "braided style", "look change", "long-lasting"]
   },
   {
-    "id": "5e10cc36-8800-40bf-8275-080c14719cff",
-    "product_categories": ["purses", "women's bags", "mini purses", "fashion accessories", "Evening Bags"],
-    "product_features": ["carry little things", "important little things", "fancy look", "special occasions", "feminine"]
-  },
-  {
-    "id": "bb3d39e3-91ee-41a2-8268-29b05c456eb6",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "all-day wear"]
-  },
-  {
-    "id": "faac1b12-025a-4427-8d73-7ebc80f40ea2",
-    "product_categories": ["handbags", "women's bags", "fashion bags", "Evening Bags", "designer handbags"],
-    "product_features": ["carry little things", "stylish carry", "fancy look", "special occasions", "fashionable"]
-  },
-  {
-    "id": "b1656312-e9d8-4036-a0e0-e164d857fb02",
-    "product_categories": ["Hair Accessories", "claw clips", "hair holders", "women's accessories", "beauty accessories"],
-    "product_features": ["hair holding", "hair back", "gentle hold", "feminine", "practical"]
-  },
-  {
-    "id": "c4d281b9-b6c0-402a-bd1e-d9c5a1c1f421",
-    "product_categories": ["health supplements", "Women's Health", "gummies", "body shaping", "wellness products"],
-    "product_features": ["body help", "health supplements", "chewy treats", "body shaping", "nutrition"]
-  },
-  {
-    "id": "59539e0c-513b-4ce0-aa3c-c4260ad3bd98",
-    "product_categories": ["mini bags", "handbags", "women's bags", "luxury bags", "designer handbags"],
-    "product_features": ["carry little things", "important little things", "luxury brand", "special occasions", "fashionable"]
-  },
-  {
-    "id": "cc0a7117-b477-421a-af56-0c18fbdde89f",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "all-day scent"],
-    "product_features": ["nice scent", "long-lasting scent", "luxury scent", "feminine scents", "unique design"]
-  },
-  {
-    "id": "e17ad177-dd21-4e4a-93cf-497eb2d654fc",
-    "product_categories": ["health supplements", "Women's Health", "wellness products", "body shaping", "medical supplements"],
-    "product_features": ["body help", "health supplements", "body shaping", "women's health", "medical"]
-  },
-  {
-    "id": "1ce928cf-3c03-4a79-a89a-4beac24aa713",
-    "product_categories": ["health supplements", "weight loss", "Women's Health", "wellness products", "dietary supplements"],
-    "product_features": ["body help", "weight management", "tummy fat", "health supplements", "abdominal comfort"]
-  },
-  {
-    "id": "96f631b1-8ad5-484c-b51b-690fe1fc239b",
-    "product_categories": ["drinkware", "tumblers", "water bottles", "travel tumblers", "utility products"],
-    "product_features": ["hot/cold retention", "drink holding", "spill-proof", "portable", "stainless steel"]
-  },
-  {
-    "id": "24ee3cfa-273e-458f-8fd5-3552fbde0f1c",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "all-day wear"]
-  },
-  {
-    "id": "f24d80ad-bccd-4c85-955d-91614290b706",
-    "product_categories": ["tote bags", "convertible bags", "fashion bags", "women's bags", "multi-purpose bags"],
-    "product_features": ["two-in-one", "versatile use", "changeable design", "stylish carry", "functional"]
-  },
-  {
-    "id": "6f557924-68dd-4a5b-8480-493a870ed572",
-    "product_categories": ["women's footwear", "flat shoes", "casual shoes", "comfort shoes", "everyday shoes"],
-    "product_features": ["comfortable walk", "flat bottom", "casual comfort", "daily wear", "outdoor walking"]
-  },
-  {
-    "id": "e6396050-1cb9-48ab-8fbc-bd2b63201091",
-    "product_categories": ["loafers", "unisex footwear", "casual shoes", "comfort shoes", "slip-on shoes"],
-    "product_features": ["easy slip-on", "comfortable walk", "casual comfort", "unisex", "daily wear"]
-  },
-  {
-    "id": "625d8350-072e-47a1-9ca6-77f625fbb090",
-    "product_categories": ["handbags", "fashion bags", "women's bags", "casual bags", "shoulder bags"],
-    "product_features": ["carry things", "stylish carry", "shoulder carry", "casual bags", "fashionable"]
-  },
-  {
-    "id": "ade755b5-95a4-4e9d-8914-0fe016aefe4a",
-    "product_categories": ["mini fans", "personal cooling", "Electronics", "portable fans", "home appliances"],
-    "product_features": ["air blowing", "cooling", "portable", "handheld cooling", "electronic"]
-  },
-  {
-    "id": "effbc7b6-c02c-4b51-a9aa-32ad5968aeff",
-    "product_categories": ["skincare", "beauty products", "skin care", "women's health", "luxury skincare"],
-    "product_features": ["skin brightening", "face brightening", "beauty enhancement", "skin health", "facial treatment"]
-  },
-  {
-    "id": "5e69b79a-54f8-448d-963f-b493ccfb5256",
-    "product_categories": ["health supplements", "weight loss", "wellness products", "Women's Health", "dietary supplements"],
-    "product_features": ["body help", "weight management", "health supplements", "slimming", "nutrition"]
-  },
-  {
-    "id": "e8cb3221-7038-461f-8907-28b5170068d2",
-    "product_categories": ["handbags", "women's bags", "fashion bags", "designer handbags", "luxury bags"],
-    "product_features": ["carry things", "stylish carry", "quality material", "luxury brand", "fashionable"]
-  },
-  {
-    "id": "be93c716-5d55-44b4-863d-77668aaabcc9",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "all-day scent"],
-    "product_features": ["nice scent", "long-lasting scent", "luxury scent", "feminine scents", "beauty product"]
-  },
-  {
-    "id": "9fb4f910-b30b-4d02-8305-600cad348992",
-    "product_categories": ["Men's Jewelry", "Male Jewelry", "Bracelets", "men's accessories", "Leather Accessories"],
-    "product_features": ["wrist jewelry", "leather material", "male design", "hand decoration", "men's design"]
-  },
-  {
-    "id": "d68e81f9-3eb6-42b9-927f-158de1e675c8",
-    "product_categories": ["Men's Jewelry", "Male Accessories", "watch sets", "men's accessories", "wristwatches"],
-    "product_features": ["wrist accessory", "time telling", "male design", "set", "men's design"]
-  },
-  {
-    "id": "bad7312a-2752-4d43-976b-0d49a51fe02b",
-    "product_categories": ["Men's Jewelry", "Male Jewelry", "Jewelry Sets", "men's accessories", "Male Fashion"],
-    "product_features": ["set", "male design", "wrist jewelry", "men's design", "stylish"]
-  },
-  {
-    "id": "43602931-b311-4504-92a5-4aff93584c69",
-    "product_categories": ["mints", "sweet treats", "dental care", "health supplements", "Freshness products"],
-    "product_features": ["fresh feel", "dental", "mint scented", "tasty", "enjoy"]
-  },
-  {
-    "id": "50958870-4a9f-4eb4-a3eb-d6bde41b9122",
-    "product_categories": ["wig stands", "beauty tools", "hair accessories", "salon services", "hair care"],
-    "product_features": ["wig display", "styling", "hair protection", "beauty tools", "professional application"]
-  },
-  {
-    "id": "b9426c53-3854-4dd1-b891-b743e11a7e4d",
-    "product_categories": ["wristwatches", "luxury watches", "women's accessories", "fashion accessories", "timepieces"],
-    "product_features": ["time telling", "luxury brand", "crystal decoration", "wrist accessory", "fancy look"]
-  },
-  {
-    "id": "8f471e38-54d3-496d-a89a-6ad2e527d824",
-    "product_categories": ["health supplements", "Women's Health", "body shaping", "wellness products", "dietary supplements"],
-    "product_features": ["body help", "health supplements", "body shaping", "women's health", "nutrition"]
-  },
-  {
-    "id": "c33d529d-8fb3-482e-bbd6-ab4cd7811060",
-    "product_categories": ["Men's Jewelry", "Male Jewelry", "Bracelets", "men's accessories", "wrist jewelry"],
-    "product_features": ["wrist jewelry", "wrist accessory", "male design", "hand decoration", "men's design"]
-  },
-  {
-    "id": "9ac7d140-af93-4ce9-9a3b-71f7f8eaf73f",
-    "product_categories": ["Men's Jewelry", "Male Jewelry", "Bracelets", "men's accessories", "wrist jewelry"],
-    "product_features": ["wrist jewelry", "wrist accessory", "male design", "hand decoration", "men's design"]
-  },
-  {
-    "id": "45833a42-edf7-428d-8720-8725cec19fd0",
-    "product_categories": ["home decor", "mats", "decorative floor", "interior design", "household items"],
-    "product_features": ["floor decoration", "decorative", "soft rug", "home enhancement", "room enhancement"]
-  },
-  {
-    "id": "098112c2-80ee-43b8-afb1-78dc5fc45b26",
-    "product_categories": ["chain bags", "handbags", "women's bags", "fashion bags", "Evening Bags"],
-    "product_features": ["carry things", "stylish carry", "chain design", "special occasions", "fashionable"]
-  },
-  {
-    "id": "d7578a13-ad83-4b56-9280-c2eb7440537d",
-    "product_categories": ["Women's Tops", "fashion tops", "Casual Tops", "women's clothing", "sleeveless tops"],
-    "product_features": ["sleeveless", "special neckline", "feminine", "casual wear", "upper body wear"]
-  },
-  {
-    "id": "658062fb-19f5-4159-a968-3a58875691af",
-    "product_categories": ["handbags", "women's bags", "fashion bags", "Evening Bags", "shiny bags"],
-    "product_features": ["carry things", "stylish carry", "shiny metal", "special occasions", "fashionable"]
-  },
-  {
-    "id": "a94da0c9-dcd7-488a-ae13-7c01198b390a",
-    "product_categories": ["perfumes", "luxury perfumes", "fashion fragrances", "women's fragrances", "sweet perfumes"],
-    "product_features": ["sweet scent", "vanilla flavor", "nice scent", "feminine scents", "luxury scent"]
+    "id": "7bedac4e-ba99-4d8b-b47c-1e96ab853a5f",
+    "product_categories": ["Bracelets", "Women's Jewelry", "fashion jewelry", "unique designs", "Artisanal Accessories"],
+    "product_features": ["wrist jewelry", "unique designs", "special look", "pretty", "noticeable design"]
   }
 ]
