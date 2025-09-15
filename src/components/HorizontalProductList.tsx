@@ -6,6 +6,9 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from '../hooks/useTracking';
+import AuthModal from './AuthModal copy';
+import { useTheme } from '../hooks/useTheme';
 
 // Define a type for your product data
 interface Product {
@@ -16,6 +19,9 @@ interface Product {
     is_available: boolean;
     full_name: string;
     phone_number: string;
+    school_id: string;
+    school_name: string;
+    school_short_name: string;
 }
 
 // Define the props interface
@@ -30,6 +36,46 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [pendingContactProduct, setPendingContactProduct] = useState<Product | null>(null);
+    const { currentTheme } = useTheme();
+
+    const handleContactSeller = async (product: Product) => {
+        // Check if user is already authenticated
+        const userAuthenticated = await isAuthenticated();
+        if (!userAuthenticated) {
+            setPendingContactProduct(product);
+            setShowAuthModal(true);
+            return;
+        }
+
+        // Proceed with contact
+        contactSeller(product);
+    };
+
+
+    const contactSeller = async (product: Product) => {
+        // Track the contact interaction for rating prompts
+        // await trackContactInteraction(product.merchant_id, requestId);
+
+        const message = `Hi! I'm looking for the following from ${product.school_short_name} University: ${product.product_description}`;
+        const whatsappUrl = `https://wa.me/${product.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+    };
+
+    const handleAuthSuccess = () => {
+
+        if (pendingContactProduct) {
+            contactSeller(pendingContactProduct);
+            setPendingContactProduct(null);
+        }
+    };
+
+    const handleAuthClose = () => {
+        setShowAuthModal(false);
+        setPendingContactProduct(null);
+    };
+
 
     useEffect(() => {
         const fetchProductsByCategory = async () => {
@@ -128,7 +174,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                     <p className="text-xl text-indigo-600 font-extrabold mb-1 truncate">{product.product_price}</p>
                                     {product.full_name && (
                                         <p className="text-sm text-gray-500 mb-3">
-                                          by <span className="font-medium text-gray-700">{product.full_name}</span>
+                                            by <span className="font-medium text-gray-700">{product.full_name}</span>
                                         </p>
                                     )}
                                     {/* <p className={`text-sm font-semibold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>
@@ -136,8 +182,8 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                     </p> */}
                                     {product.phone_number && (
                                         <button
-                                            // onClick={() => handleContactSeller(product)}
-                                            className="mt-auto flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full shadow-md transition-all duration-200 font-medium w-full"
+                                            onClick={() => handleContactSeller(product)}
+                                            className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
                                         >
                                             Get Now
                                         </button>
@@ -148,6 +194,12 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     </div>
                 )}
             </div>
+
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={handleAuthClose}
+                onSuccess={handleAuthSuccess}
+            />
         </div>
     );
 };
