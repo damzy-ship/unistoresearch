@@ -66,7 +66,7 @@ const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean }> = ({ showFirst =
 
   return (
     <div className="mx-auto p-4 sm:p-6 md:p-8 mt-3"> {/* Adjust padding for better spacing */}
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-700">Product Categories</h1> {/* Hide the main heading as per the image */}
+      {/* <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-700">Categories</h1> Hide the main heading as per the image */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6">
         {categories.map((category) => (
           <div

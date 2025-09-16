@@ -270,6 +270,10 @@ export default function HomePage() {
           {/* Search Card */}
           <ProductSearchComponent />
 
+          <HorizontalProductList
+            showFeatured={true}
+            schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
+            categoryName="Featured Products" />
 
           <MerchantCategoriesGrid />
 

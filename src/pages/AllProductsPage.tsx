@@ -50,6 +50,7 @@ interface Product {
     image_urls: string[];
     embedding: number[];
     search_description: string;
+    is_featured: boolean;
 }
 
 export default function AllProductsPage() {
@@ -218,6 +219,31 @@ export default function AllProductsPage() {
         } catch (err) {
             console.error('Error toggling product availability:', err);
             setError('Failed to toggle product availability.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleToggleFeatured = async (product: Product) => {
+        const newFeatured = !product.is_featured;
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { error: updateError } = await supabase
+                .from('merchant_products')
+                .update({ is_featured: newFeatured })
+                .eq('id', product.id);
+
+            if (updateError) {
+                throw updateError;
+            }
+
+            setAllProducts(allProducts.map(p =>
+                p.id === product.id ? { ...p, is_featured: newFeatured } : p
+            ));
+        } catch (err) {
+            console.error('Error toggling product featured status:', err);
+            setError('Failed to toggle product featured status.');
         } finally {
             setLoading(false);
         }
@@ -496,6 +522,13 @@ export default function AllProductsPage() {
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
+                                        <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
+                                            {product.is_featured ? (
+                                                <><CheckCircle className="w-4 h-4 text-green-500" /> Featured</>
+                                            ) : (
+                                                <><AlertCircle className="w-4 h-4 text-red-500" /> Not Featured</>
+                                            )}
+                                        </p>
                                         <div className="flex flex-col gap-2 mt-4 w-full">
                                             <button
                                                 onClick={() => startEditProduct(product)}
@@ -511,6 +544,15 @@ export default function AllProductsPage() {
                                                     }`}
                                             >
                                                 {product.is_available ? 'Set Unavailable' : 'Set Available'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleToggleFeatured(product)}
+                                                className={`w-full py-2 rounded-md transition-colors ${product.is_featured
+                                                        ? 'bg-red-500 text-white hover:bg-red-600'
+                                                        : 'bg-green-500 text-white hover:bg-green-600'
+                                                    }`}
+                                            >
+                                                {product.is_featured ? 'Set Unfeatured' : 'Set Featured'}
                                             </button>
                                             <button
                                                 onClick={() => handleUpdateEmbedding(product)}

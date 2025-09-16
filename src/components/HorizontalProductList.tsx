@@ -26,12 +26,13 @@ interface Product {
 
 // Define the props interface
 interface HorizontalProductListProps {
-    categoryId: string;
+    categoryId?: string;
     schoolId: string;
-    categoryName: string;
+    categoryName?: string;
+    showFeatured?: boolean; // Optional prop to show featured products
 }
 
-const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryId, schoolId, categoryName }) => {
+const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryId, schoolId, categoryName, showFeatured }) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -79,7 +80,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
 
     useEffect(() => {
         const fetchProductsByCategory = async () => {
-            if (!categoryId || !schoolId) {
+            if (!showFeatured && !categoryId || !schoolId) {
                 setError('Missing category or school ID.');
                 setLoading(false);
                 return;
@@ -93,6 +94,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     body: {
                         category_id: categoryId,
                         school_id: schoolId,
+                        show_featured: showFeatured || false
                     },
                 });
 
@@ -134,12 +136,12 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
             <div className="mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-6 sm:mb-8">
                     <div>
-                        <p className="text-lg font-medium text-gray-500">
-                            <span className="font-semibold text-indigo-600">{categoryName}</span>
+                        <p className="text-2xl font-bold text-indigo-600">
+                            {categoryName}
                         </p>
                     </div>
                     {products.length > 0 && (
-                        <button
+                        !showFeatured && <button
                             onClick={() => { navigate(`/categories/${categoryId}/products?schoolId=${schoolId}&categoryName=${encodeURIComponent(categoryName)}`); window.scrollTo(0, 0); }}
                             className="text-base font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
                         >

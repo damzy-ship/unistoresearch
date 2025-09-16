@@ -64,7 +64,7 @@ function ProductSearchComponent() {
   };
 
   return (
-    <div className="relative px-3 z-10 w-full max-w-2xl mx-auto">
+    <div className="relative px-3 z-10 w-full max-w-2xl mx-auto mb-6">
       <div
         className="p-8 shadow-xl border border-gray-100 rounded-2xl transition-colors duration-300"
         style={{ backgroundColor: 'white' }} // Using white as a placeholder for currentTheme.surface
