@@ -135,7 +135,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     }
 
     return (
-        <div className="pb-8 sm:pb-12 font-sans bg-gray-50 max-w-full overflow-hidden">
+        <div className="pb-6 sm:pb-8 font-sans bg-gray-50 max-w-full overflow-hidden">
             <div className="mx-auto">
                 <div className={`px-4 flex gap-1 items-center justify-between mb-6 sm:mb-8 bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white py-1 shadow-md transition-all duration-200 font-medium w-full`}>
 
@@ -156,9 +156,9 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 {products.length === 0 ? (
                     <p className="text-center text-gray-500 mt-16 text-xl">No products found for this category.</p>
                 ) : (
-                    <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8">
+                    <div className="flex overflow-x-auto gap-6 pb-2 scrollbar-hide px-4 sm:px-6 lg:px-8">
                         {products.map((product) => (
-                            <div key={product.id} className="w-48 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
+                            <div key={product.id} className="w-48 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
                                 <Swiper
                                     modules={[Pagination, Navigation]}
                                     spaceBetween={10}
