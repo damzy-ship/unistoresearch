@@ -20,9 +20,10 @@ import { Toaster } from 'sonner';
 import { supabase } from '../lib/supabase';
 import PaymentModal from '../components/Payment/PaymentModal';
 import ProductSearchComponent from '../components/ProductSearchComponent';
-import { getMatchingCategoriesAndFeatures, updateMerchantProductAttributes } from '../lib/generateEmbedding';
+// imports for embedding utilities were removed because they're not used in this file
 import MerchantCategoriesGrid from '../components/MerchantCategoriesGrid';
 import HorizontalProductList from '../components/HorizontalProductList';
+import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
 
@@ -32,11 +33,11 @@ export default function HomePage() {
   // const navigate = useNavigate();
   const { currentTheme, backgroundTexture } = useTheme();
   const [request, setRequest] = useState("");
-  const [university, setUniversity] = useState("Bingham");
+  const [university] = useState("Bingham");
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [matchedSellers, setMatchedSellers] = useState<MerchantWithCategories[]>([]);
-  const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
+  const [, setMatchedSellers] = useState<MerchantWithCategories[]>([]);
+  const [, setCurrentRequestId] = useState<string | null>(null);
   const [showRetryPrompt, setShowRetryPrompt] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   // const [showCreateModal, setShowCreateModal] = useState(false);
@@ -47,7 +48,11 @@ export default function HomePage() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null);
-  const [userType, setUserType] = useState<string | null>(null);
+  const [, setUserType] = useState<string | null>(null);
+
+  const [selectedSchoolId, setSelectedSchoolId] = useState(null);
+
+  const [showConfirmUniversityModal, setShowConfirmUniversityModal] = useState(false);
 
   // React.useEffect(() => {
   //   try {
@@ -98,11 +103,36 @@ export default function HomePage() {
         if (session?.user) {
           const { data: visitor } = await supabase
             .from('unique_visitors')
-            .select('user_type')
+            .select('user_type, school_id')
             .eq('auth_user_id', session.user.id)
             .single();
-          setUserType((visitor as { user_type?: string } | null)?.user_type || null);
+          // Before setting userType to null, prompt the user to confirm their university
+          const fetchedUserType = (visitor as { user_type?: string } | null)?.user_type || null;
+
+          // If the visitor has a school_id already, use it. Otherwise, show the confirm modal.
+          if (visitor?.school_id) {
+            localStorage.setItem('selectedSchoolId', visitor.school_id);
+            setSelectedSchoolId(visitor.school_id);
+          } else {
+            // Try reading from localStorage first
+            const stored = localStorage.getItem('selectedSchoolId');
+            if (stored) {
+              setSelectedSchoolId(stored);
+            } else {
+              // show modal by setting a flag (handled below)
+              setShowConfirmUniversityModal(true);
+            }
+          }
+
+          setUserType(fetchedUserType);
         } else {
+          const stored = localStorage.getItem('selectedSchoolId');
+          if (stored) {
+            setSelectedSchoolId(stored);
+          } else {
+            // show modal by setting a flag (handled below)
+            setShowConfirmUniversityModal(true);
+          }
           setUserType(null);
         }
       } catch (err) {
@@ -120,6 +150,13 @@ export default function HomePage() {
     return () => {
       window.removeEventListener('open-payment-modal', handlePaymentModalOpen);
     };
+  }, []);
+
+  // Read selected school id from localStorage on initial mount (fallback)
+  React.useEffect(() => {
+    const stored = localStorage.getItem('selectedSchoolId');
+    if (stored) { setSelectedSchoolId(stored) }
+    else setShowConfirmUniversityModal(true);
   }, []);
 
   const handleSearchRequest = async (e: React.FormEvent) => {
@@ -221,97 +258,116 @@ export default function HomePage() {
     handleSearchRequest({ preventDefault: () => { } } as React.FormEvent);
   };
 
-  return (
-    <main
-      className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
-      style={{ backgroundColor: currentTheme.background }}
-    >
-      {/* Background texture overlay */}
-      {backgroundTexture.id !== 'none' && (
-        <div
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            backgroundImage: backgroundTexture.pattern,
-            backgroundSize: backgroundTexture.id === 'grid' ? '20px 20px' : '30px 30px',
-            opacity: backgroundTexture.opacity,
-            color: currentTheme.textSecondary
-          }}
-        />
-      )}
-      <Toaster position="top-center" richColors />
-      {!showResults ? (
-        <div className="w-full flex flex-col items-center justify-center">
-          {/* User Menu */}
-          <div className="w-full max-w-2xl mx-auto">
-            <Header onAuthClick={() => setShowAuthModal(true)} />
-          </div>
 
-          {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
+
+  const handleConfirmUniversity = (schoolId: string) => {
+    // persist to localStorage and update state
+    localStorage.setItem('selectedSchoolId', schoolId);
+    setSelectedSchoolId(schoolId);
+    setShowConfirmUniversityModal(false);
+  };
+
+  return (
+    <>
+
+      {selectedSchoolId ?
+
+        <main
+          className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
+          style={{ backgroundColor: currentTheme.background }}
+        >
+
+          {/* Background texture overlay */}
+          {backgroundTexture.id !== 'none' && (
+            <div
+              className="fixed inset-0 pointer-events-none z-0"
+              style={{
+                backgroundImage: backgroundTexture.pattern,
+                backgroundSize: backgroundTexture.id === 'grid' ? '20px 20px' : '30px 30px',
+                opacity: backgroundTexture.opacity,
+                color: currentTheme.textSecondary
+              }}
+            />
+          )}
+          <Toaster position="top-center" richColors />
+          {!showResults ? (
+            <div className="w-full flex flex-col items-center justify-center">
+              {/* User Menu */}
+              <div className="w-full max-w-2xl mx-auto">
+                <Header onAuthClick={() => setShowAuthModal(true)} />
+              </div>
+
+              {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
             <h1>Get Matching Categories and Features</h1>
           </button> */}
-          {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
+              {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
             <h1>UPDATE</h1>
           </button> */}
 
-          {/* UniStore Logo */}
-          <div className="mb-12 px-2">
-            <h1 className="text-5xl md:text-6xl text-center font-bold mb-4 mt-2">
-              <span style={{ color: currentTheme.primary }}>uni</span>
-              <span style={{ color: currentTheme.secondary }}>store.</span>
-            </h1>
-            <UserGreeting
-              university={university}
-              className="text-center max-w-md mx-auto"
-            />
-          </div>
-
-
-
-          {/* Search Card */}
-          <ProductSearchComponent />
-
-          <hr className="w-full max-w-2xl bg-yellow-400 h-2 mt-4" />
-          <HorizontalProductList
-            showFeatured={true}
-            schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
-            categoryName="Featured Products" />
-
-          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
-          <MerchantCategoriesGrid />
-
-          <hr className="w-full max-w-2xl bg-yellow-400 h-2 mt-4" />
-          <HorizontalProductList
-            categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
-            schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
-            categoryName="Apparel & Clothing" />
-
-          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
-          <MerchantCategoriesGrid showFirst={false} />
-          
-          <hr className="w-full max-w-2xl bg-yellow-400 h-2 mt-4" />
-          <HorizontalProductList
-            categoryId="09e9cc32-b75e-4138-9aa6-7dbf6bb7a756"
-            schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
-            categoryName="Bags & Luggage" />
-
-          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
-          {/* Reviews Section */}
-          <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
-
-            <ReviewSlider />
-
-            {userIsAuthenticated && (
-              <div className="mt-12">
-                <h3 style={{ color: currentTheme.text }} className="text-xl font-semibold text-center mb-6">
-                  Share Your Unique Experience for fellow students to see
-                </h3>
-                <ReviewForm />
+              {/* UniStore Logo */}
+              <div className="mb-12 px-2">
+                <h1 className="text-5xl md:text-6xl text-center font-bold mb-4 mt-2">
+                  <span style={{ color: currentTheme.primary }}>uni</span>
+                  <span style={{ color: currentTheme.secondary }}>store.</span>
+                </h1>
+                <UserGreeting
+                  university={university}
+                  className="text-center max-w-md mx-auto"
+                />
               </div>
-            )}
-          </div>
 
-          {/* Bottom Links */}
-          {/* <div className="mt-12 flex flex-col items-center gap-4 w-full">
+
+
+              {/* Search Card */}
+              <ProductSearchComponent />
+
+              <hr className="w-full max-w-2xl bg-yellow-400 h-2 mt-4" />
+              <HorizontalProductList
+                showFeatured={true}
+                schoolId={selectedSchoolId}
+                categoryName="Featured Products" />
+
+              <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
+              <MerchantCategoriesGrid
+                schoolId={selectedSchoolId}
+              />
+
+              <hr className="w-full max-w-2xl bg-yellow-400 h-2 mt-4" />
+              <HorizontalProductList
+                categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
+                schoolId={selectedSchoolId}
+                categoryName="Apparel & Clothing" />
+
+              <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
+              <MerchantCategoriesGrid
+                showFirst={false}
+                schoolId={selectedSchoolId}
+              />
+
+              <hr className="w-full max-w-2xl bg-yellow-400 h-2 mt-4" />
+              <HorizontalProductList
+                categoryId="09e9cc32-b75e-4138-9aa6-7dbf6bb7a756"
+                schoolId={selectedSchoolId}
+                categoryName="Bags & Luggage" />
+
+              <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
+              {/* Reviews Section */}
+              <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
+
+                <ReviewSlider />
+
+                {userIsAuthenticated && (
+                  <div className="mt-12">
+                    <h3 style={{ color: currentTheme.text }} className="text-xl font-semibold text-center mb-6">
+                      Share Your Unique Experience for fellow students to see
+                    </h3>
+                    <ReviewForm />
+                  </div>
+                )}
+              </div>
+
+              {/* Bottom Links */}
+              {/* <div className="mt-12 flex flex-col items-center gap-4 w-full">
             <button
               onClick={() => window.open("https://unistore.ng", "_blank")}
               className="text-sm font-medium underline hover:no-underline transition-all duration-200"
@@ -322,44 +378,44 @@ export default function HomePage() {
             
     
           </div> */}
-        </div>
-      ) : (
-        <>
-          {/* Back Button and Header */}
-          <div className="w-full max-w-2xl mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={handleBackToSearch}
-                className="flex items-center gap-2 font-medium transition-colors"
-                style={{ color: currentTheme.primary }}
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to search
-              </button>
-
-              {!userIsAuthenticated && (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="font-medium transition-colors"
-                  style={{ color: currentTheme.primary }}
-                >
-                  Sign In
-                </button>
-              )}
             </div>
+          ) : (
+            <>
+              {/* Back Button and Header */}
+              <div className="w-full max-w-2xl mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    onClick={handleBackToSearch}
+                    className="flex items-center gap-2 font-medium transition-colors"
+                    style={{ color: currentTheme.primary }}
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to search
+                  </button>
 
-            <div className="text-center">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                <span style={{ color: currentTheme.primary }}>uni</span>
-                <span style={{ color: currentTheme.secondary }}>store.</span>
-              </h1>
-              <p className="text-sm text-gray-600">
-                Results for "{request}" at {university} University
-              </p>
-            </div>
-          </div>
+                  {!userIsAuthenticated && (
+                    <button
+                      onClick={() => setShowAuthModal(true)}
+                      className="font-medium transition-colors"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Sign In
+                    </button>
+                  )}
+                </div>
 
-          {/* Seller Results
+                <div className="text-center">
+                  <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                    <span style={{ color: currentTheme.primary }}>uni</span>
+                    <span style={{ color: currentTheme.secondary }}>store.</span>
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    Results for "{request}" at {university} University
+                  </p>
+                </div>
+              </div>
+
+              {/* Seller Results
           <SellerResults 
             sellers={matchedSellers}
             isLoading={isSearching}
@@ -368,74 +424,82 @@ export default function HomePage() {
             requestId={currentRequestId ?? undefined}
           /> */}
 
-          {/* Retry Search Prompt */}
-          {showRetryPrompt && !isSearching && (
-            <div className="w-full max-w-2xl mt-6">
-              <div
-                className="rounded-2xl p-6 border transition-colors duration-300"
-                style={{
-                  backgroundColor: currentTheme.surface,
-                  borderColor: currentTheme.primary + '20'
-                }}
-              >
-                <div className="text-center">
-                  <h3
-                    className="text-lg font-semibold mb-2"
-                    style={{ color: currentTheme.text }}
+              {/* Retry Search Prompt */}
+              {showRetryPrompt && !isSearching && (
+                <div className="w-full max-w-2xl mt-6">
+                  <div
+                    className="rounded-2xl p-6 border transition-colors duration-300"
+                    style={{
+                      backgroundColor: currentTheme.surface,
+                      borderColor: currentTheme.primary + '20'
+                    }}
                   >
-                    Retry?
-                  </h3>
-                  <p
-                    className="mb-4"
-                    style={{ color: currentTheme.textSecondary }}
-                  >
-                    Search results might vary with different attempts. Try rephrasing your request or searching again to potentially get better matches.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button
-                      onClick={handleRetrySearch}
-                      className={`bg-gradient-to-r ${currentTheme.buttonGradient} text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105`}
-                    >
-                      Retry Same Search
-                    </button>
-                    <button
-                      onClick={handleBackToSearch}
-                      className="border border-gray-300 hover:bg-gray-50 px-6 py-3 rounded-xl font-medium transition-colors"
-                      style={{
-                        backgroundColor: currentTheme.background,
-                        color: currentTheme.text
-                      }}
-                    >
-                      Modify Search
-                    </button>
+                    <div className="text-center">
+                      <h3
+                        className="text-lg font-semibold mb-2"
+                        style={{ color: currentTheme.text }}
+                      >
+                        Retry?
+                      </h3>
+                      <p
+                        className="mb-4"
+                        style={{ color: currentTheme.textSecondary }}
+                      >
+                        Search results might vary with different attempts. Try rephrasing your request or searching again to potentially get better matches.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                          onClick={handleRetrySearch}
+                          className={`bg-gradient-to-r ${currentTheme.buttonGradient} text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105`}
+                        >
+                          Retry Same Search
+                        </button>
+                        <button
+                          onClick={handleBackToSearch}
+                          className="border border-gray-300 hover:bg-gray-50 px-6 py-3 rounded-xl font-medium transition-colors"
+                          style={{
+                            backgroundColor: currentTheme.background,
+                            color: currentTheme.text
+                          }}
+                        >
+                          Modify Search
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
-        </>
-      )}
 
-      {/* Floating WhatsApp Button */}
-      {/* <FloatingWhatsApp isVisible={!showResults} /> */}
+          {/* Floating WhatsApp Button */}
+          {/* <FloatingWhatsApp isVisible={!showResults} /> */}
 
-      {/* Rating Prompt */}
-      <RatingPrompt />
+          {/* Rating Prompt */}
+          <RatingPrompt />
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onSuccess={handleAuthSuccess}
-      />
+          {/* Auth Modal */}
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            onSuccess={handleAuthSuccess}
+          />
 
-      {userIsAuthenticated && (
-        <PaymentModal
-          isOpen={showPaymentModal}
-          onClose={() => setShowPaymentModal(false)}
-          userId={session?.user?.id || ''}
+          {userIsAuthenticated && (
+            <PaymentModal
+              isOpen={showPaymentModal}
+              onClose={() => setShowPaymentModal(false)}
+              userId={session?.user?.id || ''}
+            />
+          )}
+        </main>
+        : <ConfirmUniversityModal
+          isOpen={showConfirmUniversityModal}
+          onClose={() => setShowConfirmUniversityModal(false)}
+          initialSchoolId={selectedSchoolId}
+          onConfirm={handleConfirmUniversity}
         />
-      )}
-    </main>
+      }
+    </>
   );
 }

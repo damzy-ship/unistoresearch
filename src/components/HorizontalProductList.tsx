@@ -7,9 +7,10 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from '../hooks/useTracking';
-import AuthModal from './AuthModal copy';
+
 import { useTheme } from '../hooks/useTheme';
 import { Loader } from 'lucide-react';
+import AuthModal from './AuthModal';
 
 // Define a type for your product data
 interface Product {
@@ -95,7 +96,8 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     body: {
                         category_id: categoryId,
                         school_id: schoolId,
-                        show_featured: showFeatured || false
+                        show_featured: showFeatured || false,
+                        match_count: showFeatured ? 10 : 20, // Fetch more if not featured
                     },
                 });
 
@@ -154,7 +156,10 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 </div>
 
                 {products.length === 0 ? (
-                    <p className="text-center text-gray-500 mt-16 text-xl">No products found for this category.</p>
+                    <div className='w-screen flex justify-center items-center h-20 bg-gray-50'>
+
+                        <p className="text-gray-500 text-xl">No products found for this category.</p>
+                    </div>
                 ) : (
                     <div className="flex overflow-x-auto gap-6 pb-2 scrollbar-hide px-4 sm:px-6 lg:px-8">
                         {products.map((product) => (

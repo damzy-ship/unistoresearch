@@ -103,9 +103,7 @@ function SearchResultsPage() {
                 </Swiper>
 
                 <div className="p-6 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold mb-2 truncate"
-                    style={{ color: currentTheme.text }}
-                  >{product.product_description}</h3>
+                  <h3 className={`text-xl font-bold mb-2 truncate text-${currentTheme.primaryTsFormat}`}>{product.product_description}</h3>
                   <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
                   {product.full_name && (
                     <p className="text-sm text-gray-500 mb-2">

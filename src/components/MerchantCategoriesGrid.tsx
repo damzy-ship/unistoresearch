@@ -11,7 +11,7 @@ interface Category {
   category_image: string;
 }
 
-const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean }> = ({ showFirst = true }) => {
+const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean; schoolId: string }> = ({ showFirst = true, schoolId }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +19,7 @@ const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean }> = ({ showFirst =
   const { currentTheme } = useTheme();
 
 
-  const schoolId = '1724171a-6664-44fd-aa1e-f509b124ab51';
+  // const schoolId = '1724171a-6664-44fd-aa1e-f509b124ab51';
 
   useEffect(() => {
     const fetchCategories = async () => {

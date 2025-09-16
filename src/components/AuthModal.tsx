@@ -9,7 +9,6 @@ import AuthInput from './auth/AuthInput';
 import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
 import OTPInput from './auth/OTPInput';
-import SchoolDropdown from './ScoolDropdown';
 import UniversitySelector from './UniversitySelector';
 
 interface AuthModalProps {
@@ -20,12 +19,6 @@ interface AuthModalProps {
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'verify-otp' | 'reset-password';
 type UserType = 'user' | 'merchant';
-
-// Define an interface for the schools data
-interface School {
-  id: string;
-  short_name: string;
-}
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [view, setView] = useState<AuthView>('login');
@@ -41,7 +34,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
   // New state for user type and schools
   const [userType, setUserType] = useState<UserType>('user');
-  const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchoolId, setSelectedSchoolId] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
 
   useEffect(() => {
@@ -58,30 +50,30 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setForgotPasswordPhone('+234');
       setUserType('user'); // Reset user type on modal open
       setSelectedSchoolId(null);
-      fetchSchools(); // Fetch schools when modal opens
+      // fetchSchools(); // Fetch schools when modal opens
     }
   }, [isOpen]);
 
   // Function to fetch schools from Supabase
-  const fetchSchools = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('id, short_name')
-        .order('short_name', { ascending: true });
+  // const fetchSchools = async () => {
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from('schools')
+  //       .select('id, short_name')
+  //       .order('short_name', { ascending: true });
 
-      if (error) {
-        throw error;
-      }
+  //     if (error) {
+  //       throw error;
+  //     }
 
-      if (data) {
-        setSchools(data);
-      }
-    } catch (error) {
-      console.error('Error fetching schools:', error);
-      toast.error('Failed to load schools. Please try again.');
-    }
-  };
+  //     if (data) {
+  //       setSchools(data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching schools:', error);
+  //     toast.error('Failed to load schools. Please try again.');
+  //   }
+  // };
 
   const validateInputs = () => {
     if (phoneNumber.length < 14) {
@@ -200,6 +192,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       // Set user as authenticated
       setUserId(authData.user.id);
+      localStorage.setItem('selectedSchoolId', selectedSchoolId);
       setPhoneAuthenticated(true);
 
       onSuccess();
@@ -265,6 +258,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
         // Set user ID to match existing visitor
         setUserId(visitorData[0].user_id);
+        localStorage.setItem('selectedSchoolId', visitorData[0].school_id);
       } else {
         // Create new visitor record if no existing visitor found
         const { data: newVisitor, error: insertError } = await supabase

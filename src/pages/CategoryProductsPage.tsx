@@ -130,7 +130,7 @@ const CategoryProductsPage: React.FC = () => {
         <div className="min-h-screen p-6 sm:p-8 font-sans">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
-                    <h1 className="text-2xl font-extrabold mb-2 tracking-tight">Products</h1>
+                    <h1 className={`text-2xl text-${currentTheme.primaryTsFormat} font-extrabold mb-2 tracking-tight`}>Products</h1>
                     <p className="text-lg font-medium text-gray-500">
                         in <span className="font-semibold">{categoryName}</span>
                     </p>

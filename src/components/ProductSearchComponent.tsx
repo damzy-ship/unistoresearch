@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
@@ -26,9 +26,15 @@ function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [university, setUniversity] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
+  const [university, setUniversity] = useState(null);
   const navigate = useNavigate(); // Get the navigate function from react-router-dom
   const { currentTheme } = useTheme();
+
+  useEffect(() => {
+      const stored = localStorage.getItem('selectedSchoolId');
+      if (stored) { setUniversity(stored) }
+      // else setShowConfirmUniversityModal(true);
+    }, []);
 
   const handleSearch = async (event: FormEvent) => {
     event.preventDefault();
@@ -71,10 +77,10 @@ function ProductSearchComponent() {
       >
         <form onSubmit={handleSearch} className="space-y-6">
           <div className="space-y-6">
-            <UniversitySelector
+           {university && <UniversitySelector
               selectedUniversity={university}
               onUniversityChange={setUniversity}
-            />
+            />}
             {/* Search Input with updated styling */}
             <div className="relative">
               <textarea
