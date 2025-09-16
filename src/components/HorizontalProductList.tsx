@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from '../hooks/useTracking';
 import AuthModal from './AuthModal copy';
 import { useTheme } from '../hooks/useTheme';
+import { Loader } from 'lucide-react';
 
 // Define a type for your product data
 interface Product {
@@ -117,8 +118,10 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gray-50">
-                <div className="text-xl font-semibold text-gray-700">Loading products...</div>
+
+            <div className="flex justify-center items-center h-44 bg-gray-50 w-full">
+                <Loader />
+                {/* <div className="text-xl font-semibold text-gray-700">Loading products...</div> */}
             </div>
         );
     }
@@ -132,20 +135,20 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     }
 
     return (
-        <div className="py-8 sm:py-12 font-sans bg-gray-50 max-w-full overflow-hidden">
-            <div className="mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center mb-6 sm:mb-8">
-                    <div>
-                        <p className="text-2xl font-bold text-indigo-600">
-                            {categoryName}
-                        </p>
-                    </div>
+        <div className="pb-8 sm:pb-12 font-sans bg-gray-50 max-w-full overflow-hidden">
+            <div className="mx-auto">
+                <div className={`px-4 flex gap-1 items-center justify-between mb-6 sm:mb-8 bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white py-1 shadow-md transition-all duration-200 font-medium w-full`}>
+
+                    <p>
+                        {categoryName?.toUpperCase()}
+                    </p>
+
                     {products.length > 0 && (
                         !showFeatured && <button
                             onClick={() => { navigate(`/categories/${categoryId}/products?schoolId=${schoolId}&categoryName=${encodeURIComponent(categoryName)}`); window.scrollTo(0, 0); }}
                             className="text-base font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
                         >
-                            View All <span aria-hidden="true">&rarr;</span>
+                            See more <span aria-hidden="true">&rarr;</span>
                         </button>
                     )}
                 </div>
@@ -153,7 +156,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 {products.length === 0 ? (
                     <p className="text-center text-gray-500 mt-16 text-xl">No products found for this category.</p>
                 ) : (
-                    <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide">
+                    <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide px-4 sm:px-6 lg:px-8">
                         {products.map((product) => (
                             <div key={product.id} className="w-48 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
                                 <Swiper

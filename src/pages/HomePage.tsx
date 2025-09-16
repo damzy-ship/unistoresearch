@@ -270,24 +270,30 @@ export default function HomePage() {
           {/* Search Card */}
           <ProductSearchComponent />
 
+          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
           <HorizontalProductList
             showFeatured={true}
             schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
             categoryName="Featured Products" />
 
+          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
           <MerchantCategoriesGrid />
+          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
 
           <HorizontalProductList
             categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
             schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
             categoryName="Apparel & Clothing" />
 
+          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
           <MerchantCategoriesGrid showFirst={false} />
+          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
 
           <HorizontalProductList
             categoryId="09e9cc32-b75e-4138-9aa6-7dbf6bb7a756"
             schoolId="1724171a-6664-44fd-aa1e-f509b124ab51"
             categoryName="Bags & Luggage" />
+          <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
           {/* Reviews Section */}
           <div className="w-full max-w-4xl mx-auto mt-16 mb-8">
 

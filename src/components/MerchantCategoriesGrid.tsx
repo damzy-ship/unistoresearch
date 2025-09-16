@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTheme } from '../hooks/useTheme';
 // import { getUserId } from '../hooks/useTracking';
 
 // Define the types for your data
@@ -15,6 +16,7 @@ const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean }> = ({ showFirst =
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { currentTheme } = useTheme();
 
 
   const schoolId = '1724171a-6664-44fd-aa1e-f509b124ab51';
@@ -80,10 +82,10 @@ const MerchantCategoriesGrid: React.FC<{ showFirst?: boolean }> = ({ showFirst =
               src={category.category_image}
               alt={category.category_name}
               // Set a fixed aspect ratio for consistent image size and apply rounded corners
-              className="w-full h-32 md:h-40 object-cover rounded-xl shadow-md transition-shadow hover:shadow-lg"
+              className="w-full h-32 md:h-40 object-cover rounded-xl shadow-md transition-shadow hover:shadow-lg bg-white"
             />
             {/* New styles for the category name */}
-            <h3 className="mt-2 text-sm md:text-base font-medium text-gray-800 truncate">
+            <h3 className={`text-${currentTheme.primaryTsFormat} mt-2 text-sm md:text-base font-medium truncate`}>
               {category.category_name}
             </h3>
           </div>
