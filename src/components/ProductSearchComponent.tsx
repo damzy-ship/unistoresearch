@@ -1,26 +1,11 @@
 import { useState, FormEvent, useEffect } from 'react';
-import { School, supabase } from '../lib/supabase';
+import { Product, School, supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
 import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
 import { History } from 'lucide-react';
 import { getMatchingCategoriesAndFeatures, transformDescriptionForEmbedding } from '../lib/generateEmbedding';
-
-// Product interface remains the same
-interface Product {
-  product_description: string;
-  product_price: string;
-  is_available: boolean;
-  image_urls: string[];
-  merchant_id: string;
-  full_name: string;
-  phone_number: string;
-  school_id: string;
-  school_name: string;
-  school_short_name: string;
-  similarity: number;
-}
 
 function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');

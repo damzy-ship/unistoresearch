@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Loader, CheckCircle, AlertCircle, Image, X, Search } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Product, supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 
@@ -39,20 +39,6 @@ const deleteImageFromSupabase = async (imageUrl) => {
         }
     }
 };
-
-interface Product {
-    id: string;
-    merchant_id: string;
-    product_description: string;
-    product_price: string;
-    is_available: boolean;
-    created_at: string;
-    image_urls: string[];
-    embedding: number[];
-    search_description: string;
-    is_featured: boolean;
-    discount_price?: string;
-}
 
 interface School {
     id: string;

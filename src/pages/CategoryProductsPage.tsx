@@ -1,29 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { Product, supabase } from '../lib/supabase';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import AuthModal from '../components/AuthModal';
-import { isAuthenticated } from '../hooks/useTracking';
+import ContactSellerButton from '../components/ContactSellerButton';
 import { useTheme } from '../hooks/useTheme';
 
-// Define a type for your product data to match the new rendering
-interface Product {
-    id: string;
-    product_description: string;
-    product_price: string;
-    image_urls: string[];
-    is_available: boolean; // Assuming this is part of your data
-    full_name: string; // Assuming this is part of your data
-    phone_number: string; // Assuming this is part of your data
-    school_id: string;
-    school_name: string;
-    school_short_name: string;
-    discount_price?: string;
-}
 
 const CategoryProductsPage: React.FC = () => {
     const { categoryId } = useParams<{ categoryId: string }>();
@@ -34,45 +19,7 @@ const CategoryProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [showAuthModal, setShowAuthModal] = useState(false);
-    const [pendingContactProduct, setPendingContactProduct] = useState<Product | null>(null);
     const { currentTheme } = useTheme();
-
-    const handleContactSeller = async (product: Product) => {
-        // Check if user is already authenticated
-        const userAuthenticated = await isAuthenticated();
-        if (!userAuthenticated) {
-            setPendingContactProduct(product);
-            setShowAuthModal(true);
-            return;
-        }
-
-        // Proceed with contact
-        contactSeller(product);
-    };
-
-
-    const contactSeller = async (product: Product) => {
-        // Track the contact interaction for rating prompts
-        // await trackContactInteraction(product.merchant_id, requestId);
-
-        const message = `Hi! I'm looking for the following from ${product.school_short_name} University: ${product.product_description}`;
-        const whatsappUrl = `https://wa.me/${product.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, "_blank");
-    };
-
-    const handleAuthSuccess = () => {
-
-        if (pendingContactProduct) {
-            contactSeller(pendingContactProduct);
-            setPendingContactProduct(null);
-        }
-    };
-
-    const handleAuthClose = () => {
-        setShowAuthModal(false);
-        setPendingContactProduct(null);
-    };
 
     useEffect(() => {
         const fetchProductsByCategory = async () => {
@@ -184,12 +131,9 @@ const CategoryProductsPage: React.FC = () => {
                                         {product.is_available ? 'In Stock' : 'Out of Stock'}
                                     </p>
                                     {product.phone_number && (
-                                        <button
-                                            onClick={() => handleContactSeller(product)}
-                                            className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
-                                        >
+                                        <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
                                             Get Now
-                                        </button>
+                                        </ContactSellerButton>
                                     )}
                                 </div>
                             </div>
@@ -198,11 +142,7 @@ const CategoryProductsPage: React.FC = () => {
                 )}
             </div>
 
-            <AuthModal
-                isOpen={showAuthModal}
-                onClose={handleAuthClose}
-                onSuccess={handleAuthSuccess}
-            />
+            {/* Auth handled inside ContactSellerButton */}
         </div>
     );
 };

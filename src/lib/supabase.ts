@@ -49,6 +49,27 @@ export interface UniqueVisitor {
   school_id: string;
 }
 
+export interface Product {
+    id: string;
+    product_description: string;
+    product_price: string;
+    image_urls: string[];
+    is_available: boolean;
+    full_name: string;
+    phone_number: string;
+    school_id: string;
+    school_name?: string;
+    school_short_name?: string;
+    discount_price?: string;
+    similarity?: number;
+    is_featured?: boolean;
+    search_description?: string;
+    embedding: number[];
+    created_at: string;
+    merchant_id: string;
+    
+}
+
 export interface RequestLog {
   id: string;
   user_id: string;
@@ -125,6 +146,16 @@ export interface MerchantWithRating extends Merchant {
     '4': number;
     '5': number;
   };
+}
+
+export interface MerchantAnalytics {
+  id: string;
+  merchant_id: string;
+  // request_id?: string;
+  product_id: string;
+  event_type: 'profile_contacted';
+  user_id: string;
+  created_at?: string;
 }
 
 // Add function to delete a request log
