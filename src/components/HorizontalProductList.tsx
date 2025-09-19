@@ -197,14 +197,14 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                     {/* <h3 className="text-xl font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
                                     {product.discount_price ? (
                                         <div>
-                                            <div className="text-sm text-gray-500 line-through">₦{product.product_price}</div>
-                                            <div className="text-xl text-indigo-600 font-extrabold mb-1 truncate">₦{product.discount_price}</div>
+                                            <div className="text-sm text-gray-500 line-through truncate">₦{product.product_price}</div>
+                                            <div className="text-xl text-indigo-600 font-extrabold mb-1">₦{product.discount_price}</div>
                                         </div>
                                     ) : (
-                                        <p className="text-xl text-indigo-600 font-extrabold mb-1 truncate">₦{product.product_price}</p>
+                                        <p className="text-xl text-indigo-600 font-extrabold mb-1">₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-sm text-gray-500 mb-3">
+                                        <p className="text-sm text-gray-500 mb-3 flex-grow">
                                             by <span className="font-medium text-gray-700">{product.full_name}</span>
                                         </p>
                                     )}
