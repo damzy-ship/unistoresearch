@@ -21,6 +21,7 @@ interface Product {
   school_name: string;
   school_short_name: string;
   similarity: number;
+  discount_price?: string;
 }
 
 function SearchResultsPage() {
@@ -97,14 +98,28 @@ function SearchResultsPage() {
                 >
                   {product.image_urls.map((url, imgIndex) => (
                     <SwiperSlide key={imgIndex}>
-                      <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                      <div className="relative w-full h-full">
+                        <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                        {product.school_short_name && (
+                          <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
+                            {product.school_short_name}
+                          </div>
+                        )}
+                      </div>
                     </SwiperSlide>
                   ))}
                 </Swiper>
 
                 <div className="p-6 flex flex-col flex-grow">
                   <h3 className={`text-xl font-bold mb-2 truncate text-${currentTheme.primaryTsFormat}`}>{product.product_description}</h3>
-                  <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
+                  {product.discount_price ? (
+                    <div className="mb-2">
+                      <div className="text-sm text-gray-500 line-through">₦{product.product_price}</div>
+                      <div className="text-3xl text-green-600 font-black">₦{product.discount_price}</div>
+                    </div>
+                  ) : (
+                    <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
+                  )}
                   {product.full_name && (
                     <p className="text-sm text-gray-500 mb-2">
                       <span className="font-semibold text-gray-700">{product.full_name}</span>

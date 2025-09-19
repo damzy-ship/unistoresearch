@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useTracking, isAuthenticated } from '../hooks/useTracking';
 import { findMerchantsForRequest, MerchantWithCategories } from '../lib/gemini';
@@ -26,6 +26,7 @@ import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
+// import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
 
 
 
@@ -88,60 +89,63 @@ export default function HomePage() {
   // }, []);
 
 
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUserIsAuthenticated(!!currentSession);
-    };
+  useEffect(() => {
+    const checkAuthAndFetchUser = async () => {
+      // Get initial session
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setUserIsAuthenticated(!!session);
 
-    checkAuth();
-
-    const fetchUserType = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
+      if (session?.user) {
+        try {
           const { data: visitor } = await supabase
             .from('unique_visitors')
             .select('user_type, school_id')
             .eq('auth_user_id', session.user.id)
             .single();
-          // Before setting userType to null, prompt the user to confirm their university
-          const fetchedUserType = (visitor as { user_type?: string } | null)?.user_type || null;
 
-          // If the visitor has a school_id already, use it. Otherwise, show the confirm modal.
+          const fetchedUserType = visitor?.user_type || null;
+          setUserType(fetchedUserType);
+
+          // Prioritize school_id from the database
           if (visitor?.school_id) {
             localStorage.setItem('selectedSchoolId', visitor.school_id);
             setSelectedSchoolId(visitor.school_id);
           } else {
-            // Try reading from localStorage first
-            const stored = localStorage.getItem('selectedSchoolId');
-            if (stored) {
-              setSelectedSchoolId(stored);
+            // Fallback to localStorage if not in DB
+            const storedId = localStorage.getItem('selectedSchoolId');
+            if (storedId) {
+              setSelectedSchoolId(storedId);
             } else {
-              // show modal by setting a flag (handled below)
+              // If neither exists, show the modal
               setShowConfirmUniversityModal(true);
             }
           }
 
-          setUserType(fetchedUserType);
-        } else {
-          const stored = localStorage.getItem('selectedSchoolId');
-          if (stored) {
-            setSelectedSchoolId(stored);
+        } catch (err) {
+          console.error('Error fetching user_type:', err);
+          setUserType(null);
+          // Fallback to localStorage
+          const storedId = localStorage.getItem('selectedSchoolId');
+          if (storedId) {
+            setSelectedSchoolId(storedId);
           } else {
-            // show modal by setting a flag (handled below)
             setShowConfirmUniversityModal(true);
           }
-          setUserType(null);
         }
-      } catch (err) {
-        console.error('Error fetching user_type:', err);
+      } else {
         setUserType(null);
+        // Handle non-authenticated user flow
+        const storedId = localStorage.getItem('selectedSchoolId');
+        if (storedId) {
+          setSelectedSchoolId(storedId);
+        } else {
+          setShowConfirmUniversityModal(true);
+        }
       }
     };
 
-    fetchUserType();
+    checkAuthAndFetchUser();
 
     // Listen for payment modal open event
     const handlePaymentModalOpen = () => setShowPaymentModal(true);
@@ -152,12 +156,6 @@ export default function HomePage() {
     };
   }, []);
 
-  // Read selected school id from localStorage on initial mount (fallback)
-  React.useEffect(() => {
-    const stored = localStorage.getItem('selectedSchoolId');
-    if (stored) { setSelectedSchoolId(stored) }
-    else setShowConfirmUniversityModal(true);
-  }, []);
 
   const handleSearchRequest = async (e: React.FormEvent) => {
     e.preventDefault();

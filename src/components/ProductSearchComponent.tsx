@@ -1,8 +1,8 @@
 import { useState, FormEvent, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { School, supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
-import UniversitySelector from './UniversitySelector';
+import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
 import { History } from 'lucide-react';
 import { getMatchingCategoriesAndFeatures, transformDescriptionForEmbedding } from '../lib/generateEmbedding';
@@ -26,14 +26,31 @@ function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [university, setUniversity] = useState(null);
+  const [universityId, setUniversityId] = useState(null);
+  const [university, setUniversity] = useState<School | null>(null);
+
+
   const navigate = useNavigate(); // Get the navigate function from react-router-dom
   const { currentTheme } = useTheme();
 
   useEffect(() => {
       const stored = localStorage.getItem('selectedSchoolId');
-      if (stored) { setUniversity(stored) }
-      // else setShowConfirmUniversityModal(true);
+      if (stored) { setUniversityId(stored) }
+
+      const fetchSchoolName = async () => {
+        const { data: schoolData } = await supabase
+          .from('schools')
+          .select('*')
+          .eq('id', stored)
+          .single();
+
+        if (schoolData) {
+          setUniversity(schoolData);
+        }
+      };
+
+      fetchSchoolName();
+      // else setShowConfirmuniversityIdModal(true);
     }, []);
 
   const handleSearch = async (event: FormEvent) => {
@@ -47,7 +64,7 @@ function ProductSearchComponent() {
     try {
       // Step 1: Call the Supabase Edge Function to get products
       const { data, error: functionError } = await supabase.functions.invoke('semantic-search', {
-        body: { request_text: enhancedDescription, school_id: university, query_categories: categories, query_features: features },
+        body: { request_text: enhancedDescription, school_id: universityId, query_categories: categories, query_features: features },
       });
 
       if (functionError) {
@@ -77,10 +94,15 @@ function ProductSearchComponent() {
       >
         <form onSubmit={handleSearch} className="space-y-6">
           <div className="space-y-6">
-           {university && <UniversitySelector
-              selectedUniversity={university}
-              onUniversityChange={setUniversity}
-            />}
+            <div
+              className={`uppercase flex gap-1 items-center justify-center bg-gradient-to-l ${currentTheme.buttonGradient}  text-white px-8 py-2.5 rounded-xl shadow-md transition-all duration-200 font-medium w-full`}
+          >
+            <p className={`text-${currentTheme.text}`}>{university?.short_name} store</p>
+          </div>
+           {/* {universityId && <universityIdSelector
+              selecteduniversityId={universityId}
+              onuniversityIdChange={setUniversityId}
+            />} */}
             {/* Search Input with updated styling */}
             <div className="relative">
               <textarea
@@ -122,7 +144,7 @@ function ProductSearchComponent() {
         {error && <p className="text-center text-red-500 font-medium mt-4">{error}</p>}
 
         {/* Past Requests Link */}
-        <div className="mt-4 text-center">
+        {/* <div className="mt-4 text-center">
           <button
             onClick={() => navigate('/past-requests')}
             className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
@@ -135,7 +157,7 @@ function ProductSearchComponent() {
             <History className="w-4 h-4" />
             View past requests
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -150,10 +172,10 @@ export default ProductSearchComponent;
 //             >
 //               <form onSubmit={handleSearchRequest} className="space-y-6">
 //                 <div className="space-y-6">
-//                   {/* University Selection */}
-//                   <UniversitySelector
-//                     selectedUniversity={university}
-//                     onUniversityChange={setUniversity}
+//                   {/* universityId Selection */}
+//                   <universityIdSelector
+//                     selecteduniversityId={universityId}
+//                     onuniversityIdChange={setUniversityId}
 //                   />
 
 //                   {/* Request Textarea */}

@@ -24,6 +24,7 @@ interface Product {
     school_id: string;
     school_name: string;
     school_short_name: string;
+    discount_price?: string;
 }
 
 // Define the props interface
@@ -92,7 +93,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 setLoading(true);
                 setError(null);
 
-                const { data, error: functionError } = await supabase.functions.invoke('smooth-service', {
+                const { data, error: functionError } = await supabase.functions.invoke('product-category-fetch', {
                     body: {
                         category_id: categoryId,
                         school_id: schoolId,
@@ -101,22 +102,26 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     },
                 });
 
+
+
                 if (functionError) {
                     throw functionError;
                 }
 
                 const products = data?.results || [];
+                // console.log('Fetched products:', products);
                 setProducts(products);
-            } catch (err: any) {
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
                 console.error('Error during category search:', err);
-                setError('An error occurred while fetching category results. Please try again.');
+                setError('An error occurred while fetching category results. Please try again. ' + msg);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProductsByCategory();
-    }, [categoryId, schoolId]);
+    }, [categoryId, schoolId, showFeatured]);
 
     if (loading) {
         return (
@@ -146,12 +151,14 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     </p>
 
                     {products.length > 0 && (
-                        !showFeatured && <button
-                            onClick={() => { navigate(`/categories/${categoryId}/products?schoolId=${schoolId}&categoryName=${encodeURIComponent(categoryName)}`); window.scrollTo(0, 0); }}
-                            className="text-base font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
-                        >
-                            See more <span aria-hidden="true">&rarr;</span>
-                        </button>
+                        !showFeatured && categoryId && (
+                            <button
+                                onClick={() => { navigate(`/categories/${categoryId}/products?schoolId=${schoolId || ''}&categoryName=${encodeURIComponent(categoryName || '')}`); window.scrollTo(0, 0); }}
+                                className="text-base font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                            >
+                                See more <span aria-hidden="true">&rarr;</span>
+                            </button>
+                        )
                     )}
                 </div>
 
@@ -175,13 +182,27 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                 >
                                     {product.image_urls.map((url, imgIndex) => (
                                         <SwiperSlide key={imgIndex}>
-                                            <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                                            <div className="relative w-full h-full">
+                                                <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                                                {product.school_short_name && (
+                                                    <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
+                                                        {product.school_short_name}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
                                 <div className="p-5 flex flex-col flex-grow">
                                     {/* <h3 className="text-xl font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
-                                    <p className="text-xl text-indigo-600 font-extrabold mb-1 truncate">{product.product_price}</p>
+                                    {product.discount_price ? (
+                                        <div>
+                                            <div className="text-sm text-gray-500 line-through">{product.product_price}</div>
+                                            <div className="text-xl text-indigo-600 font-extrabold mb-1 truncate">{product.discount_price}</div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-xl text-indigo-600 font-extrabold mb-1 truncate">{product.product_price}</p>
+                                    )}
                                     {product.full_name && (
                                         <p className="text-sm text-gray-500 mb-3">
                                             by <span className="font-medium text-gray-700">{product.full_name}</span>
