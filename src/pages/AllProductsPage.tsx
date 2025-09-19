@@ -595,6 +595,27 @@ export default function AllProductsPage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 mb-8">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1 || loading}
+                                className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-gray-700">Page {currentPage} of {totalPages}</span>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages || loading}
+                                className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                     {loading ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
@@ -638,7 +659,7 @@ export default function AllProductsPage() {
                                             onBlur={(e) => handleProductDiscountPriceChange(product.id, e.currentTarget.textContent || '')}
                                             suppressContentEditableWarning={true}
                                         >
-                                            {product.discount_price ?  product.discount_price : 'No discount'}
+                                            {product.discount_price ? product.discount_price : 'No discount'}
                                         </p>
                                         <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
                                             {product.is_available ? (

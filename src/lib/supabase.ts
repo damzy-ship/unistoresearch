@@ -56,6 +56,8 @@ export interface RequestLog {
   request_text: string;
   matched_seller_ids?: string[];
   created_at: string;
+  matched_categories?: string[];
+  matched_features?: string[];
 }
 
 export interface Merchant {

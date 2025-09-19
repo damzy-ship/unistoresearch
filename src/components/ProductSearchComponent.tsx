@@ -36,8 +36,9 @@ function ProductSearchComponent() {
   useEffect(() => {
       const stored = localStorage.getItem('selectedSchoolId');
       if (stored) { setUniversityId(stored) }
+      
 
-      const fetchSchoolName = async () => {
+      const fetchSchool = async () => {
         const { data: schoolData } = await supabase
           .from('schools')
           .select('*')
@@ -49,7 +50,7 @@ function ProductSearchComponent() {
         }
       };
 
-      fetchSchoolName();
+      fetchSchool();
       // else setShowConfirmuniversityIdModal(true);
     }, []);
 
@@ -73,6 +74,19 @@ function ProductSearchComponent() {
 
       const products: Product[] = data?.results || [];
 
+     const { error: logError } = await supabase.from('request_logs').insert([
+        {
+          request_text: searchQuery,  
+          user_id: localStorage.getItem('unistore_user_id'),
+          university: university?.short_name,
+          matched_categories: categories,
+          matched_features: features,
+        }
+      ]);
+
+      if (logError) {
+      console.log('Request log error:', logError);
+      }
       // Step 2: Store results and navigate to the new page
       // You can store the results in state management (like Redux, Zustand) or pass them via route state
       // For this example, we'll use route state to keep it simple.

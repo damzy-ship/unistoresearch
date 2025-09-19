@@ -315,8 +315,8 @@ export async function getMatchingCategoriesAndFeatures(originalText: string): Pr
   } catch (error) {
     console.error("Error generating or parsing content:", error);
   }
-  console.log("Extracted Categories:", categories);
-  console.log("Extracted Features:", features);
+  // console.log("Extracted Categories:", categories);
+  // console.log("Extracted Features:", features);
   return { categories, features };
 
 }
