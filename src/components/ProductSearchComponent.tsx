@@ -1,34 +1,43 @@
-import { useState, FormEvent } from 'react';
-import { supabase } from '../lib/supabase';
+import { useState, FormEvent, useEffect } from 'react';
+import { Product, School, supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
-import UniversitySelector from './UniversitySelector';
+import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
 import { History } from 'lucide-react';
 import { getMatchingCategoriesAndFeatures, transformDescriptionForEmbedding } from '../lib/generateEmbedding';
-
-// Product interface remains the same
-interface Product {
-  product_description: string;
-  product_price: string;
-  is_available: boolean;
-  image_urls: string[];
-  merchant_id: string;
-  full_name: string;
-  phone_number: string;
-  school_id: string;
-  school_name: string;
-  school_short_name: string;
-  similarity: number;
-}
 
 function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [university, setUniversity] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
+  const [universityId, setUniversityId] = useState(null);
+  const [university, setUniversity] = useState<School | null>(null);
+
+
   const navigate = useNavigate(); // Get the navigate function from react-router-dom
   const { currentTheme } = useTheme();
+
+  useEffect(() => {
+      const stored = localStorage.getItem('selectedSchoolId');
+      if (stored) { setUniversityId(stored) }
+      
+
+      const fetchSchool = async () => {
+        const { data: schoolData } = await supabase
+          .from('schools')
+          .select('*')
+          .eq('id', stored)
+          .single();
+
+        if (schoolData) {
+          setUniversity(schoolData);
+        }
+      };
+
+      fetchSchool();
+      // else setShowConfirmuniversityIdModal(true);
+    }, []);
 
   const handleSearch = async (event: FormEvent) => {
     event.preventDefault();
@@ -41,7 +50,7 @@ function ProductSearchComponent() {
     try {
       // Step 1: Call the Supabase Edge Function to get products
       const { data, error: functionError } = await supabase.functions.invoke('semantic-search', {
-        body: { request_text: enhancedDescription, school_id: university, query_categories: categories, query_features: features },
+        body: { request_text: enhancedDescription, school_id: universityId, query_categories: categories, query_features: features },
       });
 
       if (functionError) {
@@ -50,6 +59,19 @@ function ProductSearchComponent() {
 
       const products: Product[] = data?.results || [];
 
+     const { error: logError } = await supabase.from('request_logs').insert([
+        {
+          request_text: searchQuery,  
+          user_id: localStorage.getItem('unistore_user_id'),
+          university: university?.short_name,
+          matched_categories: categories,
+          matched_features: features,
+        }
+      ]);
+
+      if (logError) {
+      console.log('Request log error:', logError);
+      }
       // Step 2: Store results and navigate to the new page
       // You can store the results in state management (like Redux, Zustand) or pass them via route state
       // For this example, we'll use route state to keep it simple.
@@ -64,17 +86,22 @@ function ProductSearchComponent() {
   };
 
   return (
-    <div className="relative px-3 z-10 w-full max-w-2xl mx-auto">
+    <div className="relative px-3 z-10 w-full max-w-2xl mx-auto mb-6">
       <div
         className="p-8 shadow-xl border border-gray-100 rounded-2xl transition-colors duration-300"
         style={{ backgroundColor: 'white' }} // Using white as a placeholder for currentTheme.surface
       >
         <form onSubmit={handleSearch} className="space-y-6">
           <div className="space-y-6">
-            <UniversitySelector
-              selectedUniversity={university}
-              onUniversityChange={setUniversity}
-            />
+            <div
+              className={`uppercase flex gap-1 items-center justify-center bg-gradient-to-l ${currentTheme.buttonGradient}  text-white px-8 py-2.5 rounded-xl shadow-md transition-all duration-200 font-medium w-full`}
+          >
+            <p className={`text-${currentTheme.text}`}>{university?.short_name} store</p>
+          </div>
+           {/* {universityId && <universityIdSelector
+              selecteduniversityId={universityId}
+              onuniversityIdChange={setUniversityId}
+            />} */}
             {/* Search Input with updated styling */}
             <div className="relative">
               <textarea
@@ -116,7 +143,7 @@ function ProductSearchComponent() {
         {error && <p className="text-center text-red-500 font-medium mt-4">{error}</p>}
 
         {/* Past Requests Link */}
-        <div className="mt-4 text-center">
+        {/* <div className="mt-4 text-center">
           <button
             onClick={() => navigate('/past-requests')}
             className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
@@ -129,7 +156,7 @@ function ProductSearchComponent() {
             <History className="w-4 h-4" />
             View past requests
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -144,10 +171,10 @@ export default ProductSearchComponent;
 //             >
 //               <form onSubmit={handleSearchRequest} className="space-y-6">
 //                 <div className="space-y-6">
-//                   {/* University Selection */}
-//                   <UniversitySelector
-//                     selectedUniversity={university}
-//                     onUniversityChange={setUniversity}
+//                   {/* universityId Selection */}
+//                   <universityIdSelector
+//                     selecteduniversityId={universityId}
+//                     onuniversityIdChange={setUniversityId}
 //                   />
 
 //                   {/* Request Textarea */}

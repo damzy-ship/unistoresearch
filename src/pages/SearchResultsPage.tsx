@@ -5,30 +5,15 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useTheme } from '../hooks/useTheme';
-import AuthModal from '../components/AuthModal';
-import { useState } from 'react';
-import { isAuthenticated } from '../hooks/useTracking';
-
-interface Product {
-  product_description: string;
-  product_price: string;
-  is_available: boolean;
-  image_urls: string[];
-  merchant_id: string;
-  full_name: string;
-  phone_number: string;
-  school_id: string;
-  school_name: string;
-  school_short_name: string;
-  similarity: number;
-}
+// no local state needed; ContactSellerButton manages auth flow
+import ContactSellerButton from '../components/ContactSellerButton';
+import { Product } from '../lib/supabase';
 
 function SearchResultsPage() {
   const location = useLocation();
   const { currentTheme } = useTheme();
   const { products, searchQuery } = location.state as { products: Product[], searchQuery: string };
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [pendingContactProduct, setPendingContactProduct] = useState<Product | null>(null);
+  // contact/auth handled by ContactSellerButton
 
   // const getWhatsappLink = (phoneNumber: string | undefined): string => {
   //   if (!phoneNumber) return '#';
@@ -36,40 +21,7 @@ function SearchResultsPage() {
   //   return `https://wa.me/${cleanNumber}`;
   // };
 
-  const handleContactSeller = async (product: Product) => {
-    // Check if user is already authenticated
-    const userAuthenticated = await isAuthenticated();
-    if (!userAuthenticated) {
-      setPendingContactProduct(product);
-      setShowAuthModal(true);
-      return;
-    }
-
-    // Proceed with contact
-    contactSeller(product);
-  };
-
-  const contactSeller = async (product: Product) => {
-    // Track the contact interaction for rating prompts
-    // await trackContactInteraction(product.merchant_id, requestId);
-
-    const message = `Hi! I'm looking for the following from ${product.school_short_name} University: ${searchQuery}`;
-    const whatsappUrl = `https://wa.me/${product.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-  };
-
-  const handleAuthSuccess = () => {
-
-    if (pendingContactProduct) {
-      contactSeller(pendingContactProduct);
-      setPendingContactProduct(null);
-    }
-  };
-
-  const handleAuthClose = () => {
-    setShowAuthModal(false);
-    setPendingContactProduct(null);
-  };
+  // contact/auth handled by ContactSellerButton
 
   return (
     <div className="min-h-screen p-6 sm:p-8 font-sans"
@@ -97,16 +49,28 @@ function SearchResultsPage() {
                 >
                   {product.image_urls.map((url, imgIndex) => (
                     <SwiperSlide key={imgIndex}>
-                      <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                      <div className="relative w-full h-full">
+                        <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                        {product.school_short_name && (
+                          <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
+                            {product.school_short_name}
+                          </div>
+                        )}
+                      </div>
                     </SwiperSlide>
                   ))}
                 </Swiper>
 
                 <div className="p-6 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold mb-2 truncate"
-                    style={{ color: currentTheme.text }}
-                  >{product.product_description}</h3>
-                  <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
+                  <h3 className={`text-xl font-bold mb-2 truncate text-${currentTheme.primaryTsFormat}`}>{product.product_description}</h3>
+                  {product.discount_price ? (
+                    <div className="mb-2">
+                      <div className="text-sm text-gray-500 line-through">₦{product.product_price}</div>
+                      <div className="text-3xl text-green-600 font-black">₦{product.discount_price}</div>
+                    </div>
+                  ) : (
+                    <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
+                  )}
                   {product.full_name && (
                     <p className="text-sm text-gray-500 mb-2">
                       <span className="font-semibold text-gray-700">{product.full_name}</span>
@@ -116,12 +80,9 @@ function SearchResultsPage() {
                     {product.is_available ? 'In Stock' : 'Out of Stock'}
                   </p>
                   {product.phone_number && (
-                    <button
-                      onClick={() => handleContactSeller(product)}
-                      className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
-                    >
+                    <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
                       Get Now
-                    </button>
+                    </ContactSellerButton>
                   )}
                 </div>
               </div>
@@ -132,12 +93,7 @@ function SearchResultsPage() {
         </div>
       </div>
 
-      {/* Phone Authentication Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleAuthClose}
-        onSuccess={handleAuthSuccess}
-      />
+      {/* Phone Authentication now handled inside ContactSellerButton */}
     </div>
   );
 }

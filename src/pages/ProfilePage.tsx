@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { getUserId } from '../hooks/useTracking';
+// import { getUserId } from '../hooks/useTracking';
 import { useTheme, Theme, BackgroundTexture } from '../hooks/useTheme';
 import ThemeCard from '../components/ThemeCard';
 import AIThemeGenerator from '../components/AIThemeGenerator';
@@ -28,7 +28,7 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const userId = await getUserId();
+      // const userId = await getUserId();
       
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -48,6 +48,8 @@ export default function ProfilePage() {
             created_at: visitorData.created_at,
             visit_count: visitorData.visit_count || 0
           };
+
+
           
           setProfile(profileData);
         }

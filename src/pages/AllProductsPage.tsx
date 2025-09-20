@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Loader, CheckCircle, AlertCircle, Image, X, Search } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Product, supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 
@@ -40,26 +40,19 @@ const deleteImageFromSupabase = async (imageUrl) => {
     }
 };
 
-interface Product {
+interface School {
     id: string;
-    merchant_id: string;
-    product_description: string;
-    product_price: string;
-    is_available: boolean;
-    created_at: string;
-    image_urls: string[];
-    embedding: number[];
-    search_description: string;
+    name: string;
+    short_name: string;
 }
 
 export default function AllProductsPage() {
+    // Original states
     const [allProducts, setAllProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
-    // Form states for editing a product
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [searchDescription, setSearchDescription] = useState('');
@@ -69,33 +62,81 @@ export default function AllProductsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [embeddingLoadingId, setEmbeddingLoadingId] = useState<string | null>(null);
 
+    // New states for pagination and school filter
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const pageSize = 100;
+    const [schools, setSchools] = useState<School[]>([]);
+    const [selectedSchool, setSelectedSchool] = useState<string>(''); // Stores the school's UUID
+    const [showDiscountedProducts, setShowDiscountedProducts] = useState(false);
+    const [showFeaturedProducts, setShowFeaturedProducts] = useState(false);
+
     const { currentTheme } = useTheme();
 
+    // Fetch schools on initial load
     useEffect(() => {
-        fetchAllProducts();
+        fetchSchools();
     }, []);
 
-    const fetchAllProducts = async () => {
-        setLoading(true);
-        setError(null);
+    // Fetch products whenever the page or selected school changes
+    useEffect(() => {
+        fetchPaginatedProducts();
+    }, [currentPage, selectedSchool, showDiscountedProducts, showFeaturedProducts]);
+
+    const fetchSchools = async () => {
         try {
             const { data, error } = await supabase
-                .from('merchant_products')
-                .select('*')
-                .order('created_at', { ascending: false });
+                .from('schools')
+                .select('id, short_name')
+                .order('short_name');
 
             if (error) {
                 throw error;
             }
-            setAllProducts(data || []);
+            setSchools(data || []);
+            // Default to first school if available
         } catch (err) {
-            console.error('Error fetching all products:', err);
-            setError('Failed to load products.');
+            console.error('Error fetching schools:', err);
+            setError('Failed to load schools.');
+        }
+    };
+
+    const fetchPaginatedProducts = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const { data, error: functionError } = await supabase.functions.invoke('admin-fetch-products', {
+                body: {
+                    page_number: currentPage,
+                    page_size: pageSize,
+                    school_id: selectedSchool,
+                    show_featured: showFeaturedProducts,
+                    show_discount: showDiscountedProducts,
+                },
+            });
+
+            if (functionError) {
+                throw new Error(functionError.message);
+            }
+
+            const { results, pagination } = data;
+            setAllProducts(results || []);
+            // console.log('Fetched products:', results);
+            setTotalPages(pagination.total_pages);
+        } catch (err) {
+            console.error('Error fetching paginated products:', err);
+            setError('Failed to load products. ' + err.message);
         } finally {
             setLoading(false);
         }
     };
+    const handleSchoolChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSchoolId = e.target.value;
+        setSelectedSchool(newSchoolId);
+        setCurrentPage(1); // Reset to the first page whenever the filter changes
+    };
 
+    // The rest of your component logic remains the same.
     const filteredProducts = useMemo(() => {
         if (!searchTerm) {
             return allProducts;
@@ -187,7 +228,7 @@ export default function AllProductsPage() {
             }
 
             resetForm();
-            fetchAllProducts();
+            fetchPaginatedProducts();
         } catch (err) {
             console.error('Error editing product:', err);
             setUploadingImages(false);
@@ -222,6 +263,31 @@ export default function AllProductsPage() {
             setLoading(false);
         }
     };
+    const handleToggleFeatured = async (product: Product) => {
+        const newFeatured = !product.is_featured;
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { error: updateError } = await supabase
+                .from('merchant_products')
+                .update({ is_featured: newFeatured })
+                .eq('id', product.id);
+
+            if (updateError) {
+                throw updateError;
+            }
+
+            setAllProducts(allProducts.map(p =>
+                p.id === product.id ? { ...p, is_featured: newFeatured } : p
+            ));
+        } catch (err) {
+            console.error('Error toggling product featured status:', err);
+            setError('Failed to toggle product featured status.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleRemoveImageFromEdit = async (imageUrlToRemove: string) => {
         if (!editingProduct) return;
@@ -240,12 +306,12 @@ export default function AllProductsPage() {
                 throw new Error(`Error updating product record: ${dbError.message}`);
             }
 
-            fetchAllProducts();
+            fetchPaginatedProducts();
         } catch (err) {
             console.error('Error removing image:', err);
             setError(err instanceof Error ? err.message : 'Failed to remove image');
             setEditingProduct(editingProduct);
-            fetchAllProducts();
+            fetchPaginatedProducts();
         }
     };
 
@@ -281,7 +347,7 @@ export default function AllProductsPage() {
     const handleSearchDescriptionChange = async (productId: string, newDescription: string) => {
         try {
             const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(newDescription, true);
-         
+
             const { error: updateError } = await supabase
                 .from('merchant_products')
                 .update({
@@ -309,18 +375,44 @@ export default function AllProductsPage() {
                 .update({ product_price: newPrice })
                 .eq('id', productId);
 
-                if (updateError) {
-                    throw updateError;
-                }
-
-                setAllProducts(allProducts.map(p =>
-                    p.id === productId ? { ...p, product_price: newPrice } : p
-                ));
-            } catch (err) {
-                console.error('Error updating price:', err);
-                setError(err instanceof Error ? err.message : 'Failed to update price.');
+            if (updateError) {
+                throw updateError;
             }
-        };
+
+            setAllProducts(allProducts.map(p =>
+                p.id === productId ? { ...p, product_price: newPrice } : p
+            ));
+        } catch (err) {
+            console.error('Error updating price:', err);
+            setError(err instanceof Error ? err.message : 'Failed to update price.');
+        }
+    };
+
+    // New: update discount price (can be set to null if input is empty)
+    const handleProductDiscountPriceChange = async (productId: string, newDiscountPrice: string) => {
+        try {
+            // Clean the input: remove currency symbols and non-numeric characters except dot
+            const cleaned = newDiscountPrice.trim();
+
+            const discountValue = cleaned === '' ? null : cleaned;
+
+            const { error: updateError } = await supabase
+                .from('merchant_products')
+                .update({ discount_price: discountValue })
+                .eq('id', productId);
+
+            if (updateError) {
+                throw updateError;
+            }
+
+            setAllProducts(allProducts.map(p =>
+                p.id === productId ? { ...p, discount_price: discountValue === null ? undefined : discountValue } : p
+            ));
+        } catch (err) {
+            console.error('Error updating discount price:', err);
+            setError(err instanceof Error ? err.message : 'Failed to update discount price.');
+        }
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl mx-auto my-8 p-6">
@@ -440,19 +532,76 @@ export default function AllProductsPage() {
                 </div>
             ) : (
                 <div className="py-4">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Products ({filteredProducts.length})</h3>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm w-full sm:w-64"
-                            />
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+                        <h3 className="text-lg font-semibold text-gray-800">Products ({allProducts.length})</h3>
+                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm w-full"
+                                />
+                            </div>
+                            <div className="relative flex items-center gap-2">
+                                <select
+                                    value={selectedSchool}
+                                    onChange={handleSchoolChange}
+                                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md shadow-sm"
+                                >
+                                    <option value="">All Schools</option>
+                                    {schools.map(school => (
+                                        <option key={school.id} value={school.id}>
+                                            {school.short_name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {/* Toggle: Show Discounted Products */}
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowDiscountedProducts(prev => !prev); setCurrentPage(1); }}
+                                    className={`px-3 py-2 rounded-md border transition-colors text-sm ${showDiscountedProducts ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                                    title="Toggle discounted products"
+                                >
+                                    Discounted
+                                </button>
+
+                                {/* Toggle: Show Featured Products */}
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowFeaturedProducts(prev => !prev); setCurrentPage(1); }}
+                                    className={`px-3 py-2 rounded-md border transition-colors text-sm ${showFeaturedProducts ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                                    title="Toggle featured products"
+                                >
+                                    Featured
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 mb-8">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1 || loading}
+                                className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-gray-700">Page {currentPage} of {totalPages}</span>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages || loading}
+                                className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                     {loading ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
@@ -486,14 +635,30 @@ export default function AllProductsPage() {
                                             onBlur={(e) => handleProductPriceChange(product.id, e.currentTarget.textContent || '')}
                                             suppressContentEditableWarning={true}
                                         >
-                                            ₦{product.product_price}
+                                            {product.product_price}
                                         </p>
-                                        {/* <p className="text-gray-700 mt-2">₦{product.product_price}</p> */}
+
+                                        {/* Discount price (editable) */}
+                                        <p
+                                            className="text-sm text-gray-500 mt-1 px-2 py-1 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                            contentEditable={true}
+                                            onBlur={(e) => handleProductDiscountPriceChange(product.id, e.currentTarget.textContent || '')}
+                                            suppressContentEditableWarning={true}
+                                        >
+                                            {product.discount_price ? product.discount_price : 'No discount'}
+                                        </p>
                                         <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
                                             {product.is_available ? (
                                                 <><CheckCircle className="w-4 h-4 text-green-500" /> Available</>
                                             ) : (
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
+                                            )}
+                                        </p>
+                                        <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
+                                            {product.is_featured ? (
+                                                <><CheckCircle className="w-4 h-4 text-green-500" /> Featured</>
+                                            ) : (
+                                                <><AlertCircle className="w-4 h-4 text-red-500" /> Not Featured</>
                                             )}
                                         </p>
                                         <div className="flex flex-col gap-2 mt-4 w-full">
@@ -506,11 +671,20 @@ export default function AllProductsPage() {
                                             <button
                                                 onClick={() => handleToggleAvailability(product)}
                                                 className={`w-full py-2 rounded-md transition-colors ${product.is_available
-                                                        ? 'bg-red-500 text-white hover:bg-red-600'
-                                                        : 'bg-green-500 text-white hover:bg-green-600'
+                                                    ? 'bg-red-500 text-white hover:bg-red-600'
+                                                    : 'bg-green-500 text-white hover:bg-green-600'
                                                     }`}
                                             >
                                                 {product.is_available ? 'Set Unavailable' : 'Set Available'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleToggleFeatured(product)}
+                                                className={`w-full py-2 rounded-md transition-colors ${product.is_featured
+                                                    ? 'bg-red-500 text-white hover:bg-red-600'
+                                                    : 'bg-green-500 text-white hover:bg-green-600'
+                                                    }`}
+                                            >
+                                                {product.is_featured ? 'Set Unfeatured' : 'Set Featured'}
                                             </button>
                                             <button
                                                 onClick={() => handleUpdateEmbedding(product)}
@@ -525,6 +699,26 @@ export default function AllProductsPage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 mt-8">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1 || loading}
+                                className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-gray-700">Page {currentPage} of {totalPages}</span>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages || loading}
+                                className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
                         </div>
                     )}
                 </div>
