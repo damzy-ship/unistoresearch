@@ -16,6 +16,7 @@ import ReviewForm from '../components/ReviewForm';
 // import RealTimeStatusBar from '../components/RealTimeFeed/RealTimeStatusBar';
 // import CreateRealtimeModal from '../components/RealTimeFeed/CreateRealtimeModal';
 import { useTheme } from '../hooks/useTheme';
+import { Product } from '../lib/supabase';
 import { Toaster } from 'sonner';
 import { supabase } from '../lib/supabase';
 import PaymentModal from '../components/Payment/PaymentModal';
@@ -23,6 +24,7 @@ import ProductSearchComponent from '../components/ProductSearchComponent';
 // imports for embedding utilities were removed because they're not used in this file
 import MerchantCategoriesGrid from '../components/MerchantCategoriesGrid';
 import HorizontalProductList from '../components/HorizontalProductList';
+import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
@@ -51,9 +53,11 @@ export default function HomePage() {
   const [session, setSession] = useState<any>(null);
   const [, setUserType] = useState<string | null>(null);
 
-  const [selectedSchoolId, setSelectedSchoolId] = useState(null);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
 
   const [showConfirmUniversityModal, setShowConfirmUniversityModal] = useState(false);
+  const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
+  const [pendingContactProduct, setPendingContactProduct] = useState<Partial<Product> | null>(null);
 
   // React.useEffect(() => {
   //   try {
@@ -89,7 +93,7 @@ export default function HomePage() {
   // }, []);
 
 
-  useEffect(() => {
+    useEffect(() => {
     const checkAuthAndFetchUser = async () => {
       // Get initial session
       const { data: { session } } = await supabase.auth.getSession();
@@ -97,7 +101,7 @@ export default function HomePage() {
       setUserIsAuthenticated(!!session);
 
       if (session?.user) {
-        try {
+  try {
           const { data: visitor } = await supabase
             .from('unique_visitors')
             .select('user_type, school_id')
@@ -147,12 +151,24 @@ export default function HomePage() {
 
     checkAuthAndFetchUser();
 
+    const onPending = (e: Event) => {
+      // event detail contains the product
+      // types are not strict here
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const detail = (e as CustomEvent).detail as any;
+      setPendingContactProduct(detail);
+      setShowConfirmContactModal(true);
+    };
+
+    window.addEventListener('pending-contact-available', onPending as EventListener);
+
     // Listen for payment modal open event
     const handlePaymentModalOpen = () => setShowPaymentModal(true);
     window.addEventListener('open-payment-modal', handlePaymentModalOpen);
 
     return () => {
       window.removeEventListener('open-payment-modal', handlePaymentModalOpen);
+      window.removeEventListener('pending-contact-available', onPending as EventListener);
     };
   }, []);
 
@@ -254,7 +270,27 @@ export default function HomePage() {
   const handleAuthSuccess = () => {
     // After successful authentication, proceed with the search
     handleSearchRequest({ preventDefault: () => { } } as React.FormEvent);
+    // check if there is a pending contact product and if so the ConfirmContactModal will be shown by effect
   };
+
+  // Check for pending contact product when userIsAuthenticated changes to true
+  useEffect(() => {
+    if (!userIsAuthenticated) return;
+    const raw = localStorage.getItem('pending_contact_product');
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        // open confirm modal by dispatching a custom event or local state; we'll use local state below
+        // store it in localStorage is enough; we'll use a small state to trigger the modal
+        setShowAuthModal(false);
+        // create an event so other components/pages can show confirm modal if needed
+        const ev = new CustomEvent('pending-contact-available', { detail: parsed });
+        window.dispatchEvent(ev);
+      } catch (e) {
+        localStorage.removeItem('pending_contact_product');
+      }
+    }
+  }, [userIsAuthenticated]);
 
 
 
@@ -323,6 +359,7 @@ export default function HomePage() {
               <HorizontalProductList
                 showFeatured={true}
                 schoolId={selectedSchoolId}
+                userIsAuthenticated={userIsAuthenticated}
                 categoryName="Featured Products" />
 
               <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
@@ -334,6 +371,7 @@ export default function HomePage() {
               <HorizontalProductList
                 categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
                 schoolId={selectedSchoolId}
+                userIsAuthenticated={userIsAuthenticated}
                 categoryName="Apparel & Clothing" />
 
               <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
@@ -346,6 +384,7 @@ export default function HomePage() {
               <HorizontalProductList
                 categoryId="09e9cc32-b75e-4138-9aa6-7dbf6bb7a756"
                 schoolId={selectedSchoolId}
+                userIsAuthenticated={userIsAuthenticated}
                 categoryName="Bags & Luggage" />
 
               <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
@@ -481,6 +520,13 @@ export default function HomePage() {
             isOpen={showAuthModal}
             onClose={() => setShowAuthModal(false)}
             onSuccess={handleAuthSuccess}
+          />
+
+          <ConfirmContactModal
+            isOpen={showConfirmContactModal}
+            product={pendingContactProduct || undefined}
+            onClose={() => { setShowConfirmContactModal(false); setPendingContactProduct(null); localStorage.removeItem('pending_contact_product'); }}
+            onConfirm={() => { setShowConfirmContactModal(false); setPendingContactProduct(null); localStorage.removeItem('pending_contact_product'); }}
           />
 
           {userIsAuthenticated && (

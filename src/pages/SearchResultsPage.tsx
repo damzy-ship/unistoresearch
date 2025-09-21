@@ -5,23 +5,48 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useTheme } from '../hooks/useTheme';
+import { useState, useEffect } from 'react';
+import { isAuthenticated } from '../hooks/useTracking';
+import ConfirmContactModal from '../components/ConfirmContactModal';
 // no local state needed; ContactSellerButton manages auth flow
 import ContactSellerButton from '../components/ContactSellerButton';
+import ContactSellerLink from '../components/ContactSellerLink';
 import { Product } from '../lib/supabase';
 
 function SearchResultsPage() {
   const location = useLocation();
   const { currentTheme } = useTheme();
   const { products, searchQuery } = location.state as { products: Product[], searchQuery: string };
-  // contact/auth handled by ContactSellerButton
+  const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingProduct, setPendingProduct] = useState<Partial<Product>|null>(null);
 
-  // const getWhatsappLink = (phoneNumber: string | undefined): string => {
-  //   if (!phoneNumber) return '#';
-  //   const cleanNumber = phoneNumber.replace(/\s/g, '');
-  //   return `https://wa.me/${cleanNumber}`;
-  // };
-
-  // contact/auth handled by ContactSellerButton
+  useEffect(() => {
+    const check = async () => {
+      const auth = await isAuthenticated();
+      setUserIsAuthenticated(auth);
+      if (auth) {
+        const raw = localStorage.getItem('pending_contact_product');
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            setPendingProduct(parsed);
+            setShowConfirmModal(true);
+          } catch {
+            localStorage.removeItem('pending_contact_product');
+          }
+        }
+      }
+    };
+    check();
+    const onPending = (e: Event) => {
+      const detail = (e as CustomEvent).detail as any;
+      setPendingProduct(detail);
+      setShowConfirmModal(true);
+    };
+    window.addEventListener('pending-contact-available', onPending as EventListener);
+    return () => window.removeEventListener('pending-contact-available', onPending as EventListener);
+  }, []);
 
   return (
     <div className="min-h-screen p-6 sm:p-8 font-sans"
@@ -80,9 +105,15 @@ function SearchResultsPage() {
                     {product.is_available ? 'In Stock' : 'Out of Stock'}
                   </p>
                   {product.phone_number && (
-                    <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
-                      Get Now
-                    </ContactSellerButton>
+                    userIsAuthenticated ? (
+                      <ContactSellerLink product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                        Get Now
+                      </ContactSellerLink>
+                    ) : (
+                      <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                        Get Now
+                      </ContactSellerButton>
+                    )
                   )}
                 </div>
               </div>
@@ -94,6 +125,12 @@ function SearchResultsPage() {
       </div>
 
       {/* Phone Authentication now handled inside ContactSellerButton */}
+      <ConfirmContactModal
+        isOpen={showConfirmModal}
+        product={pendingProduct || undefined}
+        onClose={() => { setShowConfirmModal(false); setPendingProduct(null); localStorage.removeItem('pending_contact_product'); }}
+        onConfirm={() => { setShowConfirmModal(false); setPendingProduct(null); localStorage.removeItem('pending_contact_product'); }}
+      />
     </div>
   );
 }
