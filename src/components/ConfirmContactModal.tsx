@@ -52,7 +52,7 @@ const ConfirmContactModal: React.FC<ConfirmContactModalProps> = ({ isOpen, produ
                             localStorage.removeItem('pending_contact_product');
                         }}
                     >
-                        Contact Seller
+                        Get Now
                     </ContactSellerLink>
                 </div>
             </div>
