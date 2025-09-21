@@ -4,7 +4,7 @@ import StaticRealTimeViewer from '../components/RealTimeFeed/StaticRealTimeViewe
 import { useTheme } from '../hooks/useTheme';
 import type { RealTimeProduct } from '../lib/realTimeService';
 import { supabase } from '../lib/supabase';
-import type { Merchant } from '../lib/supabase';
+import type { Product } from '../lib/supabase';
 import ProductSearchComponent from '../components/ProductSearchComponent';
 
 // Partial merchant shape returned by lightweight select
@@ -14,23 +14,6 @@ interface MerchantPartial {
   phone_number?: string | null;
   email?: string | null;
   school_name?: string | null;
-}
-
-interface Product {
-  id?: string;
-  title?: string;
-  description?: string;
-  product_description?: string;
-  product_price?: string | number;
-  is_available?: boolean;
-  image_urls?: string[];
-  media_url?: string;
-  media_type?: string;
-  product_category?: string;
-  location?: string;
-  merchant_id?: string;
-  merchant_name?: string;
-  merchant?: Merchant;
 }
 
 export default function ProductSearchPage() {
@@ -69,14 +52,14 @@ export default function ProductSearchPage() {
     // Normalize results into RealTimeProduct shape for the viewer
   const normalized: RealTimeProduct[] = results.map((r, i) => ({
       id: r.id || `ps-${i}`,
-      title: r.product_description || r.title || 'Product',
-      description: r.description || r.product_description || '',
-      media_url: (r.image_urls && r.image_urls[0]) || r.media_url || '',
-      media_type: r.media_type || (r.image_urls && r.image_urls.length ? 'image' : 'image'),
+      title: r.product_description || 'Product',
+      description: r.product_description || '',
+      media_url: (r.image_urls && r.image_urls[0]) || '',
+      // media_type: r.media_type || (r.image_urls && r.image_urls.length ? 'image' : 'image'),
       is_text_post: false,
       price: Number(r.product_price) || 0,
-      location: r.location || '',
-      category: r.product_category || '',
+      // location: r.location || '',
+      // category: r.product_category || '',
       expires_at: new Date().toISOString(),
   merchant: (r as Product & { merchant?: MerchantPartial }).merchant || (r.merchant_id ? merchantsById[r.merchant_id] || { id: r.merchant_id, full_name: r.merchant_name || '' } : undefined)
     } as RealTimeProduct));

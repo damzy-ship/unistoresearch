@@ -65,9 +65,8 @@ export interface Product {
     is_featured?: boolean;
     search_description?: string;
     embedding: number[];
-    created_at: string;
-    merchant_id: string;
-    
+    created_at?: string;
+    merchant_id?: string;
 }
 
 export interface RequestLog {

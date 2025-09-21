@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { Loader } from 'lucide-react';
 import ContactSellerButton from './ContactSellerButton';
+import ContactSellerLink from './ContactSellerLink';
 
 
 // Define the props interface
@@ -17,9 +18,10 @@ interface HorizontalProductListProps {
     schoolId: string;
     categoryName?: string;
     showFeatured?: boolean; // Optional prop to show featured products
+    userIsAuthenticated?: boolean;
 }
 
-const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryId, schoolId, categoryName, showFeatured }) => {
+const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryId, schoolId, categoryName, showFeatured, userIsAuthenticated }) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -158,9 +160,16 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                         {product.is_available ? 'In Stock' : 'Out of Stock'}
                                     </p> */}
                                     {product.phone_number && (
-                                        <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
-                                            Get Now
-                                        </ContactSellerButton>
+                                        userIsAuthenticated ? (
+                                            // Render as link for authenticated users
+                                                <ContactSellerLink product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                                                    Get Now
+                                                </ContactSellerLink>
+                                        ) : (
+                                            <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                                                Get Now
+                                            </ContactSellerButton>
+                                        )
                                     )}
                                 </div>
                             </div>

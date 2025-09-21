@@ -13,19 +13,19 @@ interface ContactSellerButtonProps {
     children?: React.ReactNode;
 }
 
-const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, className, children }) => {
+const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, children }) => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [pendingProduct, setPendingProduct] = useState<Partial<Product> | null>(null);
     const { currentTheme } = useTheme();
 
+
+    const message = `Hi! I'm looking for the following from ${product.school_short_name || ''} University: ${product.product_description || ''}`;
     const contactSeller = async (p: Partial<Product>) => {
         if (!p.phone_number) return;
-        const message = `Hi! I'm looking for the following from ${p.school_short_name || ''} University: ${p.product_description || ''}`;
         const whatsappUrl = `https://wa.me/${p.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-        // Open WhatsApp link
+        // open in new tab
         window.open(whatsappUrl, '_blank');
 
-        // Record analytics (best-effort)
         try {
             // Try to get the authenticated user id if available
             // const { data: userData } = await supabase.auth.getUser();
@@ -61,6 +61,12 @@ const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, clas
     const handleClick = async () => {
         const userAuthenticated = await isAuthenticated();
         if (!userAuthenticated) {
+            // store pending product in localStorage so other components can access it
+            try {
+                localStorage.setItem('pending_contact_product', JSON.stringify(product || {}));
+            } catch (e) {
+                console.warn('Failed to store pending product', e);
+            }
             setPendingProduct(product);
             setShowAuthModal(true);
             return;
@@ -69,8 +75,14 @@ const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, clas
     };
 
     const handleAuthSuccess = () => {
+        // After successful auth, parent components will pick up pending product from localStorage
         if (pendingProduct) {
-            contactSeller(pendingProduct);
+            try {
+                const ev = new CustomEvent('pending-contact-available', { detail: pendingProduct });
+                window.dispatchEvent(ev);
+            } catch (e) {
+                console.warn('Failed to dispatch pending-contact event', e);
+            }
             setPendingProduct(null);
         }
         setShowAuthModal(false);
@@ -83,7 +95,7 @@ const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, clas
 
     return (
         <>
-            <button onClick={handleClick} className={className || `flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+            <button onClick={handleClick} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
                 {children || 'Get Now'}
             </button>
 

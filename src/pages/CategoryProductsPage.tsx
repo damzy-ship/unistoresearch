@@ -7,6 +7,9 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import ContactSellerButton from '../components/ContactSellerButton';
+import ConfirmContactModal from '../components/ConfirmContactModal';
+import ContactSellerLink from '../components/ContactSellerLink';
+import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
 
 
@@ -20,8 +23,49 @@ const CategoryProductsPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const { currentTheme } = useTheme();
+    const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [pendingProduct, setPendingProduct] = useState<Partial<Product> | null>(null);
 
     useEffect(() => {
+        const checkAuth = async () => {
+            const auth = await isAuthenticated();
+            setUserIsAuthenticated(auth);
+            if (auth) {
+                // if there's a pending product stored, show confirm modal
+                const raw = localStorage.getItem('pending_contact_product');
+                if (raw) {
+                    try {
+                        const parsed = JSON.parse(raw);
+                        setPendingProduct(parsed);
+                        setShowConfirmModal(true);
+                    } catch {
+                        console.warn('Invalid pending contact product in localStorage');
+                        localStorage.removeItem('pending_contact_product');
+                    }
+                }
+            }
+        };
+        checkAuth();
+        const onPending = (e: Event) => {
+            const detail = (e as CustomEvent).detail as Partial<Product>;
+            setPendingProduct(detail);
+            setShowConfirmModal(true);
+        };
+        window.addEventListener('pending-contact-available', onPending as EventListener);
+        // cleanup for this effect
+        return () => {
+            window.removeEventListener('pending-contact-available', onPending as EventListener);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!categoryId || !schoolId) {
+            setError('Missing category or school ID.');
+            setLoading(false);
+            return;
+        }
+
         const fetchProductsByCategory = async () => {
             if (!categoryId || !schoolId) {
                 setError('Missing category or school ID.');
@@ -131,15 +175,33 @@ const CategoryProductsPage: React.FC = () => {
                                         {product.is_available ? 'In Stock' : 'Out of Stock'}
                                     </p>
                                     {product.phone_number && (
-                                        <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
-                                            Get Now
-                                        </ContactSellerButton>
+                                        userIsAuthenticated ? (
+                                            <ContactSellerLink product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                                                Get Now
+                                            </ContactSellerLink>
+                                        ) : (
+                                            <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                                                Get Now
+                                            </ContactSellerButton>
+                                        )
                                     )}
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
+
+                <ConfirmContactModal
+                    isOpen={showConfirmModal}
+                    product={pendingProduct || undefined}
+                    onClose={() => { setShowConfirmModal(false); setPendingProduct(null); localStorage.removeItem('pending_contact_product'); }}
+                    onConfirm={() => {
+                        // nothing special here other than close
+                        setShowConfirmModal(false);
+                        setPendingProduct(null);
+                        localStorage.removeItem('pending_contact_product');
+                    }}
+                />
             </div>
 
             {/* Auth handled inside ContactSellerButton */}
