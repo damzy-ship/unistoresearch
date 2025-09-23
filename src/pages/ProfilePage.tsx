@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2, Store } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-// import { getUserId } from '../hooks/useTracking';
-import { useTheme, Theme, BackgroundTexture } from '../hooks/useTheme';
+import { useTheme } from '../hooks/useTheme';
 import ThemeCard from '../components/ThemeCard';
 import AIThemeGenerator from '../components/AIThemeGenerator';
+import EditBrandNameModal from '../components/EditBrandNameModal';
 
 interface UserProfile {
   full_name: string;
   phone_number: string;
   created_at: string;
   visit_count: number;
+  user_type: 'customer' | 'merchant';
+  brand_name: string | null;
 }
 
 export default function ProfilePage() {
@@ -20,6 +22,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'themes' | 'textures' | 'ai'>('themes');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -28,14 +31,12 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      // const userId = await getUserId();
-      
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
         const { data: visitorData, error } = await supabase
           .from('unique_visitors')
-          .select('*')
+          .select('*, user_type, brand_name')
           .eq('auth_user_id', session.user.id)
           .single();
 
@@ -46,10 +47,10 @@ export default function ProfilePage() {
             full_name: visitorData.full_name || 'User',
             phone_number: visitorData.phone_number || '',
             created_at: visitorData.created_at,
-            visit_count: visitorData.visit_count || 0
+            visit_count: visitorData.visit_count || 0,
+            user_type: visitorData.user_type,
+            brand_name: visitorData.brand_name
           };
-
-
           
           setProfile(profileData);
         }
@@ -58,6 +59,26 @@ export default function ProfilePage() {
       console.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateBrandName = async (newBrandName: string) => {
+    if (!profile) return;
+    
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      const { error } = await supabase
+        .from('unique_visitors')
+        .update({ brand_name: newBrandName })
+        .eq('auth_user_id', session.user.id);
+      
+      if (error) {
+        console.error('Error updating brand name:', error);
+      } else {
+        setProfile({ ...profile, brand_name: newBrandName });
+        setIsModalOpen(false);
+      }
     }
   };
 
@@ -198,6 +219,41 @@ export default function ProfilePage() {
                   </p>
 
                   <div className="space-y-4">
+                    {/* Brand Name for Merchants */}
+                    {profile.user_type === 'merchant' && (
+                      <div 
+                        className="flex items-center gap-3 p-4 rounded-xl"
+                        style={{ backgroundColor: currentTheme.background }}
+                      >
+                        <Store 
+                          className="w-5 h-5"
+                          style={{ color: currentTheme.primary }}
+                        />
+                        <div className="flex-1 text-left">
+                          <p 
+                            className="text-sm font-medium"
+                            style={{ color: currentTheme.textSecondary }}
+                          >
+                            Brand Name
+                          </p>
+                          <p style={{ color: currentTheme.text }}>
+                            {profile.brand_name || 'Not set'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setIsModalOpen(true)}
+                          className={`text-sm px-3 py-1 rounded-full font-medium transition-colors duration-200`}
+                          style={{
+                            color: currentTheme.primary,
+                            backgroundColor: currentTheme.primary + '10'
+                          }}
+                        >
+                          Change
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* User Info sections (Full Name, Phone, etc.) */}
                     <div 
                       className="flex items-center gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: currentTheme.background }}
@@ -287,7 +343,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Theme Customization Section */}
+          {/* Theme Customization Section (rest of the code is unchanged) */}
           <div className="lg:col-span-2">
             <div 
               className="rounded-2xl p-8 shadow-lg border transition-colors duration-300"
@@ -421,6 +477,16 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      
+      {/* Modal for changing brand name */}
+      {isModalOpen && (
+        <EditBrandNameModal 
+          currentBrandName={profile?.brand_name || ''}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleUpdateBrandName}
+          currentTheme={currentTheme}
+        />
+      )}
     </div>
   );
 }
