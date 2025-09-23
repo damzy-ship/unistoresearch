@@ -277,7 +277,7 @@ export default function ProfilePage() {
                           </p>
                         </div>
                         <button
-                          onClick={() => setIsModalOpen(true)}
+                          onClick={() => setIsBrandModalOpen(true)}
                           className={`text-sm px-3 py-1 rounded-full font-medium transition-colors duration-200`}
                           style={{
                             color: currentTheme.primary,
