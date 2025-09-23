@@ -85,7 +85,7 @@ export default function MerchantVerifyPrompt() {
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 pr-3">
             <div>
               <h4 className="font-semibold text-sm">Verify your seller account</h4>
               <p className="text-xs text-gray-600">Merchants with unverified accounts must verify before 30th September or uploaded products will be removed.</p>
