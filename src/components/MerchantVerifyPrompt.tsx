@@ -90,9 +90,9 @@ export default function MerchantVerifyPrompt() {
               <h4 className="font-semibold text-sm">Verify your seller account</h4>
               <p className="text-xs text-gray-600">Merchants with unverified accounts must verify before 30th September or uploaded products will be removed.</p>
             </div>
-            <button onClick={handleClose} className="p-1 rounded-md text-gray-400 hover:text-gray-700">
+            {/* <button onClick={handleClose} className="p-1 rounded-md text-gray-400 hover:text-gray-700">
               <X className="w-4 h-4" />
-            </button>
+            </button> */}
           </div>
 
           <div className="mt-3 flex gap-2">
