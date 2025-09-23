@@ -8,6 +8,7 @@ import { findMerchantsForRequest, MerchantWithCategories } from '../lib/gemini';
 import ReviewSlider from '../components/ReviewSlider';
 // import UniversitySelector from '../components/UniversitySelector';
 import RatingPrompt from '../components/RatingPrompt';
+import MerchantVerifyPrompt from '../components/MerchantVerifyPrompt';
 import UserGreeting from '../components/UserGreeting';
 import AuthModal from '../components/AuthModal';
 import Header from '../components/Header';
@@ -286,7 +287,7 @@ export default function HomePage() {
         // create an event so other components/pages can show confirm modal if needed
         const ev = new CustomEvent('pending-contact-available', { detail: parsed });
         window.dispatchEvent(ev);
-      } catch (e) {
+      } catch {
         localStorage.removeItem('pending_contact_product');
       }
     }
@@ -514,6 +515,9 @@ export default function HomePage() {
 
           {/* Rating Prompt */}
           <RatingPrompt />
+
+          {/* Merchant Verify Prompt */}
+          <MerchantVerifyPrompt />
 
           {/* Auth Modal */}
           <AuthModal
