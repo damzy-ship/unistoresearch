@@ -79,17 +79,17 @@ export default function MerchantVerifyPrompt() {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 max-w-md w-full">
+    <div className="fixed opacity-90 bottom-6 left-6 z-50 max-w-md w-full">
       <div className="rounded-2xl shadow-xl border bg-white p-4 flex items-start gap-3" style={{ borderColor: currentTheme.primary + '20' }}>
         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-white">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center justify-between gap-3 pr-3">
-            <div>
-              <h4 className="font-semibold text-sm">Verify your seller account</h4>
+          <div className="py-1 pr-3">
+            
+              <h4 className="font-semibold text-sm mb-1">Verify your seller account</h4>
               <p className="text-xs text-gray-600">Merchants with unverified accounts must verify before 30th September or uploaded products will be removed.</p>
-            </div>
+            
             {/* <button onClick={handleClose} className="p-1 rounded-md text-gray-400 hover:text-gray-700">
               <X className="w-4 h-4" />
             </button> */}
