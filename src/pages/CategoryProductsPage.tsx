@@ -77,7 +77,7 @@ const CategoryProductsPage: React.FC = () => {
                 setLoading(true);
                 setError(null);
 
-                const { data, error: functionError } = await supabase.functions.invoke('smooth-service', {
+                const { data, error: functionError } = await supabase.functions.invoke('product-category-fetch', {
                     body: {
                         category_id: categoryId,
                         school_id: schoolId

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, Users, MessageSquare, Store, Tag, School, CreditCard, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, UniqueVisitor, RequestLog, Merchant } from '../lib/supabase';
@@ -6,11 +6,8 @@ import LoginForm from './admin/LoginForm';
 import OverviewTab from './admin/OverviewTab';
 import VisitorsTab from './admin/VisitorsTab';
 import RequestsTab from './admin/RequestsTab';
-import MerchantsTab from './admin/MerchantsTab';
 import CategoriesTab from './admin/CategoriesTab';
 import SchoolsTab from './admin/SchoolsTab';
-import BillingTab from './admin/BillingTab';
-import RealTimeProductsTab from './admin/RealTimeProductsTab';
 import InvoicesTab from './admin/InvoicesTab';
 
 import { Toaster } from 'sonner';
@@ -57,7 +54,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
-    
+
     if (tabParam && ['overview', 'visitors', 'requests', 'merchants', 'categories', 'schools', 'real-time', 'invoices'].includes(tabParam)) {
       setActiveTab(tabParam as TabId);
     }
@@ -111,11 +108,11 @@ export default function AdminDashboard() {
 
       // Calculate stats
       const today = new Date().toISOString().split('T')[0];
-      const todayVisitors = visitorsData?.filter(v => 
+      const todayVisitors = visitorsData?.filter(v =>
         v.first_visit.startsWith(today)
       ).length || 0;
-      
-      const todayRequests = requestsData?.filter(r => 
+
+      const todayRequests = requestsData?.filter(r =>
         r.created_at.startsWith(today)
       ).length || 0;
 
@@ -137,7 +134,7 @@ export default function AdminDashboard() {
           return Number(a) || 0;
         } catch { return 0; }
       };
-      
+
       const { data: paidData } = await supabase
         .from('invoices')
         .select('invoice_amount', { count: 'exact' })
@@ -148,8 +145,8 @@ export default function AdminDashboard() {
         .select('invoice_amount', { count: 'exact' })
         .eq('invoice_status', 'collected');
 
-  const invoicePaidTotal = (paidData || []).reduce((s: number, r: unknown) => s + getAmt(r), 0);
-  const invoiceCollectedTotal = (collectedData || []).reduce((s: number, r: unknown) => s + getAmt(r), 0);
+      const invoicePaidTotal = (paidData || []).reduce((s: number, r: unknown) => s + getAmt(r), 0);
+      const invoiceCollectedTotal = (collectedData || []).reduce((s: number, r: unknown) => s + getAmt(r), 0);
       setStats({
         totalVisitors: visitorsData?.length || 0,
         totalRequests: requestsData?.length || 0,
@@ -159,9 +156,9 @@ export default function AdminDashboard() {
         todayRequests,
         totalMerchants: merchantsData?.length || 0,
         averageRating,
-  totalRatings,
-  invoicePaidTotal,
-  invoiceCollectedTotal
+        totalRatings,
+        invoicePaidTotal,
+        invoiceCollectedTotal
       });
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -212,24 +209,23 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Navigation Tabs */}
         <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl mb-6 sm:mb-8 overflow-x-auto">
-            {[
+          {[
             { id: 'overview', label: 'Overview', icon: TrendingUp },
             { id: 'visitors', label: 'Visitors', icon: Users },
             { id: 'requests', label: 'Requests', icon: MessageSquare },
-            { id: 'merchants', label: 'Merchants', icon: Store },
+            // { id: 'merchants', label: 'Merchants', icon: Store },
             { id: 'categories', label: 'Categories', icon: Tag },
             { id: 'schools', label: 'Schools', icon: School },
-              { id: 'invoices', label: 'Invoices', icon: CreditCard },
-              { id: 'real-time', label: 'Real-time', icon: Zap }
+            { id: 'invoices', label: 'Invoices', icon: CreditCard },
+            // { id: 'real-time', label: 'Real-time', icon: Zap }
           ].map(({ id, label, icon: Icon }) => (
             <button
-              key={id} 
+              key={id}
               onClick={() => handleTabChange(id as TabId)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
-                activeTab === id
+              className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${activeTab === id
                   ? 'bg-white text-orange-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span className="hidden sm:inline text-sm">{label}</span>
@@ -246,11 +242,10 @@ export default function AdminDashboard() {
             {activeTab === 'overview' && <OverviewTab stats={stats} />}
             {activeTab === 'visitors' && <VisitorsTab visitors={visitors} />}
             {activeTab === 'requests' && <RequestsTab requests={requests} onRefresh={fetchData} />}
-            {activeTab === 'merchants' && <MerchantsTab merchants={merchants} onRefresh={fetchData} />}
+            {/* {activeTab === 'merchants' && <MerchantsTab merchants={merchants} onRefresh={fetchData} />} */}
             {activeTab === 'categories' && <CategoriesTab />}
             {activeTab === 'schools' && <SchoolsTab />}
             {activeTab === 'invoices' && <InvoicesTab />}
-            {activeTab === 'real-time' && <RealTimeProductsTab />}
           </>
         )}
       </div>

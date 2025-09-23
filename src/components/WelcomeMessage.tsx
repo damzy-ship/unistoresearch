@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import AnimatedGreeting from './AnimatedGreeting';
@@ -10,7 +10,7 @@ interface WelcomeMessageProps {
 export default function WelcomeMessage({ className = '' }: WelcomeMessageProps) {
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState<string>('');
+  // const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
     const fetchUserAndGenerateMessage = async () => {
@@ -36,7 +36,7 @@ export default function WelcomeMessage({ className = '' }: WelcomeMessageProps) 
         
         const fullName = visitorData?.full_name || session.user.user_metadata?.full_name || '';
         const firstName = fullName ? fullName.split(' ')[0] : '';
-        setUserName(firstName);
+        // setUserName(firstName);
         
         // Generate welcome message
         const welcomeMessage = await generateWelcomeMessage(firstName);

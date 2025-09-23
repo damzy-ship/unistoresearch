@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for routin
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
 // import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
-import { History } from 'lucide-react';
+// import { History } from 'lucide-react';
 import { getMatchingCategoriesAndFeatures, transformDescriptionForEmbedding } from '../lib/generateEmbedding';
 
 function ProductSearchComponent() {

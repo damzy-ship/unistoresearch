@@ -5,12 +5,8 @@ import HomePage from './pages/HomePage';
 import PastRequestsPage from './pages/PastRequestsPage';
 import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
-import SellerDetailsPage from './pages/SellerDetailsPage';
 import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
-import BillingCallbackPage from './pages/BillingCallbackPage';
-import RealTimePage from './pages/RealTimePage';
-import CreateRealTimeProductPage from './pages/CreateRealTimeProductPage';
 import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
@@ -19,7 +15,6 @@ import InvoicesPage from './pages/InvoicesPage';
 import ViewInvoicePage from './pages/ViewInvoicePage';
 import PayMerchantPage from './pages/PayMerchantPage';
 import AnnouncementBar from './components/AnnouncementBar';
-import ProductSearchPage from './pages/ProductSearchPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
 import AllProductsPage from './pages/AllProductsPage';
@@ -44,13 +39,8 @@ function App() {
           <Route path="/sellers" element={<SellersPage />} />
           <Route path="/merchants" element={<PublicMerchantsPage />} />
           <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-          <Route path="/seller/:sellerId" element={<SellerDetailsPage />} />
-          <Route path="/billing/callback" element={<BillingCallbackPage />} />
-          <Route path="/real-time" element={<RealTimePage />} />
-          <Route path="/create-real-time-product" element={<CreateRealTimeProductPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/test-categories" element={<CategoryTest />} />
-          <Route path="/product-search" element={<ProductSearchPage />} />
           <Route path="/payment/:merchantId" element={<PaymentPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/pay-merchant" element={<PayMerchantPage />} />

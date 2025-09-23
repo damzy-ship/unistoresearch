@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Search, Filter, X, Check, Trash2, Award } from 'lucide-react';
+import { Star, Search, Filter, X, Trash2, Award } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import CustomDialog from './CustomDialog';
 import CustomAlert from './CustomAlert';

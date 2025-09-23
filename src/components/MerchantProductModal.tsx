@@ -2,48 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
+import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 
-// Reusable function to handle image upload, inspired by ProductGallery
-const uploadImageToSupabase = async (file, merchantId) => {
-    const fileExt = file.name.split('.').pop();
-    // Ensure unique file name to prevent conflicts
-    const fileName = `${merchantId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `product-images/${fileName}`;
 
-    // Upload file to Supabase storage
-    const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-    if (uploadError) {
-        throw new Error(`Error uploading image: ${uploadError.message}`);
-    }
-
-    // Get the public URL
-    const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-    return publicUrl;
-};
-
-// Reusable function to delete image from Supabase Storage
-const deleteImageFromSupabase = async (imageUrl) => {
-    const urlParts = imageUrl.split('/');
-    // Extract the filename with its folder from the public URL
-    const fileName = urlParts.slice(urlParts.indexOf('product-images') + 1).join('/');
-
-    if (fileName) {
-        const { error: storageError } = await supabase.storage
-            .from('product-images')
-            .remove([fileName]);
-
-        if (storageError) {
-            console.warn('Error deleting image from storage:', storageError);
-            // We can continue as the database record might be the primary source of truth
-        }
-    }
-};
 
 interface Product {
     id: string;
@@ -152,7 +113,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
 
             // 2. Upload images
             setUploadingImages(true);
-            const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId))) : [];
+            const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId, 'product-images', 'product-images'))) : [];
             setUploadingImages(false);
 
             // 3. Insert the new product with the embedding
@@ -208,7 +169,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
 
             // 2. Upload new images
             setUploadingImages(true);
-            const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId))) : [];
+            const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId, 'product-images', 'product-images'))) : [];
             setUploadingImages(false);
 
             const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newUrls];
@@ -248,7 +209,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
 
         try {
             // Use the reusable delete function
-            await Promise.all(imageUrls.map(url => deleteImageFromSupabase(url)));
+            await Promise.all(imageUrls.map(url => deleteImageFromSupabase(url, 'product-images')));
 
             const { error } = await supabase
                 .from('merchant_products')
@@ -285,7 +246,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
 
         // Delete from Supabase Storage and database
         try {
-            await deleteImageFromSupabase(imageUrlToRemove);
+            await deleteImageFromSupabase(imageUrlToRemove, 'product-images');
             const { error: dbError } = await supabase
                 .from('merchant_products')
                 .update({ image_urls: updatedUrls })
