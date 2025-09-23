@@ -47,6 +47,8 @@ export interface UniqueVisitor {
   created_at: string;
   user_type: string;
   school_id: string;
+  brand_name?: string;
+  email?: string;
 }
 
 export interface Product {
@@ -67,6 +69,7 @@ export interface Product {
     embedding: number[];
     created_at?: string;
     merchant_id?: string;
+    brand_name?: string;
 }
 
 export interface RequestLog {

@@ -1,367 +1,262 @@
 [
   {
-    "id": "2c370988-b7e0-46cd-b136-5ebe77076048",
-    "product_categories": ["home organization", "furniture", "storage solutions", "home decor", "bathroom accessories"],
-    "product_features": ["organization", "neat keep", "item organization", "home use", "functional"]
+    "id": "843a4da9-0b30-4f3b-8336-bd4dd6ce1417",
+    "product_categories": ["cakes", "desserts", "mini cakes", "celebration cakes", "foil cakes"],
+    "product_features": ["Ready to enjoy", "foil wrapping", "Tasty", "sweet treat", "individual dessert"]
   },
   {
-    "id": "a8e24e77-5676-4902-9882-69d9ebe8a0bc",
-    "product_categories": ["beauty tools", "skincare accessories", "personal care", "women's accessories", "facial treatment"],
-    "product_features": ["gentle massage", "skin feeling", "beauty enhancement", "smooth face", "facial treatment"]
+    "id": "63480489-2fb0-4010-a52b-12f5d2ab44ef",
+    "product_categories": ["Hair Accessories", "hair combs", "beauty tools", "Women's Accessories", "hair care kits"],
+    "product_features": ["wide teeth", "gentle untangling", "hair styling", "hair care tool", "women's design"]
   },
   {
-    "id": "c0add589-ba2d-47f4-91a3-2b870bcb2c41",
-    "product_categories": ["home decor", "handmade decor", "decorative items", "craft supplies", "artificial plants"],
-    "product_features": ["decoration", "artificial rose", "beautiful decoration", "home enhancement", "natural addition"]
+    "id": "b871cd62-c86f-4166-a2c0-b916eab02590",
+    "product_categories": ["Women's Clothing", "Casual Tops", "fashion tops", "upper body wear", "everyday wear"],
+    "product_features": ["black color", "sizes 8-12", "upper body wear", "women's design", "comfy top"]
   },
   {
-    "id": "ba139e5e-048c-4b43-b42c-278f25a1b9ad",
-    "product_categories": ["men's fragrances", "luxury perfumes", "male accessories", "fashion fragrances", "all-day scent"],
-    "product_features": ["masculine scent", "long-lasting scent", "luxury scent", "perfume", "nice smell"]
+    "id": "a20cfda4-2654-4950-be68-38c7e6c0c0da",
+    "product_categories": ["educational resource", "books", "stationery", "craft supplies", "office supplies"],
+    "product_features": ["map making", "study area", "educational", "drawing", "teaching resource"]
   },
   {
-    "id": "ea103abc-2154-4a3b-8e46-d5c880f960e0",
-    "product_categories": ["photography equipment", "content creation", "tech accessories", "mobile accessories", "video lighting"],
-    "product_features": ["bright look", "photo enhancement", "video lighting", "electronic", "handheld device"]
+    "id": "c95393c5-83f5-4031-b902-09560abed84d",
+    "product_categories": ["Mobile Phones", "Smartphones", "Electronics", "Communication Devices", "unlocked phones"],
+    "product_features": ["iPhone", "128GB storage", "physical SIM", "used model", "calls and apps"]
   },
   {
-    "id": "73283d80-8e8b-4795-87ed-6b32de33b483",
-    "product_categories": ["personal care", "grooming tools", "men's accessories", "hair care", "rechargeable"],
-    "product_features": ["rechargeable", "hair cutting", "grooming", "personal care", "electricity use"]
+    "id": "372f2a52-7bae-462f-855a-e49e7d374959",
+    "product_categories": ["makeup", "beauty products", "cosmetics", "special occasions", "Women's Accessories"],
+    "product_features": ["face application", "special look", "Thanksgiving", "beauty enhancement", "women's design"]
   },
   {
-    "id": "5562ef2d-fa13-4e3a-8b02-59b794f57c38",
-    "product_categories": ["lighting", "LED decorations", "portable gadgets", "home decor", "tech accessories"],
-    "product_features": ["LED glow", "portable", "colorful", "pocket size", "electronic"]
+    "id": "3beb615b-fdf9-4067-80ad-dbb164fd9b36",
+    "product_categories": ["Wigs", "Human Hair Wigs", "beauty products", "hair replacements", "Women's Wigs"],
+    "product_features": ["100% human hair", "hairstyle change", "head covering", "real human hair", "wearable hairpiece"]
   },
   {
-    "id": "86b41fc9-6668-40ca-822a-efa7952a4ef4",
-    "product_categories": ["phone accessories", "mobile accessories", "photography equipment", "tech accessories", "content creation"],
-    "product_features": ["phone holding", "extends reach", "wide angle", "handheld device", "group photos"]
+    "id": "22f65ff8-30c6-4b55-b935-4cd45efd9990",
+    "product_categories": ["Women's Clothing", "Casual Tops", "fashion tops", "turtle neck", "upper body wear"],
+    "product_features": ["brown color", "turtle neck", "size 6-8", "high neckline", "women's design"]
   },
   {
-    "id": "181d0f03-97d2-4271-9b23-ca82075fc7e9",
-    "product_categories": ["home decor", "decorative items", "wall decor", "beauty accessories", "aesthetic decor"],
-    "product_features": ["decoration", "adhesive", "mirror enhancement", "aesthetic", "50 pieces"]
+    "id": "64301ce4-7feb-44ab-8e13-768ec4bb2c0c",
+    "product_categories": ["Women's Clothing", "Casual Pants", "denim pants", "jeans", "comfort pants"],
+    "product_features": ["brown color", "denim material", "sizes 8b-12", "comfortable", "women's design"]
   },
   {
-    "id": "f9c77abb-ccc4-4abb-a9eb-cffc931a382d",
-    "product_categories": ["food snacks", "meat products", "spicy food", "street food", "nigerian cuisine"],
-    "product_features": ["spicy", "ginger flavor", "jerky", "crunchy", "tasty"]
+    "id": "337a41d6-6d68-498d-b5ec-31a59e516765",
+    "product_categories": ["Women's Clothing", "Casual Pants", "denim pants", "comfort jeans", "high waist"],
+    "product_features": ["blue color", "high waist", "boyfriend style", "comfy", "size 6b-8"]
   },
   {
-    "id": "d9821408-fa57-473f-9b06-4dcab23c5700",
-    "product_categories": ["cleaning supplies", "shoe care", "personal care", "home organization", "travel accessories"],
-    "product_features": ["cleaning", "shoe maintenance", "80 pieces", "convenient", "quick cleaning"]
+    "id": "3d5522bd-a10d-40ee-8ffc-19b0df975b7a",
+    "product_categories": ["Hair Accessories", "wig brushes", "beauty tools", "hair care", "Women's Accessories"],
+    "product_features": ["wig care", "flexible design", "gentle untangling", "octopus shape", "women's design"]
   },
   {
-    "id": "8057d958-08c2-4f78-a4cf-6565233e5c1a",
-    "product_categories": ["home organization", "wall accessories", "home improvement", "bathroom accessories", "decorative items"],
-    "product_features": ["transparent", "suction attachment", "wall mounting", "discreet", "multi-surface"]
+    "id": "85bb328a-5d54-4d4f-b865-f977fd96df03",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "necklaces", "Evening Accessories", "decorative jewelry"],
+    "product_features": ["flower shape", "chain necklace", "pretty design", "neck decoration", "women's design"]
   },
   {
-    "id": "7d2c551d-43c8-4514-8d61-c8375e2f9b4e",
-    "product_categories": ["rain accessories", "fashion accessories", "travel accessories", "unisex", "portable"],
-    "product_features": ["compact design", "bottle shape", "weather protection", "portable", "unique design"]
+    "id": "7d6306ef-7e57-4d4d-8f3e-2bea39d33e11",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "necklaces", "stainless steel", "Evening Accessories"],
+    "product_features": ["bow design", "stainless steel", "strong material", "decorative", "neck wear"]
   },
   {
-    "id": "e206a2f4-0299-43e9-b5a3-a8c8ea8463f2",
-    "product_categories": ["women's fragrances", "luxury perfumes", "fashion fragrances", "personal care", "scent collections"],
-    "product_features": ["luxury scent", "feminine fragrance", "perfume", "long-lasting", "spray application"]
+    "id": "925c003d-bfea-48fe-84a2-4b405aefbec8",
+    "product_categories": ["makeup", "beauty products", "cosmetics", "special occasions", "Women's Accessories"],
+    "product_features": ["Birthday", "pretty colors", "sparkles", "festive look", "special occasion"]
   },
   {
-    "id": "5ad47a3f-389e-42b1-8b9c-e4c4a1a0de90",
-    "product_categories": ["lighting", "home decor", "LED decorations", "room lighting", "mood lighting"],
-    "product_features": ["color changing", "15 colors", "LED glow", "room enhancement", "sunset effect"]
+    "id": "f03a74de-ba0a-4d9e-b50d-0173c614e49a",
+    "product_categories": ["gaming console", "Electronics", "recreational equipment", "PlayStation", "video games"],
+    "product_features": ["PS5 Slim", "two controllers", "games downloaded", "play games", "electronic device"]
   },
   {
-    "id": "023c3c01-9a2c-4f8d-bf6d-edf0f6db0401",
-    "product_categories": ["skincare", "moisturizers", "personal care", "women's health", "face care"],
-    "product_features": ["aloe vera", "moisturizing", "skin softening", "face care", "hydrating"]
+    "id": "fbaef416-3ab0-4683-a46c-bb26f3c2f2e3",
+    "product_categories": ["Women's Clothing", "Casual Pants", "denim pants", "high waist", "comfort jeans"],
+    "product_features": ["brown color", "high waist", "sizes 8-10", "women's design", "comfortable"]
   },
   {
-    "id": "b2ad4349-9f38-4744-9d91-f00cc7efec84",
-    "product_categories": ["skincare", "sun protection", "personal care", "women's health", "outdoor protection"],
-    "product_features": ["sun protection", "skin protection", "cream application", "UV protection", "outdoor use"]
+    "id": "e65f7763-07f2-4882-97f7-529ae3490d9a",
+    "product_categories": ["eyewear", "fashion glasses", "vision accessories", "Women's Accessories", "pink accessories"],
+    "product_features": ["pink color", "eye protection", "see better", "quality", "pretty pink"]
   },
   {
-    "id": "5239ede3-26b4-4c1b-9f7c-4ffdd20cfff6",
-    "product_categories": ["home decor", "artificial plants", "wall decor", "decorative items", "aesthetic decor"],
-    "product_features": ["pink color", "vine design", "decoration", "home enhancement", "natural look"]
+    "id": "b5dde783-938f-4d1d-9de2-d586b9f34066",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "Bracelets", "stainless steel", "wrist accessories"],
+    "product_features": ["thick chain", "stainless steel", "strong material", "wrist jewelry", "bold decoration"]
   },
   {
-    "id": "b59f2be4-2d9f-4122-aed1-05728381ff4e",
-    "product_categories": ["skincare", "sun protection", "personal care", "unisex", "face care"],
-    "product_features": ["sun protection", "skin care", "cream application", "UV protection", "outdoor use"]
+    "id": "22ad7f55-2564-4884-b85f-c6d2f5aec061",
+    "product_categories": ["Hair Accessories", "wig stands", "beauty tools", "hair care", "Women's Accessories"],
+    "product_features": ["wig storage", "wig display", "neat keep", "hair accessory", "quality hanger"]
   },
   {
-    "id": "b277fad1-f59b-4a1a-a3a5-f777e9d3efba",
-    "product_categories": ["home decor", "artificial plants", "decorative items", "wall decor", "green theme"],
-    "product_features": ["green color", "vine design", "decoration", "home enhancement", "natural look"]
+    "id": "cbc70cc8-cc0a-41b3-84b8-ad459b67bedb",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "necklaces", "stainless steel", "luxury jewelry"],
+    "product_features": ["square shape", "stainless steel", "multiple colors", "luxury brand", "neck decoration"]
   },
   {
-    "id": "85477be4-dc2c-4d7c-8614-1ca13eff95ab",
-    "product_categories": ["skincare", "acne treatment", "personal care", "spot treatment", "women's health"],
-    "product_features": ["pimple treatment", "spot treatment", "adhesive", "skin healing", "small patches"]
+    "id": "7bed2229-788a-4853-848b-bc87f8b9829a",
+    "product_categories": ["collectible figures", "novelty items", "toys", "decorative items", "special collections"],
+    "product_features": ["collectible", "special character", "toy", "decorative", "Labubu character"]
   },
   {
-    "id": "feaa5065-8103-46d8-978e-03c283901b29",
-    "product_categories": ["drinkware", "water bottles", "travel accessories", "utility products", "hydration products"],
-    "product_features": ["3-in-1 design", "multi-use", "portable", "hydration", "versatile use"]
+    "id": "065d701e-fe6d-4759-84e2-9fb641ded2af",
+    "product_categories": ["Women's Clothing", "Casual Pants", "flare pants", "fashion wear", "black clothing"],
+    "product_features": ["black color", "flare design", "sizes 6-10", "wide bottom", "women's design"]
   },
   {
-    "id": "b44e507c-6f5a-40bc-b064-b27605ef4d80",
-    "product_categories": ["electronics", "printers", "tech accessories", "office supplies", "portable gadgets"],
-    "product_features": ["mini size", "portable", "color printing", "paper use", "electronic"]
+    "id": "b2a70cff-2faa-464f-8ab7-b0b3a39f3754",
+    "product_categories": ["unisex footwear", "sneakers", "athletic shoes", "comfort shoes", "Converse brand"],
+    "product_features": ["Converse brand", "size 40", "unisex", "walking shoes", "casual style"]
   },
   {
-    "id": "50c33808-34ff-43de-98ed-21e5f2c851a2",
-    "product_categories": ["food snacks", "spicy food", "nigerian cuisine", "street food", "crunchy snacks"],
-    "product_features": ["spicy", "crunchy", "sweet and spicy", "bold flavor", "tasty"]
+    "id": "f542050d-5344-4173-b041-3e0927a0bc9f",
+    "product_categories": ["mobile accessories", "phone accessories", "photography equipment", "Tech Accessories", "selfie tools"],
+    "product_features": ["phone holding", "group pictures", "self pictures", "extendable", "handheld device"]
   },
   {
-    "id": "557d3404-33d4-4138-8e44-147b746520ae",
-    "product_categories": ["bathroom accessories", "towels", "personal care", "home use", "utility products"],
-    "product_features": ["plain design", "soft cloth", "drying", "bathroom use", "absorbent"]
+    "id": "1409d842-2ec8-4ea9-a173-19f20c47e2cc",
+    "product_categories": ["Wigs", "Human Hair Wigs", "beauty products", "hair replacements", "Women's Wigs"],
+    "product_features": ["Vietnamese", "bone straight", "long hair", "very straight", "beauty product"]
   },
   {
-    "id": "8e55f7ca-1cee-4d7a-85e0-c12b8ad3e7ff",
-    "product_categories": ["sleepwear", "comfort clothing", "women's clothing", "home wear", "cotton fabric"],
-    "product_features": ["cotton material", "soft fabric", "comfortable", "sleep time", "comfy"]
+    "id": "1658116f-889a-40c7-a173-17e55472e700",
+    "product_categories": ["Mobile Phones", "Smartphones", "Electronics", "Communication Devices", "iPhone"],
+    "product_features": ["iPhone 14 Plus", "128GB storage", "eSIM unlocked", "90% battery", "calls and photos"]
   },
   {
-    "id": "8220512f-689a-4f8e-82ff-17d2378e2a89",
-    "product_categories": ["women's footwear", "casual shoes", "loafers", "fashion footwear", "size 37"],
-    "product_features": ["size 37", "foot wear", "casual style", "comfortable walk", "slip-on"]
+    "id": "037a2abe-8084-408f-944a-f4b4d309464a",
+    "product_categories": ["Women's Clothing", "Casual Pants", "denim pants", "comfort jeans", "boyfriend style"],
+    "product_features": ["blue color", "high waist", "boyfriend style", "relaxed fit", "size 6b-8"]
   },
   {
-    "id": "9333cc12-eebd-4850-8f36-0d87b9262660",
-    "product_categories": ["perfumes", "travel perfumes", "fragrance collections", "mini fragrances", "unisex"],
-    "product_features": ["mini size", "portable", "multiple scents", "spray application", "long-lasting scent"]
+    "id": "0645556b-e20b-41e1-acbf-be8c15525340",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "necklaces", "stainless steel", "layered jewelry"],
+    "product_features": ["double layered", "stainless steel", "strong material", "neck decoration", "two layers"]
   },
   {
-    "id": "6d6ee487-abf8-4736-8f33-447ce6e11869",
-    "product_categories": ["audio devices", "wireless earbuds", "tech accessories", "music listening", "communication devices"],
-    "product_features": ["wireless", "music/stories", "ear decoration", "portable", "electronic"]
+    "id": "55d709aa-8d0e-4a06-bfa9-535f6a1d8342",
+    "product_categories": ["Hair Care", "wig care", "beauty products", "hair treatment", "Women's Accessories"],
+    "product_features": ["wig serum", "hair softness", "look good", "special liquid", "women's design"]
   },
   {
-    "id": "9e466a8e-a0b1-48c6-87c0-a94d0becfb43",
-    "product_categories": ["lighting", "LED decorations", "home decor", "room lighting", "tech accessories"],
-    "product_features": ["LED glow", "color changing", "room enhancement", "strip design", "decorative"]
+    "id": "64687263-1dd5-4124-8c00-67c8d62aef08",
+    "product_categories": ["Women's Clothing", "Casual Tops", "basic tops", "everyday wear", "upper body wear"],
+    "product_features": ["simple design", "everyday comfort", "upper body", "basic style", "women's design"]
   },
   {
-    "id": "5dbe647e-62f9-45be-8a6b-e74289c72764",
-    "product_categories": ["home organization", "suction mounts", "phone accessories", "car accessories", "utility products"],
-    "product_features": ["suction attachment", "multi-surface", "phone holding", "secure", "anywhere stick"]
+    "id": "bf333e07-34b9-4b9f-ba8d-6f95a57ee002",
+    "product_categories": ["Hair Accessories", "bonnets", "sleep accessories", "headwear", "Women's Accessories"],
+    "product_features": ["lace material", "head cover", "sleep time", "comfort", "decoration"]
   },
   {
-    "id": "e08f91fa-09cd-4f0a-a3e1-b2157b1882d3",
-    "product_categories": ["alarm clocks", "timepieces", "bedroom accessories", "LED decorations", "home decor"],
-    "product_features": ["digital display", "time telling", "LED glow", "bedroom use", "time management"]
+    "id": "a223c3f8-7168-4dbd-a7f8-d55341a55dfe",
+    "product_categories": ["Women's Clothing", "bodycon tops", "fashion tops", "evening wear", "upper body wear"],
+    "product_features": ["black color", "bodycon fit", "snug fit", "sizes 10-14", "women's design"]
   },
   {
-    "id": "8b836194-8156-4c00-b68b-fa81297020d1",
-    "product_categories": ["food snacks", "party snacks", "group snacks", "spicy food", "nigerian cuisine"],
-    "product_features": ["jumbo pack", "party size", "sweet and spicy", "bold flavor", "crunchy"]
+    "id": "19a7e754-131b-4e1e-b474-6690f15cdf96",
+    "product_categories": ["baby products", "sippy cups", "drinkware", "children's products", "spill-proof cups"],
+    "product_features": ["3-in-1 design", "spill-proof", "growing children", "drinking cup", "little ones"]
   },
   {
-    "id": "3f4e78e2-0c8d-4d30-9282-c6bc88f0e185",
-    "product_categories": ["fragrance accessories", "perfume sets", "travel accessories", "personal care", "luxury fragrances"],
-    "product_features": ["mini size", "spray application", "perfume carrying", "fine mist", "refillable"]
+    "id": "f5374d51-b474-4b23-b74a-62a86e2e2653",
+    "product_categories": ["Women's Bags", "tote bags", "casual bags", "denim accessories", "carry bags"],
+    "product_features": ["denim material", "tote bag", "carry things", "strong material", "shopping bag"]
   },
   {
-    "id": "343bed3f-835e-451f-8f1d-3ec8cab6e001",
-    "product_categories": ["hair care", "hair care sets", "personal care", "beauty products", "women's health"],
-    "product_features": ["complete set", "hair cleaning", "hair health", "multiple products", "care kit"]
+    "id": "7d21e9a5-31cb-4c9a-97ca-f63ed952ae5a",
+    "product_categories": ["Hair Care", "wig care", "beauty products", "styling products", "heat protection"],
+    "product_features": ["heat protectant", "wig styling", "spray application", "hair protection", "styling tool"]
   },
   {
-    "id": "2291ff05-bf43-46b7-badd-5fe897a67b9c",
-    "product_categories": ["cooling devices", "home appliances", "personal cooling", "gold accessories", "home decor"],
-    "product_features": ["gold color", "air blowing", "cooling", "home cooling", "decorative"]
+    "id": "d12cc8ca-8730-4117-96f2-513a02465f3e",
+    "product_categories": ["beauty tools", "home use", "spray bottles", "personal care", "utility products"],
+    "product_features": ["fine mist", "gentle spray", "water drops", "container", "multi-use bottles"]
   },
   {
-    "id": "102d57f9-988f-4736-bc1c-33ed30c3eac6",
-    "product_categories": ["food snacks", "spicy food", "nigerian cuisine", "crunchy snacks", "party food"],
-    "product_features": ["big pack", "sweet and spicy", "bold flavor", "crunchy", "tasty"]
+    "id": "7c9d0e52-c09f-4e63-900a-bf55fe7d1985",
+    "product_categories": ["Hair Care", "styling products", "beauty products", "hair wax", "Women's Accessories"],
+    "product_features": ["hair styling", "hold hair", "special wax", "style addition", "women's design"]
   },
   {
-    "id": "1bdd131c-59a5-489f-9966-1efcacef93b5",
-    "product_categories": ["men's fragrances", "luxury perfumes", "male accessories", "fashion fragrances", "scent variety"],
-    "product_features": ["masculine scent", "color options", "long-lasting", "perfume", "spray application"]
+    "id": "645d141b-471a-4449-adf0-4475cc1c87aa",
+    "product_categories": ["consulting services", "business services", "professional services", "strategy planning", "corporate services"],
+    "product_features": ["business consulting", "strategy building", "smart decisions", "professional guidance", "tailored solutions"]
   },
   {
-    "id": "548b87c5-7bc9-4abe-bb42-d27ccbd76ec4",
-    "product_categories": ["women's clothing", "casual tops", "fashion tops", "everyday wear", "basic clothing"],
-    "product_features": ["simple design", "versatile", "upper body wear", "casual style", "easy matching"]
+    "id": "d82bd060-0d2f-4d38-a02a-93eca374b1fc",
+    "product_categories": ["gaming console", "Electronics", "recreational equipment", "PlayStation", "video games"],
+    "product_features": ["PS4 Pro", "one controller", "video games", "play games", "electronic device"]
   },
   {
-    "id": "cda45884-5fa0-4f21-b5a3-fdceeed42398",
-    "product_categories": ["lighting", "LED decorations", "home decor", "party lighting", "neon decor"],
-    "product_features": ["multicolored", "5 meters", "flexible", "rope light", "decorative"]
+    "id": "e151a61d-7a8b-4211-8dd1-88d21e4e1dbd",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "necklaces", "stainless steel", "infinity design"],
+    "product_features": ["infinity design", "stainless steel", "silver/gold colors", "endless loop", "neck decoration"]
   },
   {
-    "id": "d1a63015-cff1-4913-a849-ec1c111de205",
-    "product_categories": ["women's bags", "tote bags", "fashion bags", "everyday carry", "shopping bags"],
-    "product_features": ["multiple colors", "shoulder carry", "spacious", "carry things", "fashionable"]
+    "id": "3f40a37e-fdd3-41be-8b8a-d7f5bd300632",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "rings", "non-tarnish", "flower design"],
+    "product_features": ["gold color", "flower shape", "non-tarnish", "finger wear", "keeps shine"]
   },
   {
-    "id": "8e362a1f-a581-4f5a-a1ec-822b21c90f03",
-    "product_categories": ["luxury perfumes", "fashion fragrances", "unisex", "scent collections", "middle eastern fragrances"],
-    "product_features": ["luxury scent", "long-lasting", "spray application", "fresh fragrance", "nice smell"]
+    "id": "6617ed9e-91ba-449c-a444-b9d30f75463b",
+    "product_categories": ["desserts", "cakes", "sweet treats", "Food", "layered desserts"],
+    "product_features": ["sweet treat", "layered dessert", "cup serving", "after meal", "Cake parfait"]
   },
   {
-    "id": "7cbf20d2-b506-4841-b5ce-bdef86916afd",
-    "product_categories": ["skincare", "eye masks", "personal care", "women's health", "beauty treatments"],
-    "product_features": ["under eye", "refreshing", "tired eyes", "skin treatment", "moisturizing"]
+    "id": "b6f53151-5533-44b7-9c12-9e43457317a7",
+    "product_categories": ["cakes", "desserts", "foil cakes", "mini cakes", "sweet treats"],
+    "product_features": ["foil wrapping", "dessert", "neatly wrapped", "sweet", "ready to enjoy"]
   },
   {
-    "id": "69295954-07ce-4081-b923-b2945a29ba92",
-    "product_categories": ["hair care", "hair dryers", "personal care", "beauty tools", "women's accessories"],
-    "product_features": ["mini size", "hair drying", "warm air", "portable", "quick drying"]
+    "id": "aabfdfc2-0abe-423a-9e72-8bb2a9f0965b",
+    "product_categories": ["Hair Care", "wig care", "beauty products", "hair treatment", "Women's Accessories"],
+    "product_features": ["wig serum", "hair care", "look good", "special liquid", "women's design"]
   },
   {
-    "id": "38246af2-8d8f-445f-b956-7277db57783b",
-    "product_categories": ["skincare", "serums", "personal care", "women's health", "face care"],
-    "product_features": ["skin treatment", "healthy skin", "liquid application", "face care", "moisturizing"]
+    "id": "75fa5efc-c284-440a-a9d5-c6ba26aa37f0",
+    "product_categories": ["Hair Accessories", "bonnets", "sleep accessories", "headwear", "Women's Accessories"],
+    "product_features": ["silk material", "hair protection", "smooth hair", "sleep time", "head cover"]
   },
   {
-    "id": "37cdc184-be2c-4a4b-a6b6-da41298ce9b6",
-    "product_categories": ["body care", "personal care", "fragrance", "women's health", "body mists"],
-    "product_features": ["body spray", "fresh scent", "light fragrance", "spray application", "nice smell"]
+    "id": "67c7c03c-4e32-41f1-9777-3483e40b95e3",
+    "product_categories": ["medical equipment", "healthcare products", "emergency equipment", "utility products", "transport devices"],
+    "product_features": ["medical use", "patient transport", "small size", "emergency", "moving assistance"]
   },
   {
-    "id": "17627389-1b57-4afa-a5a3-b70230b5c34c",
-    "product_categories": ["wearable technology", "smart watches", "cooling devices", "tech accessories", "unisex"],
-    "product_features": ["time telling", "mini fan", "cooling", "wearable", "wrist accessory"]
+    "id": "c860d2ce-24f7-4add-a00d-4ab1d6f1d929",
+    "product_categories": ["luxury bags", "designer handbags", "fashion bags", "Women's Bags", "Louis Vuitton"],
+    "product_features": ["Louis Vuitton", "luxury brand", "blue/black colors", "stylish carry", "A grade quality"]
   },
   {
-    "id": "23523a35-5d46-4817-b05d-b0ab3d25f10c",
-    "product_categories": ["women's fragrances", "luxury perfumes", "fashion fragrances", "personal care", "feminine scents"],
-    "product_features": ["feminine scent", "long-lasting", "spray application", "fresh fragrance", "nice smell"]
+    "id": "96771044-8d6b-44eb-8fc0-03bb37f3641a",
+    "product_categories": ["gaming console", "Electronics", "recreational equipment", "PlayStation", "video games"],
+    "product_features": ["PS5 console", "one controller", "video games", "play games", "electronic device"]
   },
   {
-    "id": "1527d29e-acd6-4bd5-a21e-6f846d53f792",
-    "product_categories": ["wall decor", "home decor", "decorative items", "photo collages", "aesthetic decor"],
-    "product_features": ["wall decoration", "picture display", "collection display", "home enhancement", "decorative"]
+    "id": "79f8b78a-0b9e-4adc-92f9-638ec518aa96",
+    "product_categories": ["home use", "spray bottles", "utility products", "gardening tools", "cleaning supplies"],
+    "product_features": ["big size", "liquid container", "mist spray", "spray function", "multi-use"]
   },
   {
-    "id": "5dbae56d-dc83-4f50-abdb-7063335b3b36",
-    "product_categories": ["gaming consoles", "electronics", "playstation", "recreational equipment", "tech gadgets"],
-    "product_features": ["slim design", "video games", "electronic", "entertainment", "play games"]
+    "id": "12938b7f-2bc1-48a5-89cb-2906cb024db3",
+    "product_categories": ["Women's Clothing", "Casual Tops", "crop tops", "fashion tops", "upper body wear"],
+    "product_features": ["crop top", "shorter design", "size 6-8", "upper body", "women's design"]
   },
   {
-    "id": "3f056181-11f6-4214-879c-90d98a03698e",
-    "product_categories": ["drinkware", "water bottles", "thermal bottles", "travel accessories", "hydration products"],
-    "product_features": ["temperature control", "hot/cold retention", "drink safety", "portable", "quality material"]
+    "id": "19ed041c-90c8-4e61-ad0b-6c8544139fa2",
+    "product_categories": ["Hair Accessories", "scrunchies", "hair ties", "beauty accessories", "Women's Accessories"],
+    "product_features": ["silk material", "hair tying", "gentle holding", "soft scrunchie", "comfortable"]
   },
   {
-    "id": "419eee20-2079-48d7-86c7-05c4dcd22f44",
-    "product_categories": ["women's health", "personal care", "comfort products", "menstrual products", "health accessories"],
-    "product_features": ["menstrual support", "comfort", "body help", "health care", "women's specific"]
-  },
-  {
-    "id": "a3ae3d34-323f-43a0-960a-fd945961cced",
-    "product_categories": ["skincare", "serums", "personal care", "women's health", "face care"],
-    "product_features": ["skin treatment", "healthy skin", "liquid application", "face care", "moisturizing"]
-  },
-  {
-    "id": "4cf5fbcd-e71a-4408-8195-4a9201b08bd7",
-    "product_categories": ["home organization", "storage solutions", "home decor", "baskets", "utility products"],
-    "product_features": ["organization", "neat keep", "item organization", "home use", "functional"]
-  },
-  {
-    "id": "a7a587b1-0970-4387-8460-ed0c03c511b3",
-    "product_categories": ["cooling devices", "personal cooling", "portable fans", "tech accessories", "unisex"],
-    "product_features": ["mini size", "air blowing", "cooling", "portable", "handheld cooling"]
-  },
-  {
-    "id": "e1ff482e-0b75-4f4a-8125-95e138f30f1b",
-    "product_categories": ["food snacks", "plantain chips", "nigerian cuisine", "spicy food", "crunchy snacks"],
-    "product_features": ["spicy", "crunchy", "plantain", "tasty", "fresh"]
-  },
-  {
-    "id": "7ff7f00f-8176-4fce-bebb-855d935b4602",
-    "product_categories": ["lighting equipment", "content creation", "photography equipment", "tech accessories", "video lighting"],
-    "product_features": ["bright lighting", "video enhancement", "photo quality", "professional application", "electronic"]
-  },
-  {
-    "id": "04f71018-c38a-4dd5-9dc6-d4438bef5467",
-    "product_categories": ["tote bags", "fashion bags", "women's accessories", "artisanal accessories", "graffiti design"],
-    "product_features": ["artistic design", "shoulder carry", "carry things", "bold pattern", "fashionable"]
-  },
-  {
-    "id": "dfd3b847-5d0f-4c12-8d9e-d683b9004cd9",
-    "product_categories": ["home decor", "decorative mirrors", "vanity mirrors", "aesthetic decor", "bedroom accessories"],
-    "product_features": ["aesthetic", "self-viewing", "decorative", "home enhancement", "vanity use"]
-  },
-  {
-    "id": "9a48cf3b-fc7a-46ed-9e1b-e082ed4dcda3",
-    "product_categories": ["laundry accessories", "household items", "clothes drying", "home organization", "utility products"],
-    "product_features": ["clothes drying", "clips", "holding clothes", "outdoor use", "functional"]
-  },
-  {
-    "id": "0f087ddd-f62f-497b-937a-1e10aa6bf7e6",
-    "product_categories": ["phone accessories", "mobile accessories", "photography equipment", "selfie sticks", "tech accessories"],
-    "product_features": ["extends reach", "phone holding", "group photos", "handheld device", "adjustable"]
-  },
-  {
-    "id": "e628c996-4085-45f1-83d0-323300c15a72",
-    "product_categories": ["audio devices", "wireless earbuds", "tech accessories", "music listening", "communication devices"],
-    "product_features": ["wireless", "music/stories", "ear decoration", "portable", "electronic"]
-  },
-  {
-    "id": "71a05640-c7fa-4ad0-8b6c-8df713233e23",
-    "product_categories": ["cooling devices", "home appliances", "standing fans", "portable fans", "home cooling"],
-    "product_features": ["portable", "stand floor", "air blowing", "cooling", "home use"]
-  },
-  {
-    "id": "3fc2747f-da84-4e7a-90ac-5c0ff2669e7b",
-    "product_categories": ["skincare", "vitamin c", "face care", "personal care", "women's health"],
-    "product_features": ["vitamin c", "skin brightening", "healthy skin", "oil application", "face care"]
-  },
-  {
-    "id": "b2a6d644-9a62-40da-b493-7c42800ce845",
-    "product_categories": ["women's fragrances", "luxury perfumes", "fashion fragrances", "personal care", "feminine scents"],
-    "product_features": ["feminine scent", "long-lasting", "spray application", "fresh fragrance", "nice smell"]
-  },
-  {
-    "id": "dd83247a-55a8-4a09-9868-bd06582653a4",
-    "product_categories": ["lighting", "LED decorations", "home decor", "room lighting", "color changing lights"],
-    "product_features": ["RGB lighting", "color changing", "large size", "room enhancement", "decorative"]
-  },
-  {
-    "id": "9bd7c342-cf51-4eef-95e0-7a3bc41fc696",
-    "product_categories": ["home organization", "jewelry boxes", "storage solutions", "women's accessories", "decorative items"],
-    "product_features": ["jewelry storage", "organization", "big size", "precious things", "neat keep"]
-  },
-  {
-    "id": "31896354-3f8f-40d0-845f-334c7425a2d2",
-    "product_categories": ["kitchen appliances", "electric kettles", "travel accessories", "portable gadgets", "home use"],
-    "product_features": ["foldable", "portable", "water heating", "travel-friendly", "electric"]
-  },
-  {
-    "id": "1e844417-168a-4137-9c27-e623f7dc09a2",
-    "product_categories": ["photography equipment", "tripod stands", "tech accessories", "content creation", "professional equipment"],
-    "product_features": ["4 feet", "steady hold", "camera support", "adjustable", "professional use"]
-  },
-  {
-    "id": "bae18630-4cbc-4043-b7bf-cd1fdb09a233",
-    "product_categories": ["perfume oils", "fragrance", "personal care", "luxury scents", "unisex"],
-    "product_features": ["oil-based", "perfume", "long-lasting scent", "gentle application", "luxury scent"]
-  },
-  {
-    "id": "881604ba-045a-4bd3-ae1c-a1728a745d28",
-    "product_categories": ["decoration", "stickers", "craft supplies", "kids accessories", "decorative items"],
-    "product_features": ["butterfly shape", "12 pieces", "adhesive", "decoration", "colorful"]
-  },
-  {
-    "id": "56ed9197-9dc3-4a37-bd65-9c0890459dca",
-    "product_categories": ["audio devices", "headsets", "tech accessories", "music listening", "communication devices"],
-    "product_features": ["head wear", "music/stories", "ear covering", "sound quality", "electronic"]
-  },
-  {
-    "id": "cce71144-6c58-4fa4-959e-0cd62d48e588",
-    "product_categories": ["home decor", "artificial plants", "decorative items", "pot plants", "aesthetic decor"],
-    "product_features": ["flower decoration", "pot display", "home enhancement", "beautiful", "natural look"]
+    "id": "62bb1b3b-d716-42db-ac47-9c26f570afe5",
+    "product_categories": ["Hair Accessories", "styling tools", "beauty tools", "heated combs", "Women's Accessories"],
+    "product_features": ["heated comb", "hair straightening", "smooth hair", "styling tool", "heat application"]
   }
 ]

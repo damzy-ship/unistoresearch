@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User, LogOut, History, Receipt, Package, FileText, Box } from 'lucide-react';
-import { supabase, UniqueVisitor } from '../lib/supabase';
+import { User, LogOut, History, FileText, Box } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';

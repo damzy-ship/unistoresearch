@@ -10,12 +10,13 @@ import { supabase } from '../lib/supabase';
 interface HeaderProps {
    showAuth?: boolean;
    onAuthClick?: () => void;
+   userType?: string;
 }
  
-export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
+export default function Header({ showAuth = true, onAuthClick, userType }: HeaderProps) {
    const navigate = useNavigate();
    const [userIsAuthenticated, setUserIsAuthenticated] = React.useState(false);
-  const [userType, setUserType] = React.useState<string | null>(null);
+  // const [userType, setUserType] = React.useState<string | null>(null);
    const {currentTheme} = useTheme();
    
    React.useEffect(() => {
@@ -28,30 +29,30 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
      
      checkAuth();
     // fetch user_type for the current session (if any)
-  const fetchUserType = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const { data: visitor } = await supabase
-            .from('unique_visitors')
-            .select('user_type')
-            .eq('auth_user_id', session.user.id)
-            .single();
-      setUserType((visitor as { user_type?: string } | null)?.user_type || null);
-        } else {
-          setUserType(null);
-        }
-      } catch (err) {
-        console.error('Error fetching user_type:', err);
-        setUserType(null);
-      }
-    };
+  // const fetchUserType = async () => {
+  //     try {
+  //       const { data: { session } } = await supabase.auth.getSession();
+  //       if (session?.user) {
+  //         const { data: visitor } = await supabase
+  //           .from('unique_visitors')
+  //           .select('user_type')
+  //           .eq('auth_user_id', session.user.id)
+  //           .single();
+  //     setUserType((visitor as { user_type?: string } | null)?.user_type || null);
+  //       } else {
+  //         setUserType(null);
+  //       }
+  //     } catch (err) {
+  //       console.error('Error fetching user_type:', err);
+  //       setUserType(null);
+  //     }
+  //   };
 
-    fetchUserType();
+  //   fetchUserType();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       checkAuth();
-      fetchUserType();
+      // fetchUserType();
     });
 
     return () => {

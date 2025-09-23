@@ -153,7 +153,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                     )}
                                     {product.full_name && (
                                         <p className="text-sm text-gray-500 mb-3 flex-grow">
-                                            by <span className="font-medium text-gray-700">{product.full_name}</span>
+                                            by <span className="font-medium text-gray-700">{product.brand_name ? product.brand_name : product.full_name}</span>
                                         </p>
                                     )}
                                     {/* <p className={`text-sm font-semibold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>

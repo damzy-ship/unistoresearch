@@ -98,7 +98,7 @@ function SearchResultsPage() {
                   )}
                   {product.full_name && (
                     <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-semibold text-gray-700">{product.full_name}</span>
+                      <span className="font-semibold text-gray-700">{product.brand_name ? product.brand_name : product.full_name}</span>
                     </p>
                   )}
                   <p className={`text-sm font-bold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>

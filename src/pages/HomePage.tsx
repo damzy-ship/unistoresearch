@@ -51,7 +51,7 @@ export default function HomePage() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null);
-  const [, setUserType] = useState<string | null>(null);
+  const [userType, setUserType] = useState<string>('user');
 
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
 
@@ -128,7 +128,7 @@ export default function HomePage() {
 
         } catch (err) {
           console.error('Error fetching user_type:', err);
-          setUserType(null);
+          setUserType('user');
           // Fallback to localStorage
           const storedId = localStorage.getItem('selectedSchoolId');
           if (storedId) {
@@ -138,7 +138,7 @@ export default function HomePage() {
           }
         }
       } else {
-        setUserType(null);
+        setUserType('user');
         // Handle non-authenticated user flow
         const storedId = localStorage.getItem('selectedSchoolId');
         if (storedId) {
@@ -328,7 +328,7 @@ export default function HomePage() {
             <div className="w-full flex flex-col items-center justify-center">
               {/* User Menu */}
               <div className="w-full max-w-2xl mx-auto">
-                <Header onAuthClick={() => setShowAuthModal(true)} />
+                <Header onAuthClick={() => setShowAuthModal(true)} userType={userType}/>
               </div>
 
               {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>

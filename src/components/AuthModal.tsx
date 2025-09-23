@@ -23,6 +23,7 @@ type UserType = 'user' | 'merchant';
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [view, setView] = useState<AuthView>('login');
   const [fullName, setFullName] = useState('');
+  const [brandName, setBrandName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('+234');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -41,6 +42,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       // Reset form when modal opens
       setView('login');
       setFullName('');
+      setBrandName('');
       setPhoneNumber('+234');
       setPassword('');
       setConfirmPassword('');
@@ -129,7 +131,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         full_name: fullName,
         phone_number: phoneNumber,
         user_type: userType, // Save user type to auth metadata
-        ...(userType === 'merchant' && { school_id: selectedSchoolId }) // Conditionally add school_id
+        school_id: selectedSchoolId,
+        ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
       };
 
       // Sign up with Supabase Auth using the generated email
@@ -164,7 +167,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           last_visit: new Date().toISOString(),
           visit_count: 1,
           user_type: userType, // Save user user_type
-          school_id: selectedSchoolId // Conditionally add school ID
+          school_id: selectedSchoolId,
+          ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
         });
 
       if (visitorError) {
@@ -184,7 +188,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               full_name: fullName,
               last_visit: new Date().toISOString(),
               user_type: userType,
-              school_id: selectedSchoolId
+              school_id: selectedSchoolId,
+              ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
             })
             .eq('id', existingVisitor.id);
         }
@@ -575,7 +580,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               type="text"
               value={fullName}
               onChange={setFullName}
-              placeholder="John Doe"
+              placeholder="Your Full Name"
+              required
+              disabled={loading}
+              icon={<User className="w-4 h-4" />}
+            />
+          )}
+          {view === 'signup' && userType === 'merchant' && (
+            <AuthInput
+              type="text"
+              value={brandName}
+              onChange={setBrandName}
+              placeholder="Your Brand Name"
               required
               disabled={loading}
               icon={<User className="w-4 h-4" />}
