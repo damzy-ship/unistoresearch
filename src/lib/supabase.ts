@@ -36,17 +36,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 export interface UniqueVisitor {
-  id: string;
-  user_id: string;
+  id?: string;
+  user_id?: string;
   auth_user_id?: string;
   full_name?: string;
   phone_number?: string;
-  first_visit: string;
-  last_visit: string;
-  visit_count: number;
-  created_at: string;
-  user_type: string;
-  school_id: string;
+  first_visit?: string;
+  last_visit?: string;
+  visit_count?: number;
+  created_at?: string;
+  user_type?: string;
+  school_id?: string;
+  brand_name?: string | null;
+  verification_status?: 'pending' | 'verified' | 'unverified'| null;
+  verification_id?: string;
 }
 
 export interface Product {
