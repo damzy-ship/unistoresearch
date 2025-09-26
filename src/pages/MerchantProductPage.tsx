@@ -18,6 +18,9 @@ interface Product {
     search_description: string; // New field for the enhanced description
 }
 
+// Define the maximum number of images allowed
+const MAX_IMAGES = 5;
+
 export default function MerchantProductPage() {
     const { merchantId, merchantName } = useParams<{ merchantId: string, merchantName: string }>();
 
@@ -31,10 +34,17 @@ export default function MerchantProductPage() {
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
-    const [newFiles, setNewFiles] = useState<File[]>([]); // New state for files to upload
+    const [newFiles, setNewFiles] = useState<File[]>([]); // State for new files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
 
     const { currentTheme } = useTheme();
+
+    // Calculate the total number of images that will exist after adding/editing
+    const totalCurrentImages = editingProduct?.image_urls.length || 0;
+    const totalProspectiveImages = totalCurrentImages + newFiles.length;
+    const canAddMoreImages = totalProspectiveImages < MAX_IMAGES;
+    const remainingImageSlots = MAX_IMAGES - totalCurrentImages;
+
     useEffect(() => {
         if (merchantId) {
             fetchProducts();
@@ -66,11 +76,24 @@ export default function MerchantProductPage() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
+            const totalImagesIfAdded = (editingProduct?.image_urls.length || 0) + filesArray.length;
+
+            if (totalImagesIfAdded > MAX_IMAGES) {
+                // Show error if the total number of images exceeds the limit
+                setError(`Image upload limit: You can only upload a maximum of ${MAX_IMAGES} images in total. You are trying to upload ${filesArray.length} new files, but you already have ${editingProduct?.image_urls.length || 0} images.`);
+                setNewFiles([]); // Clear selected files to prevent them from being processed later
+                // The input file value must also be reset for the user to select the same file(s) again after the error
+                e.target.value = '';
+                return;
+            }
+
             const invalidFiles = filesArray.filter(file => file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/'));
             if (invalidFiles.length > 0) {
                 setError('Some files were invalid. Max 5MB per file, and only image types are allowed.');
+                e.target.value = '';
                 return;
             }
+
             setNewFiles(filesArray);
             setError(null);
         }
@@ -112,17 +135,21 @@ export default function MerchantProductPage() {
             return;
         }
 
+        if (newFiles.length > MAX_IMAGES) {
+             setError(`You can only upload a maximum of ${MAX_IMAGES} images. You selected ${newFiles.length}.`);
+             return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
-            // const embedding = await getProductEmbedding(productDescription);
             const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
             setUploadingImages(true);
             const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId ? merchantId : "", 'product-images', 'product-images'))) : [];
             setUploadingImages(false);
 
-            const { error } = await supabase
+            const { error: dbError } = await supabase
                 .from('merchant_products')
                 .insert({
                     merchant_id: merchantId,
@@ -134,8 +161,8 @@ export default function MerchantProductPage() {
                     search_description: enhancedDescription
                 });
 
-            if (error) {
-                throw error;
+            if (dbError) {
+                throw dbError;
             }
 
             resetForm();
@@ -156,11 +183,16 @@ export default function MerchantProductPage() {
             return;
         }
 
+        const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newFiles.map(file => URL.createObjectURL(file))];
+        if (updatedImageUrls.length > MAX_IMAGES) {
+             setError(`You can only have a maximum of ${MAX_IMAGES} images. You are adding ${newFiles.length} new files to your existing ${editingProduct.image_urls.length} images.`);
+             return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
-
             let newEmbedding = editingProduct.embedding;
             let newSearchDescription = editingProduct.search_description;
 
@@ -174,22 +206,22 @@ export default function MerchantProductPage() {
             const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId ? merchantId : "", 'product-images', 'product-images'))) : [];
             setUploadingImages(false);
 
-            const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newUrls];
+            const finalImageUrls = [...(editingProduct?.image_urls || []), ...newUrls];
 
-            const { error } = await supabase
+            const { error: dbError } = await supabase
                 .from('merchant_products')
                 .update({
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
-                    image_urls: updatedImageUrls,
+                    image_urls: finalImageUrls,
                     embedding: newEmbedding,
                     search_description: newSearchDescription
                 })
                 .eq('id', editingProduct.id);
 
-            if (error) {
-                throw error;
+            if (dbError) {
+                throw dbError;
             }
 
             resetForm();
@@ -209,13 +241,13 @@ export default function MerchantProductPage() {
         setError(null);
 
         try {
-            const { error } = await supabase
+            const { error: dbError } = await supabase
                 .from('merchant_products')
                 .update({ is_available: newAvailability })
                 .eq('id', product.id);
 
-            if (error) {
-                throw error;
+            if (dbError) {
+                throw dbError;
             }
 
             // Update the state to reflect the change immediately
@@ -254,8 +286,7 @@ export default function MerchantProductPage() {
         } catch (err) {
             console.error('Error removing image:', err);
             setError(err instanceof Error ? err.message : 'Failed to remove image');
-            // On failure, revert the UI state
-            setEditingProduct(editingProduct);
+            // On failure, revert the UI state by re-fetching
             fetchProducts();
         }
     };
@@ -316,17 +347,25 @@ export default function MerchantProductPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Product Images
-                                {editingProduct && <span className="text-xs text-gray-500 ml-2">(Current images shown below. Add more, or remove existing ones.)</span>}
+                                Product Images <span className="text-xs text-orange-600 font-bold">(Max {MAX_IMAGES} images)</span>
+                                {editingProduct && <span className="text-xs text-gray-500 ml-2">({totalCurrentImages} existing, {remainingImageSlots} slots remaining.)</span>}
                             </label>
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
-                                disabled={uploadingImages || loading}
-                            />
+
+                            {!editingProduct || canAddMoreImages ? (
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                                    disabled={uploadingImages || loading}
+                                    // Use 'max' attribute to hint the limit to the browser, though validation is in handleFileChange
+                                    {...(!editingProduct && { max: MAX_IMAGES })}
+                                />
+                            ) : (
+                                <p className="text-sm text-red-500 font-medium mt-1">You have reached the maximum limit of {MAX_IMAGES} images for this product.</p>
+                            )}
+
                         </div>
 
                         {(newFiles.length > 0 || (editingProduct && editingProduct.image_urls.length > 0)) && (
@@ -337,8 +376,9 @@ export default function MerchantProductPage() {
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveImageFromEdit(url)}
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-700 transition-colors"
                                             title="Remove image"
+                                            disabled={loading || uploadingImages}
                                         >
                                             <X className="w-3 h-3" />
                                         </button>

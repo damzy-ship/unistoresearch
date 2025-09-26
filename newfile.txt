@@ -1,0 +1,108 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.invoices (
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  payment_reference text,
+  customer_id text,
+  product_id uuid,
+  merchant_id uuid,
+  invoice_status text,
+  merchant_name text,
+  merchant_number text,
+  customer_name text,
+  customer_number text,
+  customer_email text,
+  invoice_amount text,
+  id uuid DEFAULT gen_random_uuid(),
+  CONSTRAINT invoices_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.real_time_products(id)
+);
+CREATE TABLE public.merchant_analytics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  merchant_id uuid NOT NULL,
+  request_id uuid,
+  event_type text NOT NULL CHECK (event_type = ANY (ARRAY['profile_matched'::text, 'profile_contacted'::text])),
+  user_id text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  product_id uuid,
+  CONSTRAINT merchant_analytics_pkey PRIMARY KEY (id),
+  CONSTRAINT merchant_analytics_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.request_logs(id),
+  CONSTRAINT merchant_analytics_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.merchant_products(id)
+);
+CREATE TABLE public.merchant_product_categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  category_name text,
+  category_list ARRAY NOT NULL DEFAULT '{}'::text[],
+  category_image text,
+  CONSTRAINT merchant_product_categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.merchant_products (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  merchant_id uuid,
+  product_description text,
+  product_price text,
+  is_available boolean DEFAULT false,
+  image_urls ARRAY DEFAULT '{}'::text[],
+  embedding USER-DEFINED,
+  search_description text,
+  product_categories ARRAY NOT NULL DEFAULT '{}'::text[],
+  product_features ARRAY NOT NULL DEFAULT '{}'::text[],
+  is_featured boolean NOT NULL DEFAULT false,
+  discount_price text,
+  CONSTRAINT merchant_products_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.request_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id text NOT NULL,
+  university text NOT NULL CHECK (university = ANY (ARRAY['Bingham'::text, 'Veritas'::text])),
+  request_text text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  matched_seller_ids ARRAY,
+  generated_categories ARRAY,
+  matched_categories ARRAY,
+  seller_categories jsonb,
+  seller_ranking_order ARRAY,
+  admin_scores jsonb,
+  admin_notes text,
+  matched_features ARRAY NOT NULL DEFAULT '{}'::text[],
+  CONSTRAINT request_logs_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.schools (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  short_name text NOT NULL UNIQUE,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT schools_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.site_reviews (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id text NOT NULL,
+  user_name text NOT NULL,
+  rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  review_text text,
+  is_featured boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT site_reviews_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.unique_visitors (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id text NOT NULL UNIQUE,
+  first_visit timestamp with time zone DEFAULT now(),
+  last_visit timestamp with time zone DEFAULT now(),
+  visit_count integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  phone_number text UNIQUE,
+  auth_user_id text,
+  full_name text,
+  email text UNIQUE,
+  user_type text NOT NULL DEFAULT 'user'::text, CHECK (user_type = ANY (ARRAY['user'::text, 'merchant'::text]))
+  school_id uuid,
+  brand_name text,
+  verification_id text,
+  verification_status text NOT NULL DEFAULT 'unverified'::text CHECK (verification_status = ANY (ARRAY['verified'::text, 'unverified'::text, 'pending'::text])),
+  CONSTRAINT unique_visitors_pkey PRIMARY KEY (id),
+  CONSTRAINT unique_visitors_school_id_fkey FOREIGN KEY (school_id) REFERENCES public.schools(id)
+);
