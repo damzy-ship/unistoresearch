@@ -24,6 +24,9 @@ interface MerchantProductModalProps {
     onClose: () => void;
 }
 
+// Define the maximum image limit
+const MAX_IMAGES = 5;
+
 export default function MerchantProductModal({ merchantId, merchantName, onClose }: MerchantProductModalProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,18 +67,38 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
         }
     };
 
+    // 💡 ADJUSTED FUNCTION: handleFileChange
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
+            
+            // Check for file count limit (New Logic)
+            const currentFilesCount = editingProduct?.image_urls.length || 0;
+            const totalFilesAfterUpload = currentFilesCount + filesArray.length;
+
+            if (totalFilesAfterUpload > MAX_IMAGES) {
+                setError(`You can only upload a maximum of ${MAX_IMAGES} images. You currently have ${currentFilesCount} image(s) and are trying to upload ${filesArray.length} new image(s).`);
+                // Clear the file input for a better UX, though the state setNewFiles won't be called.
+                e.target.value = ''; 
+                setNewFiles([]); // Ensure no files are mistakenly queued
+                return;
+            }
+
+            // Check for file size and type limits (Existing Logic)
             const invalidFiles = filesArray.filter(file => file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/'));
             if (invalidFiles.length > 0) {
                 setError('Some files were invalid. Max 5MB per file, and only image types are allowed.');
+                e.target.value = ''; 
+                setNewFiles([]); // Ensure no files are mistakenly queued
                 return;
             }
+            
+            // If all checks pass, set the files
             setNewFiles(filesArray);
             setError(null);
         }
     };
+    // 💡 END ADJUSTED FUNCTION
 
     const resetForm = () => {
         setProductDescription('');
@@ -93,7 +116,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
         setNewFiles([]);
         setEditingProduct(null);
         setError(null);
-        // setShowAddProductForm(false);
+        // setShowAddProductForm(false); // Original code commented out this line
     };
 
     // Modify handleAddProduct
@@ -103,6 +126,13 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
             setError('Product description and price are required.');
             return;
         }
+
+        // Add an immediate check for a new product submission
+        if (newFiles.length > MAX_IMAGES) {
+             setError(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+             return;
+        }
+
 
         setLoading(true);
         setError(null);
@@ -150,6 +180,13 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
         if (!editingProduct || !productDescription || !productPrice) {
             setError('Product description and price are required.');
             return;
+        }
+
+        // Add an immediate check for the total image count during edit
+        const totalImages = (editingProduct?.image_urls.length || 0) + newFiles.length;
+        if (totalImages > MAX_IMAGES) {
+             setError(`You can only have a total of ${MAX_IMAGES} images. You currently have ${editingProduct.image_urls.length} and are trying to add ${newFiles.length} new images.`);
+             return;
         }
 
         setLoading(true);
@@ -267,6 +304,14 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
         }
     };
 
+    // 💡 MODIFIED RENDER LOGIC FOR INPUT FIELD
+    const isImageUploadDisabled = editingProduct 
+        ? (editingProduct.image_urls.length + newFiles.length) >= MAX_IMAGES
+        : newFiles.length >= MAX_IMAGES;
+
+    const currentImageCount = editingProduct ? (editingProduct.image_urls.length + newFiles.length) : newFiles.length;
+    const remainingUploads = MAX_IMAGES - currentImageCount;
+
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -327,16 +372,22 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
                             {/* Image Upload Section */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Product Images
+                                    Product Images 📸
                                     {editingProduct && <span className="text-xs text-gray-500 ml-2">(Current images shown below. Add more, or remove existing ones.)</span>}
                                 </label>
+                                {/* 💡 ADDED HINT MESSAGE */}
+                                <p className={`text-xs ${isImageUploadDisabled ? 'text-red-500' : 'text-gray-500'} mb-1`}>
+                                    Maximum of {MAX_IMAGES} images per product. (Can upload {remainingUploads} more)
+                                </p>
                                 <input
                                     type="file"
                                     multiple
                                     accept="image/*"
                                     onChange={handleFileChange}
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
-                                    disabled={uploadingImages || loading}
+                                    // 💡 MODIFIED DISABLED STATE
+                                    disabled={uploadingImages || loading || isImageUploadDisabled} 
+                                    key={editingProduct?.id} // Add key to force re-render/reset the file input on product change
                                 />
                             </div>
                             {/* Image previews and management */}

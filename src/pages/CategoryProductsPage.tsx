@@ -157,14 +157,14 @@ const CategoryProductsPage: React.FC = () => {
                                 </Swiper>
 
                                 <div className="p-6 flex flex-col flex-grow">
-                                    <h3 className="text-xl font-bold mb-2 truncate text-gray-800">{product.product_description}</h3>
+                                    <h3 className="text-xl font-bold mb-2 text-gray-800">{product.product_description}</h3>
                                     {product.discount_price ? (
                                         <div className="mb-2">
-                                            <div className="text-sm text-gray-500 line-through">{product.product_price}</div>
-                                            <div className="text-3xl text-green-600 font-black">{product.discount_price}</div>
+                                            <div className="text-sm text-gray-500 line-through">₦{product.product_price}</div>
+                                            <div className="text-3xl text-green-600 font-black">₦{product.discount_price}</div>
                                         </div>
                                     ) : (
-                                        <p className="text-3xl text-green-600 font-black mb-2">{product.product_price}</p>
+                                        <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
                                         <p className="text-sm text-gray-500 mb-2">

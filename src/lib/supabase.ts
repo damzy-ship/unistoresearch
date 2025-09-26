@@ -83,31 +83,6 @@ export interface RequestLog {
   matched_features?: string[];
 }
 
-export interface Merchant {
-  id: string;
-  seller_id: string;
-  email: string;
-  full_name: string;
-  phone_number: string;
-  school_name: string;
-  seller_description: string;
-  created_at: string;
-  categories?: string[];
-  last_matched_at?: string;
-}
-
-export interface ProductCategory {
-  id: string;
-  name: string;
-  created_at: string;
-}
-
-export interface MerchantCategory {
-  id: string;
-  merchant_id: string;
-  category_id: string;
-  created_at: string;
-}
 
 export interface School {
   id: string;
@@ -117,38 +92,6 @@ export interface School {
   created_at: string;
 }
 
-export interface SellerRating {
-  id: string;
-  user_id: string;
-  merchant_id: string;
-  request_id?: string;
-  rating: number;
-  review_text?: string;
-  created_at: string;
-}
-
-export interface ContactInteraction {
-  id: string;
-  user_id: string;
-  merchant_id: string;
-  request_id?: string;
-  contacted_at: string;
-  rating_prompted: boolean;
-  rating_completed: boolean;
-  created_at: string;
-}
-
-export interface MerchantWithRating extends Merchant {
-  average_rating: number;
-  total_ratings: number;
-  rating_breakdown: {
-    '1': number;
-    '2': number;
-    '3': number;
-    '4': number;
-    '5': number;
-  };
-}
 
 export interface MerchantAnalytics {
   id: string;
