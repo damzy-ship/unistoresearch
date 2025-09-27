@@ -19,6 +19,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
 import AllProductsPage from './pages/AllProductsPage';
 import CategoryProductsPage from './pages/CategoryProductsPage';
+import UserMenu from './components/UserMenu';
 
 function App() {
   const { currentTheme } = useTheme();
@@ -29,27 +30,31 @@ function App() {
       style={{ backgroundColor: currentTheme.background }}
     >
       <Router>
+        {/* global sidebar */}
+        <UserMenu />
         <Toaster position="top-center" richColors />
         <AnnouncementBar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/landing-page" element={<LandingPage />} />
-          <Route path="/past-requests" element={<PastRequestsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/sellers" element={<SellersPage />} />
-          <Route path="/merchants" element={<PublicMerchantsPage />} />
-          <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/test-categories" element={<CategoryTest />} />
-          <Route path="/payment/:merchantId" element={<PaymentPage />} />
-          <Route path="/invoices" element={<InvoicesPage />} />
-          <Route path="/pay-merchant" element={<PayMerchantPage />} />
-          <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
-          <Route path="/search-results" element={<SearchResultsPage />} />
-          <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
-          <Route path="/all-products" element={<AllProductsPage />} />
-          <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
-        </Routes>
+        <div className="md:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/landing-page" element={<LandingPage />} />
+            <Route path="/past-requests" element={<PastRequestsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/sellers" element={<SellersPage />} />
+            <Route path="/merchants" element={<PublicMerchantsPage />} />
+            <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/test-categories" element={<CategoryTest />} />
+            <Route path="/payment/:merchantId" element={<PaymentPage />} />
+            <Route path="/invoices" element={<InvoicesPage />} />
+            <Route path="/pay-merchant" element={<PayMerchantPage />} />
+            <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
+            <Route path="/search-results" element={<SearchResultsPage />} />
+            <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
+            <Route path="/all-products" element={<AllProductsPage />} />
+            <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
+          </Routes>
+        </div>
       </Router>
     </div>
   );
