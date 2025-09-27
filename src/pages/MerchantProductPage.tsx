@@ -22,7 +22,7 @@ interface Product {
 const MAX_IMAGES = 5;
 
 export default function MerchantProductPage() {
-    const { merchantId, merchantName } = useParams<{ merchantId: string, merchantName: string }>();
+    const { actual_merchant_id, merchantId, merchantName } = useParams<{ actual_merchant_id: string, merchantId: string, merchantName: string }>();
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -152,6 +152,7 @@ export default function MerchantProductPage() {
             const { error: dbError } = await supabase
                 .from('merchant_products')
                 .insert({
+                    actual_merchant_id: actual_merchant_id,
                     merchant_id: merchantId,
                     product_description: productDescription,
                     product_price: productPrice,

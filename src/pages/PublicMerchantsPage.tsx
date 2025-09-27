@@ -181,6 +181,7 @@ export default function PublicMerchantsPage() {
 
       {isModalOpen && selectedMerchant && (
         <MerchantProductModal
+          actual_merchant_id={selectedMerchant.id}
           merchantId={selectedMerchant.user_id}
           merchantName={selectedMerchant.full_name || 'Merchant'}
           onClose={handleCloseModal}

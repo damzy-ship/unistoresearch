@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for routin
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
 // import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
-// import { History } from 'lucide-react';
+import { History } from 'lucide-react';
 import { getMatchingCategoriesAndFeatures, transformDescriptionForEmbedding } from '../lib/generateEmbedding';
 
 function ProductSearchComponent() {
@@ -143,7 +143,7 @@ function ProductSearchComponent() {
         {error && <p className="text-center text-red-500 font-medium mt-4">{error}</p>}
 
         {/* Past Requests Link */}
-        {/* <div className="mt-4 text-center">
+        <div className="mt-4 text-center">
           <button
             onClick={() => navigate('/past-requests')}
             className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
@@ -156,7 +156,7 @@ function ProductSearchComponent() {
             <History className="w-4 h-4" />
             View past requests
           </button>
-        </div> */}
+        </div>
       </div>
     </div>
   );
