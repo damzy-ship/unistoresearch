@@ -27,6 +27,7 @@ import MerchantCategoriesGrid from '../components/MerchantCategoriesGrid';
 import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
+// import { updateAllMerchantProductsFromVisitors } from '../lib/databaseServices';
 // import { generateProductEmbeddings } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json'; // Import the JSON data directly
 // import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
@@ -338,6 +339,9 @@ export default function HomePage() {
               {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
             <h1>UPDATE</h1>
           </button> */}
+            {/* <button onClick={() => updateAllMerchantProductsFromVisitors()}>
+            <h1>UPDATE ALL MERCHANTS PRODUCTS FROM VISITORS</h1>
+          </button>  */}
 
               {/* UniStore Logo */}
               <div className="mb-12 px-2">

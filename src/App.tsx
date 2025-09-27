@@ -31,10 +31,10 @@ function App() {
     >
       <Router>
         {/* global sidebar */}
+        <div className="lg:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
         <UserMenu />
         <Toaster position="top-center" richColors />
         <AnnouncementBar />
-        <div className="md:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/landing-page" element={<LandingPage />} />
@@ -50,7 +50,7 @@ function App() {
             <Route path="/pay-merchant" element={<PayMerchantPage />} />
             <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
             <Route path="/search-results" element={<SearchResultsPage />} />
-            <Route path="/merchant/:merchantId/:merchantName" element={<MerchantProductPage />} />
+            <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
             <Route path="/all-products" element={<AllProductsPage />} />
             <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
           </Routes>

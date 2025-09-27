@@ -50,6 +50,7 @@ export interface UniqueVisitor {
   brand_name?: string | null;
   verification_status?: 'pending' | 'verified' | 'unverified'| null;
   verification_id?: string;
+
 }
 
 export interface Product {
@@ -70,6 +71,7 @@ export interface Product {
     embedding: number[];
     created_at?: string;
     merchant_id?: string;
+    actual_merchant_id?: string;
 }
 
 export interface RequestLog {

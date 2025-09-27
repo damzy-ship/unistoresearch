@@ -19,6 +19,7 @@ interface Product {
 }
 
 interface MerchantProductModalProps {
+    actual_merchant_id?: string;
     merchantId: string;
     merchantName: string;
     onClose: () => void;
@@ -27,7 +28,7 @@ interface MerchantProductModalProps {
 // Define the maximum image limit
 const MAX_IMAGES = 5;
 
-export default function MerchantProductModal({ merchantId, merchantName, onClose }: MerchantProductModalProps) {
+export default function MerchantProductModal({ actual_merchant_id, merchantId, merchantName, onClose }: MerchantProductModalProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -150,6 +151,7 @@ export default function MerchantProductModal({ merchantId, merchantName, onClose
             const { error } = await supabase
                 .from('merchant_products')
                 .insert({
+                    actual_merchant_id: actual_merchant_id,
                     merchant_id: merchantId,
                     product_description: productDescription,
                     product_price: productPrice,
