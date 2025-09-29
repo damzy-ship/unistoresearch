@@ -50,12 +50,12 @@ export default function PublicMerchantsPage() {
   });
 
   const handleViewProducts = (merchant: UniqueVisitor) => {
-    navigate(`/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`);
+    navigate(`/merchant/${merchant.id}/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`);
   };
 
   const handleCopyLink = (merchant: UniqueVisitor) => {
     const baseUrl = window.location.origin;
-    const merchantLink = `${baseUrl}/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
+    const merchantLink = `${baseUrl}/merchant/${merchant.id}/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
     navigator.clipboard.writeText(merchantLink).then(() => {
       alert('Link copied to clipboard!');
     }).catch(err => {
@@ -66,7 +66,7 @@ export default function PublicMerchantsPage() {
 
   const handleShareOnWhatsApp = (merchant: UniqueVisitor) => {
     const baseUrl = window.location.origin;
-    const merchantLink = `${baseUrl}/merchant/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
+    const merchantLink = `${baseUrl}/merchant/${merchant.id}/${merchant.user_id}/${encodeURIComponent(merchant.full_name || 'Merchant')}`;
     const message = `Manage your products at: ${merchantLink}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${merchant.phone_number}?text=${encodedMessage}`;
