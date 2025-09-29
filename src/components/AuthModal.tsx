@@ -52,30 +52,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setForgotPasswordPhone('+234');
       setUserType('user'); // Reset user type on modal open
       setSelectedSchoolId(null);
-      // fetchSchools(); // Fetch schools when modal opens
     }
   }, [isOpen]);
-
-  // Function to fetch schools from Supabase
-  // const fetchSchools = async () => {
-  //   try {
-  //     const { data, error } = await supabase
-  //       .from('schools')
-  //       .select('id, short_name')
-  //       .order('short_name', { ascending: true });
-
-  //     if (error) {
-  //       throw error;
-  //     }
-
-  //     if (data) {
-  //       setSchools(data);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching schools:', error);
-  //     toast.error('Failed to load schools. Please try again.');
-  //   }
-  // };
 
   const validateInputs = () => {
     if (phoneNumber.length < 14) {
@@ -605,13 +583,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               selectedUniversity={selectedSchoolId}
               onUniversityChange={setSelectedSchoolId}
             />
-
-            // <SchoolDropdown
-            //   schools={schools}
-            //   selectedSchoolId={selectedSchoolId}
-            //   onChange={setSelectedSchoolId}
-            //   disabled={loading}
-            // />
           )}
 
 
@@ -624,7 +595,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               required
             />
           )}
-
 
           {/* Forgot Password Phone */}
           {view === 'forgot-password' && (

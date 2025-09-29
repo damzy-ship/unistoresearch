@@ -9,50 +9,48 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { Loader } from 'lucide-react';
 import ContactSellerButton from './ContactSellerButton';
-import ContactSellerLink from './ContactSellerLink';
-
+import ContactSellerLink from './ContactSellerLink'; // Assuming this is correct
 
 // Define the props interface
-interface HorizontalProductListProps {
+interface VerticalProductListProps {
     categoryId?: string;
     schoolId: string;
     showFeatured?: boolean; // Optional prop to show featured products
     userIsAuthenticated?: boolean;
 }
 
-const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryId, schoolId, showFeatured, userIsAuthenticated }) => {
+const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, schoolId, showFeatured, userIsAuthenticated }) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [fetchedCategoryName, setCategoryName] = useState<string>('');
+    const [fetchedCategoryName, setCategoryName] = useState<string | null>('');
     const navigate = useNavigate();
     const { currentTheme } = useTheme();
 
-    useEffect(() => {
-        const fetchCategoryName = async () => {
-            if (!categoryId) return;
-
-            try {
-                const { data, error } = await supabase
-                    .from('merchant_product_categories')
-                    .select('category_name')
-                    .eq('id', categoryId)
-                    .single();
-                if (error) {
-                    console.error('Error fetching category name:', error);
+       useEffect(() => {
+            const fetchCategoryName = async () => {
+                if (!categoryId) return;
+    
+                try {
+                    const { data, error } = await supabase
+                        .from('merchant_product_categories')
+                        .select('category_name')
+                        .eq('id', categoryId)
+                        .single();
+                    if (error) {
+                        console.error('Error fetching category name:', error);
+                        return null;
+                    }
+                    setCategoryName(data.category_name);
+                } catch (err) {
+                    console.error('Unexpected error fetching category name:', err);
                     return null;
                 }
-                setCategoryName(data.category_name);
-            } catch (err) {
-                console.error('Unexpected error fetching category name:', err);
-                return null;
-            }
-        };
-
-        fetchCategoryName();
-
-    }, [categoryId, schoolId, showFeatured]);
-
+            };
+    
+            fetchCategoryName();
+    
+        }, [categoryId, schoolId, showFeatured]);
 
     useEffect(() => {
         const fetchProductsByCategory = async () => {
@@ -75,8 +73,6 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     },
                 });
 
-
-
                 if (functionError) {
                     throw functionError;
                 }
@@ -98,24 +94,22 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
 
     if (loading) {
         return (
-
             <div className="flex justify-center items-center h-44 bg-gray-50 w-full">
-                <Loader />
-                {/* <div className="text-xl font-semibold text-gray-700">Loading products...</div> */}
+                <Loader className="animate-spin h-8 w-8 text-indigo-600" />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gray-50">
-                <div className="text-xl font-semibold text-red-600">Error: {error}</div>
+            <div className="flex justify-center items-center h-44 bg-gray-50 p-4">
+                <div className="text-xl font-semibold text-red-600 text-center">Error: {error}</div>
             </div>
         );
     }
 
     return (
-        <div className="pb-6 sm:pb-8 font-sans bg-gray-50 max-w-full overflow-hidden">
+        <div className="pb-6 sm:pb-8 font-sans bg-gray-50 max-w-full">
             <div className="mx-auto">
                 <div className={`px-4 flex gap-1 items-center justify-between mb-6 sm:mb-8 bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white py-1 shadow-md transition-all duration-200 font-medium w-full`}>
 
@@ -136,22 +130,20 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 </div>
 
                 {products.length === 0 ? (
-                    <div className='w-screen flex justify-center items-center h-20 bg-gray-50'>
-
-                        <p className="text-gray-500 text-xl">No products found for this category.</p>
+                    <div className='w-full flex justify-center items-center h-20 bg-gray-50 px-4'>
+                        <p className="text-gray-500 text-xl text-center">No products found for this category.</p>
                     </div>
                 ) : (
-                    <div className="flex overflow-x-auto gap-6 pb-2 scrollbar-hide px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-6 lg:px-8">
                         {products.map((product) => (
-                            <div key={product.id} className="w-48 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
+                            <div key={product.id} className="col-span-1 bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
                                 <Swiper
                                     modules={[Pagination, Navigation]}
                                     spaceBetween={10}
                                     slidesPerView={1}
                                     pagination={{ clickable: true }}
                                     navigation
-                                    className="w-full h-32 md:h-32"
-
+                                    className="w-full h-32 md:h-40" // Increased height slightly for better visibility
                                 >
                                     {product.image_urls.map((url, imgIndex) => (
                                         <SwiperSlide key={imgIndex}>
@@ -166,32 +158,29 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
-                                <div className="p-5 flex flex-col flex-grow">
-                                    {/* <h3 className="text-xl font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
+                                <div className="p-3 sm:p-4 flex flex-col flex-grow">
+                                    {/* <h3 className="text-base font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
                                     {product.discount_price ? (
                                         <div>
-                                            <div className="text-sm text-gray-500 line-through truncate">₦{product.product_price}</div>
-                                            <div className="text-xl text-indigo-600 font-extrabold mb-1">₦{product.discount_price}</div>
+                                            <div className="text-xs text-gray-500 line-through truncate">₦{product.product_price}</div>
+                                            <div className="text-lg text-indigo-600 font-extrabold mb-1">₦{product.discount_price}</div>
                                         </div>
                                     ) : (
-                                        <p className="text-xl text-indigo-600 font-extrabold mb-1">₦{product.product_price}</p>
+                                        <p className="text-lg text-indigo-600 font-extrabold mb-1">₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-sm text-gray-500 mb-3 flex-grow">
+                                        <p className="text-xs text-gray-500 mb-3 flex-grow">
                                             by <span className="font-medium text-gray-700">{product.full_name}</span>
                                         </p>
                                     )}
-                                    {/* <p className={`text-sm font-semibold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>
-                                        {product.is_available ? 'In Stock' : 'Out of Stock'}
-                                    </p> */}
                                     {product.phone_number && (
                                         userIsAuthenticated ? (
                                             // Render as link for authenticated users
-                                            <ContactSellerLink product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                                            <ContactSellerLink product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-4 py-2 text-sm rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
                                                 Get Now
                                             </ContactSellerLink>
                                         ) : (
-                                            <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+                                            <ContactSellerButton product={product} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-4 py-2 text-sm rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
                                                 Get Now
                                             </ContactSellerButton>
                                         )
@@ -202,10 +191,8 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                     </div>
                 )}
             </div>
-
-            {/* Auth handled inside ContactSellerButton */}
         </div>
     );
 };
 
-export default HorizontalProductList;
+export default VerticalProductList;
