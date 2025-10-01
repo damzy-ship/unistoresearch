@@ -88,7 +88,7 @@ export default function MerchantVerifyPrompt() {
           <div className="py-1 pr-3">
             
               <h4 className="font-semibold text-sm mb-1">Verify your seller account</h4>
-              <p className="text-xs text-gray-600">Merchants with unverified accounts must verify before 30th September or uploaded products will be removed.</p>
+              <p className="text-xs text-gray-600">Merchants with unverified accounts must verify before 10th October or uploaded products will be removed.</p>
             
             {/* <button onClick={handleClose} className="p-1 rounded-md text-gray-400 hover:text-gray-700">
               <X className="w-4 h-4" />
