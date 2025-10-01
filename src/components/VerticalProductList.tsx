@@ -27,30 +27,30 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
     const navigate = useNavigate();
     const { currentTheme } = useTheme();
 
-       useEffect(() => {
-            const fetchCategoryName = async () => {
-                if (!categoryId) return;
-    
-                try {
-                    const { data, error } = await supabase
-                        .from('merchant_product_categories')
-                        .select('category_name')
-                        .eq('id', categoryId)
-                        .single();
-                    if (error) {
-                        console.error('Error fetching category name:', error);
-                        return null;
-                    }
-                    setCategoryName(data.category_name);
-                } catch (err) {
-                    console.error('Unexpected error fetching category name:', err);
+    useEffect(() => {
+        const fetchCategoryName = async () => {
+            if (!categoryId) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('merchant_product_categories')
+                    .select('category_name')
+                    .eq('id', categoryId)
+                    .single();
+                if (error) {
+                    console.error('Error fetching category name:', error);
                     return null;
                 }
-            };
-    
-            fetchCategoryName();
-    
-        }, [categoryId, schoolId, showFeatured]);
+                setCategoryName(data.category_name);
+            } catch (err) {
+                console.error('Unexpected error fetching category name:', err);
+                return null;
+            }
+        };
+
+        fetchCategoryName();
+
+    }, [categoryId, schoolId, showFeatured]);
 
     useEffect(() => {
         const fetchProductsByCategory = async () => {
@@ -109,7 +109,9 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
     }
 
     return (
-        <div className="pb-6 sm:pb-8 font-sans bg-gray-50 max-w-full">
+        <div className="pb-6 sm:pb-8 font-sans max-w-full"
+            style={{ backgroundColor: currentTheme.surface }}
+        >
             <div className="mx-auto">
                 <div className={`px-4 flex gap-1 items-center justify-between mb-6 sm:mb-8 bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white py-1 shadow-md transition-all duration-200 font-medium w-full`}>
 
@@ -130,13 +132,19 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
                 </div>
 
                 {products.length === 0 ? (
-                    <div className='w-full flex justify-center items-center h-20 bg-gray-50 px-4'>
-                        <p className="text-gray-500 text-xl text-center">No products found for this category.</p>
+                    <div className='w-full flex justify-center items-center h-20 px-4'
+                        style={{ backgroundColor: currentTheme.background }}
+                    >
+                        <p className="text-xl text-center"
+                            style={{ backgroundColor: currentTheme.text }}
+                        >No products found for this category.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-6 lg:px-8">
                         {products.map((product) => (
-                            <div key={product.id} className="col-span-1 bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
+                            <div key={product.id} className="col-span-1 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border"
+                                style={{ backgroundColor: currentTheme.background }}
+                            >
                                 <Swiper
                                     modules={[Pagination, Navigation]}
                                     spaceBetween={10}
@@ -162,15 +170,23 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
                                     {/* <h3 className="text-base font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
                                     {product.discount_price ? (
                                         <div>
-                                            <div className="text-xs text-gray-500 line-through truncate">₦{product.product_price}</div>
-                                            <div className="text-lg text-indigo-600 font-extrabold mb-1">₦{product.discount_price}</div>
+                                            <div className="text-sm line-through truncate"
+                                                style={{ color: currentTheme.text }}
+                                            >₦{product.product_price}</div>
+                                            <div className="text-lg font-extrabold mb-1"
+                                                style={{ color: currentTheme.primary }}
+                                            >₦{product.discount_price}</div>
                                         </div>
                                     ) : (
-                                        <p className="text-lg text-indigo-600 font-extrabold mb-1">₦{product.product_price}</p>
+                                        <p className="text-lg font-extrabold mb-1"
+                                            style={{ color: currentTheme.primary }}
+                                        >₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-xs text-gray-500 mb-3 flex-grow">
-                                            by <span className="font-medium text-gray-700">{product.full_name}</span>
+                                        <p className="text-xs mb-3 flex-grow"
+                                            style={{ color: currentTheme.text }}
+                                        >
+                                            by <span className="font-medium">{product.full_name}</span>
                                         </p>
                                     )}
                                     {product.phone_number && (
