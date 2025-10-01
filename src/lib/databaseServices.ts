@@ -29,46 +29,46 @@ export async function insertMerchantProductCategories(categoriesData: Array<{ na
 
 // Reusable function to handle image upload, inspired by ProductGallery
 export const uploadImageToSupabase = async (file, uniqueId: string, bucketName: string, folderName?: string) => {
-    const fileExt = file.name.split('.').pop();
-    // Ensure unique file name to prevent conflicts
-    const fileName = `${uniqueId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${folderName ? folderName + '/' : ''}${fileName}`;
+  const fileExt = file.name.split('.').pop();
+  // Ensure unique file name to prevent conflicts
+  const fileName = `${uniqueId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `${folderName ? folderName + '/' : ''}${fileName}`;
 
-    // Upload file to Supabase storage
-    const { error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(filePath, file);
+  // Upload file to Supabase storage
+  const { error: uploadError } = await supabase.storage
+    .from(bucketName)
+    .upload(filePath, file);
 
-    if (uploadError) {
-        throw new Error(`Error uploading image: ${uploadError.message}`);
-        console.log('Error uploading image:', uploadError);
-    }
-    
+  if (uploadError) {
+    throw new Error(`Error uploading image: ${uploadError.message}`);
+    console.log('Error uploading image:', uploadError);
+  }
 
-    // Get the public URL
-    const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
 
-    return publicUrl;
+  // Get the public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucketName)
+    .getPublicUrl(filePath);
+
+  return publicUrl;
 };
 
 // Reusable function to delete image from Supabase Storage
 export const deleteImageFromSupabase = async (imageUrl: string, bucketName: string) => {
-    const urlParts = imageUrl.split('/');
-    // Extract the filename with its folder from the public URL
-    const fileName = urlParts.slice(urlParts.indexOf(bucketName) + 1).join('/');
+  const urlParts = imageUrl.split('/');
+  // Extract the filename with its folder from the public URL
+  const fileName = urlParts.slice(urlParts.indexOf(bucketName) + 1).join('/');
 
-    if (fileName) {
-        const { error: storageError } = await supabase.storage
-            .from(bucketName)
-            .remove([fileName]);
+  if (fileName) {
+    const { error: storageError } = await supabase.storage
+      .from(bucketName)
+      .remove([fileName]);
 
-        if (storageError) {
-            console.warn('Error deleting image from storage:', storageError);
-            // We can continue as the database record might be the primary source of truth
-        }
+    if (storageError) {
+      console.warn('Error deleting image from storage:', storageError);
+      // We can continue as the database record might be the primary source of truth
     }
+  }
 };
 
 
@@ -117,7 +117,7 @@ export async function updateAllMerchantProductsFromVisitors() {
 
     try {
       console.log(`Updating products for merchant ID: ${merchantId}`);
-      
+
       const { data: updatedProducts, error: updateError } = await supabase
         .from('merchant_products')
         .update({ actual_merchant_id: visitorId })
@@ -149,7 +149,7 @@ export async function updateAllMerchantProductsFromVisitors() {
  * Updates the 'user_type' to NULL for all records in 'unique_visitors'
  * where the 'auth_user_id' is also NULL.
  */
-export async function updateUserTypeForNullAuthVisitors() {
+export async function updateSchoolForNullAuthVisitors() {
   console.log('Starting bulk update of unique_visitors where auth_user_id is NULL...');
 
   try {
@@ -158,7 +158,7 @@ export async function updateUserTypeForNullAuthVisitors() {
       .update({ school_id: null }) // Set school_id to NULL
       .is('auth_user_id', null)    // Filter where auth_user_id is NULL
       .select('id', { count: 'exact' }); // Select ID and request an exact count of updated rows
- 
+
     if (error) {
       console.error('Error during bulk user_type update:', error.message);
       return {
@@ -170,6 +170,44 @@ export async function updateUserTypeForNullAuthVisitors() {
 
     const updatedCount = count || 0;
     console.log(`Successfully updated user_type to NULL for ${updatedCount} visitor records.`);
+
+    return {
+      status: 'success',
+      message: `Updated ${updatedCount} unique visitors.`,
+      count: updatedCount,
+    };
+
+  } catch (err) {
+    console.error('Unexpected error during update:', err);
+    return {
+      status: 'error',
+      message: 'An unexpected error occurred.',
+      error: (err as Error).message,
+    };
+  }
+}
+
+export async function updateUserTypeForNullAuthVisitors() {
+  console.log('Starting bulk update of unique_visitors where auth_user_id is NULL...');
+
+  try {
+    const { data, error, count } = await supabase
+      .from('unique_visitors')
+      .update({ user_type: 'visitor' })
+      .is('auth_user_id', null)
+      .select('id', { count: 'exact' });
+
+    if (error) {
+      console.error('Error during bulk user_type update:', error.message);
+      return {
+        status: 'failed',
+        message: 'Failed to update user types.',
+        error: error.message,
+      };
+    }
+
+    const updatedCount = count || 0;
+    console.log(`Successfully updated user_type to 'visitor' for ${updatedCount} visitor records.`);
 
     return {
       status: 'success',

@@ -220,7 +220,7 @@ export default function HomePage() {
               categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
               schoolId={selectedSchoolId}
               userIsAuthenticated={userIsAuthenticated}
-             />
+            />
 
             <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
             <MerchantCategoriesGrid
