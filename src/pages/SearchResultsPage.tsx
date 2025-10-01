@@ -19,7 +19,7 @@ function SearchResultsPage() {
   const { products, searchQuery } = location.state as { products: Product[], searchQuery: string };
   const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingProduct, setPendingProduct] = useState<Partial<Product>|null>(null);
+  const [pendingProduct, setPendingProduct] = useState<Partial<Product> | null>(null);
 
   useEffect(() => {
     const check = async () => {
@@ -50,12 +50,12 @@ function SearchResultsPage() {
 
   return (
     <div className="min-h-screen p-6 sm:p-8 font-sans"
-      style={{ background: currentTheme.background }}
+      style={{ background: currentTheme.surface }}
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-2xl font-extrabold mb-2 tracking-tight animate-fade-in"
-            style={{ color: currentTheme.text }}>Search Results</h1>
+            style={{ color: currentTheme.primary }}>Search Results</h1>
           <p className="text-lg font-medium animate-slide-up"
             style={{ color: currentTheme.text }}>for <span style={{ color: currentTheme.text }} className="text-gray-900 font-semibold">"{searchQuery}"</span></p>
         </div>
@@ -63,7 +63,9 @@ function SearchResultsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {products.length > 0 ? (
             products.map((product, index) => (
-              <div key={index} className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden flex flex-col border border-gray-200">
+              <div key={index}
+                style={{ backgroundColor: currentTheme.background }}
+                className="rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden flex flex-col border border-gray-200">
                 <Swiper
                   modules={[Pagination, Navigation]}
                   spaceBetween={10}
@@ -87,18 +89,28 @@ function SearchResultsPage() {
                 </Swiper>
 
                 <div className="p-6 flex flex-col flex-grow">
-                  <h3 className={`text-xl font-bold mb-2 truncate text-${currentTheme.primaryTsFormat}`}>{product.product_description}</h3>
+                  <h3 className="text-xl font-bold mb-2 truncate"
+                    style={{ color: currentTheme.text }}
+                  >{product.product_description}</h3>
                   {product.discount_price ? (
                     <div className="mb-2">
-                      <div className="text-sm text-gray-500 line-through">₦{product.product_price}</div>
-                      <div className="text-3xl text-green-600 font-black">₦{product.discount_price}</div>
+                      <div className="text-sm line-through"
+                        style={{ color: currentTheme.text }}
+                      >₦{product.product_price}</div>
+                      <div
+                        style={{ color: currentTheme.primary }}
+                        className="text-3xl font-black">₦{product.discount_price}</div>
                     </div>
                   ) : (
-                    <p className="text-3xl text-green-600 font-black mb-2">₦{product.product_price}</p>
+                    <p
+                      style={{ color: currentTheme.primary }}
+                      className="text-3xl font-black mb-2">₦{product.product_price}</p>
                   )}
                   {product.full_name && (
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-semibold text-gray-700">{product.full_name}</span>
+                    <p className="text-sm mb-2"
+                      style={{ color: currentTheme.text }}
+                    >
+                      <span className="font-semibold">by {product.full_name}</span>
                     </p>
                   )}
                   <p className={`text-sm font-bold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>

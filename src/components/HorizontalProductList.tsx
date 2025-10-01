@@ -115,7 +115,9 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     }
 
     return (
-        <div className="pb-6 sm:pb-8 font-sans bg-gray-50 max-w-full overflow-hidden">
+        <div className="pb-6 sm:pb-8 font-sans max-w-full overflow-hidden"
+            style={{ backgroundColor: currentTheme.surface }}
+        >
             <div className="mx-auto">
                 <div className={`px-4 flex gap-1 items-center justify-between mb-6 sm:mb-8 bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white py-1 shadow-md transition-all duration-200 font-medium w-full`}>
 
@@ -136,14 +138,19 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 </div>
 
                 {products.length === 0 ? (
-                    <div className='w-screen flex justify-center items-center h-20 bg-gray-50'>
-
-                        <p className="text-gray-500 text-xl">No products found for this category.</p>
+                    <div className='w-full flex justify-center items-center h-20 px-4'
+                        style={{ backgroundColor: currentTheme.background }}
+                    >
+                        <p className="text-xl text-center"
+                            style={{ backgroundColor: currentTheme.text }}
+                        >No products found for this category.</p>
                     </div>
                 ) : (
                     <div className="flex overflow-x-auto gap-6 pb-2 scrollbar-hide px-4 sm:px-6 lg:px-8">
                         {products.map((product) => (
-                            <div key={product.id} className="w-48 md:w-60 flex-shrink-0 bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
+                            <div key={product.id}
+                                style={{ backgroundColor: currentTheme.background }}
+                                className="w-48 md:w-60 flex-shrink-0 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
                                 <Swiper
                                     modules={[Pagination, Navigation]}
                                     spaceBetween={10}
@@ -170,15 +177,23 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                     {/* <h3 className="text-xl font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
                                     {product.discount_price ? (
                                         <div>
-                                            <div className="text-sm text-gray-500 line-through truncate">₦{product.product_price}</div>
-                                            <div className="text-xl text-indigo-600 font-extrabold mb-1">₦{product.discount_price}</div>
+                                            <div className="text-sm line-through truncate"
+                                                style={{ color: currentTheme.text }}
+                                            >₦{product.product_price}</div>
+                                            <div className="text-xl font-extrabold mb-1"
+                                                style={{ color: currentTheme.primary }}
+                                            >₦{product.discount_price}</div>
                                         </div>
                                     ) : (
-                                        <p className="text-xl text-indigo-600 font-extrabold mb-1">₦{product.product_price}</p>
+                                        <p className="text-xl font-extrabold mb-1"
+                                            style={{ color: currentTheme.primary }}
+                                        >₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-sm text-gray-500 mb-3 flex-grow">
-                                            by <span className="font-medium text-gray-700">{product.full_name}</span>
+                                        <p className="text-sm mb-3 flex-grow"
+                                            style={{ color: currentTheme.text }}
+                                        >
+                                            by <span className="font-medium">{product.full_name}</span>
                                         </p>
                                     )}
                                     {/* <p className={`text-sm font-semibold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>
