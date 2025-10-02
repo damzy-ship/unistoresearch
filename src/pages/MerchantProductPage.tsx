@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, Loader, CheckCircle, AlertCircle, Image, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 
-interface Product {
-    id: string;
-    merchant_id: string;
-    product_description: string;
-    product_price: string;
-    is_available: boolean;
-    created_at: string;
-    image_urls: string[];
-    embedding: number[]; // New field for the embedding vector
-    search_description: string; // New field for the enhanced description
-}
 
 // Define the maximum number of images allowed
 const MAX_IMAGES = 5;
@@ -29,14 +18,16 @@ export default function MerchantProductPage() {
     const [error, setError] = useState<string | null>(null);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [merchantDetails, setMerchantDetails] = useState<UniqueVisitor | null>(null);
 
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
+    const [isHostelProduct, setIsHostelProduct] = useState(false);
     const [newFiles, setNewFiles] = useState<File[]>([]); // State for new files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
-
+    const [isHostelMerchant, setIsHostelMerchant] = useState(false);
     const { currentTheme } = useTheme();
 
     // Calculate the total number of images that will exist after adding/editing
@@ -47,9 +38,27 @@ export default function MerchantProductPage() {
 
     useEffect(() => {
         if (merchantId) {
+            fetchMerchant();
             fetchProducts();
         }
     }, [merchantId]);
+
+    const fetchMerchant = async () => {
+        try {
+            if (!actual_merchant_id) return null;
+            const { data, error } = await supabase
+                .from('unique_visitors')
+                .select('*')
+                .eq('id', actual_merchant_id)
+                .single();
+            if (error) {
+                console.error('Error fetching merchant:', error);
+                return null;
+            }
+            setMerchantDetails(data);
+            setIsHostelMerchant(data.is_hostel_merchant || false);
+        } catch (err) { console.error('Error fetching merchant:', err); }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -57,14 +66,17 @@ export default function MerchantProductPage() {
         try {
             const { data, error } = await supabase
                 .from('merchant_products')
-                .select('*')
+                .select(`*`)
                 .eq('merchant_id', merchantId)
                 .order('created_at', { ascending: false });
 
             if (error) {
                 throw error;
             }
-            setProducts(data || []);
+
+            setProducts(data);
+            // setIsHostelMerchant(data[0]?.unique_visitor?.is_hostel_merchant || false);
+            // console.log('Fetched products:', data);
         } catch (err) {
             console.error('Error fetching products:', err);
             setError('Failed to load products');
@@ -104,6 +116,7 @@ export default function MerchantProductPage() {
         setProductDescription(product.product_description);
         setProductPrice(product.product_price);
         setIsAvailable(product.is_available);
+        setIsHostelProduct(product.is_hostel_product);
         setNewFiles([]);
         setShowAddProductForm(true);
     };
@@ -112,6 +125,7 @@ export default function MerchantProductPage() {
         setProductDescription('');
         setProductPrice('');
         setIsAvailable(true);
+        setIsHostelProduct(false);
         setNewFiles([]);
         setEditingProduct(null);
         setError(null);
@@ -122,6 +136,7 @@ export default function MerchantProductPage() {
         setProductDescription('');
         setProductPrice('');
         setIsAvailable(true);
+        setIsHostelProduct(false);
         setNewFiles([]);
         setEditingProduct(null);
         setError(null);
@@ -136,8 +151,8 @@ export default function MerchantProductPage() {
         }
 
         if (newFiles.length > MAX_IMAGES) {
-             setError(`You can only upload a maximum of ${MAX_IMAGES} images. You selected ${newFiles.length}.`);
-             return;
+            setError(`You can only upload a maximum of ${MAX_IMAGES} images. You selected ${newFiles.length}.`);
+            return;
         }
 
         setLoading(true);
@@ -157,6 +172,7 @@ export default function MerchantProductPage() {
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
+                    is_hostel_product: isHostelProduct,
                     image_urls: imageUrls,
                     embedding: embedding,
                     search_description: enhancedDescription
@@ -186,8 +202,8 @@ export default function MerchantProductPage() {
 
         const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newFiles.map(file => URL.createObjectURL(file))];
         if (updatedImageUrls.length > MAX_IMAGES) {
-             setError(`You can only have a maximum of ${MAX_IMAGES} images. You are adding ${newFiles.length} new files to your existing ${editingProduct.image_urls.length} images.`);
-             return;
+            setError(`You can only have a maximum of ${MAX_IMAGES} images. You are adding ${newFiles.length} new files to your existing ${editingProduct.image_urls.length} images.`);
+            return;
         }
 
         setLoading(true);
@@ -215,6 +231,7 @@ export default function MerchantProductPage() {
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
+                    is_hostel_product: isHostelProduct,
                     image_urls: finalImageUrls,
                     embedding: newEmbedding,
                     search_description: newSearchDescription
@@ -235,6 +252,7 @@ export default function MerchantProductPage() {
             setLoading(false);
         }
     };
+
 
     const handleToggleAvailability = async (product: Product) => {
         const newAvailability = !product.is_available;
@@ -294,7 +312,6 @@ export default function MerchantProductPage() {
 
     return (
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto my-8 p-6"
-
         >
             <div className="flex justify-between items-center pb-4">
                 <h2 className="text-md sm:text-xl font-semibold text-gray-800">
@@ -345,6 +362,35 @@ export default function MerchantProductPage() {
                             />
                             <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">Available for sale</label>
                         </div>
+
+                        {/* --- NEW TOGGLE SWITCH FOR is_hostel_product --- */}
+                        {isHostelMerchant && <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
+                            <label htmlFor="isHostelProductToggle" className="text-sm font-medium text-gray-700 select-none">
+                                Hostel Product
+                            </label>
+                            <label
+                                htmlFor="isHostelProductToggle"
+                                className={`relative inline-flex items-center cursor-pointer transition-all duration-300 ${loading || uploadingImages ? 'opacity-50' : ''}`}
+                            >
+                                <input
+                                    id="isHostelProductToggle"
+                                    type="checkbox"
+                                    checked={isHostelProduct}
+                                    onChange={(e) => setIsHostelProduct(e.target.checked)}
+                                    disabled={loading || uploadingImages}
+                                    className="sr-only peer"
+                                />
+                                {/* Track (Rectangular Look) */}
+                                <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-sm peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:bg-yellow-500 transition-colors duration-300 ease-in-out"></div>
+
+                                {/* Thumb (Square Look) */}
+                                <div
+                                    className={`absolute left-[4px] top-[4px] bg-white w-5 h-5 transition-all duration-300 ease-in-out border border-gray-300 
+                                                ${isHostelProduct ? 'translate-x-7 bg-white shadow-md' : 'translate-x-0 bg-gray-100 shadow-sm'}`}
+                                ></div>
+                            </label>
+                        </div>}
+                        {/* ----------- END TOGGLE SWITCH FOR is_hostel_product ----------------------------------------- */}
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -453,6 +499,13 @@ export default function MerchantProductPage() {
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
+                                        {/* --- DISPLAY HOSTEL STATUS --- */}
+                                        {product.is_hostel_product && isHostelMerchant && (<p className="text-xs text-gray-500 flex items-center justify-center gap-1">
+
+                                            <span className='font-medium text-purple-600'>[Hostel Product]</span>
+
+                                        </p>)}
+
                                         <div className="flex gap-2 mt-4 w-full">
                                             <button
                                                 onClick={() => startEditProduct(product)}
@@ -469,7 +522,9 @@ export default function MerchantProductPage() {
                                             >
                                                 {product.is_available ? 'Set Unavailable' : 'Set Available'}
                                             </button>
+
                                         </div>
+
                                     </div>
                                 </div>
                             ))}

@@ -17,7 +17,8 @@ import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import VerticalProductList from '../components/VerticalProductList';
-
+// import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
+// import merchantProductData from '../data/product_data.json';
 
 export default function HomePage() {
   const { currentTheme, backgroundTexture } = useTheme();
@@ -176,15 +177,10 @@ export default function HomePage() {
               <Header onAuthClick={() => setShowAuthModal(true)} />
             </div>
 
-            {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
-            <h1>Get Matching Categories and Features</h1>
-          </button> */}
+
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
-            <h1>UPDATE</h1>
-          </button> */}
-            {/* <button onClick={() => updateAllMerchantProductsFromVisitors()}>
-            <h1>UPDATE ALL MERCHANTS PRODUCTS FROM VISITORS</h1>
-          </button>  */}
+              <h1>UPDATE</h1>
+            </button> */}
 
             {/* UniStore Logo */}
             <div className="mb-12 px-2">

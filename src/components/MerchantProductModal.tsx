@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 
 
 
-interface Product {
-    id: string;
-    merchant_id: string;
-    product_description: string;
-    product_price: string;
-    is_available: boolean;
-    created_at: string;
-    image_urls: string[];
-    embedding: number[]; // New field for the embedding vector
-    search_description: string;
-}
 
 interface MerchantProductModalProps {
     actual_merchant_id?: string;
@@ -34,17 +23,37 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     const [error, setError] = useState<string | null>(null);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
+    const [isHostelMerchant, setIsHostelMerchant] = useState(false);
+    const [merchantDetails, setMerchantDetails] = useState<UniqueVisitor | null>(null);
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
+    const [isHostelProduct, setIsHostelProduct] = useState(false);
     const [newFiles, setNewFiles] = useState<File[]>([]); // New state for files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
 
     useEffect(() => {
+        fetchMerchant();
         fetchProducts();
     }, [merchantId]);
+
+    const fetchMerchant = async () => {
+        try {
+            if (!actual_merchant_id) return null;
+            const { data, error } = await supabase
+                .from('unique_visitors')
+                .select('*')
+                .eq('id', actual_merchant_id)
+                .single();
+            if (error) {
+                console.error('Error fetching merchant:', error);
+                return null;
+            }
+            setMerchantDetails(data);
+            setIsHostelMerchant(data.is_hostel_merchant || false);
+        } catch (err) { console.error('Error fetching merchant:', err); }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -59,6 +68,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
             if (error) {
                 throw error;
             }
+
+            // setIsHostelMerchant(data[0]?.unique_visitor?.is_hostel_merchant || false);
             setProducts(data || []);
         } catch (err) {
             console.error('Error fetching products:', err);
@@ -72,7 +83,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            
+
             // Check for file count limit (New Logic)
             const currentFilesCount = editingProduct?.image_urls.length || 0;
             const totalFilesAfterUpload = currentFilesCount + filesArray.length;
@@ -80,7 +91,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
             if (totalFilesAfterUpload > MAX_IMAGES) {
                 setError(`You can only upload a maximum of ${MAX_IMAGES} images. You currently have ${currentFilesCount} image(s) and are trying to upload ${filesArray.length} new image(s).`);
                 // Clear the file input for a better UX, though the state setNewFiles won't be called.
-                e.target.value = ''; 
+                e.target.value = '';
                 setNewFiles([]); // Ensure no files are mistakenly queued
                 return;
             }
@@ -89,11 +100,11 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
             const invalidFiles = filesArray.filter(file => file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/'));
             if (invalidFiles.length > 0) {
                 setError('Some files were invalid. Max 5MB per file, and only image types are allowed.');
-                e.target.value = ''; 
+                e.target.value = '';
                 setNewFiles([]); // Ensure no files are mistakenly queued
                 return;
             }
-            
+
             // If all checks pass, set the files
             setNewFiles(filesArray);
             setError(null);
@@ -107,6 +118,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         setIsAvailable(true);
         setNewFiles([]);
         setEditingProduct(null);
+        setIsHostelProduct(false);
         setError(null);
         setShowAddProductForm(false);
     };
@@ -116,6 +128,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         setIsAvailable(true);
         setNewFiles([]);
         setEditingProduct(null);
+        setIsHostelProduct(false);
         setError(null);
         // setShowAddProductForm(false); // Original code commented out this line
     };
@@ -130,8 +143,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
 
         // Add an immediate check for a new product submission
         if (newFiles.length > MAX_IMAGES) {
-             setError(`You can only upload a maximum of ${MAX_IMAGES} images.`);
-             return;
+            setError(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+            return;
         }
 
 
@@ -156,6 +169,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
+                    is_hostel_product: isHostelProduct,
                     image_urls: imageUrls,
                     embedding: embedding, // Store the embedding
                     search_description: enhancedDescription
@@ -187,8 +201,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         // Add an immediate check for the total image count during edit
         const totalImages = (editingProduct?.image_urls.length || 0) + newFiles.length;
         if (totalImages > MAX_IMAGES) {
-             setError(`You can only have a total of ${MAX_IMAGES} images. You currently have ${editingProduct.image_urls.length} and are trying to add ${newFiles.length} new images.`);
-             return;
+            setError(`You can only have a total of ${MAX_IMAGES} images. You currently have ${editingProduct.image_urls.length} and are trying to add ${newFiles.length} new images.`);
+            return;
         }
 
         setLoading(true);
@@ -220,6 +234,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
+                    is_hostel_product: isHostelProduct,
                     image_urls: updatedImageUrls,
                     embedding: newEmbedding,
                     search_description: newSearchDescription
@@ -272,6 +287,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         setProductDescription(product.product_description);
         setProductPrice(product.product_price);
         setIsAvailable(product.is_available);
+        setIsHostelProduct(product.is_hostel_product);
         setNewFiles([]);
         setShowAddProductForm(true);
     };
@@ -307,7 +323,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     };
 
     // 💡 MODIFIED RENDER LOGIC FOR INPUT FIELD
-    const isImageUploadDisabled = editingProduct 
+    const isImageUploadDisabled = editingProduct
         ? (editingProduct.image_urls.length + newFiles.length) >= MAX_IMAGES
         : newFiles.length >= MAX_IMAGES;
 
@@ -371,6 +387,38 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                 <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">Available for sale</label>
                             </div>
 
+                            {/* --- NEW TOGGLE SWITCH FOR is_hostel_product --- */}
+                            {isHostelMerchant && (
+                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                    <label htmlFor="isHostelProductToggle" className="text-sm font-medium text-gray-700 select-none">
+                                        Hostel Product
+                                    </label>
+                                    <label
+                                        htmlFor="isHostelProductToggle"
+                                        className={`relative inline-flex items-center cursor-pointer transition-all duration-300 ${loading || uploadingImages ? 'opacity-50' : ''}`}
+                                    >
+                                        <input
+                                            id="isHostelProductToggle"
+                                            type="checkbox"
+                                            checked={isHostelProduct}
+                                            onChange={(e) => setIsHostelProduct(e.target.checked)}
+                                            disabled={loading || uploadingImages}
+                                            className="sr-only peer"
+                                        />
+                                        {/* Track (Rectangular Look) */}
+                                        <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-sm peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:bg-yellow-500 transition-colors duration-300 ease-in-out"></div>
+
+                                        {/* Thumb (Square Look) */}
+                                        <div
+                                            className={`absolute left-[4px] top-[4px] bg-white w-5 h-5 transition-all duration-300 ease-in-out border border-gray-300 
+                                                ${isHostelProduct ? 'translate-x-7 bg-white shadow-md' : 'translate-x-0 bg-gray-100 shadow-sm'}`}
+                                        ></div>
+                                    </label>
+                                </div>)
+                            }
+                            {/* ----------- END TOGGLE SWITCH FOR is_hostel_product ----------------------------------------- */}
+
+
                             {/* Image Upload Section */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -388,7 +436,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                     onChange={handleFileChange}
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
                                     // 💡 MODIFIED DISABLED STATE
-                                    disabled={uploadingImages || loading || isImageUploadDisabled} 
+                                    disabled={uploadingImages || loading || isImageUploadDisabled}
                                     key={editingProduct?.id} // Add key to force re-render/reset the file input on product change
                                 />
                             </div>
@@ -480,6 +528,13 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
+
+                                        {/* --- DISPLAY HOSTEL STATUS --- */}
+                                        {product.is_hostel_product && isHostelMerchant && (<p className="text-xs text-gray-500 flex items-center justify-center gap-1">
+
+                                            <span className='font-medium text-purple-600'>[Hostel Product]</span>
+
+                                        </p>)}
                                         <div className="flex gap-2 mt-2">
                                             <button
                                                 onClick={() => startEditProduct(product)}

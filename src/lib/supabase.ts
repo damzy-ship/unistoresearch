@@ -50,7 +50,11 @@ export interface UniqueVisitor {
   brand_name?: string | null;
   verification_status?: 'pending' | 'verified' | 'unverified'| null;
   verification_id?: string;
-
+  hostel_id?: string
+  schools?: School
+  hostels?: Hostel
+  room?: string
+  is_hostel_merchant?: boolean
 }
 
 export interface Product {
@@ -72,6 +76,8 @@ export interface Product {
     created_at?: string;
     merchant_id?: string;
     actual_merchant_id?: string;
+    unique_visitors?: UniqueVisitor;
+    is_hostel_product: boolean; 
 }
 
 export interface RequestLog {
@@ -92,6 +98,13 @@ export interface School {
   short_name: string;
   is_active: boolean;
   created_at: string;
+}
+
+export interface Hostel {
+  id: string
+  name: string
+  school_id: string
+  schools?: School
 }
 
 

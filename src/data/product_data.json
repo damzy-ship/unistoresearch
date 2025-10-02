@@ -1,407 +1,177 @@
 [
   {
-    "id": "c1e85b8c-8471-4a00-97fb-bfff9acdc8c0",
-    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "Necklaces", "Butterfly shape", "Female Accessories"],
-    "product_features": ["butterfly shape", "neck decoration", "jewelry", "pretty", "fashionable"]
+    "id": "ab871c8b-ae68-4a1d-9730-916c06958569",
+    "product_categories": ["beverage containers", "water bottles", "multi-use bottles", "drinkware", "travel bottles"],
+    "product_features": ["3-in-1 design", "hot/cold retention", "portable containers", "different drinks", "water container"]
   },
   {
-    "id": "a51515bf-47bb-4b78-b22e-89958b5a494b",
-    "product_categories": ["Women's Bags", "Tote Bags", "Everyday Carry", "Large Bags", "Fashion Bags"],
-    "product_features": ["big size", "lots of things", "extra pockets", "easy carry", "spacious"]
+    "id": "d09379ec-7efb-4ff8-a0c0-173b9bb09215",
+    "product_categories": ["room fragrances", "scent diffusers", "home decor", "reed diffusers", "aroma therapy"],
+    "product_features": ["nice scent", "room scent", "room spread", "reed sticks", "home use"]
   },
   {
-    "id": "5856bf83-5ffb-4f21-a957-942179126a65",
-    "product_categories": ["Men's Footwear", "Boots", "Protective Footwear", "Branded Shoes", "Unisex Footwear"],
-    "product_features": ["Dr. Martin brand", "foot protection", "durable", "sizes 40-48", "branded"]
+    "id": "6e34566c-bc9f-4186-8c60-1a2ad6a762b9",
+    "product_categories": ["perfumes", "Women's Fragrances", "luxury perfumes", "fashion fragrances", "personal care"],
+    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "special bottle"]
   },
   {
-    "id": "c4a1c8af-ad05-4a81-9ce4-c3637e45414e",
-    "product_categories": ["Home Decor", "LED Decorations", "Room Lighting", "Children's Products", "Decorative Items"],
-    "product_features": ["glow in dark", "LED glow", "room enhancement", "decoration", "magical feel"]
+    "id": "52e74a66-a570-490a-8f3e-04fc068a6c2c",
+    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "Jewelry Sets", "necklaces", "Bracelets"],
+    "product_features": ["jewelry", "neck decoration", "wrist jewelry", "beautiful", "fashionable"]
   },
   {
-    "id": "49bd3817-1426-497b-9366-03956f6c0003",
-    "product_categories": ["Unisex Footwear", "Sneakers", "Athletic Shoes", "Adidas Brand", "Everyday Shoes"],
-    "product_features": ["Adidas brand", "color options", "sports shoes", "casual wear", "branded"]
+    "id": "1588a03b-5b1d-4b2a-bb6d-97073c15719a",
+    "product_categories": ["Electronics", "headphones", "audio recording", "music listening", "unisex"],
+    "product_features": ["electronic", "music/stories", "voice/sound capture", "calls", "talk to people"]
   },
   {
-    "id": "df3d6bc0-db9e-40f9-8944-b316b5842cb2",
-    "product_categories": ["Women's Accessories", "Hair Accessories", "Claw Clips", "Hair Clips", "Beauty Accessories"],
-    "product_features": ["hair holding", "pretty patterns", "clip", "small/medium sizes", "hair decoration"]
+    "id": "cfe9a814-b16e-44b3-843b-3f79bd4cd2b0",
+    "product_categories": ["body mist", "Women's Fragrances", "personal care", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["nice scent", "fresh feel", "body help", "skin application", "gentle fragrance"]
   },
   {
-    "id": "bf3c8a55-9c14-4c56-adaf-8f6e5d005331",
-    "product_categories": ["Men's Footwear", "Sneakers", "Athletic Shoes", "New Balance Brand", "Unisex Footwear"],
-    "product_features": ["New Balance brand", "sports shoes", "size 43", "branded", "athletic"]
+    "id": "b0a236ca-762a-44e2-bb8a-8c150fae1906",
+    "product_categories": ["Women's Clothing", "summer clothing", "Fashion Apparel", "Casual Wear", "warm weather"],
+    "product_features": ["fashionable", "casual wear", "warm weather", "style", "nice look"]
   },
   {
-    "id": "3c784067-cf78-4ac2-b259-899968895b7a",
-    "product_categories": ["Women's Fragrances", "Perfume Oils", "Luxury Scents", "Beauty Products", "Feminine Scents"],
-    "product_features": ["perfume", "oil form", "nice scent", "small bottle", "fragrance"]
+    "id": "0bf4310e-6ee9-4a53-ad0c-85f2ae79aede",
+    "product_categories": ["Food", "desserts", "plant-based", "snacks", "unisex"],
+    "product_features": ["tasty", "sweet treat", "ready to enjoy", "creamy", "chocolate flavor"]
   },
   {
-    "id": "cc4fdea0-53b9-4f71-8e45-ce2f9a7c8414",
-    "product_categories": ["Unisex Clothing", "Sweatshirts", "Comfort Wear", "Warm Clothing", "Casual Wear"],
-    "product_features": ["warm", "cozy", "comfortable", "casual wear", "upper body wear"]
+    "id": "b3028213-c1f0-457a-933e-4e483598667d",
+    "product_categories": ["cakes", "desserts", "celebration cakes", "mini cakes", "Food"],
+    "product_features": ["sweet", "special treat", "special occasions", "tasty", "cream flavor"]
   },
   {
-    "id": "1ed7cf1f-2287-4038-9548-e4bd818e40a0",
-    "product_categories": ["Women's Accessories", "Wig Stands", "Hair Accessories", "Beauty Tools", "Hair Care"],
-    "product_features": ["wig accessory", "hair protection", "neat keep", "functional", "beauty enhancement"]
+    "id": "89432ed3-0361-4636-b444-2cb4ec6f5f0e",
+    "product_categories": ["home decor", "mats", "decorative floor", "home accessories", "welcoming"],
+    "product_features": ["floor decoration", "multi-surface", "durable", "welcoming", "home use"]
   },
   {
-    "id": "8dd0ace7-fc26-4758-94a6-c7283aa7edda",
-    "product_categories": ["Women's Accessories", "Beauty Accessories", "Perfume Atomizers", "Travel Perfumes", "Makeup Accessories"],
-    "product_features": ["perfume", "portable", "color options", "spray application", "beauty enhancement"]
+    "id": "18944045-8dc4-40e8-afaa-8547c93132fa",
+    "product_categories": ["Women's Bags", "handbags", "Fashion Bags", "pink accessories", "casual bags"],
+    "product_features": ["fashion bag", "pink color", "carry things", "stylish carry", "easy carry"]
   },
   {
-    "id": "b69bfd3b-1c83-4271-ae1a-f4335d5cae44",
-    "product_categories": ["Kitchenware", "Storage Solutions", "Home Organization", "Food Preparation", "Tableware"],
-    "product_features": ["glass material", "food storage", "home use", "versatile use", "durable"]
+    "id": "e87ca419-00c1-4fb3-8840-94a09aa14cc4",
+    "product_categories": ["Women's Clothing", "Crochet Clothing", "Casual Tops", "fashion tops", "summer clothing"],
+    "product_features": ["crochet", "crochet style", "comfy top", "upper body wear", "fashionable"]
   },
   {
-    "id": "ef6562e8-4ea7-476a-8015-bd8cc8ce7118",
-    "product_categories": ["Furniture", "Home Accessories", "Reading Materials", "Home Organization", "Portable Tables"],
-    "product_features": ["reading enjoyment", "home use", "functional", "portable tables", "comfortable"]
+    "id": "1dd85d86-180d-4dfc-a7f9-a1829948ab5b",
+    "product_categories": ["Phone Accessories", "Phone Cases", "protective covers", "crochet", "Tech Accessories"],
+    "product_features": ["crochet", "protective", "phone protection", "soft", "special yarn"]
   },
   {
-    "id": "b47c64ac-0054-4041-93ca-d62c4c91a479",
-    "product_categories": ["Electronics", "Smartphones", "Mobile Phones", "Samsung Brand", "Unlocked Phones"],
-    "product_features": ["Samsung brand", "camera", "apps", "communication tools", "high storage"]
+    "id": "d1b746b7-50b5-4917-ab8a-e05f1fd440ca",
+    "product_categories": ["Women's Bags", "tote bags", "fluffy accessories", "casual bags", "Fashion Bags"],
+    "product_features": ["fluffy", "soft", "spacious", "carry things", "stylish carry"]
   },
   {
-    "id": "c20bf12f-183a-407f-8aa4-4169c7a37c56",
-    "product_categories": ["Women's Accessories", "Wig Stands", "Hair Accessories", "Beauty Tools", "White Color"],
-    "product_features": ["wig accessory", "white color", "hair protection", "functional", "beauty tools"]
+    "id": "58995c1e-0f79-4651-b558-523ac26bef50",
+    "product_categories": ["Hair Extensions", "Human Hair", "hair replacements", "Women's Wigs", "hair accessories"],
+    "product_features": ["4x4 closure", "human hair", "hair", "wearable hairpiece", "changes hairstyle"]
   },
   {
-    "id": "dcc05de3-072b-40f9-b083-576dc6bcc34d",
-    "product_categories": ["Furniture", "Home Accessories", "Bedroom Accessories", "Portable Tables", "Reading Materials"],
-    "product_features": ["reading enjoyment", "home relaxation", "portable", "functional", "comfortable"]
+    "id": "fb2cbf5b-a656-4e30-87c2-984e833e6573",
+    "product_categories": ["Men's Clothing", "Casual Shirts", "Men's Tops", "button-down shirts", "unisex"],
+    "product_features": ["casual", "comfortable", "upper body wear", "daily wear", "nice look"]
   },
   {
-    "id": "05357795-083f-4fbe-881a-86a195c58fda",
-    "product_categories": ["Men's Footwear", "Boots", "Brown Color", "Protective Footwear", "Branded Shoes"],
-    "product_features": ["Dr. Martin brand", "brown color", "foot protection", "sizes 40-48", "durable"]
+    "id": "4f5ead40-eeef-4eeb-8644-6564365676e0",
+    "product_categories": ["Tech Accessories", "protective covers", "crochet", "headphones", "Electronics"],
+    "product_features": ["crochet", "protective", "soft", "special yarn", "cozy"]
   },
   {
-    "id": "7f856204-fde4-4c28-9e69-040aa543d439",
-    "product_categories": ["Men's Clothing", "Sweatshirts", "Religious Jewelry", "Comfort Wear", "Branded Apparel"],
-    "product_features": ["Christian theme", "warm", "comfortable", "faith expression", "upper body wear"]
+    "id": "149b8cee-cba2-4dd9-acbf-37642be6c722",
+    "product_categories": ["perfumes", "Men's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["perfume", "long-lasting scent", "special bottle", "nice smell", "skin application"]
   },
   {
-    "id": "4e3a9934-e499-49c0-9b33-85f35217e780",
-    "product_categories": ["Men's Footwear", "Fashion Shoes", "Designer Shoes", "Black Color", "Luxury Shoes"],
-    "product_features": ["Balenciaga brand", "black color", "metal decoration", "stylish", "fashionable"]
+    "id": "2610b936-ca1b-4bf5-b7d6-36556e6f12b0",
+    "product_categories": ["Women's Bags", "Beaded Handbags", "Evening Bags", "fashion accessories", "Artisanal Accessories"],
+    "product_features": ["beaded decoration", "beautiful", "decorative", "fancy", "special occasions"]
   },
   {
-    "id": "aa609438-2b3e-4418-89ef-db275f8a5cfe",
-    "product_categories": ["Women's Accessories", "Hair Bands", "Hair Ties", "Beauty Accessories", "Multi-Pack"],
-    "product_features": ["hair tying", "elastic band", "20 pieces", "gentle holding", "hair decoration"]
+    "id": "e0f8bb86-4372-4452-bc40-76258e4ca47f",
+    "product_categories": ["beverage containers", "thermos", "travel tumblers", "drinkware", "hot/cold retention"],
+    "product_features": ["hot/cold retention", "color variety", "portable containers", "different drinks", "warm/cold retention"]
   },
   {
-    "id": "727a241c-f94d-48c9-96c3-80c1a22313b8",
-    "product_categories": ["Men's Footwear", "Loafers", "Comfort Shoes", "Branded Shoes", "Unisex Footwear"],
-    "product_features": ["Dr. Martin brand", "comfortable walk", "slip-on", "sizes 40-48", "casual style"]
+    "id": "cd5a4a50-0df5-450f-8b91-b6321a7e7cbf",
+    "product_categories": ["body mist", "Women's Fragrances", "personal care", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["nice scent", "fresh feel", "body help", "skin application", "gentle fragrance"]
   },
   {
-    "id": "1dea2200-9c80-4936-ab00-262a28aa578e",
-    "product_categories": ["Bathroom Accessories", "Home Organization", "Dental Care", "Utility Products", "Countertop Gadgets"],
-    "product_features": ["toothbrush organization", "bathroom use", "neat placement", "functional", "home organization"]
+    "id": "42b3b055-c458-41f2-abd4-cfa81bed8a69",
+    "product_categories": ["Hair Accessories", "scrunchies", "soft hair accessories", "Women's Accessories", "hair ties"],
+    "product_features": ["crochet", "soft", "hair tie", "gentle hold", "pretty"]
   },
   {
-    "id": "dac130dd-4081-43e3-a814-b467b4e442b6",
-    "product_categories": ["Women's Accessories", "Hair Styling Tools", "Beauty Tools", "Hair Straightening", "Personal Care"],
-    "product_features": ["hair straightening", "mini size", "beauty tools", "smooth hair", "portable"]
+    "id": "e0ec5f9b-29a1-4f70-9fec-1a04c220950a",
+    "product_categories": ["perfumes", "Women's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["perfume", "nice smell", "long-lasting scent", "chocolate", "skin application"]
   },
   {
-    "id": "dad504dd-7bc6-4114-a708-1711aec71713",
-    "product_categories": ["Women's Accessories", "Hair Dryers", "Beauty Appliances", "Travel-Friendly", "Personal Care"],
-    "product_features": ["hair drying", "warm air", "portable", "mini size", "beauty enhancement"]
+    "id": "adf82791-0a53-4198-b890-b58f91c27848",
+    "product_categories": ["Food", "snacks", "Street Food", "Fast Food", "unisex"],
+    "product_features": ["tasty", "ready to enjoy", "special occasions", "snacks", "enjoy"]
   },
   {
-    "id": "9b75be37-b8b3-4faa-815f-c945fca8487d",
-    "product_categories": ["Men's Footwear", "Sneakers", "Air Jordan Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["Nike brand", "Air Jordan brand", "sports shoes", "size 40", "branded"]
+    "id": "d77eb9f9-802e-4333-8c62-725a53cb655b",
+    "product_categories": ["perfume sets", "luxury perfumes", "fragrance gifts", "gift sets", "unisex fragrances"],
+    "product_features": ["perfume", "gift pack", "special occasions", "nice smell", "multiple products"]
   },
   {
-    "id": "05f88378-07d4-4938-83bc-0e25ce3b14e6",
-    "product_categories": ["Drinkware", "Tableware", "Home Dining", "Fancy Design", "Beverage Containers"],
-    "product_features": ["drink holding", "fancy design", "glass material", "home use", "decorative"]
+    "id": "f85157f0-68e2-4460-b3f0-c699d6ffabaa",
+    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "hair replacements", "Hairpieces"],
+    "product_features": ["human hair", "wearable hairpiece", "changes hairstyle", "hair", "look change"]
   },
   {
-    "id": "ab827d6d-c8d7-4bbd-80ec-018915542556",
-    "product_categories": ["Men's Footwear", "Sneakers", "Air Jordan Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["Jordan brand", "sneakers", "original box", "sports shoes", "branded"]
+    "id": "9f576a26-f046-4c57-bf1b-403f29dd7449",
+    "product_categories": ["Food", "desserts", "snacks", "yoghurt", "unisex"],
+    "product_features": ["tasty", "sweet", "ready to enjoy", "creamy", "vanilla flavor"]
   },
   {
-    "id": "62236c3e-1e55-4681-8b28-72646a99d64f",
-    "product_categories": ["Home Decor", "LED Lighting", "Room Lighting", "Decorative Items", "Colorful Options"],
-    "product_features": ["LED glow", "colorful", "room enhancement", "bright look", "decoration"]
+    "id": "95c44f71-2b92-4544-876c-6b795f61ba56",
+    "product_categories": ["towels", "bathroom accessories", "personal care", "utility products", "unisex"],
+    "product_features": ["towel", "two-in-one", "soft cloth", "quick drying", "versatile use"]
   },
   {
-    "id": "efbaf567-707d-445a-90bd-7b586a80a8f3",
-    "product_categories": ["Photography Equipment", "Tech Accessories", "Camera Accessories", "Content Creation", "Video Lighting"],
-    "product_features": ["tripod stand", "camera holding", "steady shots", "photo enhancement", "professional application"]
+    "id": "56731b5f-b6af-4d43-b442-25af2484b859",
+    "product_categories": ["Food", "snacks", "Fast Food", "Street Food", "unisex"],
+    "product_features": ["tasty", "ready to enjoy", "snacks", "enjoy", "sweet"]
   },
   {
-    "id": "ff14ff20-78f1-4972-8b4e-335d7105fdd5",
-    "product_categories": ["Men's Footwear", "Sneakers", "Air Jordan Brand", "Athletic Shoes", "Original Products"],
-    "product_features": ["Jordan brand", "original", "sneakers", "authentic", "sports shoes"]
+    "id": "e39c14ef-79af-44a9-8d0a-b8bcf5be265c",
+    "product_categories": ["perfumes", "Men's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "special bottle"]
   },
   {
-    "id": "48840d8a-846b-419b-89aa-eebd72ae9193",
-    "product_categories": ["Women's Accessories", "Hair Accessories", "Claw Clips", "Hair Clips", "Beauty Accessories"],
-    "product_features": ["hair holding", "clip", "gentle hold", "hair decoration", "fashionable"]
+    "id": "6d810330-3436-4046-bbc9-093bb4e854e4",
+    "product_categories": ["body mist", "Women's Fragrances", "personal care", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["nice scent", "fresh feel", "body help", "skin application", "gentle fragrance"]
   },
   {
-    "id": "86c59625-c922-482b-a7b3-eac7308627c3",
-    "product_categories": ["Women's Footwear", "Sneakers", "Adidas Brand", "Athletic Shoes", "Black Color"],
-    "product_features": ["Adidas brand", "black color", "sports shoes", "size 36", "casual wear"]
+    "id": "fbdd3597-781f-47df-9684-5b58d05264e1",
+    "product_categories": ["oil perfumes", "perfumes", "Women's Fragrances", "personal care", "unisex fragrances"],
+    "product_features": ["perfume", "oil-based", "roll-on application", "nice smell", "skin application"]
   },
   {
-    "id": "7b2d2131-53ea-4e1f-83a9-36ddb7a354d5",
-    "product_categories": ["Men's Footwear", "Sneakers", "New Balance Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["New Balance brand", "sports shoes", "size 43", "branded", "athletic"]
+    "id": "cf1b3a39-5094-4607-9bf2-14caceb03537",
+    "product_categories": ["Women's Bags", "handbags", "designer handbags", "luxury bags", "Fashion Bags"],
+    "product_features": ["fashion bag", "high quality", "giftable", "stylish carry", "carry things"]
   },
   {
-    "id": "4d3409f6-f1e9-4f68-9123-c2df1689d495",
-    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "Necklaces", "Butterfly Shape", "Female Accessories"],
-    "product_features": ["butterfly shape", "neck decoration", "jewelry", "beautiful", "fashionable"]
+    "id": "d4aef906-dc55-400d-9523-007e256d6044",
+    "product_categories": ["perfumes", "Men's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
+    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "special bottle"]
   },
   {
-    "id": "58b58feb-933f-44fb-95a5-ce39f88e08f9",
-    "product_categories": ["Furniture", "Home Accessories", "Study Tables", "Portable Tables", "Home Organization"],
-    "product_features": ["reading enjoyment", "study use", "home use", "functional", "comfortable"]
-  },
-  {
-    "id": "005c7789-bf13-4a91-babf-379e449beb84",
-    "product_categories": ["Phone Accessories", "Tech Accessories", "Cute Design", "Rabbit Theme", "Decorative Items"],
-    "product_features": ["phone holding", "cute design", "bunny design", "functional", "decorative"]
-  },
-  {
-    "id": "8311f6d2-1fdb-4fc0-bcbf-1a729cc4ce6c",
-    "product_categories": ["Unisex Footwear", "Comfort Footwear", "Slip-On Shoes", "Crocs Brand", "House Shoes"],
-    "product_features": ["Crocs brand", "slip-on", "comfortable", "house wear", "casual style"]
-  },
-  {
-    "id": "f9e95d93-b91e-4722-bfb9-3223ad114b8a",
-    "product_categories": ["Women's Health", "Skincare", "Lip Care", "Beauty Products", "Self-Care Products"],
-    "product_features": ["lip care", "moisturizing", "soft lips", "beauty enhancement", "skin feeling"]
-  },
-  {
-    "id": "09d383a8-8c3a-45cd-982b-21922d07e0a1",
-    "product_categories": ["Men's Footwear", "Sneakers", "Air Jordan Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["Nike brand", "Air Jordan brand", "sports shoes", "size 40", "branded"]
-  },
-  {
-    "id": "811ed72a-f7a7-4114-a930-d720ca2729d6",
-    "product_categories": ["Men's Footwear", "Sneakers", "Air Jordan Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["Nike brand", "Air Jordan brand", "sports shoes", "multiple options", "branded"]
-  },
-  {
-    "id": "408fb5c8-3140-42d2-a4ce-2c10ed40b9c8",
-    "product_categories": ["Unisex Footwear", "Comfort Footwear", "Slip-On Shoes", "Crocs Brand", "House Shoes"],
-    "product_features": ["Crocs brand", "slip-on", "comfortable", "house wear", "casual style"]
-  },
-  {
-    "id": "c4b40184-eb09-45e6-b53e-1386d8a4923e",
-    "product_categories": ["Women's Bags", "Tote Bags", "Everyday Carry", "Medium Size", "Fashion Bags"],
-    "product_features": ["medium size", "everyday items", "easy carry", "casual style", "fashion bag"]
-  },
-  {
-    "id": "6c8c1a10-a8ae-42e5-8f7c-b2cabbe29fc5",
-    "product_categories": ["Women's Accessories", "Jewelry Boxes", "Home Organization", "Decorative Items", "Treasure Storage"],
-    "product_features": ["jewelry storage", "color options", "precious things", "home organization", "decorative"]
-  },
-  {
-    "id": "cbdb9bef-fa0b-4823-a61b-3b4043ed5204",
-    "product_categories": ["Unisex Footwear", "Sneakers", "Adidas Brand", "Athletic Shoes", "Blue Color"],
-    "product_features": ["Adidas brand", "blue color", "sports shoes", "casual wear", "branded"]
-  },
-  {
-    "id": "57840fe0-df66-43e3-99ae-c4bac4f1466b",
-    "product_categories": ["Men's Footwear", "Sneakers", "New Balance Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["New Balance brand", "sports shoes", "size 43", "branded", "athletic"]
-  },
-  {
-    "id": "518575ff-a4c2-4be0-b231-e34bee1625f5",
-    "product_categories": ["Unisex Footwear", "Comfort Footwear", "Slip-On Shoes", "Crocs Brand", "House Shoes"],
-    "product_features": ["Crocs brand", "slip-on", "comfortable", "house wear", "casual style"]
-  },
-  {
-    "id": "59aac245-9186-41d8-9b6e-74ec6a081ff3",
-    "product_categories": ["Men's Footwear", "Loafers", "Comfort Shoes", "Black and White", "Branded Shoes"],
-    "product_features": ["Dr. Martin brand", "black/white colors", "comfortable walk", "sizes 40-48", "casual style"]
-  },
-  {
-    "id": "8fd7cabe-e0ca-4442-9ff8-69fa6fdf79ff",
-    "product_categories": ["Men's Footwear", "Sneakers", "Air Jordan Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["Jordan brand", "sneakers", "size 40", "sports shoes", "branded"]
-  },
-  {
-    "id": "5d87d502-aa1d-4a4e-a56a-02052b7efc77",
-    "product_categories": ["Men's Accessories", "Card Holders", "Money Organizers", "Everyday Carry", "Wallet Accessories"],
-    "product_features": ["card storage", "money organization", "important items", "compact size", "functional"]
-  },
-  {
-    "id": "cd7832ed-8a59-40db-99f5-22144ee42fcf",
-    "product_categories": ["Phone Accessories", "Selfie Sticks", "Tech Accessories", "Photography Equipment", "Mobile Accessories"],
-    "product_features": ["phone holding", "photo enhancement", "extendable", "portable", "fun design"]
-  },
-  {
-    "id": "92dcefc4-711c-40c8-8698-8c9473b8dc00",
-    "product_categories": ["Shopping Events", "Clearance Sales", "Discount Offers", "Special Occasions", "Varied Products"],
-    "product_features": ["discount prices", "many items", "special events", "shopping opportunity", "variety"]
-  },
-  {
-    "id": "773994ab-ecbc-4e35-9c97-6940dd73e9ac",
-    "product_categories": ["Men's Footwear", "Boots", "Protective Footwear", "Branded Shoes", "Unisex Footwear"],
-    "product_features": ["Dr. Martin brand", "foot protection", "sizes 40-48", "durable", "branded"]
-  },
-  {
-    "id": "236fb505-2cbb-42ff-9bf9-48f717a711ff",
-    "product_categories": ["Furniture", "Bedroom Accessories", "Reading Tables", "Portable Furniture", "Home Comfort"],
-    "product_features": ["bed reading", "home relaxation", "portable", "comfortable", "functional"]
-  },
-  {
-    "id": "dd018033-2349-48f3-a8b9-3b6d09e4ab50",
-    "product_categories": ["Women's Accessories", "Shapewear", "Fashion Accessories", "Body Shaping", "Female Apparel"],
-    "product_features": ["body shaping", "smooth under clothes", "fashionable", "functional", "female design"]
-  },
-  {
-    "id": "137115a2-2030-4491-9859-72eff4fd09c4",
-    "product_categories": ["Women's Fragrances", "Perfume Oils", "Luxury Scents", "Feminine Scents", "Beauty Products"],
-    "product_features": ["perfume oil", "seductive scent", "long-lasting", "skin application", "fragrance"]
-  },
-  {
-    "id": "6335bcb9-7bd9-4a11-8bc4-110a4c66e815",
-    "product_categories": ["Unisex Footwear", "Comfort Footwear", "Slip-On Shoes", "Crocs Brand", "House Shoes"],
-    "product_features": ["Crocs brand", "slip-on", "comfortable", "house wear", "original product"]
-  },
-  {
-    "id": "0a5c71a7-f2d1-4580-93f3-4a9d1e27fbd8",
-    "product_categories": ["Men's Footwear", "Sneakers", "New Balance Brand", "Athletic Shoes", "Unisex Footwear"],
-    "product_features": ["New Balance brand", "sports shoes", "size 43", "branded", "athletic"]
-  },
-  {
-    "id": "11674e33-ef33-4a50-8dbe-c1cff5c7718a",
-    "product_categories": ["Business Supplies", "Wholesale Packages", "Storage Solutions", "Organization", "Utility Products"],
-    "product_features": ["bulk packaging", "business use", "many items", "organization", "utility products"]
-  },
-  {
-    "id": "70263935-d6f3-4c09-9dfb-f3708a396d3f",
-    "product_categories": ["Women's Fragrances", "Perfume Oils", "Feminine Scents", "Beauty Products", "Luxury Scents"],
-    "product_features": ["perfume oil", "pink chiffon scent", "50ml size", "long-lasting", "feminine scents"]
-  },
-  {
-    "id": "5d3c0deb-7f1d-4e4a-8b73-09b263fb9899",
-    "product_categories": ["Eyewear", "Vision Accessories", "Discount Offers", "Personal Care", "Unisex Accessories"],
-    "product_features": ["glasses", "vision correction", "discount price", "eye protection", "unisex"]
-  },
-  {
-    "id": "7c737a13-bb96-4a8b-b712-79d9097b972d",
-    "product_categories": ["Skincare", "Acne Treatment", "Beauty Products", "Spot Treatment", "Self-Care Products"],
-    "product_features": ["pimple treatment", "skin health", "small spots treatment", "adhesive", "facial treatment"]
-  },
-  {
-    "id": "18484047-4c8a-4d58-bab0-efff1336593a",
-    "product_categories": ["Furniture", "Bedroom Accessories", "Reading Tables", "Portable Furniture", "Home Comfort"],
-    "product_features": ["bed reading", "home relaxation", "portable", "comfortable", "functional"]
-  },
-  {
-    "id": "afb76813-717d-4bd3-8043-26b31bdc8f47",
-    "product_categories": ["Children's Products", "Sippy Cups", "Baby Products", "Spill-Proof", "Kids Cups"],
-    "product_features": ["spill-proof", "child-friendly", "little ones", "drink safety", "small size"]
-  },
-  {
-    "id": "23a99450-6373-4e97-b3c1-e9b1e3a7410f",
-    "product_categories": ["Unisex Footwear", "Comfort Footwear", "Slip-On Shoes", "Crocs Brand", "House Shoes"],
-    "product_features": ["Crocs brand", "slip-on", "comfortable", "house wear", "original product"]
-  },
-  {
-    "id": "7c353660-9110-4041-8919-b962290af3a0",
-    "product_categories": ["Women's Footwear", "Sneakers", "Adidas Brand", "Athletic Shoes", "White Color"],
-    "product_features": ["Adidas brand", "white color", "sports shoes", "size 36", "casual wear"]
-  },
-  {
-    "id": "f2a9acdc-ee54-4224-998e-5a2d93069ead",
-    "product_categories": ["Women's Clothing", "Fashion Tops", "Bodycon Style", "Evening Wear", "Female Apparel"],
-    "product_features": ["backless design", "snug fit", "fashionable", "female design", "evening occasion"]
-  },
-  {
-    "id": "9b73f94c-4db2-4f77-a209-fbe8377d48ba",
-    "product_categories": ["Women's Fragrances", "Perfume Oils", "Luxury Scents", "Black Opium Brand", "Feminine Scents"],
-    "product_features": ["perfume oil", "Black Opium scent", "30ml size", "long-lasting", "luxury scent"]
-  },
-  {
-    "id": "0fc8d44f-6b3e-4d87-bf4e-3e6f9640308b",
-    "product_categories": ["Women's Fragrances", "Perfume Oils", "Travel Perfumes", "Mini Size", "Beauty Products"],
-    "product_features": ["perfume oil", "3ml size", "travel-friendly", "mini size", "on-the-go"]
-  },
-  {
-    "id": "b3e9a7b2-819f-4945-9871-fd21d73975c3",
-    "product_categories": ["Drinkware", "Tableware", "Home Dining", "Beverage Containers", "Everyday Use"],
-    "product_features": ["drink holding", "home use", "various beverages", "functional", "tableware"]
-  },
-  {
-    "id": "3b264ee8-ab74-43c2-b02e-117916f78e45",
-    "product_categories": ["Women's Fragrances", "Perfume Oils", "Travel Perfumes", "Mini Size", "Beauty Products"],
-    "product_features": ["perfume oil", "6ml size", "travel-friendly", "mini size", "on-the-go"]
-  },
-  {
-    "id": "6b61cf6e-c39d-43b7-aa5f-d479badff36b",
-    "product_categories": ["Drinkware", "Thermal Bottles", "Travel Tumblers", "Hot/Cold Retention", "Unisex Accessories"],
-    "product_features": ["thermal retention", "stainless steel", "durable", "hot/cold drinks", "travel-friendly"]
-  },
-  {
-    "id": "4601bbb7-870a-407e-9c47-cf1a18d2f519",
-    "product_categories": ["Home Organization", "Laundry Accessories", "Utility Products", "Storage Solutions", "Home Goods"],
-    "product_features": ["laundry organization", "clothes carrying", "home use", "functional", "spacious"]
-  },
-  {
-    "id": "c2e73631-9958-40bc-931b-3703cc1d47b8",
-    "product_categories": ["Photography Equipment", "Influencer Lights", "Video Lighting", "Content Creation", "Tech Accessories"],
-    "product_features": ["video lighting", "color options", "content creation", "photo enhancement", "professional use"]
-  },
-  {
-    "id": "047b58a0-9749-4874-80be-ccf49228685f",
-    "product_categories": ["Phone Accessories", "Tech Accessories", "Phone Stands", "Mobile Accessories", "Everyday Use"],
-    "product_features": ["phone holding", "upright position", "functional", "easy viewing", "tech accessories"]
-  },
-  {
-    "id": "4c9e2eef-6723-4a87-8437-f7aca6d0d72f",
-    "product_categories": ["Women's Clothing", "Outdoor Wear", "Winter Wear", "3-in-1 Design", "Protective Clothing"],
-    "product_features": ["3-in-1 design", "warmth", "outdoor protection", "bonnet included", "versatile use"]
-  },
-  {
-    "id": "99113bd6-456c-4d75-adb2-a1f6dcaeb10f",
-    "product_categories": ["Men's Footwear", "Boots", "Protective Footwear", "Branded Shoes", "Unisex Footwear"],
-    "product_features": ["Dr. Martin brand", "foot protection", "sizes 40-48", "durable", "branded"]
-  },
-  {
-    "id": "ab2058f3-17d7-4a40-a261-03a413ded568",
-    "product_categories": ["Women's Fragrances", "Body Mists", "Beauty Products", "Feminine Scents", "Personal Care"],
-    "product_features": ["body mist", "light fragrance", "fresh feel", "spray application", "feminine scents"]
-  },
-  {
-    "id": "8a57f65b-ae52-43a3-a624-44bbfc8d4f68",
-    "product_categories": ["Women's Clothing", "Bodycon Tops", "Fashion Tops", "Black Color", "Female Apparel"],
-    "product_features": ["bodycon fit", "black color", "sizes 6-10", "snug fit", "female design"]
-  },
-  {
-    "id": "cf74e5b9-0138-49d1-9cb8-3415d8c1c460",
-    "product_categories": ["Men's Clothing", "T-Shirts", "Religious Themes", "Branded Apparel", "Graphic Tees"],
-    "product_features": ["Christian theme", "casual wear", "upper body wear", "faith expression", "graphic design"]
-  },
-  {
-    "id": "e63ff3d3-9edb-42cd-b906-38d8a84e74d6",
-    "product_categories": ["Home Decor", "Rugs", "Soft Bedding", "Decorative Floor", "Home Comfort"],
-    "product_features": ["fluffy", "soft rug", "floor decoration", "cozy", "home enhancement"]
-  },
-  {
-    "id": "79f5ef44-926b-4ff5-a574-d01d0cce7fa0",
-    "product_categories": ["Unisex Footwear", "Comfort Footwear", "Slip-On Shoes", "Crocs Brand", "House Shoes"],
-    "product_features": ["Crocs brand", "slip-on", "comfortable", "house wear", "original product"]
+    "id": "003628fa-1081-4cf5-9e4b-3f8c57c1af3b",
+    "product_categories": ["perfumes", "Women's Fragrances", "luxury perfumes", "fashion fragrances", "Beauty Products"],
+    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "feminine scents"]
   }
 ]
