@@ -193,7 +193,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                         <p className="text-sm mb-3 flex-grow"
                                             style={{ color: currentTheme.text }}
                                         >
-                                            by <span className="font-medium">{product.full_name}</span>
+                                            by <span className="font-medium">{product.brand_name ? product.brand_name : product.full_name}</span>
                                         </p>
                                     )}
                                     {/* <p className={`text-sm font-semibold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>

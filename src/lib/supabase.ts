@@ -72,6 +72,7 @@ export interface Product {
     created_at?: string;
     merchant_id?: string;
     actual_merchant_id?: string;
+    brand_name?: string;
 }
 
 export interface RequestLog {
