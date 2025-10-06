@@ -12,10 +12,12 @@ import ConfirmContactModal from '../components/ConfirmContactModal';
 import ContactSellerButton from '../components/ContactSellerButton';
 import ContactSellerLink from '../components/ContactSellerLink';
 import { Product } from '../lib/supabase';
+import { useHostelMode } from '../hooks/useHostelMode';
 
 function SearchResultsPage() {
   const location = useLocation();
   const { currentTheme } = useTheme();
+  const { hostelMode } = useHostelMode();
   const { products, searchQuery } = location.state as { products: Product[], searchQuery: string };
   const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -107,10 +109,18 @@ function SearchResultsPage() {
                       className="text-3xl font-black mb-2">₦{product.product_price}</p>
                   )}
                   {product.full_name && (
-                    <p className="text-sm mb-2"
+                    <p className="text-sm mb-1"
                       style={{ color: currentTheme.text }}
                     >
                       <span className="font-semibold">by {product.full_name}</span>
+                    </p>
+                  )}
+                  {hostelMode && (product.is_hostel_product || product.unique_visitors?.is_hostel_merchant) && (
+                    <p className="text-xs mb-2"
+                      style={{ color: currentTheme.text }}
+                    >
+                      Hostel: <span className="font-medium">{product.unique_visitors?.hostels?.name || 'Unknown Hostel'}</span>
+                      {product.unique_visitors?.room ? ` • Room ${product.unique_visitors.room}` : ''}
                     </p>
                   )}
                   <p className={`text-sm font-bold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>

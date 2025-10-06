@@ -11,6 +11,7 @@ import ConfirmContactModal from '../components/ConfirmContactModal';
 import ContactSellerLink from '../components/ContactSellerLink';
 import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
+import { useHostelMode } from '../hooks/useHostelMode';
 
 
 const CategoryProductsPage: React.FC = () => {
@@ -23,6 +24,7 @@ const CategoryProductsPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const { currentTheme } = useTheme();
+    const { hostelMode } = useHostelMode();
     const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingProduct, setPendingProduct] = useState<Partial<Product> | null>(null);
@@ -183,10 +185,18 @@ const CategoryProductsPage: React.FC = () => {
                                             className="text-3xl font-black mb-2">₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-sm mb-2"
+                                        <p className="text-sm mb-1"
                                             style={{ color: currentTheme.text }}
                                         >
                                             by <span className="font-semibold">{product.full_name}</span>
+                                        </p>
+                                    )}
+                                    {hostelMode && (product.is_hostel_product || product.unique_visitors?.is_hostel_merchant) && (
+                                        <p className="text-xs mb-2"
+                                            style={{ color: currentTheme.text }}
+                                        >
+                                            Hostel: <span className="font-medium">{product.unique_visitors?.hostels?.name || 'Unknown Hostel'}</span>
+                                            {product.unique_visitors?.room ? ` • Room ${product.unique_visitors.room}` : ''}
                                         </p>
                                     )}
                                     <p className={`text-sm font-bold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>

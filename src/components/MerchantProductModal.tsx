@@ -4,9 +4,6 @@ import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 
-
-
-
 interface MerchantProductModalProps {
     actual_merchant_id?: string;
     merchantId: string;

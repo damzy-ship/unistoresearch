@@ -7,6 +7,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
+import { useHostelMode } from '../hooks/useHostelMode';
 import { Loader } from 'lucide-react';
 import ContactSellerButton from './ContactSellerButton';
 import ContactSellerLink from './ContactSellerLink'; // Assuming this is correct
@@ -26,6 +27,7 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
     const [fetchedCategoryName, setCategoryName] = useState<string | null>('');
     const navigate = useNavigate();
     const { currentTheme } = useTheme();
+    const { hostelMode } = useHostelMode();
 
     useEffect(() => {
         const fetchCategoryName = async () => {
@@ -183,10 +185,18 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
                                         >₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-xs mb-3 flex-grow"
+                                        <p className="text-xs mb-1 flex-grow"
                                             style={{ color: currentTheme.text }}
                                         >
                                             by <span className="font-medium">{product.full_name}</span>
+                                        </p>
+                                    )}
+                                    {hostelMode && (product.is_hostel_product && product.is_hostel_merchant)  && (
+                                        <p className="text-xs mb-3"
+                                            style={{ color: currentTheme.text }}
+                                        >
+                                            Hostel: <span className="font-medium">{product.hostel_name || 'Unknown Hostel'}</span>
+                                            {product?.room ? ` • Room ${product.room}` : ''}
                                         </p>
                                     )}
                                     {product.phone_number && (

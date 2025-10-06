@@ -78,6 +78,9 @@ export interface Product {
     actual_merchant_id?: string;
     unique_visitors?: UniqueVisitor;
     is_hostel_product: boolean; 
+    hostel_name?: string;
+    room?: string;
+    is_hostel_merchant?: boolean;
 }
 
 export interface RequestLog {
@@ -117,6 +120,15 @@ export interface MerchantAnalytics {
   user_id: string;
   created_at?: string;
 }
+
+export interface ProductCategory {
+  id: string;
+  category_name: string;
+  category_image: string;
+  category_list: string[];
+  created_at: string;
+}
+
 
 // Add function to delete a request log
 export async function deleteRequestLog(requestId: string): Promise<{ success: boolean; error?: string }> {

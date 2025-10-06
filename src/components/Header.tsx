@@ -5,6 +5,7 @@ import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useHostelMode } from '../hooks/useHostelMode';
 
 interface HeaderProps {
   showAuth?: boolean;
@@ -15,6 +16,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
   const navigate = useNavigate();
   const [userIsAuthenticated, setUserIsAuthenticated] = React.useState(false);
   const { currentTheme } = useTheme();
+  const { hostelMode, toggleHostelMode } = useHostelMode();
 
   React.useEffect(() => {
     const checkAuth = async () => {
@@ -50,6 +52,16 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
           <CreditCard className="w-4 h-4" />
           <span className="hidden sm:inline">Make Payment</span>
           <span className="inline sm:hidden">Make Payment</span>
+        </button>
+
+        <button
+          onClick={toggleHostelMode}
+          className="ml-2 px-3 py-2 rounded-lg border text-sm"
+          style={{ borderColor: currentTheme.primary, color: currentTheme.primary }}
+          aria-label="Toggle hostel mode"
+          title="Toggle hostel mode"
+        >
+          {hostelMode ? 'Hostel Mode: On' : 'Hostel Mode: Off'}
         </button>
 
         {showAuth && (

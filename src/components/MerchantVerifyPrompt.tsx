@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
-import { X, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 export default function MerchantVerifyPrompt() {
   const { currentTheme } = useTheme();
