@@ -81,6 +81,7 @@ export interface Product {
     hostel_name?: string;
     room?: string;
     is_hostel_merchant?: boolean;
+    brand_name?: string | null;
 }
 
 export interface RequestLog {
