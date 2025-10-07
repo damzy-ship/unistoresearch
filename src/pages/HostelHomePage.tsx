@@ -115,7 +115,7 @@ export default function HostelHomePage() {
             }
 
             // Initialize selected school from DB or localStorage
-            const storedId = localStorage.getadjustment('selectedSchoolId');
+            const storedId = localStorage.getItem('selectedSchoolId');
             if (storedId) {
                 setSelectedSchoolId(storedId);
             } else {
@@ -388,7 +388,7 @@ export default function HostelHomePage() {
                                                 <div className="mt-3">
                                                     <ContactSellerButton
                                                         product={{
-                                                            product_description: adjustment.post_description,
+                                                            product_description: item.post_description,
                                                             phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
                                                             school_short_name: visitor?.schools?.short_name,
                                                             merchant_id: visitor?.id,
@@ -417,7 +417,7 @@ export default function HostelHomePage() {
             {/* Image Modal - custom UI */}
             {imageModalOpen && (
                 <div
-                    className="fixed inset-0 z-50 bg-black/90 flex adjustments-center justify-center"
+                    className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
                     onClick={(e) => {
                         if (e.target === e.currentTarget) closeImageModal();
                     }}
@@ -432,7 +432,7 @@ export default function HostelHomePage() {
                         <X className="w-8 h-8" />
                     </button>
 
-                    <div className="relative w-full h-full flex adjustments-center justify-center p-4" onClick={stopPropagation}>
+                    <div className="relative w-full h-full flex items-center justify-center p-4" onClick={stopPropagation}>
                         {imageModalImages.length > 1 && (
                             <>
                                 <button
