@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogIn, Menu, User } from 'lucide-react';
+import { LogIn, Menu, Repeat } from 'lucide-react';
 import { CreditCard } from 'lucide-react';
 import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
@@ -38,7 +38,17 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
 
 
   return (
-    <div className="w-full flex items-center justify-end">
+    <div className="w-full flex items-center justify-between py-4">
+      {/* Left: Mode toggle always visible */}
+      <button
+        onClick={() => {toggleHostelMode(); navigate('/');}}
+        className={`ml-4 flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent text-sm ${hostelMode ? 'bg-[#15202b] text-white' : 'bg-gray-100 text-gray-800'} hover:opacity-90`}
+        aria-label="Toggle hostel mode"
+        title="Switch modes"
+      >
+        <Repeat className="w-4 h-4" />
+        
+      </button>
 
       {/* Right: actions */}
       <div className="flex items-center">
@@ -54,15 +64,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
           <span className="inline sm:hidden">Make Payment</span>
         </button>
 
-        <button
-          onClick={toggleHostelMode}
-          className="ml-2 px-3 py-2 rounded-lg border text-sm"
-          style={{ borderColor: currentTheme.primary, color: currentTheme.primary }}
-          aria-label="Toggle hostel mode"
-          title="Toggle hostel mode"
-        >
-          {hostelMode ? 'Hostel Mode: On' : 'Hostel Mode: Off'}
-        </button>
+        
 
         {showAuth && (
           userIsAuthenticated ? (

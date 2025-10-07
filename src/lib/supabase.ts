@@ -55,6 +55,7 @@ export interface UniqueVisitor {
   hostels?: Hostel
   room?: string
   is_hostel_merchant?: boolean
+  profile_picture?: string
 }
 
 export interface Product {
@@ -82,6 +83,16 @@ export interface Product {
     room?: string;
     is_hostel_merchant?: boolean;
     brand_name?: string | null;
+    profile_picture?: string
+}
+
+export interface HostelsProductUpdates {
+  id: string;
+  post_description: string;
+  post_images: string[];
+  created_at: string;
+  merchant_id: string;
+  unique_visitors?: UniqueVisitor;
 }
 
 export interface RequestLog {
