@@ -7,6 +7,8 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import ContactSellerButton from '../components/ContactSellerButton';
 import AuthModal from '../components/AuthModal';
+import ConfirmContactModal from '../components/ConfirmContactModal';
+import { useTheme } from '../hooks/useTheme';
 
 // Helper function to format time (placeholder implementation for a Twitter-like "Xh" format)
 const formatTimeAgo = (timestamp: string): string => {
@@ -39,32 +41,54 @@ export default function HostelHomePage() {
     const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
     const [showConfirmUniversityModal, setShowConfirmUniversityModal] = useState(false);
 
+    // Hostel & Category filters
+    const [hostels, setHostels] = useState<Array<{id: string; name: string}>>([]);
+    const [selectedHostel, setSelectedHostel] = useState<string>('all');
+    const [categories] = useState<Array<{id: string; name: string}>>([
+        { id: 'electronics', name: 'Electronics' },
+        { id: 'fashion', name: 'Fashion' },
+        { id: 'books', name: 'Books' },
+        { id: 'furniture', name: 'Furniture' },
+        { id: 'stationery', name: 'Stationery' },
+    ]);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
+    const [pendingContactProduct, setPendingContactProduct] = useState(null);
+
+    const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
+
+    const { currentTheme } = useTheme();
+
+
 
 
     const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
+
         try {
             setLoadingFeed(true);
-            const { data, error } = await supabase
-                .from('hostel_product_updates')
-                .select(`
-          id,
-          post_description,
-          post_images,
-          created_at,
-          merchant_id,
-          unique_visitors:merchant_id (
-            id,
-            full_name,
-            profile_picture,
-            phone_number,
-            room,
-            is_hostel_merchant,
-            hostels (name, school_id),
-            schools (short_name)
-          )
-        `)
-                .order('created_at', { ascending: false });
+                        const { data, error } = await supabase
+                                .from('hostel_product_updates')
+                                .select(`
+                    id,
+                    post_description,
+                    post_images,
+                    created_at,
+                    merchant_id,
+                    unique_visitors:merchant_id (
+                        id,
+                        full_name,
+                        profile_picture,
+                        phone_number,
+                        room,
+                        is_hostel_merchant,
+                        hostel_id,
+                        hostels (id, name, school_id),
+                        schools (short_name)
+                    )
+                `)
+                                .order('created_at', { ascending: false });
 
             if (error) throw error;
 
@@ -77,9 +101,14 @@ export default function HostelHomePage() {
                 unique_visitors?: UniqueVisitor;
             };
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
-            const filtered = (schoolId
+            const filteredBySchool = (schoolId
                 ? rawList.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === schoolId)
                 : rawList);
+
+            // If a selectedHostel filter is active, filter by the merchant's hostel_id
+            const filtered = selectedHostel && selectedHostel !== 'all'
+                ? filteredBySchool.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostel_id === selectedHostel)
+                : filteredBySchool;
 
             const mapped: HostelsProductUpdates[] = filtered.map((d) => ({
                 id: d.id,
@@ -96,6 +125,26 @@ export default function HostelHomePage() {
         } finally {
             setLoadingFeed(false);
         }
+    }, [selectedSchoolId, selectedHostel]);
+
+    // Fetch hostels for the current school when selectedSchoolId changes
+    useEffect(() => {
+        const fetchHostels = async () => {
+            if (!selectedSchoolId) return;
+            try {
+                const { data, error } = await supabase
+                    .from('hostels')
+                    .select('id, name')
+                    .eq('school_id', selectedSchoolId)
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+                setHostels((data || []) as Array<{id: string; name: string}>);
+            } catch (e) {
+                console.error('Failed to fetch hostels', e);
+            }
+        };
+        fetchHostels();
     }, [selectedSchoolId]);
 
     useEffect(() => {
@@ -103,7 +152,7 @@ export default function HostelHomePage() {
             const { data: { session } } = await supabase.auth.getSession();
             const userId = session?.user?.id || null;
 
-            // setUserIsAuthenticated(!!session);
+            setUserIsAuthenticated(!!session);
 
             if (userId) {
                 const { data: visitor } = await supabase
@@ -125,7 +174,40 @@ export default function HostelHomePage() {
             await loadFeed(storedId || null);
         };
         init();
+
+        const onPending = (e: Event) => {
+            // event detail contains the product
+            // types are not strict here
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const detail = (e as CustomEvent).detail as any;
+            setPendingContactProduct(detail);
+            setShowConfirmContactModal(true);
+        };
+
+        window.addEventListener('pending-contact-available', onPending as EventListener);
+        return () => {
+            window.removeEventListener('pending-contact-available', onPending as EventListener);
+        };
     }, [loadFeed]);
+
+    // Check for pending contact product when userIsAuthenticated changes to true
+    useEffect(() => {
+        if (!userIsAuthenticated) return;
+        const raw = localStorage.getItem('pending_contact_product');
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                // open confirm modal by dispatching a custom event or local state; we'll use local state below
+                // store it in localStorage is enough; we'll use a small state to trigger the modal
+                setShowAuthModal(false);
+                // create an event so other components/pages can show confirm modal if needed
+                const ev = new CustomEvent('pending-contact-available', { detail: parsed });
+                window.dispatchEvent(ev);
+            } catch {
+                localStorage.removeItem('pending_contact_product');
+            }
+        }
+    }, [userIsAuthenticated]);
 
 
     const canPost = useMemo(() => {
@@ -198,7 +280,7 @@ export default function HostelHomePage() {
         const gridClass = count === 1 ? 'grid-cols-1' : 'grid-cols-2';
 
         return (
-            <div className={`mt-3 grid ${gridClass} gap-2`}> 
+            <div className={`mt-3 grid ${gridClass} gap-2`}>
                 {images.slice(0, 4).map((url, idx) => {
                     // For a 3-image layout, make the first image span both columns
                     const isThreeLeft = count === 3 && idx === 0;
@@ -240,257 +322,325 @@ export default function HostelHomePage() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-900">
-            <Toaster position="top-center" richColors />
+        <>
+            {selectedSchoolId ?
+                <main className="min-h-screen bg-gray-900">
+                    <Toaster position="top-center" richColors />
 
-            {/* Header container spacing to match HomePage */}
-            <div className="w-full max-w-2xl mx-auto px-2">
-                <Header onAuthClick={() => setShowAuthModal(true)}/>
-            </div>
+                    {/* Header container spacing to match HomePage */}
+                    <div className="w-full max-w-2xl mx-auto px-2">
+                        <Header onAuthClick={() => setShowAuthModal(true)} />
+                    </div>
 
-            {selectedSchoolId ? (
-                <main className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
-                    {/* Post Composer Area */}
-                    {canPost && (
-                        <div className="p-4 border-b border-gray-800 flex gap-3">
-                            <div className="flex-shrink-0">
-                                <div className="w-10 h-10 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
-                                    {currentVisitor?.profile_picture ? (
-                                        <img src={currentVisitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span className="text-sm font-semibold text-[#8b98a5]">
-                                            {String(currentVisitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2)}
-                                        </span>
+
+                    <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
+                        {/* Post Composer Area */}
+                        {canPost && (
+                            <div className="p-4 border-b border-gray-800 flex gap-3">
+                                <div className="flex-shrink-0">
+                                    <div className="w-10 h-10 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                        {currentVisitor?.profile_picture ? (
+                                            <img src={currentVisitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-sm font-semibold text-[#8b98a5]">
+                                                {String(currentVisitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2)}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <textarea
+                                        value={composerText}
+                                        onChange={(e) => setComposerText(e.target.value)}
+                                        placeholder="What are you selling?"
+                                        className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
+                                        rows={2}
+                                    />
+
+                                    {/* Composer Image Preview */}
+                                    {composerImages.length > 0 && (
+                                        <div className="mt-3 grid grid-cols-2 gap-2">
+                                            {composerImages.map((file, idx) => (
+                                                <div key={idx} className="relative rounded-2xl overflow-hidden">
+                                                    <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-48 object-cover" />
+                                                    <button
+                                                        onClick={() => removeComposerImage(idx)}
+                                                        className="absolute top-2 right-2 bg-gray-900/80 hover:bg-gray-800 text-white rounded-full p-2 transition-colors"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
+
+                                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                onChange={onSelectImages}
+                                                className="hidden"
+                                                id="image-upload"
+                                            />
+                                            <label
+                                                htmlFor="image-upload"
+                                                className={`text-emerald-500 hover:bg-emerald-500/10 p-2 rounded-full transition-colors cursor-pointer`}
+                                            >
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" className="w-5 h-5"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2M8.5 12.5l2.5 3l3.5-4.5L19 17H5m3-7a2 2 0 1 1 2-2a2 2 0 0 1-2 2Z" /></svg>
+                                            </label>
+                                        </div>
+                                        <button
+                                            onClick={handlePost}
+                                            disabled={posting || (!composerText.trim() && composerImages.length === 0)}
+                                            className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold px-6 py-2 rounded-full transition-colors"
+                                        >
+                                            {posting ? 'Posting...' : 'Post'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex-1">
-                                <textarea
-                                    value={composerText}
-                                    onChange={(e) => setComposerText(e.target.value)}
-                                    placeholder="What are you selling?"
-                                    className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
-                                    rows={2}
-                                />
+                        )}
 
-                                {/* Composer Image Preview */}
-                                {composerImages.length > 0 && (
-                                    <div className="mt-3 grid grid-cols-2 gap-2">
-                                        {composerImages.map((file, idx) => (
-                                            <div key={idx} className="relative rounded-2xl overflow-hidden">
-                                                <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-48 object-cover" />
-                                                <button
-                                                    onClick={() => removeComposerImage(idx)}
-                                                    className="absolute top-2 right-2 bg-gray-900/80 hover:bg-gray-800 text-white rounded-full p-2 transition-colors"
-                                                >
-                                                    ×
-                                                </button>
+                        {/* Feed Divider */}
+                        {/* <div className="h-2 bg-[#2f3336]"></div> */}
+
+
+                        {/* Main Feed Area */}
+                        {/* Filters: Hostels and Categories */}
+                        <div className="px-4 pt-3">
+                            <div className="flex gap-2 sm:gap-3 mb-3 overflow-x-auto pb-2 scrollbar-hide">
+                                <button
+                                    onClick={() => setSelectedHostel('all')}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                                        selectedHostel === 'all'
+                                            ?  `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    All Hostels
+                                </button>
+                                {hostels.map(hostel => (
+                                    <button
+                                        key={hostel.id}
+                                        onClick={() => setSelectedHostel(hostel.id)}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                                            selectedHostel === hostel.id
+                                                ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {hostel.name}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Category Filters */}
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                <button
+                                    onClick={() => setSelectedCategory('all')}
+                                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                                        selectedCategory === 'all'
+                                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    All
+                                </button>
+                                {categories.map(category => (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => setSelectedCategory(category.id)}
+                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                                            selectedCategory === category.id
+                                                ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {category.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col">
+                            {loadingFeed ? (
+                                <div className="p-4 text-sm text-[#8b98a5] text-center">Loading updates...</div>
+                            ) : feed.length === 0 ? (
+                                <div className="p-4 text-sm text-[#8b98a5] text-center">No updates yet.</div>
+                            ) : (
+                                feed.map((item) => {
+                                    const visitor = item.unique_visitors as UniqueVisitor | undefined;
+                                    const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
+                                    const name = visitor?.full_name || 'User';
+                                    // Use the at-handle format from the screenshot
+                                    const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
+                                    const hostel = visitor?.hostels?.name;
+                                    const room = visitor?.room ? `Room ${visitor.room}` : '';
+                                    // const location = [hostel, room].filter(Boolean).join(' • ');
+                                    const timeAgo = formatTimeAgo(item.created_at);
+
+                                    return (
+                                        <article key={item.id} className="border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors">
+                                            <div className="flex gap-3">
+                                                {/* Avatar Column */}
+                                                <div className="flex-shrink-0">
+                                                    <div className="w-12 h-12 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                                        {visitor?.profile_picture ? (
+                                                            <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <span className="text-sm font-semibold text-[#8b98a5]">{initials}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Content Column */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2 flex-wrap text-sm">
+                                                            <span className="font-bold text-white hover:underline cursor-pointer">{name}</span>
+                                                            <span className="text-gray-500">{handle}</span>
+                                                            <span className="text-gray-500">·</span>
+                                                            <span className="text-gray-500">{timeAgo}</span>
+                                                        </div>
+                                                        {/* More options icon would go here */}
+                                                    </div>
+
+                                                    {/* Location Line - emphasized */}
+                                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
+                                                        <span>{hostel}</span>
+                                                        <span>·</span>
+                                                        {room && <span>{room}</span>}
+                                                    </div>
+
+                                                    {/* Post Description */}
+                                                    {item.post_description && (
+                                                        <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">
+                                                            {item.post_description}
+                                                        </p>
+                                                    )}
+
+                                                    {/* Image Grid */}
+                                                    {renderImageGrid(item.post_images, openImageModal)}
+
+                                                    {/* Replace actions with ContactSellerButton */}
+                                                    <div className="mt-3">
+                                                        <ContactSellerButton
+                                                            product={{
+                                                                product_description: item.post_description,
+                                                                phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
+                                                                school_short_name: visitor?.schools?.short_name,
+                                                                merchant_id: visitor?.id,
+                                                            }}
+                                                        >
+                                                            Contact Seller
+                                                        </ContactSellerButton>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        ))}
+                                        </article>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+
+
+                    {/* Image Modal - custom UI */}
+                    {imageModalOpen && (
+                        <div
+                            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+                            onClick={(e) => {
+                                if (e.target === e.currentTarget) closeImageModal();
+                            }}
+                            role="dialog"
+                            aria-modal="true"
+                        >
+                            <button
+                                onClick={closeImageModal}
+                                className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+                                aria-label="Close"
+                            >
+                                <X className="w-8 h-8" />
+                            </button>
+
+                            <div className="relative w-full h-full flex items-center justify-center p-4" onClick={stopPropagation}>
+                                {imageModalImages.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setImageModalActive((prev) => (prev === 0 ? imageModalImages.length - 1 : prev - 1)); }}
+                                            className="absolute left-4 text-white hover:text-gray-300 transition-colors bg-black/50 hover:bg-black/70 rounded-full p-3"
+                                            aria-label="Previous image"
+                                        >
+                                            <ChevronLeft className="w-8 h-8" />
+                                        </button>
+
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setImageModalActive((prev) => (prev === imageModalImages.length - 1 ? 0 : prev + 1)); }}
+                                            className="absolute right-4 text-white hover:text-gray-300 transition-colors bg-black/50 hover:bg-black/70 rounded-full p-3"
+                                            aria-label="Next image"
+                                        >
+                                            <ChevronRight className="w-8 h-8" />
+                                        </button>
+                                    </>
+                                )}
+
+                                <div className="max-w-6xl max-h-full">
+                                    <img
+                                        src={imageModalImages[imageModalActive]}
+                                        alt={`Image ${imageModalActive + 1}`}
+                                        className="max-w-full max-h-[90vh] object-contain"
+                                    />
+                                </div>
+
+                                {imageModalImages.length > 1 && (
+                                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/70 px-4 py-2 rounded-full">
+                                        <span className="text-white font-medium">
+                                            {imageModalActive + 1} / {imageModalImages.length}
+                                        </span>
                                     </div>
                                 )}
 
-                                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                            onChange={onSelectImages}
-                                            className="hidden"
-                                            id="image-upload"
-                                        />
-                                        <label
-                                            htmlFor="image-upload"
-                                            className={`text-emerald-500 hover:bg-emerald-500/10 p-2 rounded-full transition-colors cursor-pointer`}
-                                        >
-                                            <svg viewBox="0 0 24 24" aria-hidden="true" className="w-5 h-5"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2M8.5 12.5l2.5 3l3.5-4.5L19 17H5m3-7a2 2 0 1 1 2-2a2 2 0 0 1-2 2Z"/></svg>
-                                        </label>
+                                {imageModalImages.length > 1 && (
+                                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
+                                        {imageModalImages.map((_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={(e) => { e.stopPropagation(); setImageModalActive(index); }}
+                                                className={`w-2 h-2 rounded-full transition-all ${index === imageModalActive ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'}`}
+                                                aria-label={`Go to image ${index + 1}`}
+                                            />
+                                        ))}
                                     </div>
-                                    <button
-                                        onClick={handlePost}
-                                        disabled={posting || (!composerText.trim() && composerImages.length === 0)}
-                                        className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold px-6 py-2 rounded-full transition-colors"
-                                    >
-                                        {posting ? 'Posting...' : 'Post'}
-                                    </button>
-                                </div>
+                                )}
                             </div>
                         </div>
                     )}
 
-                    {/* Feed Divider */}
-                    {/* <div className="h-2 bg-[#2f3336]"></div> */}
+                    {/* Auth Modal */}
+                    <AuthModal
+                        isOpen={showAuthModal}
+                        onClose={() => setShowAuthModal(false)}
+                        onSuccess={() => setUserIsAuthenticated(true)}
+                    />
 
+                    <ConfirmContactModal
+                        isOpen={showConfirmContactModal}
+                        product={pendingContactProduct || undefined}
+                        onClose={() => { setShowConfirmContactModal(false); setPendingContactProduct(null); localStorage.removeItem('pending_contact_product'); }}
+                        onConfirm={() => { setShowConfirmContactModal(false); setPendingContactProduct(null); localStorage.removeItem('pending_contact_product'); }}
+                        hostelMode={true}
+                    />
 
-                    {/* Main Feed Area */}
-                    <div className="flex flex-col">
-                        {loadingFeed ? (
-                            <div className="p-4 text-sm text-[#8b98a5] text-center">Loading updates...</div>
-                        ) : feed.length === 0 ? (
-                            <div className="p-4 text-sm text-[#8b98a5] text-center">No updates yet.</div>
-                        ) : (
-                            feed.map((item) => {
-                                const visitor = item.unique_visitors as UniqueVisitor | undefined;
-                                const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
-                                const name = visitor?.full_name || 'User';
-                                // Use the at-handle format from the screenshot
-                                const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
-                                const hostel = visitor?.hostels?.name;
-                                const room = visitor?.room ? `Room ${visitor.room}` : '';
-                                // const location = [hostel, room].filter(Boolean).join(' • ');
-                                const timeAgo = formatTimeAgo(item.created_at);
-
-                                return (
-                                    <article key={item.id} className="border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors">
-                                        <div className="flex gap-3">
-                                            {/* Avatar Column */}
-                                            <div className="flex-shrink-0">
-                                                 <div className="w-12 h-12 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
-                                                    {visitor?.profile_picture ? (
-                                                        <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <span className="text-sm font-semibold text-[#8b98a5]">{initials}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Content Column */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                     <div className="flex items-center gap-2 flex-wrap text-sm">
-                                                         <span className="font-bold text-white hover:underline cursor-pointer">{name}</span>
-                                                         <span className="text-gray-500">{handle}</span>
-                                                         <span className="text-gray-500">·</span>
-                                                         <span className="text-gray-500">{timeAgo}</span>
-                                                    </div>
-                                                    {/* More options icon would go here */}
-                                                </div>
-
-                                                {/* Location Line - emphasized */}
-                                                 <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
-                                                     <span>{hostel}</span>
-                                                     <span>·</span>
-                                                     {room && <span>{room}</span>}
-                                                </div>
-
-                                                {/* Post Description */}
-                                                 {item.post_description && (
-                                                     <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">
-                                                        {item.post_description}
-                                                    </p>
-                                                )}
-
-                                                {/* Image Grid */}
-                                                 {renderImageGrid(item.post_images, openImageModal)}
-
-                                                {/* Replace actions with ContactSellerButton */}
-                                                <div className="mt-3">
-                                                    <ContactSellerButton
-                                                        product={{
-                                                            product_description: item.post_description,
-                                                            phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
-                                                            school_short_name: visitor?.schools?.short_name,
-                                                            merchant_id: visitor?.id,
-                                                        }}
-                                                    >
-                                                        Contact Seller
-                                                    </ContactSellerButton>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </article>
-                                );
-                            })
-                        )}
-                    </div>
                 </main>
-            ) : (
-                <ConfirmUniversityModal
-                    isOpen={showConfirmUniversityModal || !selectedSchoolId}
+                : <ConfirmUniversityModal
+                    isOpen={showConfirmUniversityModal}
                     onClose={() => setShowConfirmUniversityModal(false)}
                     initialSchoolId={selectedSchoolId}
                     onConfirm={handleConfirmUniversity}
-                />
-            )}
+                />}
 
-            {/* Image Modal - custom UI */}
-            {imageModalOpen && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-                    onClick={(e) => {
-                        if (e.target === e.currentTarget) closeImageModal();
-                    }}
-                    role="dialog"
-                    aria-modal="true"
-                >
-                    <button
-                        onClick={closeImageModal}
-                        className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
-                        aria-label="Close"
-                    >
-                        <X className="w-8 h-8" />
-                    </button>
-
-                    <div className="relative w-full h-full flex items-center justify-center p-4" onClick={stopPropagation}>
-                        {imageModalImages.length > 1 && (
-                            <>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); setImageModalActive((prev) => (prev === 0 ? imageModalImages.length - 1 : prev - 1)); }}
-                                    className="absolute left-4 text-white hover:text-gray-300 transition-colors bg-black/50 hover:bg-black/70 rounded-full p-3"
-                                    aria-label="Previous image"
-                                >
-                                    <ChevronLeft className="w-8 h-8" />
-                                </button>
-
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); setImageModalActive((prev) => (prev === imageModalImages.length - 1 ? 0 : prev + 1)); }}
-                                    className="absolute right-4 text-white hover:text-gray-300 transition-colors bg-black/50 hover:bg-black/70 rounded-full p-3"
-                                    aria-label="Next image"
-                                >
-                                    <ChevronRight className="w-8 h-8" />
-                                </button>
-                            </>
-                        )}
-
-                        <div className="max-w-6xl max-h-full">
-                            <img
-                                src={imageModalImages[imageModalActive]}
-                                alt={`Image ${imageModalActive + 1}`}
-                                className="max-w-full max-h-[90vh] object-contain"
-                            />
-                        </div>
-
-                        {imageModalImages.length > 1 && (
-                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/70 px-4 py-2 rounded-full">
-                                <span className="text-white font-medium">
-                                    {imageModalActive + 1} / {imageModalImages.length}
-                                </span>
-                            </div>
-                        )}
-
-                        {imageModalImages.length > 1 && (
-                            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
-                                {imageModalImages.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={(e) => { e.stopPropagation(); setImageModalActive(index); }}
-                                        className={`w-2 h-2 rounded-full transition-all ${index === imageModalActive ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'}`}
-                                        aria-label={`Go to image ${index + 1}`}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* Auth Modal */}
-            <AuthModal
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-                onSuccess={() => setShowAuthModal(false)}
-            />
-        </main>
+        </>
     );
 }

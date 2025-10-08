@@ -84,7 +84,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                 }
 
                 const products = data?.results || [];
-                console.log('Fetched products:', products);
+                // console.log('Fetched products:', products);
                 setProducts(products);
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
