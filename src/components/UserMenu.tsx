@@ -61,7 +61,6 @@ export default function UserMenu() {
 
   const handleSignOut = async () => {
     await signOut();
-    window.location.reload();
   };
 
   const getFirstName = (fullName: string) => fullName.split(' ')[0] || 'User';
