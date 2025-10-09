@@ -93,6 +93,7 @@ export interface HostelsProductUpdates {
   created_at: string;
   merchant_id: string;
   unique_visitors?: UniqueVisitor;
+  post_category: string;
 }
 
 export interface RequestLog {

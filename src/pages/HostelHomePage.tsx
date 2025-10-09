@@ -3,12 +3,13 @@ import { Toaster } from 'sonner';
 import Header from '../components/Header';
 import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
 import { uploadImageToSupabase } from '../lib/databaseServices';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Search, Upload } from 'lucide-react';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import ContactSellerButton from '../components/ContactSellerButton';
 import AuthModal from '../components/AuthModal';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import { useTheme } from '../hooks/useTheme';
+import { categorizePost } from '../lib/gemini';
 
 // Helper function to format time (placeholder implementation for a Twitter-like "Xh" format)
 const formatTimeAgo = (timestamp: string): string => {
@@ -28,6 +29,7 @@ export default function HostelHomePage() {
     const [composerText, setComposerText] = useState<string>('');
     const [composerImages, setComposerImages] = useState<File[]>([]);
     const [posting, setPosting] = useState<boolean>(false);
+    // limit composer images to 4
     const [feed, setFeed] = useState<HostelsProductUpdates[]>([]);
     const [loadingFeed, setLoadingFeed] = useState<boolean>(true);
 
@@ -42,24 +44,44 @@ export default function HostelHomePage() {
     const [showConfirmUniversityModal, setShowConfirmUniversityModal] = useState(false);
 
     // Hostel & Category filters
-    const [hostels, setHostels] = useState<Array<{id: string; name: string}>>([]);
+    const [hostels, setHostels] = useState<Array<{ id: string; name: string }>>([]);
     const [selectedHostel, setSelectedHostel] = useState<string>('all');
-    const [categories] = useState<Array<{id: string; name: string}>>([
-        { id: 'electronics', name: 'Electronics' },
-        { id: 'fashion', name: 'Fashion' },
-        { id: 'books', name: 'Books' },
-        { id: 'furniture', name: 'Furniture' },
-        { id: 'stationery', name: 'Stationery' },
+    const [categories] = useState<string[]>([
+        'food & snacks',
+        'clothing',
+        'shoes',
+        'caps',
+        'gadgets',
+        'phones',
+        'jewelries',
+        'bags',
+        'beauty & skincare',
+        'hair accessories',
+        'others'
     ]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     const [showAuthModal, setShowAuthModal] = useState(false);
+    // composer mode: false = post form, true = search form
+    const [isSearchView, setIsSearchView] = useState(false);
+    const [showImageSearchPrompt, setShowImageSearchPrompt] = useState(false);
+    const [searchResults, setSearchResults] = useState<HostelsProductUpdates[] | null>(null);
     const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
     const [pendingContactProduct, setPendingContactProduct] = useState(null);
 
     const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
     const { currentTheme } = useTheme();
+
+    // Only visitors who are hostel merchants may switch between search and post composer modes.
+    const userIsHostelMerchant = currentVisitor?.is_hostel_merchant === true;
+
+    // If the current visitor is NOT a hostel merchant, force the composer into search view.
+    useEffect(() => {
+        if (!userIsHostelMerchant) {
+            setIsSearchView(true);
+        }
+    }, [userIsHostelMerchant]);
 
 
 
@@ -68,10 +90,11 @@ export default function HostelHomePage() {
 
         try {
             setLoadingFeed(true);
-                        const { data, error } = await supabase
-                                .from('hostel_product_updates')
-                                .select(`
+            const { data, error } = await supabase
+                .from('hostel_product_updates')
+                .select(`
                     id,
+                                post_category,
                     post_description,
                     post_images,
                     created_at,
@@ -88,7 +111,7 @@ export default function HostelHomePage() {
                         schools (short_name)
                     )
                 `)
-                                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
 
@@ -96,6 +119,7 @@ export default function HostelHomePage() {
                 id: string;
                 post_description: string;
                 post_images: string[];
+                post_category?: string | null;
                 created_at: string;
                 merchant_id: string;
                 unique_visitors?: UniqueVisitor;
@@ -105,15 +129,14 @@ export default function HostelHomePage() {
                 ? rawList.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === schoolId)
                 : rawList);
 
-            // If a selectedHostel filter is active, filter by the merchant's hostel_id
-            const filtered = selectedHostel && selectedHostel !== 'all'
-                ? filteredBySchool.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostel_id === selectedHostel)
-                : filteredBySchool;
+            // Keep full list (we'll apply hostel/category filters client-side when rendering)
+            const filtered = filteredBySchool;
 
             const mapped: HostelsProductUpdates[] = filtered.map((d) => ({
                 id: d.id,
                 post_description: d.post_description,
                 post_images: Array.isArray(d.post_images) ? d.post_images : [],
+                post_category: d.post_category ?? '',
                 created_at: d.created_at,
                 merchant_id: d.merchant_id,
                 unique_visitors: d.unique_visitors,
@@ -125,7 +148,23 @@ export default function HostelHomePage() {
         } finally {
             setLoadingFeed(false);
         }
-    }, [selectedSchoolId, selectedHostel]);
+    }, [selectedSchoolId]);
+
+    // Compute displayed feed by applying hostel and category filters client-side
+    const displayedFeed = useMemo(() => {
+        return feed.filter((item) => {
+            const visitor = item.unique_visitors as UniqueVisitor | undefined;
+            const matchesHostel = selectedHostel === 'all' || !selectedHostel
+                ? true
+                : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel;
+
+            const matchesCategory = selectedCategory === 'all' || !selectedCategory
+                ? true
+                : (item.post_category || '').toLowerCase() === selectedCategory.toLowerCase();
+
+            return matchesHostel && matchesCategory;
+        });
+    }, [feed, selectedHostel, selectedCategory]);
 
     // Fetch hostels for the current school when selectedSchoolId changes
     useEffect(() => {
@@ -139,7 +178,7 @@ export default function HostelHomePage() {
                     .order('name', { ascending: true });
 
                 if (error) throw error;
-                setHostels((data || []) as Array<{id: string; name: string}>);
+                setHostels((data || []) as Array<{ id: string; name: string }>);
             } catch (e) {
                 console.error('Failed to fetch hostels', e);
             }
@@ -161,6 +200,8 @@ export default function HostelHomePage() {
                     .eq('auth_user_id', userId)
                     .single();
                 setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                // default view for merchants is post form, for others default to search
+                setIsSearchView(!visitor?.is_hostel_merchant);
             }
 
             // Initialize selected school from DB or localStorage
@@ -210,17 +251,13 @@ export default function HostelHomePage() {
     }, [userIsAuthenticated]);
 
 
-    const canPost = useMemo(() => {
-        if (!currentVisitor) return false;
-        // Assuming 'is_hostel_merchant' is the field that determines posting ability based on the screenshot structure
-        // If the screenshot implies only the current user can post a "What are you selling?" prompt
-        return !!currentVisitor.is_hostel_merchant;
-    }, [currentVisitor]);
+    // permission helper for posting is determined by currentVisitor.is_hostel_merchant when needed
 
     const onSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
-        setComposerImages((prev) => [...prev, ...files].slice(0, 8)); // cap to reasonable number
+        // allow up to 4 images
+        setComposerImages((prev) => [...prev, ...files].slice(0, 4));
         // Clear the input value so the same file(s) can be selected again if needed
         e.target.value = '';
     };
@@ -232,6 +269,7 @@ export default function HostelHomePage() {
     const handlePost = async () => {
         if (!currentVisitor?.id) return;
         if (!composerText.trim() && composerImages.length === 0) return;
+
         try {
             setPosting(true);
             const uploadedUrls = composerImages.length > 0
@@ -240,12 +278,15 @@ export default function HostelHomePage() {
                 )
                 : [];
 
+            const postCategory = await categorizePost(composerText.trim())
+
             const { error } = await supabase
                 .from('hostel_product_updates')
                 .insert({
                     post_description: composerText.trim(),
                     post_images: uploadedUrls,
                     merchant_id: currentVisitor.id, // FK to unique_visitors
+                    post_category: postCategory
                 });
 
             if (error) throw error;
@@ -265,6 +306,50 @@ export default function HostelHomePage() {
         setImageModalActive(startIndex);
         setImageModalOpen(true);
     };
+
+    // Search handler: queries post_description and post_category
+    const handleSearch = async () => {
+        const q = composerText.trim();
+        if (!q) return;
+        try {
+            setPosting(true);
+            const { data, error } = await supabase
+                .from('hostel_product_updates')
+                .select(`id, post_description, post_images, post_category, created_at, merchant_id, unique_visitors:merchant_id (id, full_name, profile_picture, phone_number, room, hostel_id, hostels(id, name, school_id), schools(short_name))`)
+                .or(`post_description.ilike.%${q}%,post_category.ilike.%${q}%`)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const list = (data || []) as HostelsProductUpdates[];
+            // filter by school if selected
+            const filtered = selectedSchoolId ? list.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId) : list;
+            setSearchResults(filtered);
+        } catch (e) {
+            console.error('Search failed', e);
+            setSearchResults([]);
+        } finally {
+            setPosting(false);
+        }
+    };
+
+    // Image-search prompt modal (coming soon)
+    const ImageSearchPrompt = () => (
+        showImageSearchPrompt ? (
+            <div
+                className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center"
+                onClick={() => setShowImageSearchPrompt(false)}
+            >
+                <div className="bg-gray-900 p-6 rounded-2xl max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
+                    <h3 className="text-white text-lg font-semibold">Find products using images</h3>
+                    <p className="text-gray-400 mt-2">(Coming soon...)</p>
+                    <div className="mt-4">
+                        <button onClick={() => setShowImageSearchPrompt(false)} className="px-4 py-2 bg-emerald-500 text-white rounded-full">Close</button>
+                    </div>
+                </div>
+            </div>
+        ) : null
+    );
 
     // FIX: Added to address the issue of modal not unappearing when background is touched.
     const closeImageModal = () => setImageModalOpen(false);
@@ -335,10 +420,53 @@ export default function HostelHomePage() {
 
                     <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
                         {/* Post Composer Area */}
-                        {canPost && (
-                            <div className="p-4 border-b border-gray-800 flex gap-3">
+                        {/* Post Composer Area */}
+                        <div className="p-4 border-b border-gray-800 flex gap-3">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                    {currentVisitor?.profile_picture ? (
+                                        <img src={currentVisitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-sm font-semibold text-[#8b98a5]">
+                                            {String(currentVisitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2)}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex-1">
+                                <div className="flex items-start justify-between">
+                                    <textarea
+                                        value={composerText}
+                                        onChange={(e) => setComposerText(e.target.value)}
+                                        placeholder={isSearchView ? 'What are you looking for?' : 'What are you selling?'}
+                                        className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
+                                        rows={2}
+                                    />
+                                    <div className="ml-3">
+                                        {/* Toggle icons: only show to hostel merchants. Other users always stay in search view. */}
+                                        {userIsHostelMerchant ? (
+                                            !isSearchView ? (
+                                                <button
+                                                    onClick={() => setIsSearchView(true)}
+                                                    className="text-gray-400 hover:text-white p-2 rounded-full"
+                                                    aria-label="Search mode"
+                                                >
+                                                    <Search className="w-5 h-5" />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => setIsSearchView(false)}
+                                                    className="text-gray-400 hover:text-white p-2 rounded-full"
+                                                    aria-label="Post mode"
+                                                >
+                                                    <Upload className="w-5 h-5" />
+                                                </button>
+                                            )
+                                        ) : null}
+                                    </div>
+                                </div>
                                 <div className="flex-shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                    {/* <div className="w-10 h-10 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
                                         {currentVisitor?.profile_picture ? (
                                             <img src={currentVisitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
                                         ) : (
@@ -346,16 +474,16 @@ export default function HostelHomePage() {
                                                 {String(currentVisitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2)}
                                             </span>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="flex-1">
-                                    <textarea
+                                    {/* <textarea
                                         value={composerText}
                                         onChange={(e) => setComposerText(e.target.value)}
                                         placeholder="What are you selling?"
                                         className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
                                         rows={2}
-                                    />
+                                    /> */}
 
                                     {/* Composer Image Preview */}
                                     {composerImages.length > 0 && (
@@ -384,24 +512,32 @@ export default function HostelHomePage() {
                                                 className="hidden"
                                                 id="image-upload"
                                             />
-                                            <label
-                                                htmlFor="image-upload"
+                                            {/* If in search view, clicking the image icon should show a modal prompt (coming soon). */}
+                                            <button
+                                                onClick={() => {
+                                                    if (isSearchView) setShowImageSearchPrompt(true);
+                                                    else document.getElementById('image-upload')?.click();
+                                                }}
                                                 className={`text-emerald-500 hover:bg-emerald-500/10 p-2 rounded-full transition-colors cursor-pointer`}
+                                                aria-label="Add images"
                                             >
                                                 <svg viewBox="0 0 24 24" aria-hidden="true" className="w-5 h-5"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2M8.5 12.5l2.5 3l3.5-4.5L19 17H5m3-7a2 2 0 1 1 2-2a2 2 0 0 1-2 2Z" /></svg>
-                                            </label>
+                                            </button>
                                         </div>
                                         <button
-                                            onClick={handlePost}
-                                            disabled={posting || (!composerText.trim() && composerImages.length === 0)}
+                                            onClick={() => {
+                                                if (isSearchView) handleSearch();
+                                                else handlePost();
+                                            }}
+                                            disabled={posting || (!composerText.trim() && composerImages.length === 0 && !isSearchView)}
                                             className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold px-6 py-2 rounded-full transition-colors"
                                         >
-                                            {posting ? 'Posting...' : 'Post'}
+                                            {isSearchView ? (posting ? 'Searching...' : 'Search') : (posting ? 'Posting...' : 'Post')}
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </div>
 
                         {/* Feed Divider */}
                         {/* <div className="h-2 bg-[#2f3336]"></div> */}
@@ -413,11 +549,10 @@ export default function HostelHomePage() {
                             <div className="flex gap-2 sm:gap-3 mb-3 overflow-x-auto pb-2 scrollbar-hide">
                                 <button
                                     onClick={() => setSelectedHostel('all')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
-                                        selectedHostel === 'all'
-                                            ?  `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                    }`}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedHostel === 'all'
+                                        ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
                                 >
                                     All Hostels
                                 </button>
@@ -425,11 +560,10 @@ export default function HostelHomePage() {
                                     <button
                                         key={hostel.id}
                                         onClick={() => setSelectedHostel(hostel.id)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
-                                            selectedHostel === hostel.id
-                                                ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedHostel === hostel.id
+                                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         {hostel.name}
                                     </button>
@@ -440,108 +574,254 @@ export default function HostelHomePage() {
                             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                                 <button
                                     onClick={() => setSelectedCategory('all')}
-                                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
-                                        selectedCategory === 'all'
-                                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === 'all'
+                                        ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
                                 >
                                     All
                                 </button>
                                 {categories.map(category => (
                                     <button
-                                        key={category.id}
-                                        onClick={() => setSelectedCategory(category.id)}
-                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
-                                            selectedCategory === category.id
-                                                ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        key={category}
+                                        onClick={() => setSelectedCategory(category)}
+                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === category
+                                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
-                                        {category.name}
+                                        {category}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         <div className="flex flex-col">
-                            {loadingFeed ? (
-                                <div className="p-4 text-sm text-[#8b98a5] text-center">Loading updates...</div>
-                            ) : feed.length === 0 ? (
-                                <div className="p-4 text-sm text-[#8b98a5] text-center">No updates yet.</div>
-                            ) : (
-                                feed.map((item) => {
-                                    const visitor = item.unique_visitors as UniqueVisitor | undefined;
-                                    const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
-                                    const name = visitor?.full_name || 'User';
-                                    // Use the at-handle format from the screenshot
-                                    const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
-                                    const hostel = visitor?.hostels?.name;
-                                    const room = visitor?.room ? `Room ${visitor.room}` : '';
-                                    // const location = [hostel, room].filter(Boolean).join(' • ');
-                                    const timeAgo = formatTimeAgo(item.created_at);
+                            {isSearchView ? (
+                                <div>
+                                    {searchResults === null && (
+                                        <div>
+                                            {loadingFeed && (
+                                                <div className="p-4 text-sm text-[#8b98a5] text-center">Loading updates...</div>
+                                            )}
+                                            {!loadingFeed && feed.length === 0 && (
+                                                <div className="p-4 text-sm text-[#8b98a5] text-center">No updates yet.</div>
+                                            )}
+                                            {!loadingFeed && feed.length > 0 && (
+                                                displayedFeed.map((item) => {
+                                                    const visitor = item.unique_visitors as UniqueVisitor | undefined;
+                                                    const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
+                                                    const name = visitor?.full_name || 'User';
+                                                    const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
+                                                    const hostel = visitor?.hostels?.name;
+                                                    const room = visitor?.room ? `Room ${visitor.room}` : '';
+                                                    const timeAgo = formatTimeAgo(item.created_at);
 
-                                    return (
-                                        <article key={item.id} className="border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors">
-                                            <div className="flex gap-3">
-                                                {/* Avatar Column */}
-                                                <div className="flex-shrink-0">
-                                                    <div className="w-12 h-12 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
-                                                        {visitor?.profile_picture ? (
-                                                            <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <span className="text-sm font-semibold text-[#8b98a5]">{initials}</span>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                                    return (
+                                                        <article key={item.id} className="border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors">
+                                                            <div className="flex gap-3">
+                                                                {/* Avatar Column */}
+                                                                <div className="flex-shrink-0">
+                                                                    <div className="w-12 h-12 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                                                        {visitor?.profile_picture ? (
+                                                                            <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <span className="text-sm font-semibold text-[#8b98a5]">{initials}</span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
 
-                                                {/* Content Column */}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-2 flex-wrap text-sm">
-                                                            <span className="font-bold text-white hover:underline cursor-pointer">{name}</span>
-                                                            <span className="text-gray-500">{handle}</span>
-                                                            <span className="text-gray-500">·</span>
-                                                            <span className="text-gray-500">{timeAgo}</span>
-                                                        </div>
-                                                        {/* More options icon would go here */}
-                                                    </div>
+                                                                {/* Content Column */}
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="flex items-center gap-2 flex-wrap text-sm">
+                                                                            <span className="font-bold text-white hover:underline cursor-pointer">{name}</span>
+                                                                            <span className="text-gray-500">{handle}</span>
+                                                                            <span className="text-gray-500">·</span>
+                                                                            <span className="text-gray-500">{timeAgo}</span>
+                                                                        </div>
+                                                                        {/* More options icon would go here */}
+                                                                    </div>
 
-                                                    {/* Location Line - emphasized */}
-                                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
-                                                        <span>{hostel}</span>
-                                                        <span>·</span>
-                                                        {room && <span>{room}</span>}
-                                                    </div>
+                                                                    {/* Location Line - emphasized */}
+                                                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
+                                                                        <span>{hostel}</span>
+                                                                        <span>·</span>
+                                                                        {room && <span>{room}</span>}
+                                                                    </div>
 
-                                                    {/* Post Description */}
-                                                    {item.post_description && (
-                                                        <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">
-                                                            {item.post_description}
-                                                        </p>
-                                                    )}
+                                                                    {/* Post Description */}
+                                                                    {item.post_description && (
+                                                                        <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">
+                                                                            {item.post_description}
+                                                                        </p>
+                                                                    )}
 
-                                                    {/* Image Grid */}
-                                                    {renderImageGrid(item.post_images, openImageModal)}
+                                                                    {/* Image Grid */}
+                                                                    {renderImageGrid(item.post_images, openImageModal)}
 
-                                                    {/* Replace actions with ContactSellerButton */}
-                                                    <div className="mt-3">
-                                                        <ContactSellerButton
-                                                            product={{
-                                                                product_description: item.post_description,
-                                                                phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
-                                                                school_short_name: visitor?.schools?.short_name,
-                                                                merchant_id: visitor?.id,
-                                                            }}
-                                                        >
-                                                            Contact Seller
-                                                        </ContactSellerButton>
-                                                    </div>
-                                                </div>
+                                                                    {/* Replace actions with ContactSellerButton */}
+                                                                    <div className="mt-3">
+                                                                        <ContactSellerButton
+                                                                            product={{
+                                                                                product_description: item.post_description,
+                                                                                phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
+                                                                                school_short_name: visitor?.schools?.short_name,
+                                                                                merchant_id: visitor?.id,
+                                                                            }}
+                                                                        >
+                                                                            Contact Seller
+                                                                        </ContactSellerButton>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </article>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
+                                    )}
+                                    {searchResults !== null && searchResults.length === 0 && (
+                                        <div className="p-4 text-sm text-[#8b98a5] text-center">
+                                            No results for product. Would you like to check the main store for the product?
+                                            <div className="mt-3">
+                                                <button
+                                                    onClick={() => { window.location.href = '/'; }}
+                                                    className="bg-emerald-500 text-white px-4 py-2 rounded-full"
+                                                >
+                                                    Yes, take me to store
+                                                </button>
                                             </div>
-                                        </article>
-                                    );
-                                })
+                                        </div>
+                                    )}
+                                    {searchResults && searchResults.length > 0 && (
+                                        searchResults.map((item) => {
+                                            const visitor = item.unique_visitors as UniqueVisitor | undefined;
+                                            const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
+                                            const name = visitor?.full_name || 'User';
+                                            const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
+                                            const hostel = visitor?.hostels?.name;
+                                            const room = visitor?.room ? `Room ${visitor.room}` : '';
+                                            const timeAgo = formatTimeAgo(item.created_at);
+
+                                            return (
+                                                <article key={item.id} className="border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors">
+                                                    <div className="flex gap-3">
+                                                        <div className="flex-shrink-0">
+                                                            <div className="w-12 h-12 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                                                {visitor?.profile_picture ? (
+                                                                    <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <span className="text-sm font-semibold text-[#8b98a5]">{initials}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-2 flex-wrap text-sm">
+                                                                    <span className="font-bold text-white hover:underline cursor-pointer">{name}</span>
+                                                                    <span className="text-gray-500">{handle}</span>
+                                                                    <span className="text-gray-500">·</span>
+                                                                    <span className="text-gray-500">{timeAgo}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
+                                                                <span>{hostel}</span>
+                                                                <span>·</span>
+                                                                {room && <span>{room}</span>}
+                                                            </div>
+                                                            {item.post_description && (
+                                                                <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">{item.post_description}</p>
+                                                            )}
+                                                            {renderImageGrid(item.post_images, openImageModal)}
+                                                        </div>
+                                                    </div>
+                                                </article>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            ) : (
+                                <div>
+                                    {loadingFeed && (
+                                        <div className="p-4 text-sm text-[#8b98a5] text-center">Loading updates...</div>
+                                    )}
+                                    {!loadingFeed && feed.length === 0 && (
+                                        <div className="p-4 text-sm text-[#8b98a5] text-center">No updates yet.</div>
+                                    )}
+                                    {!loadingFeed && feed.length > 0 && (
+                                        displayedFeed.map((item) => {
+                                            const visitor = item.unique_visitors as UniqueVisitor | undefined;
+                                            const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
+                                            const name = visitor?.full_name || 'User';
+                                            const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
+                                            const hostel = visitor?.hostels?.name;
+                                            const room = visitor?.room ? `Room ${visitor.room}` : '';
+                                            const timeAgo = formatTimeAgo(item.created_at);
+
+                                            return (
+                                                <article key={item.id} className="border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors">
+                                                    <div className="flex gap-3">
+                                                        {/* Avatar Column */}
+                                                        <div className="flex-shrink-0">
+                                                            <div className="w-12 h-12 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
+                                                                {visitor?.profile_picture ? (
+                                                                    <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <span className="text-sm font-semibold text-[#8b98a5]">{initials}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Content Column */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-2 flex-wrap text-sm">
+                                                                    <span className="font-bold text-white hover:underline cursor-pointer">{name}</span>
+                                                                    <span className="text-gray-500">{handle}</span>
+                                                                    <span className="text-gray-500">·</span>
+                                                                    <span className="text-gray-500">{timeAgo}</span>
+                                                                </div>
+                                                                {/* More options icon would go here */}
+                                                            </div>
+
+                                                            {/* Location Line - emphasized */}
+                                                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
+                                                                <span>{hostel}</span>
+                                                                <span>·</span>
+                                                                {room && <span>{room}</span>}
+                                                            </div>
+
+                                                            {/* Post Description */}
+                                                            {item.post_description && (
+                                                                <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">
+                                                                    {item.post_description}
+                                                                </p>
+                                                            )}
+
+                                                            {/* Image Grid */}
+                                                            {renderImageGrid(item.post_images, openImageModal)}
+
+                                                            {/* Replace actions with ContactSellerButton */}
+                                                            <div className="mt-3">
+                                                                <ContactSellerButton
+                                                                    product={{
+                                                                        product_description: item.post_description,
+                                                                        phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
+                                                                        school_short_name: visitor?.schools?.short_name,
+                                                                        merchant_id: visitor?.id,
+                                                                    }}
+                                                                >
+                                                                    Contact Seller
+                                                                </ContactSellerButton>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </article>
+                                            );
+                                        })
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -617,6 +897,8 @@ export default function HostelHomePage() {
                             </div>
                         </div>
                     )}
+
+                    {ImageSearchPrompt()}
 
                     {/* Auth Modal */}
                     <AuthModal
