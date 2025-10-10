@@ -116,7 +116,7 @@ export default function UserMenu() {
           className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <FileText className="w-4 h-4" />
-          Invoices
+          Transactions
         </button>
 
         {userType === 'merchant' && (

@@ -9,7 +9,9 @@ import ContactSellerButton from '../components/ContactSellerButton';
 import AuthModal from '../components/AuthModal';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import { useTheme } from '../hooks/useTheme';
-import { categorizePost } from '../lib/gemini';
+import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
+import { useNavigate } from 'react-router-dom';
+import { useHostelMode } from '../hooks/useHostelMode';
 
 // Helper function to format time (placeholder implementation for a Twitter-like "Xh" format)
 const formatTimeAgo = (timestamp: string): string => {
@@ -70,6 +72,9 @@ export default function HostelHomePage() {
     const [pendingContactProduct, setPendingContactProduct] = useState(null);
 
     const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
+
+    const navigate = useNavigate();
+    const { toggleHostelMode } = useHostelMode();
 
     const { currentTheme } = useTheme();
 
@@ -279,6 +284,7 @@ export default function HostelHomePage() {
                 : [];
 
             const postCategory = await categorizePost(composerText.trim())
+            const postSearchWords = await extractProductKeywordsFromDescription(composerText.trim())
 
             const { error } = await supabase
                 .from('hostel_product_updates')
@@ -286,7 +292,8 @@ export default function HostelHomePage() {
                     post_description: composerText.trim(),
                     post_images: uploadedUrls,
                     merchant_id: currentVisitor.id, // FK to unique_visitors
-                    post_category: postCategory
+                    post_category: postCategory,
+                    search_words: postSearchWords
                 });
 
             if (error) throw error;
@@ -308,23 +315,89 @@ export default function HostelHomePage() {
     };
 
     // Search handler: queries post_description and post_category
+    // Search handler: queries post_category and search_words
     const handleSearch = async () => {
         const q = composerText.trim();
+
         if (!q) return;
+
         try {
             setPosting(true);
+
+            // --- Step 1: Get categorization and search words for the query ---
+            const postCategory = await categorizePost(q);
+            const postSearchWords = await extractProductKeywordsFromDescription(q);
+
+            // Crucial check: If we can't determine a category, we won't get results based on the new requirement.
+            if (!postCategory) {
+                console.warn('Could not determine post category for the query.');
+                setSearchResults([]);
+                return;
+            }
+
+            // --- Step 2: Fetch data filtered STRICTLY by postCategory ---
+            // 1. Filter: Use .eq() to ensure post_category EXACTLY matches the determined category.
+            // 2. Search: We could potentially use .or() on search_words if Supabase supported advanced array matching/text search here, 
+            //    but since we are doing the ranking later, we'll keep the filter strict and let the ranking handle keyword relevance.
+
             const { data, error } = await supabase
                 .from('hostel_product_updates')
-                .select(`id, post_description, post_images, post_category, created_at, merchant_id, unique_visitors:merchant_id (id, full_name, profile_picture, phone_number, room, hostel_id, hostels(id, name, school_id), schools(short_name))`)
-                .or(`post_description.ilike.%${q}%,post_category.ilike.%${q}%`)
+                .select(`id, post_description, post_images, post_category, search_words, created_at, merchant_id, unique_visitors:merchant_id (id, full_name, profile_picture, phone_number, room, hostel_id, hostels(id, name, school_id), schools(short_name))`)
+                .eq('post_category', postCategory) // NEW: Strict filter for the determined category
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
 
             const list = (data || []) as HostelsProductUpdates[];
-            // filter by school if selected
-            const filtered = selectedSchoolId ? list.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId) : list;
-            setSearchResults(filtered);
+
+            // Filter by school if selected
+            const filtered = selectedSchoolId
+                ? list.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId)
+                : list;
+
+            // --- Step 3: Client-Side Ranking by Search Words Similarity ---
+            if (postSearchWords.length > 0) {
+                // Calculate a score for each result based on keyword overlap
+                const rankedResults = filtered.map(item => {
+                    // Ensure item.search_words is an array for safe comparison
+                    const itemSearchWords: string[] = Array.isArray(item.search_words) ? item.search_words : [];
+                    let score = 0;
+
+                    // Calculate score based on keyword overlap
+                    for (const queryWord of postSearchWords) {
+                        if (itemSearchWords.includes(queryWord)) {
+                            // Give a point for each exact match
+                            score += 1;
+                        }
+                    }
+
+                    return { ...item, score };
+                });
+
+                // Sort the results: 
+                // 1. Higher score first (most similar)
+                // 2. Then by the original created_at (most recent)
+                rankedResults.sort((a, b) => {
+                    // Primary sort: score (descending)
+                    if (b.score !== a.score) {
+                        return b.score - a.score;
+                    }
+
+                    // Secondary sort: created_at (descending - ensures recency for ties)
+                    const dateA = new Date(a.created_at).getTime();
+                    const dateB = new Date(b.created_at).getTime();
+                    return dateB - dateA;
+                });
+
+                // Remove the temporary 'score' property before setting the state
+                const finalResults = rankedResults.map(({ score, ...rest }) => rest);
+                setSearchResults(finalResults as HostelsProductUpdates[]);
+
+            } else {
+                // If no keywords were generated from the query, use the filtered list directly (already category-filtered)
+                setSearchResults(filtered);
+            }
+
         } catch (e) {
             console.error('Search failed', e);
             setSearchResults([]);
@@ -686,7 +759,7 @@ export default function HostelHomePage() {
                                             No results for product. Would you like to check the main store for the product?
                                             <div className="mt-3">
                                                 <button
-                                                    onClick={() => { window.location.href = '/'; }}
+                                                    onClick={() => { toggleHostelMode(); navigate('/'); }}
                                                     className="bg-emerald-500 text-white px-4 py-2 rounded-full"
                                                 >
                                                     Yes, take me to store
@@ -734,6 +807,20 @@ export default function HostelHomePage() {
                                                                 <p className="text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap">{item.post_description}</p>
                                                             )}
                                                             {renderImageGrid(item.post_images, openImageModal)}
+
+                                                            {/* Replace actions with ContactSellerButton */}
+                                                            <div className="mt-3">
+                                                                <ContactSellerButton
+                                                                    product={{
+                                                                        product_description: item.post_description,
+                                                                        phone_number: (visitor as UniqueVisitor | undefined)?.phone_number || '',
+                                                                        school_short_name: visitor?.schools?.short_name,
+                                                                        merchant_id: visitor?.id,
+                                                                    }}
+                                                                >
+                                                                    Contact Seller
+                                                                </ContactSellerButton>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </article>

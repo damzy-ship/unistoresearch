@@ -890,3 +890,70 @@ export async function categorizePost(post: string): Promise<string> {
     return 'others';
   }
 }
+
+export async function extractProductKeywordsFromDescription(description: string): Promise<string[]> {
+  if (!genAI) return ['product']; 
+
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  // Adjusted Prompt
+  const extractionPrompt = `
+    Analyze the following text, which can be a product post or a user search query. Your task is to extract a list of the most relevant and important search words or keywords that identify the *item or product itself*.
+
+    **DO NOT** include:
+    - Transactional words (e.g., selling, have, for sale, looking for).
+    - Condition/Quality words (e.g., new, used, old, discount).
+    - Price or currency information (e.g., 14k, 700k, naira, price).
+    - Generic location terms (e.g., room 5, hostel, location).
+
+    The keywords should focus ONLY on:
+    1.  The primary **product** (e.g., "sneakers", "bread", "tops").
+    2.  Any specific **brands** or **models** (e.g., "Gucci", "dell xps 13", "munchit").
+    3.  A likely **category** if the product is generic (e.g., "laptop", "snacks").
+    
+    Return the result as a JSON object with a single key: "keywords" containing an array of strings.
+    
+    Text Description: "${description}"
+    
+    Example output for "I have a Gucci bag selling 14k":
+    {
+      "keywords": ["Gucci bag", "bag"]
+    }
+
+    Example output for "Im selling my new dell xps 13 for 700k":
+    {
+        "keywords": ["dell xps 13", "laptop"]
+    }
+
+    Example output for "I'm selling 200 naira bread and 500 naira bread at old hostel":
+    {
+        "keywords": ["bread", "food"]
+    }
+    
+    Return ONLY the JSON object, nothing else. All keywords should be lowercased and single words or essential phrases.
+  `;
+
+  try {
+    const result = await generativeModel.generateContent({
+      contents: [{ parts: [{ text: extractionPrompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const extractionData = JSON.parse(result.response.text());
+
+    if (Array.isArray(extractionData.keywords)) {
+      // Ensure all elements are strings and lowercased before returning
+      return extractionData.keywords.map((word: unknown) => 
+        String(word).trim().toLowerCase()
+      );
+    } else {
+      console.warn('Could not extract keywords array, defaulting to ["product"]');
+      return ['product'];
+    }
+  } catch (error) {
+    console.error('Error extracting product keywords:', error);
+    return ['product'];
+  }
+}

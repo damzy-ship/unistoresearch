@@ -94,6 +94,7 @@ export interface HostelsProductUpdates {
   merchant_id: string;
   unique_visitors?: UniqueVisitor;
   post_category: string;
+  search_words: string[];
 }
 
 export interface RequestLog {
