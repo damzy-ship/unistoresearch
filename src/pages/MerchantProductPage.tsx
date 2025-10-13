@@ -24,10 +24,8 @@ export default function MerchantProductPage() {
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [isAvailable, setIsAvailable] = useState(true);
-    const [isHostelProduct, setIsHostelProduct] = useState(false);
     const [newFiles, setNewFiles] = useState<File[]>([]); // State for new files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
-    const [isHostelMerchant, setIsHostelMerchant] = useState(false);
     const { currentTheme } = useTheme();
 
     // Calculate the total number of images that will exist after adding/editing
@@ -56,7 +54,6 @@ export default function MerchantProductPage() {
                 return null;
             }
             setMerchantDetails(data);
-            setIsHostelMerchant(data.is_hostel_merchant || false);
         } catch (err) { console.error('Error fetching merchant:', err); }
     };
 
@@ -75,7 +72,6 @@ export default function MerchantProductPage() {
             }
 
             setProducts(data);
-            // setIsHostelMerchant(data[0]?.unique_visitor?.is_hostel_merchant || false);
             // console.log('Fetched products:', data);
         } catch (err) {
             console.error('Error fetching products:', err);
@@ -116,7 +112,6 @@ export default function MerchantProductPage() {
         setProductDescription(product.product_description);
         setProductPrice(product.product_price);
         setIsAvailable(product.is_available);
-        setIsHostelProduct(product.is_hostel_product);
         setNewFiles([]);
         setShowAddProductForm(true);
     };
@@ -125,7 +120,6 @@ export default function MerchantProductPage() {
         setProductDescription('');
         setProductPrice('');
         setIsAvailable(true);
-        setIsHostelProduct(false);
         setNewFiles([]);
         setEditingProduct(null);
         setError(null);
@@ -136,7 +130,6 @@ export default function MerchantProductPage() {
         setProductDescription('');
         setProductPrice('');
         setIsAvailable(true);
-        setIsHostelProduct(false);
         setNewFiles([]);
         setEditingProduct(null);
         setError(null);
@@ -173,7 +166,6 @@ export default function MerchantProductPage() {
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
-                    is_hostel_product: isHostelProduct,
                     image_urls: imageUrls,
                     product_category: query_category,
                     search_words: query_search_words
@@ -231,7 +223,6 @@ export default function MerchantProductPage() {
                     product_description: productDescription,
                     product_price: productPrice,
                     is_available: isAvailable,
-                    is_hostel_product: isHostelProduct,
                     image_urls: finalImageUrls,
                     product_category: query_category,
                     search_words: query_search_words
@@ -363,35 +354,6 @@ export default function MerchantProductPage() {
                             <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">Available for sale</label>
                         </div>
 
-                        {/* --- NEW TOGGLE SWITCH FOR is_hostel_product --- */}
-                        {isHostelMerchant && <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
-                            <label htmlFor="isHostelProductToggle" className="text-sm font-medium text-gray-700 select-none">
-                                Hostel Product
-                            </label>
-                            <label
-                                htmlFor="isHostelProductToggle"
-                                className={`relative inline-flex items-center cursor-pointer transition-all duration-300 ${loading || uploadingImages ? 'opacity-50' : ''}`}
-                            >
-                                <input
-                                    id="isHostelProductToggle"
-                                    type="checkbox"
-                                    checked={isHostelProduct}
-                                    onChange={(e) => setIsHostelProduct(e.target.checked)}
-                                    disabled={loading || uploadingImages}
-                                    className="sr-only peer"
-                                />
-                                {/* Track (Rectangular Look) */}
-                                <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-sm peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:bg-yellow-500 transition-colors duration-300 ease-in-out"></div>
-
-                                {/* Thumb (Square Look) */}
-                                <div
-                                    className={`absolute left-[4px] top-[4px] bg-white w-5 h-5 transition-all duration-300 ease-in-out border border-gray-300 
-                                                ${isHostelProduct ? 'translate-x-7 bg-white shadow-md' : 'translate-x-0 bg-gray-100 shadow-sm'}`}
-                                ></div>
-                            </label>
-                        </div>}
-                        {/* ----------- END TOGGLE SWITCH FOR is_hostel_product ----------------------------------------- */}
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Product Images <span className="text-xs text-orange-600 font-bold">(Max {MAX_IMAGES} images)</span>
@@ -499,12 +461,7 @@ export default function MerchantProductPage() {
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
-                                        {/* --- DISPLAY HOSTEL STATUS --- */}
-                                        {product.is_hostel_product && isHostelMerchant && (<p className="text-xs text-gray-500 flex items-center justify-center gap-1">
 
-                                            <span className='font-medium text-purple-600'>[Hostel Product]</span>
-
-                                        </p>)}
 
                                         <div className="flex gap-2 mt-4 w-full">
                                             <button
