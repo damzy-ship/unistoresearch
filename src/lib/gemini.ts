@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from './supabase';
 import { fetchExistingCategories } from './categoryService';
+import { transformDescriptionForEmbedding } from './generateEmbedding';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -827,6 +828,9 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
 
   const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
+  // const post_description = await transformDescriptionForEmbedding(post);
+
+
   let categories = [];
   if (mode === 'hostel') {
 
@@ -848,16 +852,16 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
     categories = [
       'bags',
       'fragrances',
-      'Health, Beauty & Personal Care',
-      'Shoes',
-      'Jewelry & Accessories',
-      'Home & Kitchen',
-      'Others',
-      'Electronics & Gadgets',
-      'Sports & Fitness',
-      'Food & Beverage',
-      'Clothing',
-      'Books & Stationery',
+      'health, beauty & personal care',
+      'shoes',
+      'jewelry & accessories',
+      'home & kitchen',
+      'others',
+      'electronics & gadgets',
+      'sports & fitness',
+      'food & beverage',
+      'clothing',
+      'books & stationery',
       'caps & hats'
     ];
   }
@@ -873,17 +877,17 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
     
     Guidelines:
     - "food & snacks": Any edible items, beverages, food products
-    - "clothing": Apparel items like shirts, pants, dresses, jackets (but NOT shoes, caps, or bags)
-    - "shoes": Footwear of any kind
+    - "clothing": Apparel items like shirts, pants, jeans, dresses, jackets (but NOT shoes, caps, or bags)
+    - "shoes": Footwear of any kind, shoes, adidas shoes, nike shoes, puma shoes, converse shoes
     - "caps": Headwear, hats, caps
     - "gadgets": Electronic devices like laptops, tablets, smartwatches, cameras (but NOT phones)
     - "phones": Mobile phones, smartphones, cellphones
     - "jewelries": Accessories like rings, necklaces, earrings, bracelets, watches
     - "bags": Purses, backpacks, handbags, luggage
     - "others": Anything that doesn't fit the above categories
-    
+
     Product Description: "${post}"
-    
+
     Example output format:
     {
       "category": "shoes"
@@ -900,16 +904,16 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
     
     Guidelines:
     - "food & beverages": Any edible items, beverages, food products
-    - "clothing": Apparel items like shirts, pants, dresses, jackets (but NOT shoes, caps, or bags)
+    - "clothing": Apparel items like shirts, pants, jeans, dresses, jackets (but NOT shoes, caps, or bags)
     - "shoes": Footwear of any kind
     - "caps": Headwear, hats, caps
     - "Electronics & Gadgets": Electronic devices like laptops, tablets, smartwatches, cameras, Mobile phones, smartphones, cellphones
     - "Jewelry & Accessories": Accessories like rings, necklaces, earrings, bracelets, watches
     - "bags": Purses, backpacks, handbags, luggage
     - "others": Anything that doesn't fit the above categories
-    
+
     Product Description: "${post}"
-    
+
     Example output format:
     {
       "category": "shoes"
@@ -930,10 +934,11 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
     });
 
     const categorizationData = JSON.parse(result.response.text());
-
+    console.log('Categorization result:', categorizationData.category);
+    console.log('Available categories:', categories);
     // Validate that the returned category is in our list
-    if (categorizationData.category && categories.includes(categorizationData.category)) {
-      return categorizationData.category;
+    if (categorizationData.category && categories.includes(categorizationData.category.toLowerCase())) {
+      return categorizationData.category.toLowerCase();
     } else {
       console.warn('Invalid category returned, defaulting to "others"');
       return 'others';

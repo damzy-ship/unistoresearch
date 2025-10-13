@@ -99,7 +99,7 @@ export default function HostelHomePage() {
                 .from('hostel_product_updates')
                 .select(`
                     id,
-                                post_category,
+                    post_category,
                     post_description,
                     post_images,
                     created_at,
@@ -113,7 +113,7 @@ export default function HostelHomePage() {
                         is_hostel_merchant,
                         hostel_id,
                         hostels (id, name, school_id),
-                        schools (short_name)
+                        schools (id, short_name)
                     )
                 `)
                 .order('created_at', { ascending: false });
