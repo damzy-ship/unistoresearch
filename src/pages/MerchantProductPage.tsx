@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Plus, Loader, CheckCircle, AlertCircle, Image, X } from 'lucide-react';
 import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
-import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
+import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 
 
 // Define the maximum number of images allowed
@@ -159,7 +159,8 @@ export default function MerchantProductPage() {
         setError(null);
 
         try {
-            const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
+            const query_category = await categorizePost(productDescription);
+            const query_search_words = await extractProductKeywordsFromDescription(productDescription);
             setUploadingImages(true);
             const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId ? merchantId : "", 'product-images', 'product-images'))) : [];
             setUploadingImages(false);
@@ -174,8 +175,8 @@ export default function MerchantProductPage() {
                     is_available: isAvailable,
                     is_hostel_product: isHostelProduct,
                     image_urls: imageUrls,
-                    embedding: embedding,
-                    search_description: enhancedDescription
+                    product_category: query_category,
+                    search_words: query_search_words
                 });
 
             if (dbError) {
@@ -210,13 +211,12 @@ export default function MerchantProductPage() {
         setError(null);
 
         try {
-            let newEmbedding = editingProduct.embedding;
-            let newSearchDescription = editingProduct.search_description;
+            let query_category = editingProduct.product_category;
+            let query_search_words = editingProduct.search_words;
 
             if (productDescription !== editingProduct.product_description) {
-                const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
-                newEmbedding = embedding;
-                newSearchDescription = enhancedDescription;
+                query_category = await categorizePost(editingProduct.product_description);
+                query_search_words = await extractProductKeywordsFromDescription(editingProduct.product_description);
             }
 
             setUploadingImages(true);
@@ -233,8 +233,8 @@ export default function MerchantProductPage() {
                     is_available: isAvailable,
                     is_hostel_product: isHostelProduct,
                     image_urls: finalImageUrls,
-                    embedding: newEmbedding,
-                    search_description: newSearchDescription
+                    product_category: query_category,
+                    search_words: query_search_words
                 })
                 .eq('id', editingProduct.id);
 

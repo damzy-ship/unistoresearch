@@ -3,6 +3,7 @@ import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from '
 import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
+import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 
 interface MerchantProductModalProps {
     actual_merchant_id?: string;
@@ -149,8 +150,9 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         setError(null);
 
         try {
-            // 1. Generate the embedding
-            const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
+            const query_category = await categorizePost(productDescription);
+            const query_search_words = await extractProductKeywordsFromDescription(productDescription);
+
 
             // 2. Upload images
             setUploadingImages(true);
@@ -168,8 +170,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                     is_available: isAvailable,
                     is_hostel_product: isHostelProduct,
                     image_urls: imageUrls,
-                    embedding: embedding, // Store the embedding
-                    search_description: enhancedDescription
+                    product_category: query_category,
+                    search_words: query_search_words
                 });
 
             if (error) {
@@ -206,15 +208,12 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         setError(null);
 
         try {
-            // 1. Generate a new embedding if the description changed
-            let newEmbedding = editingProduct.embedding;
-            let newSearchDescription = editingProduct.search_description;
-
+            let query_category = editingProduct.product_category;
+            let query_search_words = editingProduct.search_words;
 
             if (productDescription !== editingProduct.product_description) {
-                const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
-                newEmbedding = embedding;
-                newSearchDescription = enhancedDescription;
+                query_category = await categorizePost(editingProduct.product_description);
+                query_search_words = await extractProductKeywordsFromDescription(editingProduct.product_description);
             }
 
             // 2. Upload new images
@@ -233,8 +232,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                     is_available: isAvailable,
                     is_hostel_product: isHostelProduct,
                     image_urls: updatedImageUrls,
-                    embedding: newEmbedding,
-                    search_description: newSearchDescription
+                    product_category: query_category,
+                    search_words: query_search_words
                 })
                 .eq('id', editingProduct.id);
 
