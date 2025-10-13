@@ -108,16 +108,16 @@ Generate categories now:`;
     let categories: string[];
     try {
       categories = JSON.parse(jsonText);
-      
+
       if (!Array.isArray(categories) || !categories.every(cat => typeof cat === 'string')) {
         throw new Error('Invalid response format');
       }
-      
+
       categories = categories
-        .map(cat => cat.trim()) 
+        .map(cat => cat.trim())
         .filter(cat => cat.length > 0)
         .slice(0, 5);
-        
+
     } catch (parseError) {
       console.error('Failed to parse Gemini response:', jsonText);
       return {
@@ -193,16 +193,16 @@ Generate categories for this request:`;
     let categories: string[];
     try {
       categories = JSON.parse(jsonText);
-      
+
       if (!Array.isArray(categories) || !categories.every(cat => typeof cat === 'string')) {
         throw new Error('Invalid response format');
       }
-      
+
       categories = categories
         .map(cat => cat.trim())
         .filter(cat => cat.length > 0)
         .slice(0, 5);
-        
+
     } catch (parseError) {
       console.error('Failed to parse Gemini response for category generation:', jsonText);
       return {
@@ -233,10 +233,10 @@ Generate categories for this request:`;
 export async function findSimilarCategoriesWithAI(generatedCategories: string[], catalogCategories: string[]): Promise<CategoryMatchResult> {
   // First get word-based matches (high scores)
   const wordBasedMatches = findSimilarCategories(generatedCategories, catalogCategories);
-  
+
   // Then get semantic matches (extremely low scores)
   const semanticMatches = await findSemanticMatches(generatedCategories, catalogCategories);
-  
+
   // Combine results, removing duplicates (word-based takes precedence)
   const allMatches = [...wordBasedMatches];
   for (const semanticMatch of semanticMatches) {
@@ -244,7 +244,7 @@ export async function findSimilarCategoriesWithAI(generatedCategories: string[],
       allMatches.push(semanticMatch);
     }
   }
-  
+
   return {
     categories: allMatches,
     success: true
@@ -299,14 +299,14 @@ Return semantic matches:`;
     let semanticMatches: string[];
     try {
       semanticMatches = JSON.parse(jsonText);
-      
+
       if (!Array.isArray(semanticMatches) || !semanticMatches.every(cat => typeof cat === 'string')) {
         return [];
       }
-      
+
       // Validate that returned categories exist in catalog
       semanticMatches = semanticMatches.filter(match => catalogCategories.includes(match));
-      
+
     } catch (parseError) {
       console.error('Failed to parse semantic matching response:', jsonText);
       return [];
@@ -326,18 +326,18 @@ Return semantic matches:`;
  */
 export function findSimilarCategories(generatedCategories: string[], catalogCategories: string[]): string[] {
   const similarCategories: string[] = [];
-  
+
   console.log('=== Word-Based Category Matching Debug ===');
   console.log('Generated categories:', generatedCategories);
   console.log('Catalog categories:', catalogCategories);
-  
+
   for (const generated of generatedCategories) {
     const generatedLower = generated.toLowerCase();
     console.log(`\nChecking generated category: "${generated}"`);
-    
+
     for (const catalog of catalogCategories) {
       const catalogLower = catalog.toLowerCase();
-      
+
       // Exact match (highest priority)
       if (generatedLower === catalogLower) {
         console.log(`✓ Exact match found: "${generated}" = "${catalog}"`);
@@ -346,7 +346,7 @@ export function findSimilarCategories(generatedCategories: string[], catalogCate
         }
         continue;
       }
-      
+
       // Word containment matching
       if (catalogLower.includes(generatedLower) && generatedLower.length >= 3) {
         console.log(`✓ Generated contained in catalog: "${generated}" in "${catalog}"`);
@@ -355,7 +355,7 @@ export function findSimilarCategories(generatedCategories: string[], catalogCate
         }
         continue;
       }
-      
+
       if (generatedLower.includes(catalogLower) && catalogLower.length >= 3) {
         console.log(`✓ Catalog contained in generated: "${catalog}" in "${generated}"`);
         if (!similarCategories.includes(catalog)) {
@@ -363,11 +363,11 @@ export function findSimilarCategories(generatedCategories: string[], catalogCate
         }
         continue;
       }
-      
+
       // Word-by-word matching
       const generatedWords = generatedLower.split(/\s+/);
       const catalogWords = catalogLower.split(/\s+/);
-      
+
       let hasWordMatch = false;
       for (const gWord of generatedWords) {
         for (const cWord of catalogWords) {
@@ -385,16 +385,16 @@ export function findSimilarCategories(generatedCategories: string[], catalogCate
         }
         if (hasWordMatch) break;
       }
-      
+
       if (hasWordMatch && !similarCategories.includes(catalog)) {
         similarCategories.push(catalog);
       }
     }
   }
-  
+
   console.log('Final similar categories found:', similarCategories);
   console.log('=== End Word-Based Category Matching Debug ===\n');
-  
+
   return similarCategories;
 }
 
@@ -403,7 +403,7 @@ export function findSimilarCategories(generatedCategories: string[], catalogCate
  * Now includes recency penalty for fair visibility
  */
 function calculateCategoryMatchScore(
-  merchantCategories: string[], 
+  merchantCategories: string[],
   requestCategories: string[],
   averageRating?: number,
   totalRatings?: number,
@@ -428,19 +428,19 @@ function calculateCategoryMatchScore(
   for (const requestCat of requestCategoriesLower) {
     for (const merchantCat of merchantCategoriesLower) {
       if (requestCat !== merchantCat) {
-        if ((requestCat.includes(merchantCat) && merchantCat.length >= 3) || 
-            (merchantCat.includes(requestCat) && requestCat.length >= 3)) {
+        if ((requestCat.includes(merchantCat) && merchantCat.length >= 3) ||
+          (merchantCat.includes(requestCat) && requestCat.length >= 3)) {
           score += 50;
         } else {
           const requestWords = requestCat.split(/\s+/);
           const merchantWords = merchantCat.split(/\s+/);
-          
+
           for (const rWord of requestWords) {
             for (const mWord of merchantWords) {
               if (rWord === mWord && rWord.length >= 3) {
                 score += 20;
-              } else if (rWord.length >= 4 && mWord.length >= 4 && 
-                        (rWord.includes(mWord) || mWord.includes(rWord))) {
+              } else if (rWord.length >= 4 && mWord.length >= 4 &&
+                (rWord.includes(mWord) || mWord.includes(rWord))) {
                 score += 10;
               }
             }
@@ -456,23 +456,23 @@ function calculateCategoryMatchScore(
 
   // Normalize score by number of merchant categories to favor specialists
   let normalizedScore = score / Math.max(merchantCategories.length, 1);
-  
+
   // Apply rating boost
   if (averageRating && totalRatings) {
     const ratingBoost = 1 + ((averageRating - 3) * 0.1);
     normalizedScore *= ratingBoost;
-    
+
     if (totalRatings >= 5) {
       normalizedScore += 0.2;
     }
   }
-  
+
   // Apply recency penalty for fair visibility
   if (lastMatchedAt) {
     const now = new Date();
     const lastMatched = new Date(lastMatchedAt);
     const hoursSinceLastMatch = (now.getTime() - lastMatched.getTime()) / (1000 * 60 * 60);
-    
+
     // Apply penalty if matched within last 24 hours
     if (hoursSinceLastMatch < 24) {
       // Penalty ranges from 0.5 (just matched) to 1.0 (24 hours ago)
@@ -481,7 +481,7 @@ function calculateCategoryMatchScore(
       console.log(`Applied recency penalty to merchant: ${recencyPenalty.toFixed(2)} (${hoursSinceLastMatch.toFixed(1)} hours ago)`);
     }
   }
-  
+
   return normalizedScore;
 }
 
@@ -503,7 +503,7 @@ export async function findMerchantsForRequest(
     console.log('University:', universityName);
 
     const generationResult = await generateCategoriesFromRequest(requestText);
-    
+
     if (!generationResult.success || generationResult.categories.length === 0) {
       console.log('No categories generated from request');
       return {
@@ -514,14 +514,14 @@ export async function findMerchantsForRequest(
         sellerCategories: {}
       };
     }
-    
+
     console.log('Generated categories from request:', generationResult.categories);
-    
+
     const availableCategories = await fetchExistingCategories();
     console.log('Available categories in catalog:', availableCategories);
-    
+
     const matchResult = await findSimilarCategoriesWithAI(generationResult.categories, availableCategories);
-    
+
     if (!matchResult.success || matchResult.categories.length === 0) {
       console.log('No matching categories found in catalog');
       return {
@@ -532,11 +532,11 @@ export async function findMerchantsForRequest(
         sellerCategories: {}
       };
     }
-    
+
     console.log('Similar categories found in catalog:', matchResult.categories);
 
     const { merchants, sellerCategories } = await findMerchantsByCategories(matchResult.categories, universityName, generationResult.categories, limit);
-    
+
     console.log('=== End AI-Powered Merchant Matching ===\n');
 
     return {
@@ -564,7 +564,7 @@ export async function findMerchantsForRequest(
  * Find merchants that have any of the specified categories, ranked by relevance and ratings
  */
 async function findMerchantsByCategories(
-  categoryNames: string[], 
+  categoryNames: string[],
   universityName: string,
   originalRequestCategories: string[],
   limit: number = 5
@@ -671,13 +671,13 @@ async function findMerchantsByCategories(
       }
     });
 
-    const filteredMerchants = Array.from(merchantMap.values()).filter(merchant => 
+    const filteredMerchants = Array.from(merchantMap.values()).filter(merchant =>
       merchant.school_name === universityName
     );
 
     const merchants = filteredMerchants.map(merchant => {
       merchant.categoryMatchScore = calculateCategoryMatchScore(
-        merchant.categories, 
+        merchant.categories,
         originalRequestCategories,
         merchant.average_rating,
         merchant.total_ratings,
@@ -690,17 +690,17 @@ async function findMerchantsByCategories(
     merchants.sort((a, b) => {
       const scoreA = a.categoryMatchScore || 0;
       const scoreB = b.categoryMatchScore || 0;
-      
+
       // If scores are very close (within 10%), prioritize merchants who haven't been matched recently
       const scoreDifference = Math.abs(scoreA - scoreB);
       const averageScore = (scoreA + scoreB) / 2;
       const isCloseScore = averageScore > 0 && (scoreDifference / averageScore) < 0.1;
-      
+
       if (isCloseScore) {
         // For close scores, prioritize merchants who haven't been matched recently
         const aLastMatched = a.last_matched_at ? new Date(a.last_matched_at).getTime() : 0;
         const bLastMatched = b.last_matched_at ? new Date(b.last_matched_at).getTime() : 0;
-        
+
         // Merchants never matched (0) should come before recently matched merchants
         if (aLastMatched === 0 && bLastMatched > 0) return -1;
         if (bLastMatched === 0 && aLastMatched > 0) return 1;
@@ -714,20 +714,20 @@ async function findMerchantsByCategories(
       if (scoreA !== scoreB) {
         return scoreB - scoreA;
       }
-      
+
       const ratingA = a.average_rating || 0;
       const ratingB = b.average_rating || 0;
-      
+
       if (ratingA !== ratingB) {
         return ratingB - ratingA;
       }
-      
+
       return a.categories.length - b.categories.length;
     });
 
     console.log('Ranked merchants with fair visibility:');
     merchants.forEach((merchant, index) => {
-      const lastMatchedInfo = merchant.last_matched_at 
+      const lastMatchedInfo = merchant.last_matched_at
         ? `Last matched: ${new Date(merchant.last_matched_at).toLocaleString()}`
         : 'Never matched';
       console.log(`${index + 1}. ${merchant.full_name} - Score: ${merchant.categoryMatchScore?.toFixed(2)}, Rating: ${merchant.average_rating}⭐ (${merchant.total_ratings}), ${lastMatchedInfo}`);
@@ -735,7 +735,7 @@ async function findMerchantsByCategories(
 
     console.log('=== End Merchant Search with Fair Visibility ===\n');
 
-    return { 
+    return {
       merchants: merchants.slice(0, limit),
       sellerCategories
     };
@@ -747,7 +747,7 @@ async function findMerchantsByCategories(
 }
 
 export async function extractProductInfoFromText(
-  title: string, 
+  title: string,
   description: string
 ): Promise<ProductExtractionResult> {
   if (!genAI) {
@@ -818,5 +818,196 @@ Extract information now:`;
       success: false,
       error: error instanceof Error ? error.message : 'Failed to extract product information'
     };
+  }
+}
+
+
+export async function categorizePost(post: string, mode: string = 'store'): Promise<string> {
+  if (!genAI) return 'others'
+
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  let categories = [];
+  if (mode === 'hostel') {
+
+    categories = [
+      'food & snacks',
+      'clothing',
+      'shoes',
+      'caps',
+      'gadgets',
+      'phones',
+      'jewelries',
+      'bags',
+      'beauty & skincare',
+      'hair accessories',
+      'others'
+    ];
+  } else {
+
+    categories = [
+      'bags',
+      'fragrances',
+      'Health, Beauty & Personal Care',
+      'Shoes',
+      'Jewelry & Accessories',
+      'Home & Kitchen',
+      'Others',
+      'Electronics & Gadgets',
+      'Sports & Fitness',
+      'Food & Beverage',
+      'Clothing',
+      'Books & Stationery',
+      'caps & hats'
+    ];
+  }
+
+  let categorizationPrompt = '';
+
+  if (mode === 'hostel') {
+    categorizationPrompt =
+      `
+    Analyze the following product description and categorize it into EXACTLY ONE of these categories: ${categories.join(', ')}.
+    
+    Return the result as a JSON object with a single key: "category" containing the chosen category string.
+    
+    Guidelines:
+    - "food & snacks": Any edible items, beverages, food products
+    - "clothing": Apparel items like shirts, pants, dresses, jackets (but NOT shoes, caps, or bags)
+    - "shoes": Footwear of any kind
+    - "caps": Headwear, hats, caps
+    - "gadgets": Electronic devices like laptops, tablets, smartwatches, cameras (but NOT phones)
+    - "phones": Mobile phones, smartphones, cellphones
+    - "jewelries": Accessories like rings, necklaces, earrings, bracelets, watches
+    - "bags": Purses, backpacks, handbags, luggage
+    - "others": Anything that doesn't fit the above categories
+    
+    Product Description: "${post}"
+    
+    Example output format:
+    {
+      "category": "shoes"
+    }
+    
+    Return ONLY the JSON object, nothing else.
+  `;
+  } else {
+    categorizationPrompt =
+      `
+    Analyze the following product description and categorize it into EXACTLY ONE of these categories: ${categories.join(', ')}.
+    
+    Return the result as a JSON object with a single key: "category" containing the chosen category string.
+    
+    Guidelines:
+    - "food & beverages": Any edible items, beverages, food products
+    - "clothing": Apparel items like shirts, pants, dresses, jackets (but NOT shoes, caps, or bags)
+    - "shoes": Footwear of any kind
+    - "caps": Headwear, hats, caps
+    - "Electronics & Gadgets": Electronic devices like laptops, tablets, smartwatches, cameras, Mobile phones, smartphones, cellphones
+    - "Jewelry & Accessories": Accessories like rings, necklaces, earrings, bracelets, watches
+    - "bags": Purses, backpacks, handbags, luggage
+    - "others": Anything that doesn't fit the above categories
+    
+    Product Description: "${post}"
+    
+    Example output format:
+    {
+      "category": "shoes"
+    }
+    
+    Return ONLY the JSON object, nothing else.
+  `;
+
+
+  }
+
+  try {
+    const result = await generativeModel.generateContent({
+      contents: [{ parts: [{ text: categorizationPrompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const categorizationData = JSON.parse(result.response.text());
+
+    // Validate that the returned category is in our list
+    if (categorizationData.category && categories.includes(categorizationData.category)) {
+      return categorizationData.category;
+    } else {
+      console.warn('Invalid category returned, defaulting to "others"');
+      return 'others';
+    }
+  } catch (error) {
+    console.error('Error categorizing post:', error);
+    // Return 'others' as fallback in case of any error
+    return 'others';
+  }
+}
+
+export async function extractProductKeywordsFromDescription(description: string): Promise<string[]> {
+  if (!genAI) return ['product'];
+
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  // Adjusted Prompt
+  const extractionPrompt = `
+    Analyze the following text, which can be a product post or a user search query. Your task is to extract a list of the most relevant and important search words or keywords that identify the *item or product itself*.
+
+    **DO NOT** include:
+    - Transactional words (e.g., selling, have, for sale, looking for).
+    - Condition/Quality words (e.g., new, used, old, discount).
+    - Price or currency information (e.g., 14k, 700k, naira, price).
+    - Generic location terms (e.g., room 5, hostel, location).
+
+    The keywords should focus ONLY on:
+    1.  The primary **product** (e.g., "sneakers", "bread", "tops").
+    2.  Any specific **brands** or **models** (e.g., "Gucci", "dell xps 13", "munchit").
+    3.  A likely **category** if the product is generic (e.g., "laptop", "snacks").
+    
+    Return the result as a JSON object with a single key: "keywords" containing an array of strings.
+    
+    Text Description: "${description}"
+    
+    Example output for "I have a Gucci bag selling 14k":
+    {
+      "keywords": ["Gucci bag", "bag"]
+    }
+
+    Example output for "Im selling my new dell xps 13 for 700k":
+    {
+        "keywords": ["dell xps 13", "laptop"]
+    }
+
+    Example output for "I'm selling 200 naira bread and 500 naira bread at old hostel":
+    {
+        "keywords": ["bread", "food"]
+    }
+    
+    Return ONLY the JSON object, nothing else. All keywords should be lowercased and single words or essential phrases.
+  `;
+
+  try {
+    const result = await generativeModel.generateContent({
+      contents: [{ parts: [{ text: extractionPrompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const extractionData = JSON.parse(result.response.text());
+
+    if (Array.isArray(extractionData.keywords)) {
+      // Ensure all elements are strings and lowercased before returning
+      return extractionData.keywords.map((word: unknown) =>
+        String(word).trim().toLowerCase()
+      );
+    } else {
+      console.warn('Could not extract keywords array, defaulting to ["product"]');
+      return ['product'];
+    }
+  } catch (error) {
+    console.error('Error extracting product keywords:', error);
+    return ['product'];
   }
 }
