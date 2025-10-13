@@ -1,177 +1,1502 @@
 [
   {
-    "id": "ab871c8b-ae68-4a1d-9730-916c06958569",
-    "product_categories": ["beverage containers", "water bottles", "multi-use bottles", "drinkware", "travel bottles"],
-    "product_features": ["3-in-1 design", "hot/cold retention", "portable containers", "different drinks", "water container"]
+    "id": "75fa5efc-c284-440a-a9d5-c6ba26aa37f0",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["silk bonnet"]
   },
   {
-    "id": "d09379ec-7efb-4ff8-a0c0-173b9bb09215",
-    "product_categories": ["room fragrances", "scent diffusers", "home decor", "reed diffusers", "aroma therapy"],
-    "product_features": ["nice scent", "room scent", "room spread", "reed sticks", "home use"]
+    "id": "19ed041c-90c8-4e61-ad0b-6c8544139fa2",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["silk scrunchy"]
   },
   {
-    "id": "6e34566c-bc9f-4186-8c60-1a2ad6a762b9",
-    "product_categories": ["perfumes", "Women's Fragrances", "luxury perfumes", "fashion fragrances", "personal care"],
-    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "special bottle"]
+    "id": "00893bc8-e39e-4b8a-a203-c5c7bad1ba1f",
+    "product_category": "Clothing",
+    "search_words": ["silk long skirts"]
   },
   {
-    "id": "52e74a66-a570-490a-8f3e-04fc068a6c2c",
-    "product_categories": ["Women's Jewelry", "Fashion Jewelry", "Jewelry Sets", "necklaces", "Bracelets"],
-    "product_features": ["jewelry", "neck decoration", "wrist jewelry", "beautiful", "fashionable"]
+    "id": "176ab2db-c3f6-405d-a9cb-82b1fd693886",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["silver necklace", "jewel"]
   },
   {
-    "id": "1588a03b-5b1d-4b2a-bb6d-97073c15719a",
-    "product_categories": ["Electronics", "headphones", "audio recording", "music listening", "unisex"],
-    "product_features": ["electronic", "music/stories", "voice/sound capture", "calls", "talk to people"]
+    "id": "099d805a-54b8-43a5-a40a-24a591c374ba",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["hand chain", "silver", "gold"]
   },
   {
-    "id": "cfe9a814-b16e-44b3-843b-3f79bd4cd2b0",
-    "product_categories": ["body mist", "Women's Fragrances", "personal care", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["nice scent", "fresh feel", "body help", "skin application", "gentle fragrance"]
+    "id": "5eaeb9ad-71ed-4110-a7e4-d4a51f4c0072",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["hand chain", "silver"]
   },
   {
-    "id": "b0a236ca-762a-44e2-bb8a-8c150fae1906",
-    "product_categories": ["Women's Clothing", "summer clothing", "Fashion Apparel", "Casual Wear", "warm weather"],
-    "product_features": ["fashionable", "casual wear", "warm weather", "style", "nice look"]
+    "id": "edeb78ba-55cd-4039-9b6a-a6a251d15279",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["hand chain", "silver"]
   },
   {
-    "id": "0bf4310e-6ee9-4a53-ad0c-85f2ae79aede",
-    "product_categories": ["Food", "desserts", "plant-based", "snacks", "unisex"],
-    "product_features": ["tasty", "sweet treat", "ready to enjoy", "creamy", "chocolate flavor"]
+    "id": "494345da-33a6-43f6-92c6-4423bc451fdc",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["hand chain", "silver", "gold"]
+  },
+  {
+    "id": "64687263-1dd5-4124-8c00-67c8d62aef08",
+    "product_category": "Clothing",
+    "search_words": ["basic tops"]
+  },
+  {
+    "id": "548b87c5-7bc9-4abe-bb42-d27ccbd76ec4",
+    "product_category": "Clothing",
+    "search_words": ["basic tops"]
+  },
+  {
+    "id": "3f997168-7a06-4819-923b-b14f82539042",
+    "product_category": "Clothing",
+    "search_words": ["simple cooperate gown"]
+  },
+  {
+    "id": "8220512f-689a-4f8e-82ff-17d2378e2a89",
+    "product_category": "Shoes",
+    "search_words": ["loafers", "size 37"]
+  },
+  {
+    "id": "effbc7b6-c02c-4b51-a9aa-32ad5968aeff",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["skin whitening combo"]
+  },
+  {
+    "id": "e1914c0c-7a42-41a4-92d9-b9f646f035c5",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["bio aqua face mask"]
+  },
+  {
+    "id": "2e4824d7-0838-4f7d-a4b3-312b648ee201",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["butt oil"]
+  },
+  {
+    "id": "a3ae3d34-323f-43a0-960a-fd945961cced",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["roushun serum"]
+  },
+  {
+    "id": "38246af2-8d8f-445f-b956-7277db57783b",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["dr rashell serum"]
+  },
+  {
+    "id": "b841868c-7ba7-4430-a5a5-ddbb8539f141",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["human hair skull cap"]
+  },
+  {
+    "id": "6a856fb1-74ca-486e-91c2-339d234c52f8",
+    "product_category": "Clothing",
+    "search_words": ["2pcs nightwear"]
+  },
+  {
+    "id": "c843b315-0cdc-4b39-b9c1-e37f3a630cf8",
+    "product_category": "Clothing",
+    "search_words": ["night wear"]
+  },
+  {
+    "id": "d7578a13-ad83-4b56-9280-c2eb7440537d",
+    "product_category": "Clothing",
+    "search_words": ["cow neck sleeveless top"]
+  },
+  {
+    "id": "a6ff2398-5916-44e1-a1dd-d0a0fe4a5fe9",
+    "product_category": "Clothing",
+    "search_words": ["casual sleeveless tops"]
+  },
+  {
+    "id": "5dbae56d-dc83-4f50-abdb-7063335b3b36",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["playstation 5 slim", "europe"]
+  },
+  {
+    "id": "9082bf52-9544-4067-82e6-f4eca496bcce",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["cluster lashes"]
+  },
+  {
+    "id": "846efe60-bd28-4e6f-90f2-52ab75687b74",
+    "product_category": "bags",
+    "search_words": ["cute mini purses"]
+  },
+  {
+    "id": "e4c9b336-8503-4eee-b7ea-563907f0525e",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["handmade fascinator"]
+  },
+  {
+    "id": "08c0dc3f-e824-4b0c-8fd9-bbe285a28b11",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["handmade fascinator"]
+  },
+  {
+    "id": "8762ef85-0993-4a6a-a99d-e5a401bf4a01",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["handmade fascinator"]
+  },
+  {
+    "id": "630060d1-8b22-4de3-b71b-ea68dfa6b234",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["hair pins"]
+  },
+  {
+    "id": "ff671d7d-9d80-410c-971e-133457e06ad3",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["small scrunchy", "bow combo"]
+  },
+  {
+    "id": "019f1636-210e-4e52-9782-fad03b8a3aff",
+    "product_category": "bags",
+    "search_words": ["mini bags"]
+  },
+  {
+    "id": "1fc30bf8-4f30-4ee7-a9bf-c1ea43835173",
+    "product_category": "bags",
+    "search_words": ["mini bag"]
+  },
+  {
+    "id": "d93afb15-e22e-4bfe-99a4-a7857022389e",
+    "product_category": "bags",
+    "search_words": ["fierce charm bag"]
+  },
+  {
+    "id": "d9502139-450a-4094-8f6e-a0c78db167d7",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["mini hand dryer"]
+  },
+  {
+    "id": "d60cc00f-17b9-4de1-afef-796da3f22c33",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["kawaii pimple patches"]
+  },
+  {
+    "id": "858c8ccd-1539-42f8-9a73-101669a809f0",
+    "product_category": "Books & Stationery",
+    "search_words": ["post it notes"]
+  },
+  {
+    "id": "743b8b5f-3b22-4275-8441-48f0c0de8fbc",
+    "product_category": "bags",
+    "search_words": ["mini bag", "black", "nude", "coffee brown"]
+  },
+  {
+    "id": "57e7a16e-9b73-4637-a5b4-44f346e03069",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["smart watch set", "watch straps", "air pod"]
+  },
+  {
+    "id": "e10c22e1-b986-48be-a004-58dc02e6dfc6",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lip gloss"]
+  },
+  {
+    "id": "cff05f1a-fed9-4e87-b51d-ac490f1a064c",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lip mask"]
+  },
+  {
+    "id": "ee5ae17a-5af9-4640-82dc-22e5222e84ca",
+    "product_category": "Shoes",
+    "search_words": ["adidas classical f50"]
+  },
+  {
+    "id": "b5af8215-2162-4956-8086-55ccf2fd7eee",
+    "product_category": "Clothing",
+    "search_words": ["t-shirt"]
+  },
+  {
+    "id": "32f8c89c-8016-408b-b5b7-5b7a69596a8b",
+    "product_category": "Clothing",
+    "search_words": ["t-shirt"]
+  },
+  {
+    "id": "3e415788-81b7-40ef-af52-659f47e5df88",
+    "product_category": "Clothing",
+    "search_words": ["high luxury well branded tee", "white"]
+  },
+  {
+    "id": "64657231-e1d9-4195-81a1-988b39415d62",
+    "product_category": "Clothing",
+    "search_words": ["high luxury well branded tee", "milk color"]
+  },
+  {
+    "id": "d5d48fac-4489-4cb9-9868-960d2e713d05",
+    "product_category": "Clothing",
+    "search_words": ["high luxury well branded tee"]
+  },
+  {
+    "id": "a3134b7a-ba16-4b5d-8f81-669a3213325f",
+    "product_category": "Clothing",
+    "search_words": ["high luxury well branded tee"]
+  },
+  {
+    "id": "3b1cc227-df5a-48b4-b6df-791a5c890c23",
+    "product_category": "Clothing",
+    "search_words": ["sweatshirts", "hoodies"]
+  },
+  {
+    "id": "785c2093-afcb-4b8d-88b3-cb738ee89c24",
+    "product_category": "Home & Kitchen",
+    "search_words": ["soft wide blankets"]
+  },
+  {
+    "id": "df2f030b-5241-4bba-b6ab-cab88e1a2441",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["face brush"]
+  },
+  {
+    "id": "73436578-8cd9-4faa-aa70-78a62c331981",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["face sheet mask"]
+  },
+  {
+    "id": "31792766-4956-4be9-918b-0c9acef8433a",
+    "product_category": "Clothing",
+    "search_words": ["crepe vintage shirts"]
+  },
+  {
+    "id": "777eca00-8c2b-493c-95e9-3d360dbc0085",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["scrunchies"]
+  },
+  {
+    "id": "51d2bbdb-c32a-4c54-a6d2-a19878f7b1ed",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["scrunchies"]
+  },
+  {
+    "id": "0951de16-a3fe-4153-bbbb-9125231fcdb0",
+    "product_category": "Clothing",
+    "search_words": ["crepe vintage shirt"]
+  },
+  {
+    "id": "a9bc8fd9-748f-4b4a-b16e-5c837683c9cd",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["scrunchies"]
+  },
+  {
+    "id": "520684af-3bdc-4370-808c-1d90c7520206",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["scrunchie set"]
+  },
+  {
+    "id": "aa34c2b9-e325-442d-895e-eb506337c0e9",
+    "product_category": "Clothing",
+    "search_words": ["crepe vintage shirts"]
+  },
+  {
+    "id": "c1231f3f-3362-48b4-9310-b2895516edc5",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["bonnets"]
+  },
+  {
+    "id": "43c001d4-7548-41ec-84a6-eb35c1bb1a5f",
+    "product_category": "bags",
+    "search_words": ["customizable phone pouches"]
+  },
+  {
+    "id": "26700e1d-86fc-463d-99df-77315a7e49a4",
+    "product_category": "bags",
+    "search_words": ["customizable phone pouches"]
+  },
+  {
+    "id": "d16c756a-7c03-48da-af18-110e0af13722",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["scrunchie", "hair clip"]
+  },
+  {
+    "id": "930b12cc-a385-46e4-b9b9-b005f049ad5a",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["satin bow"]
+  },
+  {
+    "id": "07bf33c5-eab6-45fd-bab2-e674ca96d73e",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["beauty face mask"]
+  },
+  {
+    "id": "0e7506bf-21bc-4ef8-8775-c26d1fe3a998",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["regular scrunchy"]
+  },
+  {
+    "id": "eb506a1e-e703-4e65-92b1-49b79cb0a82f",
+    "product_category": "bags",
+    "search_words": ["clene tote bag", "purse"]
+  },
+  {
+    "id": "3b995ce6-fdf9-4f54-a8bd-4d4e0c1e052c",
+    "product_category": "Books & Stationery",
+    "search_words": ["novel", "last chance books"]
+  },
+  {
+    "id": "c423f6d1-de9e-44b4-97e3-42251987b1ba",
+    "product_category": "Clothing",
+    "search_words": ["ruched top"]
+  },
+  {
+    "id": "38f9c482-0efd-47d3-8761-04f20b2eea9f",
+    "product_category": "Clothing",
+    "search_words": ["outing gowns"]
+  },
+  {
+    "id": "7120347e-909a-4439-9174-0b3a65abf200",
+    "product_category": "Clothing",
+    "search_words": ["outing gowns"]
+  },
+  {
+    "id": "2e574e29-58e3-4ac0-92ec-b55dcffd3ee8",
+    "product_category": "Clothing",
+    "search_words": ["jerseys"]
+  },
+  {
+    "id": "e1ff482e-0b75-4f4a-8125-95e138f30f1b",
+    "product_category": "Food & Beverage",
+    "search_words": ["spicy plantain chips"]
+  },
+  {
+    "id": "50c33808-34ff-43de-98ed-21e5f2c851a2",
+    "product_category": "Food & Beverage",
+    "search_words": ["spicy plantain chips"]
+  },
+  {
+    "id": "f9c77abb-ccc4-4abb-a9eb-cffc931a382d",
+    "product_category": "Food & Beverage",
+    "search_words": ["spicy ginger kilishi"]
+  },
+  {
+    "id": "afb76813-717d-4bd3-8043-26b31bdc8f47",
+    "product_category": "Home & Kitchen",
+    "search_words": ["small size sippy cup"]
+  },
+  {
+    "id": "f8492f5b-6e4d-497d-a206-505258810e62",
+    "product_category": "Home & Kitchen",
+    "search_words": ["sippy cups", "different colors"]
+  },
+  {
+    "id": "30d48ec1-17bb-4a7a-9e20-4fac4611223c",
+    "product_category": "Home & Kitchen",
+    "search_words": ["glass sippies"]
+  },
+  {
+    "id": "e5c89323-5a58-4297-906c-c19d666ed838",
+    "product_category": "Clothing",
+    "search_words": ["jerseys", "player version", "fan version"]
+  },
+  {
+    "id": "ebdf320a-4b61-42f8-93d6-b3dc27c4a7d5",
+    "product_category": "Shoes",
+    "search_words": ["puma shoes"]
+  },
+  {
+    "id": "f1084419-077f-4c88-b221-f182621d8182",
+    "product_category": "Shoes",
+    "search_words": ["nike sneakers"]
+  },
+  {
+    "id": "5fa1f150-6702-44ab-8598-9cb4fb11fa2d",
+    "product_category": "Clothing",
+    "search_words": ["jerseys"]
+  },
+  {
+    "id": "25218415-992d-40f9-9be6-34c829072efb",
+    "product_category": "Clothing",
+    "search_words": ["jerseys"]
+  },
+  {
+    "id": "56408454-4481-4817-83a8-a029ecc189b6",
+    "product_category": "Clothing",
+    "search_words": ["retro jersey"]
+  },
+  {
+    "id": "849b477b-cd4e-4512-ae5e-7fa524f1c0d8",
+    "product_category": "Shoes",
+    "search_words": ["predator boots"]
+  },
+  {
+    "id": "34769b8a-6260-4170-b869-f109bc186f10",
+    "product_category": "Shoes",
+    "search_words": ["nike phantom sport shoe"]
+  },
+  {
+    "id": "2b8b3ed3-2e3f-45e0-a713-55b35eed9e68",
+    "product_category": "Clothing",
+    "search_words": ["jerseys"]
+  },
+  {
+    "id": "e714ebfd-bc27-432b-addc-e0aa87c0d52b",
+    "product_category": "Shoes",
+    "search_words": ["air jordan sneakers"]
+  },
+  {
+    "id": "509da82c-c100-41a9-860a-8f89b7951312",
+    "product_category": "Clothing",
+    "search_words": ["jerseys"]
+  },
+  {
+    "id": "c3f5e535-c40d-4c48-bb89-d2d7394bfef7",
+    "product_category": "Clothing",
+    "search_words": ["jerseys"]
+  },
+  {
+    "id": "5cbdc289-1504-4238-a786-8e1ffc38b03a",
+    "product_category": "Shoes",
+    "search_words": ["nike venom sneakers"]
+  },
+  {
+    "id": "832d219b-4d22-4dde-ac3f-9135785c8a7d",
+    "product_category": "Shoes",
+    "search_words": ["nike air zoom"]
+  },
+  {
+    "id": "cbc70cc8-cc0a-41b3-84b8-ad459b67bedb",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["square luxury necklace", "stainless steel"]
+  },
+  {
+    "id": "8e9b415e-5dcf-4cf0-b362-538193f53746",
+    "product_category": "Clothing",
+    "search_words": ["check shirts"]
+  },
+  {
+    "id": "93184e22-5925-41d0-97e9-3fcf46301739",
+    "product_category": "Home & Kitchen",
+    "search_words": ["ccc stainless travel tumbler", "quencher"]
+  },
+  {
+    "id": "6dc160c0-fa9e-4c7c-8318-47df55f88e62",
+    "product_category": "Home & Kitchen",
+    "search_words": ["aaa stainless travel tumbler", "quencher"]
+  },
+  {
+    "id": "50f9d84f-3cb8-4996-b77e-d3ee3f8a74b9",
+    "product_category": "Home & Kitchen",
+    "search_words": ["portable standing fan"]
+  },
+  {
+    "id": "42258cc2-94bf-4390-ab74-458735decc3c",
+    "product_category": "Home & Kitchen",
+    "search_words": ["bathroom decor"]
+  },
+  {
+    "id": "32ea020d-9627-4053-b3f9-74b7663fdbe2",
+    "product_category": "Books & Stationery",
+    "search_words": ["novel", "one of us is lying"]
+  },
+  {
+    "id": "b57201a1-034a-4b83-806e-633510a22a0e",
+    "product_category": "Clothing",
+    "search_words": ["casual strapless tops"]
+  },
+  {
+    "id": "8ae91eec-46e6-4ff0-8743-7dbc4997f4b7",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["tummy wrap"]
+  },
+  {
+    "id": "006c7b4e-825f-400d-b8fa-e29138c8e813",
+    "product_category": "bags",
+    "search_words": ["coach bag"]
+  },
+  {
+    "id": "42400f0c-c917-478f-88af-2a6cf43cc6fb",
+    "product_category": "bags",
+    "search_words": ["stylish bag", "different colours"]
+  },
+  {
+    "id": "48c2bb2e-286c-4277-8639-6fa1ca78c03a",
+    "product_category": "bags",
+    "search_words": ["classy tote bag"]
+  },
+  {
+    "id": "5dbe647e-62f9-45be-8a6b-e74289c72764",
+    "product_category": "Home & Kitchen",
+    "search_words": ["suction holder"]
+  },
+  {
+    "id": "3069111d-c5e4-4822-89ac-47c0381b0f3e",
+    "product_category": "Home & Kitchen",
+    "search_words": ["phone suction"]
+  },
+  {
+    "id": "b59f2be4-2d9f-4122-aed1-05728381ff4e",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["estelin sunscreen"]
+  },
+  {
+    "id": "b2ad4349-9f38-4744-9d91-f00cc7efec84",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["dr rashell sun cream"]
   },
   {
     "id": "b3028213-c1f0-457a-933e-4e483598667d",
-    "product_categories": ["cakes", "desserts", "celebration cakes", "mini cakes", "Food"],
-    "product_features": ["sweet", "special treat", "special occasions", "tasty", "cream flavor"]
+    "product_category": "Food & Beverage",
+    "search_words": ["bento cake"]
   },
   {
-    "id": "89432ed3-0361-4636-b444-2cb4ec6f5f0e",
-    "product_categories": ["home decor", "mats", "decorative floor", "home accessories", "welcoming"],
-    "product_features": ["floor decoration", "multi-surface", "durable", "welcoming", "home use"]
+    "id": "3ddba85a-7384-4f07-8de2-b237f7140c84",
+    "product_category": "fragrances",
+    "search_words": ["cloud candy perfume"]
   },
   {
-    "id": "18944045-8dc4-40e8-afaa-8547c93132fa",
-    "product_categories": ["Women's Bags", "handbags", "Fashion Bags", "pink accessories", "casual bags"],
-    "product_features": ["fashion bag", "pink color", "carry things", "stylish carry", "easy carry"]
+    "id": "a94da0c9-dcd7-488a-ae13-7c01198b390a",
+    "product_category": "fragrances",
+    "search_words": ["brioche vanille perfume"]
   },
   {
-    "id": "e87ca419-00c1-4fb3-8840-94a09aa14cc4",
-    "product_categories": ["Women's Clothing", "Crochet Clothing", "Casual Tops", "fashion tops", "summer clothing"],
-    "product_features": ["crochet", "crochet style", "comfy top", "upper body wear", "fashionable"]
+    "id": "96104b02-ba9b-4751-b483-13b9e053654e",
+    "product_category": "Food & Beverage",
+    "search_words": ["sugar mints"]
   },
   {
-    "id": "1dd85d86-180d-4dfc-a7f9-a1829948ab5b",
-    "product_categories": ["Phone Accessories", "Phone Cases", "protective covers", "crochet", "Tech Accessories"],
-    "product_features": ["crochet", "protective", "phone protection", "soft", "special yarn"]
+    "id": "6617ed9e-91ba-449c-a444-b9d30f75463b",
+    "product_category": "Food & Beverage",
+    "search_words": ["cake perfait"]
   },
   {
-    "id": "d1b746b7-50b5-4917-ab8a-e05f1fd440ca",
-    "product_categories": ["Women's Bags", "tote bags", "fluffy accessories", "casual bags", "Fashion Bags"],
-    "product_features": ["fluffy", "soft", "spacious", "carry things", "stylish carry"]
+    "id": "3578f27f-509f-4960-8edb-168371f14516",
+    "product_category": "Food & Beverage",
+    "search_words": ["box of 12 cup cakes"]
   },
   {
-    "id": "58995c1e-0f79-4651-b558-523ac26bef50",
-    "product_categories": ["Hair Extensions", "Human Hair", "hair replacements", "Women's Wigs", "hair accessories"],
-    "product_features": ["4x4 closure", "human hair", "hair", "wearable hairpiece", "changes hairstyle"]
+    "id": "522ae700-476d-494e-b9ea-4edf165fff62",
+    "product_category": "Food & Beverage",
+    "search_words": ["tres leaches milk cake"]
   },
   {
-    "id": "fb2cbf5b-a656-4e30-87c2-984e833e6573",
-    "product_categories": ["Men's Clothing", "Casual Shirts", "Men's Tops", "button-down shirts", "unisex"],
-    "product_features": ["casual", "comfortable", "upper body wear", "daily wear", "nice look"]
+    "id": "4d20664e-b81d-47e9-8731-bb2db562cba3",
+    "product_category": "Food & Beverage",
+    "search_words": ["banana bread"]
   },
   {
-    "id": "4f5ead40-eeef-4eeb-8644-6564365676e0",
-    "product_categories": ["Tech Accessories", "protective covers", "crochet", "headphones", "Electronics"],
-    "product_features": ["crochet", "protective", "soft", "special yarn", "cozy"]
+    "id": "b027cd9a-01cd-4883-b179-d97ee897de89",
+    "product_category": "Food & Beverage",
+    "search_words": ["cake slices"]
   },
   {
-    "id": "149b8cee-cba2-4dd9-acbf-37642be6c722",
-    "product_categories": ["perfumes", "Men's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["perfume", "long-lasting scent", "special bottle", "nice smell", "skin application"]
+    "id": "1a129a14-68f8-4eb0-9c76-33b72205b6aa",
+    "product_category": "Food & Beverage",
+    "search_words": ["box of 6 cup cakes"]
   },
   {
-    "id": "2610b936-ca1b-4bf5-b7d6-36556e6f12b0",
-    "product_categories": ["Women's Bags", "Beaded Handbags", "Evening Bags", "fashion accessories", "Artisanal Accessories"],
-    "product_features": ["beaded decoration", "beautiful", "decorative", "fancy", "special occasions"]
+    "id": "a6ba0395-0e42-48c9-8969-68d009658026",
+    "product_category": "Food & Beverage",
+    "search_words": ["cake parfait"]
   },
   {
-    "id": "e0f8bb86-4372-4452-bc40-76258e4ca47f",
-    "product_categories": ["beverage containers", "thermos", "travel tumblers", "drinkware", "hot/cold retention"],
-    "product_features": ["hot/cold retention", "color variety", "portable containers", "different drinks", "warm/cold retention"]
+    "id": "929a52d2-7cf6-4b61-9faa-b303b923f06d",
+    "product_category": "Food & Beverage",
+    "search_words": ["mini loaf cakes"]
   },
   {
-    "id": "cd5a4a50-0df5-450f-8b91-b6321a7e7cbf",
-    "product_categories": ["body mist", "Women's Fragrances", "personal care", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["nice scent", "fresh feel", "body help", "skin application", "gentle fragrance"]
+    "id": "1cd7bd6e-461c-400b-af2f-49beaa1f5afd",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["infinix smart 10"]
   },
   {
-    "id": "42b3b055-c458-41f2-abd4-cfa81bed8a69",
-    "product_categories": ["Hair Accessories", "scrunchies", "soft hair accessories", "Women's Accessories", "hair ties"],
-    "product_features": ["crochet", "soft", "hair tie", "gentle hold", "pretty"]
+    "id": "efcff1cb-8804-4aa9-adcc-1ac37977fbfc",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["redmi a3x"]
   },
   {
-    "id": "e0ec5f9b-29a1-4f70-9fec-1a04c220950a",
-    "product_categories": ["perfumes", "Women's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["perfume", "nice smell", "long-lasting scent", "chocolate", "skin application"]
+    "id": "f27095e6-4c02-444c-9c65-4c35064bf983",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["redmi a5"]
   },
   {
-    "id": "adf82791-0a53-4198-b890-b58f91c27848",
-    "product_categories": ["Food", "snacks", "Street Food", "Fast Food", "unisex"],
-    "product_features": ["tasty", "ready to enjoy", "special occasions", "snacks", "enjoy"]
+    "id": "dc9e49b6-c6e1-4f5e-90d1-6dd89b294efc",
+    "product_category": "Shoes",
+    "search_words": ["corporate stiletto heels"]
   },
   {
-    "id": "d77eb9f9-802e-4333-8c62-725a53cb655b",
-    "product_categories": ["perfume sets", "luxury perfumes", "fragrance gifts", "gift sets", "unisex fragrances"],
-    "product_features": ["perfume", "gift pack", "special occasions", "nice smell", "multiple products"]
+    "id": "b5f3f835-8f84-479b-a829-cba7d6323da2",
+    "product_category": "Food & Beverage",
+    "search_words": ["puff puff"]
   },
   {
-    "id": "f85157f0-68e2-4460-b3f0-c699d6ffabaa",
-    "product_categories": ["Wigs", "Human Hair Wigs", "Women's Wigs", "hair replacements", "Hairpieces"],
-    "product_features": ["human hair", "wearable hairpiece", "changes hairstyle", "hair", "look change"]
-  },
-  {
-    "id": "9f576a26-f046-4c57-bf1b-403f29dd7449",
-    "product_categories": ["Food", "desserts", "snacks", "yoghurt", "unisex"],
-    "product_features": ["tasty", "sweet", "ready to enjoy", "creamy", "vanilla flavor"]
-  },
-  {
-    "id": "95c44f71-2b92-4544-876c-6b795f61ba56",
-    "product_categories": ["towels", "bathroom accessories", "personal care", "utility products", "unisex"],
-    "product_features": ["towel", "two-in-one", "soft cloth", "quick drying", "versatile use"]
+    "id": "ec0f00b8-2931-43e5-9ec5-9992eaa18784",
+    "product_category": "Food & Beverage",
+    "search_words": ["samosa", "spring rolls"]
   },
   {
     "id": "56731b5f-b6af-4d43-b442-25af2484b859",
-    "product_categories": ["Food", "snacks", "Fast Food", "Street Food", "unisex"],
-    "product_features": ["tasty", "ready to enjoy", "snacks", "enjoy", "sweet"]
+    "product_category": "Food & Beverage",
+    "search_words": ["kaly"]
   },
   {
-    "id": "e39c14ef-79af-44a9-8d0a-b8bcf5be265c",
-    "product_categories": ["perfumes", "Men's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "special bottle"]
+    "id": "adf82791-0a53-4198-b890-b58f91c27848",
+    "product_category": "Food & Beverage",
+    "search_words": ["small chops"]
   },
   {
-    "id": "6d810330-3436-4046-bbc9-093bb4e854e4",
-    "product_categories": ["body mist", "Women's Fragrances", "personal care", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["nice scent", "fresh feel", "body help", "skin application", "gentle fragrance"]
+    "id": "9f576a26-f046-4c57-bf1b-403f29dd7449",
+    "product_category": "Food & Beverage",
+    "search_words": ["vanilla yoghurt", "banana yoghurt", "strawberry yoghurt"]
   },
   {
-    "id": "fbdd3597-781f-47df-9684-5b58d05264e1",
-    "product_categories": ["oil perfumes", "perfumes", "Women's Fragrances", "personal care", "unisex fragrances"],
-    "product_features": ["perfume", "oil-based", "roll-on application", "nice smell", "skin application"]
+    "id": "0bf4310e-6ee9-4a53-ad0c-85f2ae79aede",
+    "product_category": "Food & Beverage",
+    "search_words": ["coconut yoghurt"]
   },
   {
-    "id": "cf1b3a39-5094-4607-9bf2-14caceb03537",
-    "product_categories": ["Women's Bags", "handbags", "designer handbags", "luxury bags", "Fashion Bags"],
-    "product_features": ["fashion bag", "high quality", "giftable", "stylish carry", "carry things"]
+    "id": "4cc4b0a0-299c-4c05-ab97-e47c48e3419b",
+    "product_category": "Food & Beverage",
+    "search_words": ["sandwich"]
   },
   {
-    "id": "d4aef906-dc55-400d-9523-007e256d6044",
-    "product_categories": ["perfumes", "Men's Fragrances", "luxury perfumes", "fashion fragrances", "unisex fragrances"],
-    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "special bottle"]
+    "id": "f2c7a1ad-05f2-44b3-a463-44029c4859c6",
+    "product_category": "Clothing",
+    "search_words": ["retro"]
   },
   {
-    "id": "003628fa-1081-4cf5-9e4b-3f8c57c1af3b",
-    "product_categories": ["perfumes", "Women's Fragrances", "luxury perfumes", "fashion fragrances", "Beauty Products"],
-    "product_features": ["perfume", "nice smell", "long-lasting scent", "skin application", "feminine scents"]
+    "id": "fbe5e633-63c1-44af-871e-0de77a82ddd2",
+    "product_category": "Clothing",
+    "search_words": ["madrid kit"]
+  },
+  {
+    "id": "3c6f8892-1daf-445f-b1d2-84e017db2401",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["removable braces"]
+  },
+  {
+    "id": "3f056181-11f6-4214-879c-90d98a03698e",
+    "product_category": "Home & Kitchen",
+    "search_words": ["stanley cup"]
+  },
+  {
+    "id": "6b61cf6e-c39d-43b7-aa5f-d479badff36b",
+    "product_category": "Home & Kitchen",
+    "search_words": ["stanley cups"]
+  },
+  {
+    "id": "aae3847c-14bd-4051-92c3-4f4cc7fd71b6",
+    "product_category": "Home & Kitchen",
+    "search_words": ["water bottle", "thermo"]
+  },
+  {
+    "id": "b5dde783-938f-4d1d-9de2-d586b9f34066",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["thick chain bracelets", "stainless steel"]
+  },
+  {
+    "id": "b9c17362-ac9a-40f3-a7a6-fcfb4ee6d7db",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "4d154e5d-bfba-4aed-abdf-c01245bd6eea",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "71d3dd2d-ca45-4480-96b0-af9ea69acea8",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "6179e1ca-3260-4948-8829-af4dafe5615e",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "3e2dcdc1-3473-44fb-83a7-5d5bc2544710",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "41876082-f900-4fa5-bff8-1d93c7cc7e98",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "839c6bd8-4a50-41e7-b2f7-c15f74de0743",
+    "product_category": "Clothing",
+    "search_words": ["thick round neck tees"]
+  },
+  {
+    "id": "bad3c9f3-3051-4be6-9323-12f5d60218f4",
+    "product_category": "Clothing",
+    "search_words": ["high quality jacket shirt"]
+  },
+  {
+    "id": "e7f86910-94c2-40ed-bc98-63f5461f8ca0",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["thin waist chain"]
+  },
+  {
+    "id": "a7e73995-fefc-473b-9cc6-4fdf9e9c7f1f",
+    "product_category": "Home & Kitchen",
+    "search_words": ["bathroom rack"]
+  },
+  {
+    "id": "260d360a-afa8-4fbd-be9e-b9da630adff0",
+    "product_category": "Home & Kitchen",
+    "search_words": ["drying cloth hanger"]
+  },
+  {
+    "id": "4dac99d4-5db6-4028-8d8b-95a2ea9fc50e",
+    "product_category": "Home & Kitchen",
+    "search_words": ["3 in 1 drinking water", "water bottle"]
+  },
+  {
+    "id": "5f3bb337-2c5f-482f-b1c7-f030f14626ff",
+    "product_category": "bags",
+    "search_words": ["3 in 1 bag", "red", "green"]
+  },
+  {
+    "id": "1e7ec41e-9fa4-44ab-a3d8-68461eab9da8",
+    "product_category": "bags",
+    "search_words": ["3 in 1 bag", "mini purses"]
+  },
+  {
+    "id": "d6766b6f-5a6a-4235-bf60-d83654c616dd",
+    "product_category": "Shoes",
+    "search_words": ["timberland shoes"]
+  },
+  {
+    "id": "5e8946ef-ad4e-4d9b-8344-2dd1a0f4998f",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["wristwatch", "bangles"]
+  },
+  {
+    "id": "b9426c53-3854-4dd1-b891-b743e11a7e4d",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["luxury crystal wristwatch"]
+  },
+  {
+    "id": "17627389-1b57-4afa-a5a3-b70230b5c34c",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["ultra watch", "fan"]
+  },
+  {
+    "id": "7eb7a689-8fd8-4d3b-857c-7dc77011df1b",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["gold watch", "bracelet set"]
+  },
+  {
+    "id": "f1bb9a8b-6587-4dd7-b5c2-b71a27bef92d",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["micheal kors chain watches"]
+  },
+  {
+    "id": "c4dd0133-b4c6-4b6f-93ff-ac5fa5eb24d3",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["ck watch", "bracelet combo"]
+  },
+  {
+    "id": "e8ad3bc3-14f3-443f-b411-5cd74e40b4a7",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["stylish watches"]
+  },
+  {
+    "id": "85fe9a63-a8aa-420a-b3c4-015211271221",
+    "product_category": "bags",
+    "search_words": ["beaded bags"]
+  },
+  {
+    "id": "1dea2200-9c80-4936-ab00-262a28aa578e",
+    "product_category": "Home & Kitchen",
+    "search_words": ["toothbrush holder"]
+  },
+  {
+    "id": "4f05f402-94a6-476d-b719-4c6bff49420a",
+    "product_category": "Home & Kitchen",
+    "search_words": ["gift set", "towel", "mini fan", "sippy cup"]
+  },
+  {
+    "id": "4c0acbb4-1bc4-4b2e-98a9-0e2e808088fd",
+    "product_category": "Home & Kitchen",
+    "search_words": ["3 in 1 gift set", "towel", "mini fan", "sippy cup"]
+  },
+  {
+    "id": "95c44f71-2b92-4544-876c-6b795f61ba56",
+    "product_category": "Home & Kitchen",
+    "search_words": ["2 in 1 towel"]
+  },
+  {
+    "id": "65060d23-9046-4acc-9c4f-914d855392f2",
+    "product_category": "Books & Stationery",
+    "search_words": ["novel", "the girl on the train"]
+  },
+  {
+    "id": "8057d958-08c2-4f78-a4cf-6565233e5c1a",
+    "product_category": "Home & Kitchen",
+    "search_words": ["transparent wall hooks"]
+  },
+  {
+    "id": "fbe6d804-4819-43ea-a0bb-3c9d81eeaef0",
+    "product_category": "bags",
+    "search_words": ["sac fourre bag"]
+  },
+  {
+    "id": "efbaf567-707d-445a-90bd-7b586a80a8f3",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["l16 tripod"]
+  },
+  {
+    "id": "4256658c-7b4c-47e2-bbe1-f757c1a1a445",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["hot belt power", "tummy fat"]
+  },
+  {
+    "id": "3030141a-e868-4b63-a178-cb996e031187",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["waist trainer leggings"]
+  },
+  {
+    "id": "07d4db77-cb1c-425b-b594-79bce6cde4cf",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["double colored scrunchie"]
+  },
+  {
+    "id": "282f1a91-b1e5-4634-8c68-763e075b9406",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["2pcs chain"]
+  },
+  {
+    "id": "67ebfb15-aa57-4b47-b9a6-5cfca34eaee8",
+    "product_category": "bags",
+    "search_words": ["2 in 1 bag"]
+  },
+  {
+    "id": "d402c4e6-1e06-4200-ba78-3a06c0160f8c",
+    "product_category": "bags",
+    "search_words": ["2 in 1 tote bag"]
+  },
+  {
+    "id": "f24d80ad-bccd-4c85-955d-91614290b706",
+    "product_category": "bags",
+    "search_words": ["mm 2 in 1 tote bag"]
+  },
+  {
+    "id": "07b7a3a7-a896-4ea8-9f36-88c28111047f",
+    "product_category": "Clothing",
+    "search_words": ["crochet half sweater", "shrug combo"]
+  },
+  {
+    "id": "7cbf20d2-b506-4841-b5ce-bdef86916afd",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["under eye mask"]
+  },
+  {
+    "id": "462042d5-5b1b-4f65-a542-3b506b93882b",
+    "product_category": "Clothing",
+    "search_words": ["foreign made top"]
+  },
+  {
+    "id": "56b2a609-b962-4413-bb14-35e4e4407b9f",
+    "product_category": "Clothing",
+    "search_words": ["nova top"]
+  },
+  {
+    "id": "c1172c7f-57f6-4c1f-ab6f-aaa7f7a31f23",
+    "product_category": "Shoes",
+    "search_words": ["vans male shoe"]
+  },
+  {
+    "id": "9ebf208f-3027-4a3b-8848-c9d851059cbe",
+    "product_category": "Shoes",
+    "search_words": ["vans shoes"]
+  },
+  {
+    "id": "fe4b0b38-cf0e-4e8e-860b-b06521af2eb4",
+    "product_category": "Clothing",
+    "search_words": ["ankara baggy trousers"]
+  },
+  {
+    "id": "c2e73631-9958-40bc-931b-3703cc1d47b8",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["influencer lights", "all colours"]
+  },
+  {
+    "id": "eb1cd422-97df-4a4e-84c3-1b2c523265d6",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["influencer light"]
+  },
+  {
+    "id": "1409d842-2ec8-4ea9-a173-19f20c47e2cc",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["vietnamese bone straight wig"]
+  },
+  {
+    "id": "7c97db09-72f8-41e9-90fc-c9747dcff063",
+    "product_category": "Clothing",
+    "search_words": ["crepe vintage shirt"]
+  },
+  {
+    "id": "3fc2747f-da84-4e7a-90ac-5c0ff2669e7b",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["disaar vitamin c oil"]
+  },
+  {
+    "id": "7cf2fc21-8a19-4de5-82c9-4e0b44fed20c",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["vitamin c toner"]
+  },
+  {
+    "id": "873dbd72-c0ca-40af-b3e8-1c1463312ff8",
+    "product_category": "Shoes",
+    "search_words": ["nike airmax"]
+  },
+  {
+    "id": "1527d29e-acd6-4bd5-a21e-6f846d53f792",
+    "product_category": "Home & Kitchen",
+    "search_words": ["wall collages"]
+  },
+  {
+    "id": "3ab1861d-5048-44ff-92ee-c9c74175fe82",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["asher gift set", "black wallet", "stainless steel watch"]
+  },
+  {
+    "id": "cc4fdea0-53b9-4f71-8e45-ce2f9a7c8414",
+    "product_category": "Clothing",
+    "search_words": ["sweatshirts"]
+  },
+  {
+    "id": "0d76a404-f292-46c8-a638-bcaedbd6fd61",
+    "product_category": "Clothing",
+    "search_words": ["short"]
+  },
+  {
+    "id": "e878a8e9-8024-4a29-a022-2874157f1fac",
+    "product_category": "Clothing",
+    "search_words": ["sweater vests"]
+  },
+  {
+    "id": "5d4b3235-44ca-452c-ab22-06333950483e",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["male gift set", "wrist watch", "necklace", "ring", "hand chain"]
+  },
+  {
+    "id": "895f7d81-804c-4107-aa91-0246aaa7221f",
+    "product_category": "Home & Kitchen",
+    "search_words": ["water bottle"]
+  },
+  {
+    "id": "4033adb1-33ca-475d-8238-ea961ea5ace2",
+    "product_category": "Home & Kitchen",
+    "search_words": ["water bottle"]
+  },
+  {
+    "id": "ce106815-27f0-40f5-8532-264d874402ff",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["braided wig"]
+  },
+  {
+    "id": "d12a3608-7ff9-4069-98d2-a5831ad6aeda",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["braided wig"]
+  },
+  {
+    "id": "3480f635-9670-4c8d-af11-3ba8ca5bf3e0",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["zigzag braid hair wig"]
+  },
+  {
+    "id": "9328fbab-a6a9-4d33-b954-2813cc846845",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["french braid curls wig"]
+  },
+  {
+    "id": "e67e8c5b-c4e1-4366-a8cf-590d2e8cf69a",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["luna band tiara"]
+  },
+  {
+    "id": "cd9213b4-0bd8-45f5-9ec2-ff76a2ded794",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["white flower statement earring"]
+  },
+  {
+    "id": "b05d1d34-cf57-45b5-8b6c-2e9c38cebe39",
+    "product_category": "Food & Beverage",
+    "search_words": ["single layered white heart themed cake"]
+  },
+  {
+    "id": "ba58cc53-44c2-4c5f-a670-70442a3b7e11",
+    "product_category": "Clothing",
+    "search_words": ["high luxury well branded tee", "white"]
+  },
+  {
+    "id": "63480489-2fb0-4010-a52b-12f5d2ab44ef",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["womens hair comb", "wide tooth comb"]
+  },
+  {
+    "id": "1ed7cf1f-2287-4038-9548-e4bd818e40a0",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["wig stand"]
+  },
+  {
+    "id": "c20bf12f-183a-407f-8aa4-4169c7a37c56",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["wig stand", "white"]
+  },
+  {
+    "id": "3d5522bd-a10d-40ee-8ffc-19b0df975b7a",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["womens wig brush", "octopus brush"]
+  },
+  {
+    "id": "50958870-4a9f-4eb4-a3eb-d6bde41b9122",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["wig tripod"]
+  },
+  {
+    "id": "aabfdfc2-0abe-423a-9e72-8bb2a9f0965b",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["womens wig serum", "luodais"]
+  },
+  {
+    "id": "55d709aa-8d0e-4a06-bfa9-535f6a1d8342",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["womens wig serum", "luodais"]
+  },
+  {
+    "id": "22ad7f55-2564-4884-b85f-c6d2f5aec061",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["womens wig stand", "wig hanger"]
+  },
+  {
+    "id": "48d77c50-69f0-4680-b581-809f3c01e8b9",
+    "product_category": "Home & Kitchen",
+    "search_words": ["amoeba mirror"]
+  },
+  {
+    "id": "ae410354-c2d0-4233-9391-37ebe7555ebf",
+    "product_category": "Clothing",
+    "search_words": ["size xl-4xl", "wine"]
+  },
+  {
+    "id": "6d6ee487-abf8-4736-8f33-447ce6e11869",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["ultra earpod"]
+  },
+  {
+    "id": "e628c996-4085-45f1-83d0-323300c15a72",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["airpod"]
+  },
+  {
+    "id": "d8a0dac0-95a5-492f-b28d-23bd014dbc4b",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["wireless microphone"]
+  },
+  {
+    "id": "2df780fd-0830-4f70-a053-98606d71b105",
+    "product_category": "Shoes",
+    "search_words": ["quality lady slippers"]
+  },
+  {
+    "id": "385a142c-563a-40b2-9939-470e8fe16990",
+    "product_category": "Clothing",
+    "search_words": ["female baggy trousers"]
+  },
+  {
+    "id": "331cf633-6478-4d59-b519-1aa5cb3e874f",
+    "product_category": "Shoes",
+    "search_words": ["corporate shoes"]
+  },
+  {
+    "id": "e23154d3-52a3-41f6-a908-546a46bc4e01",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["waist chain", "gold", "silver"]
+  },
+  {
+    "id": "d68e81f9-3eb6-42b9-927f-158de1e675c8",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["leather bracelet", "wrist watch set", "guys"]
+  },
+  {
+    "id": "104acba4-0e8a-4f34-83dd-68ac836fd32d",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["flower bangles"]
+  },
+  {
+    "id": "9fb4f910-b30b-4d02-8305-600cad348992",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["male leather bracelet"]
+  },
+  {
+    "id": "7bedac4e-ba99-4d8b-b47c-1e96ab853a5f",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["design bangles"]
+  },
+  {
+    "id": "c33d529d-8fb3-482e-bbd6-ab4cd7811060",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["male bracelet"]
+  },
+  {
+    "id": "9ac7d140-af93-4ce9-9a3b-71f7f8eaf73f",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["male bracelet"]
+  },
+  {
+    "id": "4eb922fc-c64e-4323-8574-4f2adfc730df",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["male bracelet"]
+  },
+  {
+    "id": "7982facb-7315-43a6-a4dc-4ed99e342d6a",
+    "product_category": "Books & Stationery",
+    "search_words": ["resin jotters", "customised design"]
+  },
+  {
+    "id": "c2eb18b7-ee7c-4891-a3d8-27d3f886a0f1",
+    "product_category": "Books & Stationery",
+    "search_words": ["resin jotter set", "a6 jotter", "bookmark", "keychain", "pen"]
+  },
+  {
+    "id": "de1d2b19-7d51-49a5-99b2-805e75075cc7",
+    "product_category": "Books & Stationery",
+    "search_words": ["pen"]
+  },
+  {
+    "id": "842dfc97-29a8-4584-a33c-b9a3a60e9e33",
+    "product_category": "Books & Stationery",
+    "search_words": ["a5 notebooks", "different colors"]
+  },
+  {
+    "id": "9d1b6bdd-903b-4450-a676-66638862ea55",
+    "product_category": "bags",
+    "search_words": ["zara handbag"]
+  },
+  {
+    "id": "3c526a2e-d8c2-46c8-8413-fe36a7ed8a4a",
+    "product_category": "Shoes",
+    "search_words": ["zara sandals"]
+  },
+  {
+    "id": "0994d200-3d2e-4a75-be9c-f732c9a2740c",
+    "product_category": "Shoes",
+    "search_words": ["female heel shoes"]
+  },
+  {
+    "id": "a639ec18-719d-40c9-9567-2b5f6d30ec3d",
+    "product_category": "Home & Kitchen",
+    "search_words": ["hello kitty mat"]
+  },
+  {
+    "id": "c01cefb6-d7c3-4e3b-9d18-65063999f9ec",
+    "product_category": "bags",
+    "search_words": ["kelly bag", "original"]
+  },
+  {
+    "id": "f029a4f6-9f22-4151-a404-478ca7095438",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["samsung s25 ultra"]
+  },
+  {
+    "id": "6dcb894a-b884-4b7f-b0c3-f730a11c0fbd",
+    "product_category": "bags",
+    "search_words": ["customizable phone pouches"]
+  },
+  {
+    "id": "5cdab9b5-fa17-4518-be4e-6dcf2621e05f",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["cute head band"]
+  },
+  {
+    "id": "d89b007b-47d3-4e33-abbd-4373aa4a4bd6",
+    "product_category": "bags",
+    "search_words": ["resin phone pouch"]
+  },
+  {
+    "id": "e0f8bb86-4372-4452-bc40-76258e4ca47f",
+    "product_category": "Home & Kitchen",
+    "search_words": ["vaccum flask set", "different colors"]
+  },
+  {
+    "id": "96f631b1-8ad5-484c-b51b-690fe1fc239b",
+    "product_category": "Home & Kitchen",
+    "search_words": ["stanley cup"]
+  },
+  {
+    "id": "4f16c881-8222-4042-8ef2-53b96407f907",
+    "product_category": "Home & Kitchen",
+    "search_words": ["thermal bottle"]
+  },
+  {
+    "id": "f85157f0-68e2-4460-b3f0-c699d6ffabaa",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["wigs", "human hair", "sdd 10 inches"]
+  },
+  {
+    "id": "6fd99755-6717-4f8c-a3fc-b5f0daeb8fd8",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["human hair blend"]
+  },
+  {
+    "id": "7b7b98b5-69a5-495f-8f16-0ef89236128a",
+    "product_category": "Books & Stationery",
+    "search_words": ["novel", "looking for alaska"]
+  },
+  {
+    "id": "e151a61d-7a8b-4211-8dd1-88d21e4e1dbd",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["infinity necklace", "stainless steel", "silver", "gold"]
+  },
+  {
+    "id": "d72679a7-8489-48fd-93ff-e34d2cc23387",
+    "product_category": "Clothing",
+    "search_words": ["graphic tees", "black", "white"]
+  },
+  {
+    "id": "2c1bb625-7ac8-4ca1-8f57-938c967b2476",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["redmi note 14"]
+  },
+  {
+    "id": "c95393c5-83f5-4031-b902-09560abed84d",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["iphone 14 pro max", "128gb", "physical sim"]
+  },
+  {
+    "id": "1658116f-889a-40c7-a173-17e55472e700",
+    "product_category": "Electronics & Gadgets",
+    "search_words": ["iphone 14 plus", "128gb", "face id", "esim"]
+  },
+  {
+    "id": "52e74a66-a570-490a-8f3e-04fc068a6c2c",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["necklace", "bracelet"]
+  },
+  {
+    "id": "6c8c1a10-a8ae-42e5-8f7c-b2cabbe29fc5",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["jewelry box", "red", "gold", "peach"]
+  },
+  {
+    "id": "9bd7c342-cf51-4eef-95e0-7a3bc41fc696",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["big jewelry box organizer"]
+  },
+  {
+    "id": "ff14ff20-78f1-4972-8b4e-335d7105fdd5",
+    "product_category": "Shoes",
+    "search_words": ["jordan 4", "fully boxed", "original"]
+  },
+  {
+    "id": "ab827d6d-c8d7-4bbd-80ec-018915542556",
+    "product_category": "Shoes",
+    "search_words": ["jordan 4", "fully boxed"]
+  },
+  {
+    "id": "8fd7cabe-e0ca-4442-9ff8-69fa6fdf79ff",
+    "product_category": "Shoes",
+    "search_words": ["jordan 4", "fully boxed"]
+  },
+  {
+    "id": "8b836194-8156-4c00-b68b-fa81297020d1",
+    "product_category": "Food & Beverage",
+    "search_words": ["spicy plantain chips"]
+  },
+  {
+    "id": "867220f8-f91d-46a3-a3f8-dad60d6fa48b",
+    "product_category": "Home & Kitchen",
+    "search_words": ["cute bow key holder"]
+  },
+  {
+    "id": "958737c7-69b6-42f7-8f56-7ddc533b7f60",
+    "product_category": "Home & Kitchen",
+    "search_words": ["cute smiley face key holder"]
+  },
+  {
+    "id": "bf333e07-34b9-4b9f-ba8d-6f95a57ee002",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lace bonnet"]
+  },
+  {
+    "id": "3ab313ae-6ec0-4cea-a32e-6b933760ccae",
+    "product_category": "bags",
+    "search_words": ["lacoste tote bag"]
+  },
+  {
+    "id": "f3300970-4424-48c4-9bfa-1a956ff22111",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["large scrunchy", "bow combo"]
+  },
+  {
+    "id": "0ff61c33-7352-4c32-a930-41b39d6ffd88",
+    "product_category": "bags",
+    "search_words": ["tote bag", "big sized"]
+  },
+  {
+    "id": "83adbffb-1024-4dcd-b37d-d2975685cf99",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["large scrunchy"]
+  },
+  {
+    "id": "3632b1cb-fa83-403e-bee4-76a81d54f1ca",
+    "product_category": "Clothing",
+    "search_words": ["size l-4xl", "foreign made"]
+  },
+  {
+    "id": "32f336bb-8c38-452e-96da-12903f69eff1",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lash installation", "strip lashes"]
+  },
+  {
+    "id": "4601bbb7-870a-407e-9c47-cf1a18d2f519",
+    "product_category": "Home & Kitchen",
+    "search_words": ["laundry baskets"]
+  },
+  {
+    "id": "e47cfa51-dc45-4e3c-8ba0-5674488e68a9",
+    "product_category": "Jewelry & Accessories",
+    "search_words": ["leather bracelet", "wrist watch set", "guys"]
+  },
+  {
+    "id": "a5f796fc-473f-4521-b576-bfd5da1b15b5",
+    "product_category": "Home & Kitchen",
+    "search_words": ["led rose decor"]
+  },
+  {
+    "id": "cd253ef3-32f3-4317-aa3e-1b858515510a",
+    "product_category": "Home & Kitchen",
+    "search_words": ["led light plain"]
+  },
+  {
+    "id": "9e466a8e-a0b1-48c6-87c0-a94d0becfb43",
+    "product_category": "Home & Kitchen",
+    "search_words": ["led strips"]
+  },
+  {
+    "id": "21145993-6ac9-4635-a63c-180a4ebdbade",
+    "product_category": "Home & Kitchen",
+    "search_words": ["led light colored"]
+  },
+  {
+    "id": "62236c3e-1e55-4681-8b28-72646a99d64f",
+    "product_category": "Home & Kitchen",
+    "search_words": ["neon led light"]
+  },
+  {
+    "id": "5562ef2d-fa13-4e3a-8b02-59b794f57c38",
+    "product_category": "Home & Kitchen",
+    "search_words": ["small rgb pocket light"]
+  },
+  {
+    "id": "1ad4a344-fe46-4216-afb2-ae21c133d404",
+    "product_category": "Clothing",
+    "search_words": ["kampala trousers"]
+  },
+  {
+    "id": "9b69bd59-f9e2-4596-91e8-c67c5720a16b",
+    "product_category": "Clothing",
+    "search_words": ["kampala trousers"]
+  },
+  {
+    "id": "45b234c8-7908-415c-91bf-18d758a08221",
+    "product_category": "Clothing",
+    "search_words": ["kampala trousers"]
+  },
+  {
+    "id": "e5d41ef0-d42e-4905-b823-dc7ad136190f",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lash extensions"]
+  },
+  {
+    "id": "fec1760d-b3b7-462d-86f1-a0c5e014f8c7",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lash installations"]
+  },
+  {
+    "id": "b1adbd50-8726-45de-9514-055db46ef61d",
+    "product_category": "Clothing",
+    "search_words": ["long leopard skin skirt"]
+  },
+  {
+    "id": "aed0253f-6d7f-4770-8a86-0a38e2661865",
+    "product_category": "bags",
+    "search_words": ["leopard print bag"]
+  },
+  {
+    "id": "1be8e3ba-62c2-4172-9cf2-83c8cc3f7bcf",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["sleeping mask"]
+  },
+  {
+    "id": "f9e95d93-b91e-4722-bfb9-3223ad114b8a",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lip mask"]
+  },
+  {
+    "id": "01ac3d0d-9deb-4266-882c-f08dcadb29ae",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["lip gloss", "scrub"]
+  },
+  {
+    "id": "5a5a6e1b-23af-4966-bb15-484b58edf971",
+    "product_category": "Clothing",
+    "search_words": ["crochet shrug"]
+  },
+  {
+    "id": "1ff1bb4a-5234-4f48-993a-9add3b3eaf5e",
+    "product_category": "Clothing",
+    "search_words": ["liverpool kit"]
+  },
+  {
+    "id": "c5f54a0c-8431-4b61-9edc-9e8f82a211c2",
+    "product_category": "Clothing",
+    "search_words": ["size m-xxl", "foreign made", "abaya"]
+  },
+  {
+    "id": "7bf446bb-e358-4dba-899c-817c1a011e1e",
+    "product_category": "Clothing",
+    "search_words": ["maxi skirt"]
+  },
+  {
+    "id": "b4a67cc4-9d16-4d95-be12-1fb758423746",
+    "product_category": "Clothing",
+    "search_words": ["backless ankara gown"]
+  },
+  {
+    "id": "03abc74e-1b34-4c93-b236-50b3d7ffaf6c",
+    "product_category": "Health, Beauty & Personal Care",
+    "search_words": ["jc wig", "18''dd volume"]
+  },
+  {
+    "id": "a502b8c3-c30d-470f-b253-b89e923d3249",
+    "product_category": "Clothing",
+    "search_words": ["dubai abaya", "big veil"]
+  },
+  {
+    "id": "9fb2bbb7-5dba-4bad-9012-6030026c5766",
+    "product_category": "Clothing",
+    "search_words": ["long sleeve maxi gown"]
+  },
+  {
+    "id": "c8cb3bfd-fbb1-4f25-abe8-99ffc40bba4f",
+    "product_category": "Clothing",
+    "search_words": ["casual long sleeve tops"]
+  },
+  {
+    "id": "20d7e8bc-14cc-4448-99b6-e2f96236ae88",
+    "product_category": "Clothing",
+    "search_words": ["casual long sleeve tops"]
+  },
+  {
+    "id": "77b6aba5-a175-464a-abcb-c5a91db3b20a",
+    "product_category": "Clothing",
+    "search_words": ["long sleeve off shoulder casual tops"]
+  },
+  {
+    "id": "84f0dd86-a54f-47b2-a99f-f64d13e859b4",
+    "product_category": "fragrances",
+    "search_words": ["badee'al oud", "100ml"]
+  },
+  {
+    "id": "26b83929-affd-4ca4-9f59-6df91d68369a",
+    "product_category": "fragrances",
+    "search_words": ["badee'al oud", "50ml"]
   }
 ]

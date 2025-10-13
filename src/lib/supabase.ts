@@ -83,7 +83,9 @@ export interface Product {
     room?: string;
     is_hostel_merchant?: boolean;
     brand_name?: string | null;
-    profile_picture?: string
+    product_category?: string;
+    search_words?: string[];
+
 }
 
 export interface HostelsProductUpdates {

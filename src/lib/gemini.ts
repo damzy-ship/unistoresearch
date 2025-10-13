@@ -822,26 +822,51 @@ Extract information now:`;
 }
 
 
-export async function categorizePost(post: string): Promise<string> {
-  if(!genAI) return 'others'
+export async function categorizePost(post: string, mode: string = 'store'): Promise<string> {
+  if (!genAI) return 'others'
 
   const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-  const categories = [
-    'food & snacks',
-    'clothing', 
-    'shoes',
-    'caps',
-    'gadgets',
-    'phones',
-    'jewelries',
-    'bags',
-    'beauty & skincare',
-    'hair accessories',
-    'others'
-  ];
+  let categories = [];
+  if (mode === 'hostel') {
 
-  const categorizationPrompt = `
+    categories = [
+      'food & snacks',
+      'clothing',
+      'shoes',
+      'caps',
+      'gadgets',
+      'phones',
+      'jewelries',
+      'bags',
+      'beauty & skincare',
+      'hair accessories',
+      'others'
+    ];
+  } else {
+
+    categories = [
+      'bags',
+      'fragrances',
+      'Health, Beauty & Personal Care',
+      'Shoes',
+      'Jewelry & Accessories',
+      'Home & Kitchen',
+      'Others',
+      'Electronics & Gadgets',
+      'Sports & Fitness',
+      'Food & Beverage',
+      'Clothing',
+      'Books & Stationery',
+      'caps & hats'
+    ];
+  }
+
+  let categorizationPrompt = '';
+
+  if (mode === 'hostel') {
+    categorizationPrompt =
+      `
     Analyze the following product description and categorize it into EXACTLY ONE of these categories: ${categories.join(', ')}.
     
     Return the result as a JSON object with a single key: "category" containing the chosen category string.
@@ -866,6 +891,35 @@ export async function categorizePost(post: string): Promise<string> {
     
     Return ONLY the JSON object, nothing else.
   `;
+  } else {
+    categorizationPrompt =
+      `
+    Analyze the following product description and categorize it into EXACTLY ONE of these categories: ${categories.join(', ')}.
+    
+    Return the result as a JSON object with a single key: "category" containing the chosen category string.
+    
+    Guidelines:
+    - "food & beverages": Any edible items, beverages, food products
+    - "clothing": Apparel items like shirts, pants, dresses, jackets (but NOT shoes, caps, or bags)
+    - "shoes": Footwear of any kind
+    - "caps": Headwear, hats, caps
+    - "Electronics & Gadgets": Electronic devices like laptops, tablets, smartwatches, cameras, Mobile phones, smartphones, cellphones
+    - "Jewelry & Accessories": Accessories like rings, necklaces, earrings, bracelets, watches
+    - "bags": Purses, backpacks, handbags, luggage
+    - "others": Anything that doesn't fit the above categories
+    
+    Product Description: "${post}"
+    
+    Example output format:
+    {
+      "category": "shoes"
+    }
+    
+    Return ONLY the JSON object, nothing else.
+  `;
+
+
+  }
 
   try {
     const result = await generativeModel.generateContent({
@@ -876,7 +930,7 @@ export async function categorizePost(post: string): Promise<string> {
     });
 
     const categorizationData = JSON.parse(result.response.text());
-    
+
     // Validate that the returned category is in our list
     if (categorizationData.category && categories.includes(categorizationData.category)) {
       return categorizationData.category;
@@ -892,7 +946,7 @@ export async function categorizePost(post: string): Promise<string> {
 }
 
 export async function extractProductKeywordsFromDescription(description: string): Promise<string[]> {
-  if (!genAI) return ['product']; 
+  if (!genAI) return ['product'];
 
   const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
@@ -945,7 +999,7 @@ export async function extractProductKeywordsFromDescription(description: string)
 
     if (Array.isArray(extractionData.keywords)) {
       // Ensure all elements are strings and lowercased before returning
-      return extractionData.keywords.map((word: unknown) => 
+      return extractionData.keywords.map((word: unknown) =>
         String(word).trim().toLowerCase()
       );
     } else {

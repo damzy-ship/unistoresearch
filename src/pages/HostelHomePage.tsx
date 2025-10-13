@@ -325,7 +325,7 @@ export default function HostelHomePage() {
             setPosting(true);
 
             // --- Step 1: Get categorization and search words for the query ---
-            const postCategory = await categorizePost(q);
+            const postCategory = await categorizePost(q, 'hostel');
             const postSearchWords = await extractProductKeywordsFromDescription(q);
 
             // Crucial check: If we can't determine a category, we won't get results based on the new requirement.
