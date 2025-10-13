@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { Product, supabase, UniqueVisitor } from '../lib/supabase';
-import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 
