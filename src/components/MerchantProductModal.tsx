@@ -1,22 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
+import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
-
-
-
-interface Product {
-    id: string;
-    merchant_id: string;
-    product_description: string;
-    product_price: string;
-    is_available: boolean;
-    created_at: string;
-    image_urls: string[];
-    embedding: number[]; // New field for the embedding vector
-    search_description: string;
-}
+import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 
 interface MerchantProductModalProps {
     actual_merchant_id?: string;
@@ -34,7 +20,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     const [error, setError] = useState<string | null>(null);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
+  
+    const [merchantDetails, setMerchantDetails] = useState<UniqueVisitor | null>(null);
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
@@ -43,8 +30,25 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     const [uploadingImages, setUploadingImages] = useState(false);
 
     useEffect(() => {
+        fetchMerchant();
         fetchProducts();
     }, [merchantId]);
+
+    const fetchMerchant = async () => {
+        try {
+            if (!actual_merchant_id) return null;
+            const { data, error } = await supabase
+                .from('unique_visitors')
+                .select('*')
+                .eq('id', actual_merchant_id)
+                .single();
+            if (error) {
+                console.error('Error fetching merchant:', error);
+                return null;
+            }
+            setMerchantDetails(data);
+        } catch (err) { console.error('Error fetching merchant:', err); }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -59,6 +63,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
             if (error) {
                 throw error;
             }
+
             setProducts(data || []);
         } catch (err) {
             console.error('Error fetching products:', err);
@@ -72,7 +77,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            
+
             // Check for file count limit (New Logic)
             const currentFilesCount = editingProduct?.image_urls.length || 0;
             const totalFilesAfterUpload = currentFilesCount + filesArray.length;
@@ -80,7 +85,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
             if (totalFilesAfterUpload > MAX_IMAGES) {
                 setError(`You can only upload a maximum of ${MAX_IMAGES} images. You currently have ${currentFilesCount} image(s) and are trying to upload ${filesArray.length} new image(s).`);
                 // Clear the file input for a better UX, though the state setNewFiles won't be called.
-                e.target.value = ''; 
+                e.target.value = '';
                 setNewFiles([]); // Ensure no files are mistakenly queued
                 return;
             }
@@ -89,11 +94,11 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
             const invalidFiles = filesArray.filter(file => file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/'));
             if (invalidFiles.length > 0) {
                 setError('Some files were invalid. Max 5MB per file, and only image types are allowed.');
-                e.target.value = ''; 
+                e.target.value = '';
                 setNewFiles([]); // Ensure no files are mistakenly queued
                 return;
             }
-            
+
             // If all checks pass, set the files
             setNewFiles(filesArray);
             setError(null);
@@ -130,8 +135,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
 
         // Add an immediate check for a new product submission
         if (newFiles.length > MAX_IMAGES) {
-             setError(`You can only upload a maximum of ${MAX_IMAGES} images.`);
-             return;
+            setError(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+            return;
         }
 
 
@@ -139,8 +144,9 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         setError(null);
 
         try {
-            // 1. Generate the embedding
-            const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
+            const query_category = await categorizePost(productDescription);
+            const query_search_words = await extractProductKeywordsFromDescription(productDescription);
+
 
             // 2. Upload images
             setUploadingImages(true);
@@ -157,8 +163,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                     product_price: productPrice,
                     is_available: isAvailable,
                     image_urls: imageUrls,
-                    embedding: embedding, // Store the embedding
-                    search_description: enhancedDescription
+                    product_category: query_category,
+                    search_words: query_search_words
                 });
 
             if (error) {
@@ -187,23 +193,20 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         // Add an immediate check for the total image count during edit
         const totalImages = (editingProduct?.image_urls.length || 0) + newFiles.length;
         if (totalImages > MAX_IMAGES) {
-             setError(`You can only have a total of ${MAX_IMAGES} images. You currently have ${editingProduct.image_urls.length} and are trying to add ${newFiles.length} new images.`);
-             return;
+            setError(`You can only have a total of ${MAX_IMAGES} images. You currently have ${editingProduct.image_urls.length} and are trying to add ${newFiles.length} new images.`);
+            return;
         }
 
         setLoading(true);
         setError(null);
 
         try {
-            // 1. Generate a new embedding if the description changed
-            let newEmbedding = editingProduct.embedding;
-            let newSearchDescription = editingProduct.search_description;
-
+            let query_category = editingProduct.product_category;
+            let query_search_words = editingProduct.search_words;
 
             if (productDescription !== editingProduct.product_description) {
-                const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
-                newEmbedding = embedding;
-                newSearchDescription = enhancedDescription;
+                query_category = await categorizePost(editingProduct.product_description);
+                query_search_words = await extractProductKeywordsFromDescription(editingProduct.product_description);
             }
 
             // 2. Upload new images
@@ -221,8 +224,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                     product_price: productPrice,
                     is_available: isAvailable,
                     image_urls: updatedImageUrls,
-                    embedding: newEmbedding,
-                    search_description: newSearchDescription
+                    product_category: query_category,
+                    search_words: query_search_words
                 })
                 .eq('id', editingProduct.id);
 
@@ -307,7 +310,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     };
 
     // 💡 MODIFIED RENDER LOGIC FOR INPUT FIELD
-    const isImageUploadDisabled = editingProduct 
+    const isImageUploadDisabled = editingProduct
         ? (editingProduct.image_urls.length + newFiles.length) >= MAX_IMAGES
         : newFiles.length >= MAX_IMAGES;
 
@@ -371,6 +374,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                 <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">Available for sale</label>
                             </div>
 
+                 
                             {/* Image Upload Section */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -388,7 +392,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                     onChange={handleFileChange}
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
                                     // 💡 MODIFIED DISABLED STATE
-                                    disabled={uploadingImages || loading || isImageUploadDisabled} 
+                                    disabled={uploadingImages || loading || isImageUploadDisabled}
                                     key={editingProduct?.id} // Add key to force re-render/reset the file input on product change
                                 />
                             </div>
@@ -480,6 +484,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
+
                                         <div className="flex gap-2 mt-2">
                                             <button
                                                 onClick={() => startEditProduct(product)}
