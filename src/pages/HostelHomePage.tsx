@@ -307,7 +307,15 @@ export default function HostelHomePage() {
                     let score = 0;
 
                     for (const queryWord of postSearchWords) {
-                        if (itemSearchWords.includes(queryWord)) {
+                        // Normalize for case-insensitive matching
+                        const lowerQueryWord = queryWord.toLowerCase();
+
+                        // Check if ANY of the item's search words contain the query word
+                        const matchFound = itemSearchWords.some(itemWord =>
+                            itemWord.toLowerCase().includes(lowerQueryWord)
+                        );
+
+                        if (matchFound) {
                             score += 1;
                         }
                     }
