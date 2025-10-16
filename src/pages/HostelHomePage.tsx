@@ -48,7 +48,7 @@ export default function HostelHomePage() {
     const [myProductsActive, setMyProductsActive] = useState<boolean>(false);
 
     const [showAuthModal, setShowAuthModal] = useState(false);
-    const [isSearchView, setIsSearchView] = useState(false);
+    const [isSearchView, setIsSearchView] = useState(true);
     const [showImageSearchPrompt, setShowImageSearchPrompt] = useState(false);
     const [searchResults, setSearchResults] = useState<HostelsProductUpdates[] | null>(null);
     const [searchTerm, setSearchTerm] = useState<string | null>(null);
@@ -66,11 +66,6 @@ export default function HostelHomePage() {
 
     const userIsHostelMerchant = currentVisitor?.is_hostel_merchant === true;
 
-    useEffect(() => {
-        if (!userIsHostelMerchant) {
-            setIsSearchView(true);
-        }
-    }, [userIsHostelMerchant]);
 
     const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
         try {
@@ -186,7 +181,7 @@ export default function HostelHomePage() {
                     .eq('auth_user_id', userId)
                     .single();
                 setCurrentVisitor(visitor as unknown as UniqueVisitor);
-                setIsSearchView(!visitor?.is_hostel_merchant);
+                // setIsSearchView(!visitor?.is_hostel_merchant);
             }
 
             const storedId = localStorage.getItem('selectedSchoolId');

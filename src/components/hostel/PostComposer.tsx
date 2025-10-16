@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Upload } from 'lucide-react';
 import { UniqueVisitor } from '../../lib/supabase';
 
@@ -26,6 +26,7 @@ export default function PostComposer({
     const [composerText, setComposerText] = useState<string>('');
     const [composerImages, setComposerImages] = useState<File[]>([]);
 
+
     const onSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
@@ -44,6 +45,7 @@ export default function PostComposer({
             await onPost(composerText, composerImages);
             setComposerText('');
             setComposerImages([]);
+            onToggleView(true);
         }
     };
 
@@ -51,6 +53,8 @@ export default function PostComposer({
         setComposerText('');
         setComposerImages([]);
     };
+
+    
 
     return (
         <div className="p-4 border-b border-gray-800 flex gap-3">
