@@ -145,6 +145,14 @@ export interface ProductCategory {
   created_at: string;
 }
 
+export interface OtpCode {
+  id: string;
+  code: string;
+  email_address?: string;
+  created_at: string;
+  expires_at: string;
+}
+
 
 // Add function to delete a request log
 export async function deleteRequestLog(requestId: string): Promise<{ success: boolean; error?: string }> {
