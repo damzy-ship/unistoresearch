@@ -24,9 +24,9 @@ const base64urlEncode = (str: string): string => {
 
 // ⚠️ WARNING: DO NOT EXPOSE SECRETS IN PRODUCTION FRONTENDS! 
 // Replace these with your actual keys.
-const PICA_SECRET_KEY = import.meta.env.PICA_SECRET_KEY;
-const PICA_GMAIL_CONNECTION_KEY = import.meta.env.PICA_GMAIL_CONNECTION_KEY;
-const PICA_ACTION_ID = import.meta.env.PICA_ACTION_ID;
+const PICA_SECRET_KEY = import.meta.env.VITE_PICA_SECRET_KEY;
+const PICA_GMAIL_CONNECTION_KEY = import.meta.env.VITE_PICA_GMAIL_CONNECTION_KEY;
+const PICA_ACTION_ID = import.meta.env.VITE_PICA_ACTION_ID;
 const API_URL = 'https://api.picaos.com/v1/passthrough/users/me/messages/send';
 
 interface SendEmailParams {
