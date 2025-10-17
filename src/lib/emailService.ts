@@ -24,9 +24,9 @@ const base64urlEncode = (str: string): string => {
 
 // ⚠️ WARNING: DO NOT EXPOSE SECRETS IN PRODUCTION FRONTENDS! 
 // Replace these with your actual keys.
-const PICA_SECRET_KEY = import.meta.env.VITE_PICA_SECRET_KEY;
-const PICA_GMAIL_CONNECTION_KEY = import.meta.env.VITE_PICA_GMAIL_CONNECTION_KEY;
-const PICA_ACTION_ID = import.meta.env.VITE_PICA_ACTION_ID;
+const PICA_SECRET_KEY = 'sk_test_CGubMTmGSfjCDHvdpRmB8GfAjBXr8S4eaoGR7zYalik';
+const PICA_GMAIL_CONNECTION_KEY = 'test::gmail::default::cba6e3b50bf24d4ea4d6d26a78134965';
+const PICA_ACTION_ID = 'conn_mod_def::F_JeJ_A_TKg::cc2kvVQQTiiIiLEDauy6zQ';
 const API_URL = 'https://api.picaos.com/v1/passthrough/users/me/messages/send';
 
 interface SendEmailParams {
@@ -43,7 +43,7 @@ interface SendEmailParams {
  */
 export const sendPicaEmail = async ({ to, subject, body, from }: SendEmailParams): Promise<any> => {
     // Simple check to remind user to update keys if placeholders are detected
-    if (!PICA_SECRET_KEY || !PICA_GMAIL_CONNECTION_KEY) {
+    if (PICA_SECRET_KEY.includes('YOUR_') || PICA_GMAIL_CONNECTION_KEY.includes('YOUR_')) {
         throw new Error("Pica keys are missing. Please update PICA_SECRET_KEY and PICA_GMAIL_CONNECTION_KEY.");
     }
 
