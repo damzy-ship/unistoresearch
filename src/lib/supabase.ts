@@ -48,6 +48,7 @@ export interface UniqueVisitor {
   user_type?: string;
   school_id?: string;
   brand_name?: string | null;
+  email?: string;
   verification_status?: 'pending' | 'verified' | 'unverified'| null;
   verification_id?: string;
   hostel_id?: string
@@ -148,7 +149,7 @@ export interface ProductCategory {
 export interface OtpCode {
   id: string;
   code: string;
-  email_address?: string;
+  email?: string;
   created_at: string;
   expires_at: string;
 }

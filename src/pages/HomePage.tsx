@@ -178,7 +178,7 @@ export default function HomePage() {
               <Header onAuthClick={() => setShowAuthModal(true)} />
             </div>
 
-            <WelcomeEmailSender />
+            {/* <WelcomeEmailSender /> */}
 
 
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
