@@ -17,6 +17,7 @@ import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import VerticalProductList from '../components/VerticalProductList';
+import WelcomeEmailSender from '../components/EmailSender/WelcomeEmailSender';
 // import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json';
 
@@ -176,6 +177,8 @@ export default function HomePage() {
             <div className="w-full max-w-2xl mx-auto">
               <Header onAuthClick={() => setShowAuthModal(true)} />
             </div>
+
+            <WelcomeEmailSender />
 
 
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
