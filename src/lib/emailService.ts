@@ -43,7 +43,7 @@ interface SendEmailParams {
  */
 export const sendPicaEmail = async ({ to, subject, body, from }: SendEmailParams): Promise<any> => {
     // Simple check to remind user to update keys if placeholders are detected
-    if (PICA_SECRET_KEY.includes('YOUR_') || PICA_GMAIL_CONNECTION_KEY.includes('YOUR_')) {
+    if (!PICA_SECRET_KEY || !PICA_GMAIL_CONNECTION_KEY) {
         throw new Error("Pica keys are missing. Please update PICA_SECRET_KEY and PICA_GMAIL_CONNECTION_KEY.");
     }
 
