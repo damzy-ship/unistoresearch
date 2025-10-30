@@ -66,7 +66,6 @@ export async function updateMerchantProductAttributes(productsToUpdate: Merchant
   return results;
 }
 
-
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**

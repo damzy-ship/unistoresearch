@@ -188,10 +188,10 @@ export default function EditEmailModal({ currentEmail, onClose, onSave, currentT
 
       // Update email in auth
       const { error: authError } = await supabase.auth.updateUser({
-        phone: newEmail
+        email: newEmail
       });
 
-      console.log(error)
+      console.log(authError)
 
 
       if (authError) throw authError;

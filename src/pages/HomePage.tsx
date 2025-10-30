@@ -17,7 +17,7 @@ import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import VerticalProductList from '../components/VerticalProductList';
-import WelcomeEmailSender from '../components/EmailSender/WelcomeEmailSender';
+import CountdownTimer from '../components/CountDownTimer';
 // import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json';
 
@@ -153,8 +153,10 @@ export default function HomePage() {
 
       {selectedSchoolId ?
 
+      //remeber to add back py-8 to main classname after hostel mode launch
+
         <main
-          className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
+          className="flex min-h-screen flex-col items-center justify-center  transition-colors duration-300"
           style={{ backgroundColor: currentTheme.background }}
         >
 
@@ -171,6 +173,8 @@ export default function HomePage() {
             />
           )}
           <Toaster position="top-center" richColors />
+
+          <CountdownTimer />
 
           <div className="w-full flex flex-col items-center justify-center">
             {/* User Menu */}

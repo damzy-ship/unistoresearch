@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { User, Lock, LogIn, UserPlus, Send, Briefcase } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { setUserId, setPhoneAuthenticated } from '../hooks/useTracking';
-import { sendOTP, verifyOTP } from '../lib/smsService';
-import { toast } from 'react-hot-toast';
 import AuthHeader from './auth/AuthHeader';
 import AuthInput from './auth/AuthInput';
 import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
-import OTPInput from './auth/OTPInput';
 import UniversitySelector from './UniversitySelector';
 
 interface AuthModalProps {
@@ -17,7 +14,7 @@ interface AuthModalProps {
   onSuccess: () => void;
 }
 
-type AuthView = 'login' | 'signup' | 'forgot-password' | 'verify-otp' | 'reset-password';
+type AuthView = 'login' | 'signup' | 'forgot-password' | 'check-email';
 type UserType = 'user' | 'merchant';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
@@ -26,16 +23,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [brandName, setBrandName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('+234');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [displayOtp, setDisplayOtp] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [forgotPasswordPhone, setForgotPasswordPhone] = useState('+234');
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [checkEmailMessage, setCheckEmailMessage] = useState('');
 
   // New state for user type and schools
   const [userType, setUserType] = useState<UserType>('user');
-  const [selectedSchoolId, setSelectedSchoolId] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
 
   useEffect(() => {
     if (isOpen) {
@@ -45,11 +40,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setBrandName('');
       setPhoneNumber('+234');
       setPassword('');
-      setConfirmPassword('');
-      setOtp('');
-      setDisplayOtp(null);
       setError('');
-      setForgotPasswordPhone('+234');
+      setForgotPasswordEmail('');
       setUserType('user'); // Reset user type on modal open
       setSelectedSchoolId(null);
     }
@@ -80,19 +72,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     return true;
   };
 
-  const validatePasswordReset = () => {
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-
-    return true;
-  };
+  
 
   const handleSignUp = async () => {
     if (!validateInputs()) return;
@@ -173,16 +153,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         }
       }
 
-      // Set user as authenticated
-      setUserId(authData.user.id);
-      localStorage.setItem('selectedSchoolId', selectedSchoolId);
+  // Set user as authenticated
+  setUserId(authData.user.id);
+  localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
       setPhoneAuthenticated(true);
 
       onSuccess();
       onClose();
-    } catch (error: any) {
-      console.error('Sign up error:', error);
-      setError(error.message || 'Failed to sign up. Please try again.');
+    } catch (err) {
+      console.error('Sign up error:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to sign up. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -268,17 +249,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       onSuccess();
       window.location.reload();
       onClose();
-    } catch (error: any) {
-      console.error('Login error:', error);
-      setError(error.message || 'Failed to log in. Please try again.');
+    } catch (err) {
+      console.error('Login error:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to log in. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSendOtp = async () => {
-    if (forgotPasswordPhone.length < 14) {
-      setError('Please enter a complete phone number');
+    if (!forgotPasswordEmail.includes('@')) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -286,144 +268,30 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
 
     try {
-      // Check if user exists
-      const { data: userData, error: userError } = await supabase
-        .from('unique_visitors')
-        .select('auth_user_id')
-        .eq('phone_number', forgotPasswordPhone)
-        .maybeSingle();
-
-      if (userError || !userData?.auth_user_id) {
-        setError('No account found with this phone number');
-        setLoading(false);
-        return;
-      }
-
-      // Send OTP via SMS service
-      const result = await sendOTP(forgotPasswordPhone);
-
-      if (!result.success) {
-        setError(result.error || 'Failed to send OTP');
-        setLoading(false);
-        return;
-      }
-
-      // If SMS service is not configured, show OTP on screen
-      if (result.otp) {
-        setDisplayOtp(result.otp);
-        toast.success(`Your OTP is: ${result.otp}`, { duration: 10000 });
-      } else {
-        toast.success('OTP sent to your phone number');
-      }
-
-      // Move to verification view
-      setView('verify-otp');
-
-    } catch (error: any) {
-      console.error('Error sending OTP:', error);
-      setError('Failed to send OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length !== 6) {
-      setError('Please enter a valid 6-digit OTP');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // Verify OTP using the SMS service
-      const isValid = await verifyOTP(forgotPasswordPhone, otp);
-
-      if (!isValid) {
-        setError('Invalid or expired OTP. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      // Move to reset password view
-      setView('reset-password');
-
-    } catch (error: any) {
-      console.error('Error verifying OTP:', error);
-      setError('Failed to verify OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (!validatePasswordReset()) return;
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // Create a unique email from the phone number for Supabase Auth
-      const phoneEmail = `${forgotPasswordPhone.replace(/\+/g, '')}@phone.unistore.local`;
-
-      // Sign in with the phone email to get the session
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: phoneEmail,
-        password: 'temp_password_for_reset' // This will fail but we need the user context
+      // Use Supabase to send a password reset email
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/update-password`
       });
 
-      // Since we can't use admin functions, we'll update via the auth API
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password
-      });
-
-      if (updateError) {
-        // If direct update fails, try alternative approach
-        console.error('Direct password update failed:', updateError);
-
-        // Get user data to verify they exist
-        const { data: userData } = await supabase
-          .from('unique_visitors')
-          .select('auth_user_id')
-          .eq('phone_number', forgotPasswordPhone)
-          .single();
-
-        if (!userData?.auth_user_id) {
-          setError('User not found');
-          setLoading(false);
-          return;
-        }
-
-        // For now, we'll show success but the password reset might need manual intervention
-        console.warn('Password reset may require manual intervention');
+      if (resetError) {
+        console.error('Supabase reset error:', resetError);
+        setError(resetError.message || 'Failed to send reset email');
+        setLoading(false);
+        return;
       }
 
-      // Show success message
-      toast.success('Password reset successfully! Please sign in with your new password.');
-
-      // Reset view to login
-      setView('login');
-      setPassword('');
-      setConfirmPassword('');
-      setOtp('');
-
-    } catch (error: any) {
-      console.error('Error resetting password:', error);
-      setError('Password reset completed. Please try signing in with your new password.');
-
-      // Reset to login view even if there was an "error"
-      setTimeout(() => {
-        setView('login');
-        setPassword('');
-        setConfirmPassword('');
-        setOtp('');
-        setError('');
-      }, 2000);
+      setCheckEmailMessage(`A password reset link was sent to ${forgotPasswordEmail}. Check your email and follow the instructions.`);
+      setView('check-email');
+    } catch (err) {
+      console.error('Error sending reset email:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  // The reset flow is handled by Supabase sending a reset link to the user's email.
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -436,12 +304,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         break;
       case 'forgot-password':
         handleSendOtp();
-        break;
-      case 'verify-otp':
-        handleVerifyOtp();
-        break;
-      case 'reset-password':
-        handleResetPassword();
         break;
     }
   };
@@ -471,21 +333,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       case 'forgot-password':
         return {
           title: 'Reset Password',
-          subtitle: 'Enter your phone number to receive a verification code.',
+          subtitle: 'Enter your email address to receive a password reset link.',
           showBack: true
         };
-      case 'verify-otp':
+      case 'check-email':
         return {
-          title: 'Verify Code',
-          subtitle: 'Enter the verification code sent to your phone.',
+          title: 'Check your email',
+          subtitle: checkEmailMessage || 'We sent a password reset link to your email.',
           showBack: true
         };
-      case 'reset-password':
-        return {
-          title: 'Set New Password',
-          subtitle: 'Create a new password for your account.',
-          showBack: true
-        };
+      
       default:
         return {
           title: 'Authentication',
@@ -505,7 +362,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           subtitle={viewConfig.subtitle}
           onClose={handleClose}
           onBack={() => {
-            if (view === 'verify-otp' || view === 'reset-password') {
+            if (view === 'check-email') {
               setView('forgot-password');
             } else {
               setView('login');
@@ -516,16 +373,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         />
 
         {/* Display OTP on screen if SMS service is not configured */}
-        {displayOtp && view === 'verify-otp' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-            <p className="text-yellow-800 text-sm">
-              <strong>Note:</strong> SMS service is not configured. Your OTP is:
-            </p>
-            <p className="text-center font-mono text-lg font-bold text-yellow-900 mt-2">
-              {displayOtp}
-            </p>
-          </div>
-        )}
+        
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* User Type Tabs (Sign Up only) */}
@@ -580,8 +428,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           {view === 'signup' && (
 
             <UniversitySelector
-              selectedUniversity={selectedSchoolId}
-              onUniversityChange={setSelectedSchoolId}
+              selectedUniversity={selectedSchoolId ?? ''}
+              onUniversityChange={(id: string) => setSelectedSchoolId(id)}
             />
           )}
 
@@ -598,55 +446,44 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
           {/* Forgot Password Phone */}
           {view === 'forgot-password' && (
-            <PhoneInput
-              value={forgotPasswordPhone}
-              onChange={setForgotPasswordPhone}
-              disabled={loading}
+             <AuthInput
+              type="text"
+              value={forgotPasswordEmail}
+              onChange={setForgotPasswordEmail}
+              placeholder="Your Email"
               required
+              disabled={loading}
+              icon={<User className="w-4 h-4" />}
             />
+
           )}
 
-          {/* OTP Input */}
-          {view === 'verify-otp' && (
-            <OTPInput
-              value={otp}
-              onChange={setOtp}
-              disabled={loading}
-            />
+          {view === 'check-email' && (
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+              <p className="text-sm text-blue-800">{checkEmailMessage || 'A password reset link was sent. Check your email.'}</p>
+            </div>
           )}
 
           {/* Password */}
-          {(view === 'login' || view === 'signup' || view === 'reset-password') && (
+          {(view === 'login' || view === 'signup') && (
             <AuthInput
               type="password"
               value={password}
               onChange={setPassword}
-              placeholder={view === 'reset-password' ? 'Enter new password' : 'Enter password'}
+              placeholder={'Enter password'}
               required
               disabled={loading}
               icon={<Lock className="w-4 h-4" />}
               showPasswordToggle
               helpText={
-                (view === 'signup' || view === 'reset-password')
-                  ? 'Password must be at least 6 characters'
-                  : undefined
+                'Password must be at least 6 characters'
+                  
               }
             />
           )}
 
           {/* Confirm Password (Reset Password only) */}
-          {view === 'reset-password' && (
-            <AuthInput
-              type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              placeholder="Confirm new password"
-              required
-              disabled={loading}
-              icon={<Lock className="w-4 h-4" />}
-              showPasswordToggle
-            />
-          )}
+          {/** reset handled via email link; no in-modal reset UI **/}
 
           {/* Forgot Password Link (Login view only) */}
           {view === 'login' && (
@@ -698,12 +535,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
               {view === 'forgot-password' && (
                 <>
-                  {loading ? 'Sending Code...' : 'Send Verification Code'}
+                  {loading ? 'Sending link...' : 'Send reset link'}
                   {!loading && <Send className="w-4 h-4 ml-2" />}
                 </>
               )}
-              {view === 'verify-otp' && (loading ? 'Verifying...' : 'Verify Code')}
-              {view === 'reset-password' && (loading ? 'Resetting Password...' : 'Reset Password')}
+              {view === 'check-email' && (loading ? 'Processing...' : 'Ok')}
             </AuthButton>
           </div>
         </form>

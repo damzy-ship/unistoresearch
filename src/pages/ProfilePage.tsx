@@ -49,7 +49,7 @@ export default function ProfilePage() {
             brand_name: visitorData.brand_name,
             verification_status: visitorData.verification_status,
             verification_id: visitorData.verification_id,
-            email: visitorData.email || session.user.email
+            email: visitorData.email
           };
 
           setProfile(profileData);
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                           Email Address
                         </p>
                         <p style={{ color: currentTheme.text }}>
-                          {profile.email.slice(0,5) + "***" + profile.email.slice(-8) || 'Not set'}
+                          {profile.email ? profile.email.slice(0,5) + "***" + profile.email.slice(-9) : 'Not set'}
                         </p>
                       </div>
                       <button
