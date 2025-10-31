@@ -3,7 +3,7 @@ import React, { useState, useEffect, FC } from 'react';
 // Define the target date: Next week Friday at 00:00:00
 // Current date: Thursday, Oct 30, 2025
 // Next Friday: Nov 7, 2025
-const TARGET_DATE: number = new Date('2025-11-07T00:00:00').getTime(); // Using 'number' for the timestamp
+const TARGET_DATE: number = new Date('2025-11-07T23:00:00').getTime(); // Using 'number' for the timestamp
 
 // --- Interfaces for Type Safety ---
 
