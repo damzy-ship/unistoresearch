@@ -3,7 +3,7 @@ import React, { useState, useEffect, FC } from 'react';
 // Define the target date: Next week Friday at 00:00:00
 // Current date: Thursday, Oct 30, 2025
 // Next Friday: Nov 7, 2025
-const TARGET_DATE: number = new Date('2025-11-07T00:00:00').getTime(); // Using 'number' for the timestamp
+const TARGET_DATE: number = new Date('2025-11-07T23:00:00').getTime(); // Using 'number' for the timestamp
 
 // --- Interfaces for Type Safety ---
 
@@ -89,7 +89,7 @@ const CountdownTimer: FC = () => {
 
   // The rest of the component is standard JSX
   return (
-    <div className="w-full font-sans p-4 sm:p-6 mb-6 bg-gradient-to-r from-orange-400 to-red-500 text-white border-b-4 border-orange-600 shadow-xl overflow-hidden relative">
+    <div className="w-full font-sans p-4 sm:p-6 bg-gradient-to-r from-orange-400 to-red-500 text-white border-b-4 border-orange-600 shadow-xl overflow-hidden relative">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-20 z-0" style={{
           backgroundImage: 'radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
