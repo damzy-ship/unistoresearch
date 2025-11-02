@@ -22,7 +22,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [fullName, setFullName] = useState('');
   const [brandName, setBrandName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('+234');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [authMethod, setAuthMethod] = useState<'phone' | 'email'>('phone');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
@@ -44,20 +46,30 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setForgotPasswordEmail('');
       setUserType('user'); // Reset user type on modal open
       setSelectedSchoolId(null);
+      setAuthMethod('phone');
     }
   }, [isOpen]);
 
   const validateInputs = () => {
-    if (phoneNumber.length < 14) {
-      setError('Please enter a complete phone number');
-      return false;
-    }
-
+    // Validate password
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return false;
     }
 
+    // Validate inputs for login depending on method
+    if (view === 'login') {
+      if (authMethod === 'phone' && phoneNumber.length < 14) {
+        setError('Please enter a complete phone number');
+        return false;
+      }
+      if (authMethod === 'email' && !email.includes('@')) {
+        setError('Please enter a valid email address');
+        return false;
+      }
+    }
+
+    // Signup validations
     if (view === 'signup' && !fullName.trim()) {
       setError('Please enter your full name');
       return false;
@@ -69,10 +81,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       return false;
     }
 
+    // Make registering with email compulsory
+    if (view === 'signup' && !email.includes('@')) {
+      setError('Please provide a valid email address to register');
+      return false;
+    }
+
     return true;
   };
 
-  
+
 
   const handleSignUp = async () => {
     if (!validateInputs()) return;
@@ -81,8 +99,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
 
     try {
-      // Create a unique email from the phone number for Supabase Auth
-      const phoneEmail = `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
+      // Use the provided email for signup (registration with email is compulsory)
+      const signupEmail = email.trim();
 
       // Prepare user metadata
       const userMetadata = {
@@ -95,7 +113,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       // Sign up with Supabase Auth using the generated email
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: phoneEmail,
+        email: signupEmail,
         password: password,
         options: {
           data: userMetadata
@@ -104,7 +122,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       if (authError) {
         if (authError.message?.includes('already registered')) {
-          setError('An account with this phone number already exists. Please sign in instead.');
+          setError('An account with this email already exists. Please sign in instead.');
           return;
         }
         throw authError;
@@ -153,9 +171,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         }
       }
 
-  // Set user as authenticated
-  setUserId(authData.user.id);
-  localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
+      // Set user as authenticated
+      setUserId(authData.user.id);
+      localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
       setPhoneAuthenticated(true);
 
       onSuccess();
@@ -176,19 +194,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
 
     try {
-      // Create a unique email from the phone number for Supabase Auth
-      const phoneEmail = `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
+      // Determine login email depending on chosen method
+      const loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
 
-      // Sign in with Supabase Auth using the generated email
+      // Sign in with Supabase Auth using the selected email
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: 'unistorenaija@gmail.com',
+        email: loginEmail,
         password: password
       });
 
       if (authError) {
         throw authError;
       }
- 
+
       if (!authData.user) {
         throw new Error('Failed to log in');
       }
@@ -344,7 +362,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           subtitle: checkEmailMessage || 'We sent a password reset link to your email.',
           showBack: true
         };
-      
+
       default:
         return {
           title: 'Authentication',
@@ -375,7 +393,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         />
 
         {/* Display OTP on screen if SMS service is not configured */}
-        
+
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* User Type Tabs (Sign Up only) */}
@@ -435,20 +453,56 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             />
           )}
 
-
-          {/* Phone Number */}
           {(view === 'login' || view === 'signup') && (
-            <PhoneInput
-              value={phoneNumber}
-              onChange={setPhoneNumber}
-              disabled={loading}
-              required
-            />
+            <>
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setAuthMethod('phone')}
+                  disabled={loading}
+                  className={`px-3 py-1 rounded-md text-sm ${authMethod === 'phone' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
+                >
+                  Use phone
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMethod('email')}
+                  disabled={loading}
+                  className={`px-3 py-1 rounded-md text-sm ${authMethod === 'email' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
+                >
+                  Use email
+                </button>
+              </div>
+
+              {/* Email input - required for signup (registering with email is compulsory) */}
+              {(view === 'signup' || authMethod === 'email') && (
+                <AuthInput
+                  type="text"
+                  value={email}
+                  onChange={setEmail}
+                  placeholder="Your Email"
+                  required={view === 'signup'}
+                  disabled={loading}
+                  icon={<User className="w-4 h-4" />}
+                />
+              )}
+
+              {/* Phone input - shown when user chooses phone method (mainly for login) */}
+              {authMethod === 'phone' && (view === 'login' || view === 'signup') && (
+                <PhoneInput
+                  value={phoneNumber}
+                  onChange={setPhoneNumber}
+                  disabled={loading}
+                  required={authMethod === 'phone'}
+                />
+              )}
+            </>
           )}
+
 
           {/* Forgot Password Phone */}
           {view === 'forgot-password' && (
-             <AuthInput
+            <AuthInput
               type="text"
               value={forgotPasswordEmail}
               onChange={setForgotPasswordEmail}
@@ -479,7 +533,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               showPasswordToggle
               helpText={
                 'Password must be at least 6 characters'
-                  
+
               }
             />
           )}
