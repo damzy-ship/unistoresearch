@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, LogIn, UserPlus, Send, Briefcase } from 'lucide-react';
+import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { setUserId, setPhoneAuthenticated } from '../hooks/useTracking';
 import AuthHeader from './auth/AuthHeader';
@@ -139,6 +139,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           user_id: authData.user.id,
           auth_user_id: authData.user.id,
           phone_number: phoneNumber,
+          email: signupEmail,
           full_name: fullName,
           last_visit: new Date().toISOString(),
           visit_count: 1,
@@ -161,6 +162,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             .from('unique_visitors')
             .update({
               phone_number: phoneNumber,
+              email: signupEmail,
               full_name: fullName,
               last_visit: new Date().toISOString(),
               user_type: userType,
@@ -455,26 +457,28 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
           {(view === 'login' || view === 'signup') && (
             <>
-              <div className="flex gap-2 mb-3">
-                <button
-                  type="button"
-                  onClick={() => setAuthMethod('phone')}
-                  disabled={loading}
-                  className={`px-3 py-1 rounded-md text-sm ${authMethod === 'phone' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
-                >
-                  Use phone
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMethod('email')}
-                  disabled={loading}
-                  className={`px-3 py-1 rounded-md text-sm ${authMethod === 'email' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
-                >
-                  Use email
-                </button>
-              </div>
+              {view === 'login' && (
+                <div className="flex gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod('phone')}
+                    disabled={loading}
+                    className={`px-3 py-1 rounded-md text-sm ${authMethod === 'phone' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
+                  >
+                    Use phone
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod('email')}
+                    disabled={loading}
+                    className={`px-3 py-1 rounded-md text-sm ${authMethod === 'email' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
+                  >
+                    Use email
+                  </button>
+                </div>
+              )}
 
-              {/* Email input - required for signup (registering with email is compulsory) */}
+              {/* Email input - always visible on signup; visible on login when authMethod === 'email' */}
               {(view === 'signup' || authMethod === 'email') && (
                 <AuthInput
                   type="text"
@@ -483,17 +487,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   placeholder="Your Email"
                   required={view === 'signup'}
                   disabled={loading}
-                  icon={<User className="w-4 h-4" />}
+                  icon={<Mail className="w-4 h-4" />}
                 />
               )}
 
-              {/* Phone input - shown when user chooses phone method (mainly for login) */}
-              {authMethod === 'phone' && (view === 'login' || view === 'signup') && (
+              {/* Phone input - always visible on signup; visible on login when authMethod === 'phone' */}
+              {(view === 'signup' || authMethod === 'phone') && (
                 <PhoneInput
                   value={phoneNumber}
                   onChange={setPhoneNumber}
                   disabled={loading}
-                  required={authMethod === 'phone'}
+                  required={view === 'signup' || authMethod === 'phone'}
                 />
               )}
             </>
