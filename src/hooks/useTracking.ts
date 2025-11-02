@@ -141,47 +141,4 @@ export function useTracking() {
     trackVisitor();
   }, []);
 
-  const trackRequest = async (
-    university: string, 
-    requestText: string, 
-    matchedSellerIds?: string[],
-    additionalData?: {
-      generatedCategories?: string[];
-      matchedCategories?: string[];
-      sellerCategories?: Record<string, string[]>;
-      sellerRankingOrder?: string[];
-    }
-  ) => {
-    const userId = await getUserId();
-    
-    try {
-      const { data, error } = await supabase
-        .from('request_logs')
-        .insert({
-          user_id: userId,
-          university,
-          request_text: requestText,
-          matched_seller_ids: matchedSellerIds || [],
-          generated_categories: additionalData?.generatedCategories || [],
-          matched_categories: additionalData?.matchedCategories || [],
-          seller_categories: additionalData?.sellerCategories || {},
-          seller_ranking_order: additionalData?.sellerRankingOrder || [],
-          created_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error tracking request:', error);
-        return null;
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Error tracking request:', error);
-      return null;
-    }
-  };
-
-  return { trackRequest };
 }

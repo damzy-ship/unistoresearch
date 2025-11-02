@@ -233,8 +233,8 @@ interface MigrationResult {
 
 export async function migrateMerchantProductIDs(): Promise<MigrationResult> {
   const OLD_MERCHANT_ID = 'ca7af7d4-a6bb-416d-a57c-ba35829ba323';
-  const NEW_MERCHANT_ID = 'ad1add6a-2d62-4f39-8acf-b058de0b4045';
-  const NEW_ACTUAL_MERCHANT_ID = '5358f3ff-e157-441f-abaa-545321b0d53c';
+  const NEW_MERCHANT_ID = '0da0cf16-722b-4803-9ce8-ff352e4c7804';
+  const NEW_ACTUAL_MERCHANT_ID = '961cacc6-4e67-4b0a-935d-9d907fe58fdd';
 
   console.log(`Starting bulk migration for products with old merchant ID: ${OLD_MERCHANT_ID}`);
   console.log(`Targeting new merchant ID: ${NEW_MERCHANT_ID} and actual merchant ID: ${NEW_ACTUAL_MERCHANT_ID}`);

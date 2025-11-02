@@ -30,7 +30,11 @@ export default function ProfilePage() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
+
+
       if (session?.user) {
+
+
         const { data: visitorData, error } = await supabase
           .from('unique_visitors')
           .select('*, user_type, brand_name')
@@ -51,6 +55,12 @@ export default function ProfilePage() {
             verification_id: visitorData.verification_id,
             email: visitorData.email
           };
+
+          // console.log(session.user.email)
+
+          // if (session.user.email !== visitorData.email) {
+          //   handleUpdateEmail(session.user.email || '');
+          // }
 
           setProfile(profileData);
         }
@@ -295,7 +305,7 @@ export default function ProfilePage() {
                           Email Address
                         </p>
                         <p style={{ color: currentTheme.text }}>
-                          {profile.email ? profile.email.slice(0,5) + "***" + profile.email.slice(-9) : 'Not set'}
+                          {profile.email ? profile.email.slice(0, 5) + "***" + profile.email.slice(-9) : 'Not set'}
                         </p>
                       </div>
                       <button
@@ -364,7 +374,7 @@ export default function ProfilePage() {
                         </div>
                         {profile.verification_status === 'pending' && (
                           <div className="flex gap-2">
-                          
+
                             <button
                               onClick={() => setIsVerifyModalOpen(true)}
                               className={`p-2 rounded-full transition-colors duration-200 hover:bg-opacity-20`}

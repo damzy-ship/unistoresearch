@@ -18,6 +18,7 @@ import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import VerticalProductList from '../components/VerticalProductList';
 import CountdownTimer from '../components/CountDownTimer';
+// import { migrateMerchantProductIDs } from '../lib/databaseServices';
 // import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
 // import merchantProductData from '../data/product_data.json';
 
@@ -186,6 +187,9 @@ export default function HomePage() {
 
 
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
+              <h1>UPDATE</h1>
+            </button> */}
+            {/* <button onClick={migrateMerchantProductIDs}>
               <h1>UPDATE</h1>
             </button> */}
 

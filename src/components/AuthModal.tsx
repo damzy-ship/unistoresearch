@@ -181,14 +181,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       // Sign in with Supabase Auth using the generated email
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: phoneEmail,
+        email: 'unistorenaija@gmail.com',
         password: password
       });
 
       if (authError) {
         throw authError;
       }
-
+ 
       if (!authData.user) {
         throw new Error('Failed to log in');
       }
@@ -269,9 +269,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     try {
       // Use Supabase to send a password reset email
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+      const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
         redirectTo: `${window.location.origin}/update-password`
       });
+
+      console.log(data);
 
       if (resetError) {
         console.error('Supabase reset error:', resetError);
