@@ -172,7 +172,6 @@ export default function HomePage() {
             />
           )}
           <Toaster position="top-center" richColors />
-          <CountdownTimer />
 
           <CountdownTimer />
 
