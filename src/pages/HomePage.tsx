@@ -174,8 +174,6 @@ export default function HomePage() {
           <Toaster position="top-center" richColors />
           <CountdownTimer />
 
-          <CountdownTimer />
-
           <div className="w-full flex flex-col items-center justify-center">
             {/* User Menu */}
             <div className="w-full max-w-2xl mx-auto">
