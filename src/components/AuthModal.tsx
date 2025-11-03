@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail } from 'lucide-react';
+import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { setUserId, setPhoneAuthenticated, getUserId } from '../hooks/useTracking';
 import AuthHeader from './auth/AuthHeader';
@@ -223,7 +223,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       const { data: userEmailFromUniqueVisitors } = await supabase.from('unique_visitors').select('email').eq('phone_number', phoneNumber).single();
       console.log('userEmailFromUniqueVisitors:', userEmailFromUniqueVisitors);
-      
+
       let loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
 
       if (userEmailFromUniqueVisitors && userEmailFromUniqueVisitors.email) {
@@ -457,6 +457,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* School Dropdown */}
+          {view === 'signup' && (
+
+            <UniversitySelector
+              selectedUniversity={selectedSchoolId ?? ''}
+              onUniversityChange={(id: string) => setSelectedSchoolId(id)}
+            />
+          )}
           {/* User Type Tabs (Sign Up only) */}
           {view === 'signup' && (
             <div className="flex bg-gray-100 rounded-xl p-1 mb-4">
@@ -487,32 +496,28 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               type="text"
               value={fullName}
               onChange={setFullName}
-              placeholder="Your Full Name"
+              placeholder="Full Name"
               required
               disabled={loading}
               icon={<User className="w-4 h-4" />}
             />
           )}
+
+
           {view === 'signup' && userType === 'merchant' && (
             <AuthInput
               type="text"
               value={brandName}
               onChange={setBrandName}
-              placeholder="Your Brand Name"
+              placeholder="Brand Name"
               required
               disabled={loading}
-              icon={<User className="w-4 h-4" />}
+              icon={<Tag className="w-4 h-4" />}
             />
           )}
 
-          {/* School Dropdown (Merchant Sign Up only) */}
-          {view === 'signup' && (
 
-            <UniversitySelector
-              selectedUniversity={selectedSchoolId ?? ''}
-              onUniversityChange={(id: string) => setSelectedSchoolId(id)}
-            />
-          )}
+
 
           {(view === 'login' || view === 'signup') && (
             <>
@@ -543,7 +548,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   type="text"
                   value={email}
                   onChange={setEmail}
-                  placeholder="Your Email"
+                  placeholder="Email"
                   required={view === 'signup'}
                   disabled={loading}
                   icon={<Mail className="w-4 h-4" />}
