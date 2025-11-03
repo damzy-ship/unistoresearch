@@ -152,6 +152,8 @@ export default function HomePage() {
 
       {selectedSchoolId ?
 
+      //remeber to add back py-8 to main classname after hostel mode launch
+
         <main
           className="flex min-h-screen flex-col items-center justify-center transition-colors duration-300"
           style={{ backgroundColor: currentTheme.background }}
@@ -172,21 +174,23 @@ export default function HomePage() {
           <Toaster position="top-center" richColors />
           <CountdownTimer />
 
+          <CountdownTimer />
+
           <div className="w-full flex flex-col items-center justify-center">
             {/* User Menu */}
             <div className="w-full max-w-2xl mx-auto">
               <Header onAuthClick={() => setShowAuthModal(true)} />
             </div>
 
-            {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
-            <h1>Get Matching Categories and Features</h1>
-          </button> */}
+            {/* <WelcomeEmailSender /> */}
+
+
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
-            <h1>UPDATE</h1>
-          </button> */}
-            {/* <button onClick={() => updateAllMerchantProductsFromVisitors()}>
-            <h1>UPDATE ALL MERCHANTS PRODUCTS FROM VISITORS</h1>
-          </button>  */}
+              <h1>UPDATE</h1>
+            </button> */}
+            {/* <button onClick={migrateMerchantProductIDs}>
+              <h1>UPDATE</h1>
+            </button> */}
 
             {/* UniStore Logo */}
             <div className="mb-12 px-2">

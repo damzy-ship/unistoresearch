@@ -48,6 +48,7 @@ export interface UniqueVisitor {
   user_type?: string;
   school_id?: string;
   brand_name?: string | null;
+  email?: string;
   verification_status?: 'pending' | 'verified' | 'unverified'| null;
   verification_id?: string;
   hostel_id?: string

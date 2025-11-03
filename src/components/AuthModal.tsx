@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, LogIn, UserPlus, Send, Briefcase } from 'lucide-react';
+import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { setUserId, setPhoneAuthenticated } from '../hooks/useTracking';
-import { sendOTP, verifyOTP } from '../lib/smsService';
-import { toast } from 'react-hot-toast';
+import { setUserId, setPhoneAuthenticated, getUserId } from '../hooks/useTracking';
 import AuthHeader from './auth/AuthHeader';
 import AuthInput from './auth/AuthInput';
 import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
-import OTPInput from './auth/OTPInput';
 import UniversitySelector from './UniversitySelector';
 
 interface AuthModalProps {
@@ -17,7 +14,7 @@ interface AuthModalProps {
   onSuccess: () => void;
 }
 
-type AuthView = 'login' | 'signup' | 'forgot-password' | 'verify-otp' | 'reset-password';
+type AuthView = 'login' | 'signup' | 'forgot-password' | 'check-email';
 type UserType = 'user' | 'merchant';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
@@ -25,17 +22,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [fullName, setFullName] = useState('');
   const [brandName, setBrandName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('+234');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [displayOtp, setDisplayOtp] = useState<string | null>(null);
+  const [authMethod, setAuthMethod] = useState<'phone' | 'email'>('phone');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [forgotPasswordPhone, setForgotPasswordPhone] = useState('+234');
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [checkEmailMessage, setCheckEmailMessage] = useState('');
 
   // New state for user type and schools
   const [userType, setUserType] = useState<UserType>('user');
-  const [selectedSchoolId, setSelectedSchoolId] = useState("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>("684c03a5-a18d-4df9-b064-0aaeee2a5f01");
 
   useEffect(() => {
     if (isOpen) {
@@ -45,27 +42,34 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setBrandName('');
       setPhoneNumber('+234');
       setPassword('');
-      setConfirmPassword('');
-      setOtp('');
-      setDisplayOtp(null);
       setError('');
-      setForgotPasswordPhone('+234');
+      setForgotPasswordEmail('');
       setUserType('user'); // Reset user type on modal open
       setSelectedSchoolId(null);
+      setAuthMethod('phone');
     }
   }, [isOpen]);
 
   const validateInputs = () => {
-    if (phoneNumber.length < 14) {
-      setError('Please enter a complete phone number');
-      return false;
-    }
-
+    // Validate password
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return false;
     }
 
+    // Validate inputs for login depending on method
+    if (view === 'login') {
+      if (authMethod === 'phone' && phoneNumber.length < 14) {
+        setError('Please enter a complete phone number');
+        return false;
+      }
+      if (authMethod === 'email' && !email.includes('@')) {
+        setError('Please enter a valid email address');
+        return false;
+      }
+    }
+
+    // Signup validations
     if (view === 'signup' && !fullName.trim()) {
       setError('Please enter your full name');
       return false;
@@ -77,22 +81,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       return false;
     }
 
-    return true;
-  };
-
-  const validatePasswordReset = () => {
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    // Make registering with email compulsory
+    if (view === 'signup' && !email.includes('@')) {
+      setError('Please provide a valid email address to register');
       return false;
     }
 
     return true;
   };
+
+
 
   const handleSignUp = async () => {
     if (!validateInputs()) return;
@@ -101,21 +99,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
 
     try {
-      // Create a unique email from the phone number for Supabase Auth
-      const phoneEmail = `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
+      const signupEmail = email.trim();
+      // 1. Get the current anonymous ID stored in local storage BEFORE auth call
+      const currentLocalUserId = await getUserId();
 
-      // Prepare user metadata
+      // Prepare user metadata for Supabase Auth
       const userMetadata = {
         full_name: fullName,
         phone_number: phoneNumber,
-        user_type: userType, // Save user type to auth metadata
+        user_type: userType,
         school_id: selectedSchoolId,
-        ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
+        ...(userType === 'merchant' && { brand_name: brandName })
       };
 
-      // Sign up with Supabase Auth using the generated email
+      // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: phoneEmail,
+        email: signupEmail,
         password: password,
         options: {
           data: userMetadata
@@ -124,7 +123,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       if (authError) {
         if (authError.message?.includes('already registered')) {
-          setError('An account with this phone number already exists. Please sign in instead.');
+          setError('An account with this email already exists. Please sign in instead.');
           return;
         }
         throw authError;
@@ -134,55 +133,79 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         throw new Error('Failed to create user account');
       }
 
-      // Create or update visitor record
-      const { error: visitorError } = await supabase
+      const newAuthUserId = authData.user.id;
+
+      // **2. Set the permanent Auth ID in local storage immediately**
+      setUserId(newAuthUserId);
+      localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
+
+      // **3. Merge/Upsert Visitor Record**
+
+      // Check for an existing anonymous record with the user's old local ID
+      const { data: existingAnonVisitor } = await supabase
         .from('unique_visitors')
-        .insert({
-          user_id: authData.user.id,
-          auth_user_id: authData.user.id,
+        .select('id, visit_count')
+        .eq('user_id', currentLocalUserId) // Check using the old local ID
+        .limit(1)
+        .maybeSingle();
+
+      if (existingAnonVisitor) {
+        // **A. Found anonymous record: Attempt to merge its history by updating it**
+        const mergePayload = {
+          auth_user_id: newAuthUserId,
           phone_number: phoneNumber,
+          email: signupEmail,
           full_name: fullName,
-          last_visit: new Date().toISOString(),
-          visit_count: 1,
-          user_type: userType, // Save user user_type
+          user_type: userType,
           school_id: selectedSchoolId,
-          ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
-        });
+          last_visit: new Date().toISOString(),
+          visit_count: existingAnonVisitor.visit_count + 1, // Keep old visits + 1 for sign-up
+          ...(userType === 'merchant' && { brand_name: brandName })
+        };
 
-      if (visitorError) {
-        console.error('Error updating visitor record:', visitorError);
-        // Try to update existing record
-        const { data: existingVisitor } = await supabase
+        const { error: updateError } = await supabase
           .from('unique_visitors')
-          .select('id')
-          .eq('auth_user_id', authData.user.id)
-          .single();
+          .update(mergePayload)
+          .eq('id', existingAnonVisitor.id);
 
-        if (existingVisitor) {
-          await supabase
-            .from('unique_visitors')
-            .update({
-              phone_number: phoneNumber,
-              full_name: fullName,
-              last_visit: new Date().toISOString(),
-              user_type: userType,
-              school_id: selectedSchoolId,
-              ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
-            })
-            .eq('id', existingVisitor.id);
+        if (updateError) {
+          // If the merge update fails, we warn and let the final upsert handle creation/update.
+          console.warn('Warning: Failed to merge anonymous record on sign-up.', updateError);
         }
       }
 
-      // Set user as authenticated
-      setUserId(authData.user.id);
-      localStorage.setItem('selectedSchoolId', selectedSchoolId);
-      setPhoneAuthenticated(true);
+      // **B. Final Insert/Upsert:** Guarantees a canonical authenticated record exists.
+      // This runs whether a merge happened, failed, or no anonymous record existed.
+      const finalRecordPayload = {
+        user_id: newAuthUserId, // Auth ID is now the permanent user_id
+        auth_user_id: newAuthUserId,
+        phone_number: phoneNumber,
+        email: signupEmail,
+        full_name: fullName,
+        last_visit: new Date().toISOString(),
+        visit_count: 1, // Start count at 1 (if new record)
+        user_type: userType,
+        school_id: selectedSchoolId,
+        ...(userType === 'merchant' && { brand_name: brandName })
+      };
 
+      // Use upsert on the canonical key (auth_user_id) to ensure exactly one record exists.
+      const { error: upsertError } = await supabase
+        .from('unique_visitors')
+        .upsert(finalRecordPayload, { onConflict: 'auth_user_id', ignoreDuplicates: false });
+
+      if (upsertError) {
+        console.error('Error ensuring final visitor record on sign up:', upsertError);
+      }
+
+      // Final steps
+      setPhoneAuthenticated(true);
       onSuccess();
       onClose();
-    } catch (error: any) {
-      console.error('Sign up error:', error);
-      setError(error.message || 'Failed to sign up. Please try again.');
+    } catch (err) {
+      console.error('Sign up error:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to sign up. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -194,13 +217,23 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(true);
     setError('');
 
-    try {
-      // Create a unique email from the phone number for Supabase Auth
-      const phoneEmail = `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
 
-      // Sign in with Supabase Auth using the generated email
+
+    try {
+
+      const { data: userEmailFromUniqueVisitors } = await supabase.from('unique_visitors').select('email').eq('phone_number', phoneNumber).single();
+      console.log('userEmailFromUniqueVisitors:', userEmailFromUniqueVisitors);
+
+      let loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
+
+      if (userEmailFromUniqueVisitors && userEmailFromUniqueVisitors.email) {
+        loginEmail = userEmailFromUniqueVisitors.email;
+      }
+
+
+      // 1. Sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: phoneEmail,
+        email: loginEmail,
         password: password
       });
 
@@ -212,73 +245,101 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         throw new Error('Failed to log in');
       }
 
-      // Update visitor record
+      const loggedInAuthUserId = authData.user.id;
+
+      // **NEW: Consolidate data from Auth Metadata**
+      const authMetadata = authData.user.identities[0].identity_data || {};
+      const existingPhoneNumber = authMetadata.phone_number || '';
+      const existingFullName = authMetadata.full_name || '';
+
+      // Determine the phone number to save: Use the one from the form if provided, otherwise use the existing one.
+      // NOTE: 'phoneNumber' state might be empty if logging in with email.
+      const finalPhoneNumber = existingPhoneNumber;
+
+      // Determine the email to save: Use the one from the auth session if the user logged in via phone number alias.
+      const finalEmail = authData.user.email || '';
+
+      // **2. Set the permanent Auth ID in local storage immediately**
+      setUserId(loggedInAuthUserId);
+      setPhoneAuthenticated(true);
+
+      // **3. Update Visitor Record**
+
+      // The preferred way to find a visitor record for a logged-in user is by Auth ID.
       const { data: visitorData, error: visitorFetchError } = await supabase
         .from('unique_visitors')
-        .select('*')
-        .or(`phone_number.eq.${phoneNumber},auth_user_id.eq.${authData.user.id}`)
+        .select('id, user_id, school_id, visit_count, phone_number, email')
+        .eq('auth_user_id', loggedInAuthUserId)
         .limit(1);
 
       if (visitorFetchError && visitorFetchError.code !== 'PGRST116') {
         console.error('Error fetching visitor record:', visitorFetchError);
       }
 
+      let schoolIdToSet = '';
+
       if (visitorData && visitorData.length > 0) {
-        // Update existing visitor
+        // **A. Update existing visitor**
+        const existingVisitor = visitorData[0];
+        schoolIdToSet = existingVisitor.school_id;
+
+        // Only update fields that should change (visit count, time, and potentially phone/email if they changed)
+        const updatePayload = {
+          last_visit: new Date().toISOString(),
+          visit_count: (existingVisitor.visit_count || 0) + 1,
+          email: finalEmail,
+          phone_number: finalPhoneNumber,
+        };
+
         const { error: updateError } = await supabase
           .from('unique_visitors')
-          .update({
-            auth_user_id: authData.user.id,
-            phone_number: phoneNumber,
-            last_visit: new Date().toISOString(),
-            visit_count: (visitorData[0].visit_count || 0) + 1
-          })
-          .eq('id', visitorData[0].id);
+          .update(updatePayload)
+          .eq('id', existingVisitor.id);
 
         if (updateError) {
-          console.error('Error updating visitor record:', updateError);
+          console.error('Error updating visitor record on login:', updateError);
         }
 
-        // Set user ID to match existing visitor
-        setUserId(visitorData[0].user_id);
-        localStorage.setItem('selectedSchoolId', visitorData[0].school_id);
       } else {
-        // Create new visitor record if no existing visitor found
+        // **B. Create new visitor record** (Crucial Safety Net)
         const { data: newVisitor, error: insertError } = await supabase
           .from('unique_visitors')
           .insert({
-            user_id: authData.user.id,
-            auth_user_id: authData.user.id,
-            phone_number: phoneNumber,
-            full_name: authData.user.user_metadata?.full_name || '',
+            user_id: loggedInAuthUserId,
+            auth_user_id: loggedInAuthUserId,
+            // phone_number: finalPhoneNumber, // Use the consolidated data
+            // email: finalEmail,             // Use the consolidated data
+            full_name: existingFullName,
             last_visit: new Date().toISOString(),
             visit_count: 1
           })
-          .select()
+          .select('school_id')
           .single();
 
         if (insertError) {
-          console.error('Error creating visitor record:', insertError);
+          console.error('Error creating visitor record on login:', insertError);
         } else if (newVisitor) {
-          setUserId(newVisitor.user_id);
+          schoolIdToSet = newVisitor.school_id;
         }
       }
 
-      setPhoneAuthenticated(true);
+      // Final steps
+      localStorage.setItem('selectedSchoolId', schoolIdToSet ?? '');
       onSuccess();
       window.location.reload();
       onClose();
-    } catch (error: any) {
-      console.error('Login error:', error);
-      setError(error.message || 'Failed to log in. Please try again.');
+    } catch (err) {
+      console.error('Login error:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to log in. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSendOtp = async () => {
-    if (forgotPasswordPhone.length < 14) {
-      setError('Please enter a complete phone number');
+    if (!forgotPasswordEmail.includes('@')) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -286,144 +347,32 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
 
     try {
-      // Check if user exists
-      const { data: userData, error: userError } = await supabase
-        .from('unique_visitors')
-        .select('auth_user_id')
-        .eq('phone_number', forgotPasswordPhone)
-        .maybeSingle();
-
-      if (userError || !userData?.auth_user_id) {
-        setError('No account found with this phone number');
-        setLoading(false);
-        return;
-      }
-
-      // Send OTP via SMS service
-      const result = await sendOTP(forgotPasswordPhone);
-
-      if (!result.success) {
-        setError(result.error || 'Failed to send OTP');
-        setLoading(false);
-        return;
-      }
-
-      // If SMS service is not configured, show OTP on screen
-      if (result.otp) {
-        setDisplayOtp(result.otp);
-        toast.success(`Your OTP is: ${result.otp}`, { duration: 10000 });
-      } else {
-        toast.success('OTP sent to your phone number');
-      }
-
-      // Move to verification view
-      setView('verify-otp');
-
-    } catch (error: any) {
-      console.error('Error sending OTP:', error);
-      setError('Failed to send OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length !== 6) {
-      setError('Please enter a valid 6-digit OTP');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // Verify OTP using the SMS service
-      const isValid = await verifyOTP(forgotPasswordPhone, otp);
-
-      if (!isValid) {
-        setError('Invalid or expired OTP. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      // Move to reset password view
-      setView('reset-password');
-
-    } catch (error: any) {
-      console.error('Error verifying OTP:', error);
-      setError('Failed to verify OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (!validatePasswordReset()) return;
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // Create a unique email from the phone number for Supabase Auth
-      const phoneEmail = `${forgotPasswordPhone.replace(/\+/g, '')}@phone.unistore.local`;
-
-      // Sign in with the phone email to get the session
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: phoneEmail,
-        password: 'temp_password_for_reset' // This will fail but we need the user context
+      // Use Supabase to send a password reset email
+      const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/update-password`
       });
 
-      // Since we can't use admin functions, we'll update via the auth API
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password
-      });
+      console.log(data);
 
-      if (updateError) {
-        // If direct update fails, try alternative approach
-        console.error('Direct password update failed:', updateError);
-
-        // Get user data to verify they exist
-        const { data: userData } = await supabase
-          .from('unique_visitors')
-          .select('auth_user_id')
-          .eq('phone_number', forgotPasswordPhone)
-          .single();
-
-        if (!userData?.auth_user_id) {
-          setError('User not found');
-          setLoading(false);
-          return;
-        }
-
-        // For now, we'll show success but the password reset might need manual intervention
-        console.warn('Password reset may require manual intervention');
+      if (resetError) {
+        console.error('Supabase reset error:', resetError);
+        setError(resetError.message || 'Failed to send reset email');
+        setLoading(false);
+        return;
       }
 
-      // Show success message
-      toast.success('Password reset successfully! Please sign in with your new password.');
-
-      // Reset view to login
-      setView('login');
-      setPassword('');
-      setConfirmPassword('');
-      setOtp('');
-
-    } catch (error: any) {
-      console.error('Error resetting password:', error);
-      setError('Password reset completed. Please try signing in with your new password.');
-
-      // Reset to login view even if there was an "error"
-      setTimeout(() => {
-        setView('login');
-        setPassword('');
-        setConfirmPassword('');
-        setOtp('');
-        setError('');
-      }, 2000);
+      setCheckEmailMessage(`A password reset link was sent to ${forgotPasswordEmail}. Check your email and follow the instructions.`);
+      setView('check-email');
+    } catch (err) {
+      console.error('Error sending reset email:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  // The reset flow is handled by Supabase sending a reset link to the user's email.
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -436,12 +385,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         break;
       case 'forgot-password':
         handleSendOtp();
-        break;
-      case 'verify-otp':
-        handleVerifyOtp();
-        break;
-      case 'reset-password':
-        handleResetPassword();
         break;
     }
   };
@@ -471,21 +414,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       case 'forgot-password':
         return {
           title: 'Reset Password',
-          subtitle: 'Enter your phone number to receive a verification code.',
+          subtitle: 'Enter your email address to receive a password reset link.',
           showBack: true
         };
-      case 'verify-otp':
+      case 'check-email':
         return {
-          title: 'Verify Code',
-          subtitle: 'Enter the verification code sent to your phone.',
+          title: 'Check your email',
+          subtitle: checkEmailMessage || 'We sent a password reset link to your email.',
           showBack: true
         };
-      case 'reset-password':
-        return {
-          title: 'Set New Password',
-          subtitle: 'Create a new password for your account.',
-          showBack: true
-        };
+
       default:
         return {
           title: 'Authentication',
@@ -505,7 +443,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           subtitle={viewConfig.subtitle}
           onClose={handleClose}
           onBack={() => {
-            if (view === 'verify-otp' || view === 'reset-password') {
+            if (view === 'check-email') {
               setView('forgot-password');
             } else {
               setView('login');
@@ -516,18 +454,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         />
 
         {/* Display OTP on screen if SMS service is not configured */}
-        {displayOtp && view === 'verify-otp' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-            <p className="text-yellow-800 text-sm">
-              <strong>Note:</strong> SMS service is not configured. Your OTP is:
-            </p>
-            <p className="text-center font-mono text-lg font-bold text-yellow-900 mt-2">
-              {displayOtp}
-            </p>
-          </div>
-        )}
+
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* School Dropdown */}
+          {view === 'signup' && (
+
+            <UniversitySelector
+              selectedUniversity={selectedSchoolId ?? ''}
+              onUniversityChange={(id: string) => setSelectedSchoolId(id)}
+            />
+          )}
           {/* User Type Tabs (Sign Up only) */}
           {view === 'signup' && (
             <div className="flex bg-gray-100 rounded-xl p-1 mb-4">
@@ -558,95 +496,118 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               type="text"
               value={fullName}
               onChange={setFullName}
-              placeholder="Your Full Name"
+              placeholder="Full Name"
               required
               disabled={loading}
               icon={<User className="w-4 h-4" />}
             />
           )}
+
+
           {view === 'signup' && userType === 'merchant' && (
             <AuthInput
               type="text"
               value={brandName}
               onChange={setBrandName}
-              placeholder="Your Brand Name"
+              placeholder="Brand Name"
               required
               disabled={loading}
-              icon={<User className="w-4 h-4" />}
-            />
-          )}
-
-          {/* School Dropdown (Merchant Sign Up only) */}
-          {view === 'signup' && (
-
-            <UniversitySelector
-              selectedUniversity={selectedSchoolId}
-              onUniversityChange={setSelectedSchoolId}
+              icon={<Tag className="w-4 h-4" />}
             />
           )}
 
 
-          {/* Phone Number */}
+
+
           {(view === 'login' || view === 'signup') && (
-            <PhoneInput
-              value={phoneNumber}
-              onChange={setPhoneNumber}
-              disabled={loading}
-              required
-            />
+            <>
+              {view === 'login' && (
+                <div className="flex gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod('phone')}
+                    disabled={loading}
+                    className={`px-3 py-1 rounded-md text-sm ${authMethod === 'phone' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
+                  >
+                    Use phone
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod('email')}
+                    disabled={loading}
+                    className={`px-3 py-1 rounded-md text-sm ${authMethod === 'email' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
+                  >
+                    Use email
+                  </button>
+                </div>
+              )}
+
+              {/* Email input - always visible on signup; visible on login when authMethod === 'email' */}
+              {(view === 'signup' || authMethod === 'email') && (
+                <AuthInput
+                  type="text"
+                  value={email}
+                  onChange={setEmail}
+                  placeholder="Email"
+                  required={view === 'signup'}
+                  disabled={loading}
+                  icon={<Mail className="w-4 h-4" />}
+                />
+              )}
+
+              {/* Phone input - always visible on signup; visible on login when authMethod === 'phone' */}
+              {(view === 'signup' || authMethod === 'phone') && (
+                <PhoneInput
+                  value={phoneNumber}
+                  onChange={setPhoneNumber}
+                  disabled={loading}
+                  required={view === 'signup' || authMethod === 'phone'}
+                />
+              )}
+            </>
           )}
+
 
           {/* Forgot Password Phone */}
           {view === 'forgot-password' && (
-            <PhoneInput
-              value={forgotPasswordPhone}
-              onChange={setForgotPasswordPhone}
-              disabled={loading}
+            <AuthInput
+              type="text"
+              value={forgotPasswordEmail}
+              onChange={setForgotPasswordEmail}
+              placeholder="Your Email"
               required
+              disabled={loading}
+              icon={<Mail className="w-4 h-4" />}
             />
+
           )}
 
-          {/* OTP Input */}
-          {view === 'verify-otp' && (
-            <OTPInput
-              value={otp}
-              onChange={setOtp}
-              disabled={loading}
-            />
+          {view === 'check-email' && (
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+              <p className="text-sm text-blue-800">{checkEmailMessage || 'A password reset link was sent. Check your email.'}</p>
+            </div>
           )}
 
           {/* Password */}
-          {(view === 'login' || view === 'signup' || view === 'reset-password') && (
+          {(view === 'login' || view === 'signup') && (
             <AuthInput
               type="password"
               value={password}
               onChange={setPassword}
-              placeholder={view === 'reset-password' ? 'Enter new password' : 'Enter password'}
+              placeholder={'Enter password'}
               required
               disabled={loading}
               icon={<Lock className="w-4 h-4" />}
               showPasswordToggle
               helpText={
-                (view === 'signup' || view === 'reset-password')
-                  ? 'Password must be at least 6 characters'
-                  : undefined
+                'Password must be at least 6 characters'
+
               }
             />
           )}
 
           {/* Confirm Password (Reset Password only) */}
-          {view === 'reset-password' && (
-            <AuthInput
-              type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              placeholder="Confirm new password"
-              required
-              disabled={loading}
-              icon={<Lock className="w-4 h-4" />}
-              showPasswordToggle
-            />
-          )}
+          {/** reset handled via email link; no in-modal reset UI **/}
 
           {/* Forgot Password Link (Login view only) */}
           {view === 'login' && (
@@ -698,12 +659,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
               {view === 'forgot-password' && (
                 <>
-                  {loading ? 'Sending Code...' : 'Send Verification Code'}
+                  {loading ? 'Sending link...' : 'Confirm'}
                   {!loading && <Send className="w-4 h-4 ml-2" />}
                 </>
               )}
-              {view === 'verify-otp' && (loading ? 'Verifying...' : 'Verify Code')}
-              {view === 'reset-password' && (loading ? 'Resetting Password...' : 'Reset Password')}
+              {view === 'check-email' && (loading ? 'Processing...' : 'Ok')}
             </AuthButton>
           </div>
         </form>

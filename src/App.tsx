@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme';
 import HomePage from './pages/HomePage';
@@ -19,7 +19,16 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
 import AllProductsPage from './pages/AllProductsPage';
 import CategoryProductsPage from './pages/CategoryProductsPage';
+import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import UserMenu from './components/UserMenu';
+import HostelHomePage from './pages/HostelHomePage';
+import { useHostelMode } from './hooks/useHostelMode';
+
+function HomeEntry() {
+  const { hostelMode } = useHostelMode();
+  if (hostelMode) return <Navigate to="/hostel" replace />;
+  return <HomePage />;
+}
 
 function App() {
   const { currentTheme } = useTheme();
@@ -36,7 +45,8 @@ function App() {
         <Toaster position="top-center" richColors />
         <AnnouncementBar />
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomeEntry />} />
+            <Route path="/hostel" element={<HostelHomePage />} />
             <Route path="/landing-page" element={<LandingPage />} />
             <Route path="/past-requests" element={<PastRequestsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -53,6 +63,7 @@ function App() {
             <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
             <Route path="/all-products" element={<AllProductsPage />} />
             <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
+            <Route path="/update-password" element={<UpdatePasswordPage />} />
           </Routes>
         </div>
       </Router>

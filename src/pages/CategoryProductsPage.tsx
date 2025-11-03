@@ -11,6 +11,8 @@ import ConfirmContactModal from '../components/ConfirmContactModal';
 import ContactSellerLink from '../components/ContactSellerLink';
 import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
+import { useHostelMode } from '../hooks/useHostelMode';
+import ProductImageModal from '../components/ProductImageModal';
 
 
 const CategoryProductsPage: React.FC = () => {
@@ -23,9 +25,11 @@ const CategoryProductsPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const { currentTheme } = useTheme();
+    const { hostelMode } = useHostelMode();
     const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingProduct, setPendingProduct] = useState<Partial<Product> | null>(null);
+    const [selectedImageModal, setSelectedImageModal] = useState<{ product: Product; imageIndex: number } | null>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -142,27 +146,36 @@ const CategoryProductsPage: React.FC = () => {
                             <div key={product.id} className="rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden flex flex-col border border-gray-200"
                                 style={{ backgroundColor: currentTheme.background }}
                             >
-                                <Swiper
-                                    modules={[Pagination, Navigation]}
-                                    spaceBetween={10}
-                                    slidesPerView={1}
-                                    pagination={{ clickable: true }}
-                                    navigation
-                                    className="w-full h-64"
+                                <div
+                                    className="relative w-full h-64 cursor-pointer"
+                                    onClick={() => setSelectedImageModal({ product, imageIndex: 0 })}
                                 >
-                                    {product.image_urls.map((url, imgIndex) => (
-                                        <SwiperSlide key={imgIndex}>
-                                            <div className="relative w-full h-full">
-                                                <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
-                                                {product.school_short_name && (
-                                                    <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
-                                                        {product.school_short_name}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
+                                    <Swiper
+                                        modules={[Pagination, Navigation]}
+                                        spaceBetween={10}
+                                        slidesPerView={1}
+                                        pagination={{ clickable: true }}
+                                        navigation
+                                        className="w-full h-full"
+                                        onSlideChange={(swiper) => {
+                                            const currentSlide = swiper.activeIndex;
+                                            setSelectedImageModal(prev => prev ? { ...prev, imageIndex: currentSlide } : null);
+                                        }}
+                                    >
+                                        {product.image_urls.map((url, imgIndex) => (
+                                            <SwiperSlide key={imgIndex}>
+                                                <div className="relative w-full h-full">
+                                                    <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                                                    {product.school_short_name && (
+                                                        <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
+                                                            {product.school_short_name}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+                                </div>
 
                                 <div className="p-6 flex flex-col flex-grow">
                                     <h3 className="text-xl font-bold mb-2 text-gray-800"
@@ -183,10 +196,18 @@ const CategoryProductsPage: React.FC = () => {
                                             className="text-3xl font-black mb-2">₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-sm mb-2"
+                                        <p className="text-sm mb-1"
                                             style={{ color: currentTheme.text }}
                                         >
                                             by <span className="font-semibold">{product.full_name}</span>
+                                        </p>
+                                    )}
+                                    {hostelMode && (product.is_hostel_product || product.unique_visitors?.is_hostel_merchant) && (
+                                        <p className="text-xs mb-2"
+                                            style={{ color: currentTheme.text }}
+                                        >
+                                            Hostel: <span className="font-medium">{product.unique_visitors?.hostels?.name || 'Unknown Hostel'}</span>
+                                            {product.unique_visitors?.room ? ` • Room ${product.unique_visitors.room}` : ''}
                                         </p>
                                     )}
                                     <p className={`text-sm font-bold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>
@@ -221,6 +242,18 @@ const CategoryProductsPage: React.FC = () => {
                     }}
                 />
             </div>
+
+            {/* Image Modal */}
+            {selectedImageModal && (
+                <ProductImageModal
+                    images={selectedImageModal.product.image_urls}
+                    initialIndex={selectedImageModal.imageIndex}
+                    isOpen={!!selectedImageModal}
+                    onClose={() => setSelectedImageModal(null)}
+                    productTitle={selectedImageModal.product.product_description}
+                    merchantName={selectedImageModal.product.brand_name || selectedImageModal.product.full_name || 'Unknown Seller'}
+                />
+            )}
 
             {/* Auth handled inside ContactSellerButton */}
         </div>
