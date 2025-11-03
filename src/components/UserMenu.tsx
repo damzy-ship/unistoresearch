@@ -79,7 +79,7 @@ export default function UserMenu() {
       </div>
 
       <div className="p-2 flex-1 overflow-y-auto">
-        <button
+        {/* <button
           onClick={() => {
             setHostelMode(false);
             setMobileOpen(false);
@@ -99,9 +99,9 @@ export default function UserMenu() {
           className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         >
           Hostel Mode
-        </button>
+        </button> */}
 
-        <div className="px-3 py-1 text-xs text-gray-500">Current: {hostelMode ? 'Hostel' : 'Store'}</div>
+        {/* <div className="px-3 py-1 text-xs text-gray-500">Current: {hostelMode ? 'Hostel' : 'Store'}</div> */}
 
         <button
           onClick={() => { navigate('/profile'); setMobileOpen(false); }}
