@@ -206,8 +206,7 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
                                         <p className="text-xs mb-3"
                                             style={{ color: currentTheme.text }}
                                         >
-                                            Hostel: <span className="font-medium">{product.hostel_name || 'Unknown Hostel'}</span>
-                                            {product?.room ? ` • Room ${product.room}` : ''}
+                                            by <span className="font-medium">{product.brand_name ? product.brand_name :product.full_name}</span>
                                         </p>
                                     )}
                                     {product.phone_number && (

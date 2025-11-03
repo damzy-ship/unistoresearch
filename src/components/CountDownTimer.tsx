@@ -89,7 +89,7 @@ const CountdownTimer: FC = () => {
 
   // The rest of the component is standard JSX
   return (
-    <div className="w-full font-sans p-4 sm:p-6 bg-gradient-to-r from-orange-400 to-red-500 text-white border-b-4 border-orange-600 shadow-xl overflow-hidden relative">
+    <div className="w-full font-sans p-4 sm:p-6 mb-6 bg-gradient-to-r from-orange-400 to-red-500 text-white border-b-4 border-orange-600 shadow-xl overflow-hidden relative">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-20 z-0" style={{
           backgroundImage: 'radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',

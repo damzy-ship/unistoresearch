@@ -205,15 +205,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                         <p className="text-sm mb-1 flex-grow"
                                             style={{ color: currentTheme.text }}
                                         >
-                                            by <span className="font-medium">{product?.brand_name ? product.brand_name : product.full_name}</span>
-                                        </p>
-                                    )}
-                                    {hostelMode && (product.is_hostel_product && product.is_hostel_merchant)  && (
-                                        <p className="text-xs mb-3"
-                                            style={{ color: currentTheme.text }}
-                                        >
-                                            Hostel: <span className="font-medium">{product.hostel_name || 'Unknown Hostel'}</span>
-                                            {product?.room ? ` • Room ${product.room}` : ''}
+                                            by <span className="font-medium">{product.brand_name ? product.brand_name : product.full_name}</span>
                                         </p>
                                     )}
                                     {/* <p className={`text-sm font-semibold mb-4 ${product.is_available ? 'text-green-500' : 'text-red-500'}`}>
