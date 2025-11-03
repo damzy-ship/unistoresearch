@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { setUserId, setPhoneAuthenticated } from '../hooks/useTracking';
+import { setUserId, setPhoneAuthenticated, getUserId } from '../hooks/useTracking';
 import AuthHeader from './auth/AuthHeader';
 import AuthInput from './auth/AuthInput';
 import AuthButton from './auth/AuthButton';
@@ -99,19 +99,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
 
     try {
-      // Use the provided email for signup (registration with email is compulsory)
       const signupEmail = email.trim();
+      // 1. Get the current anonymous ID stored in local storage BEFORE auth call
+      const currentLocalUserId = await getUserId();
 
-      // Prepare user metadata
+      // Prepare user metadata for Supabase Auth
       const userMetadata = {
         full_name: fullName,
         phone_number: phoneNumber,
-        user_type: userType, // Save user type to auth metadata
+        user_type: userType,
         school_id: selectedSchoolId,
-        ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
+        ...(userType === 'merchant' && { brand_name: brandName })
       };
 
-      // Sign up with Supabase Auth using the generated email
+      // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: signupEmail,
         password: password,
@@ -132,52 +133,73 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         throw new Error('Failed to create user account');
       }
 
-      // Create or update visitor record
-      const { error: visitorError } = await supabase
+      const newAuthUserId = authData.user.id;
+
+      // **2. Set the permanent Auth ID in local storage immediately**
+      setUserId(newAuthUserId);
+      localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
+
+      // **3. Merge/Upsert Visitor Record**
+
+      // Check for an existing anonymous record with the user's old local ID
+      const { data: existingAnonVisitor } = await supabase
         .from('unique_visitors')
-        .insert({
-          user_id: authData.user.id,
-          auth_user_id: authData.user.id,
+        .select('id, visit_count')
+        .eq('user_id', currentLocalUserId) // Check using the old local ID
+        .limit(1)
+        .maybeSingle();
+
+      if (existingAnonVisitor) {
+        // **A. Found anonymous record: Attempt to merge its history by updating it**
+        const mergePayload = {
+          auth_user_id: newAuthUserId,
           phone_number: phoneNumber,
           email: signupEmail,
           full_name: fullName,
-          last_visit: new Date().toISOString(),
-          visit_count: 1,
-          user_type: userType, // Save user user_type
+          user_type: userType,
           school_id: selectedSchoolId,
-          ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
-        });
+          last_visit: new Date().toISOString(),
+          visit_count: existingAnonVisitor.visit_count + 1, // Keep old visits + 1 for sign-up
+          ...(userType === 'merchant' && { brand_name: brandName })
+        };
 
-      if (visitorError) {
-        console.error('Error updating visitor record:', visitorError);
-        // Try to update existing record
-        const { data: existingVisitor } = await supabase
+        const { error: updateError } = await supabase
           .from('unique_visitors')
-          .select('id')
-          .eq('auth_user_id', authData.user.id)
-          .single();
+          .update(mergePayload)
+          .eq('id', existingAnonVisitor.id);
 
-        if (existingVisitor) {
-          await supabase
-            .from('unique_visitors')
-            .update({
-              phone_number: phoneNumber,
-              email: signupEmail,
-              full_name: fullName,
-              last_visit: new Date().toISOString(),
-              user_type: userType,
-              school_id: selectedSchoolId,
-              ...(userType === 'merchant' && { brand_name: brandName }) // Conditionally add brand_name
-            })
-            .eq('id', existingVisitor.id);
+        if (updateError) {
+          // If the merge update fails, we warn and let the final upsert handle creation/update.
+          console.warn('Warning: Failed to merge anonymous record on sign-up.', updateError);
         }
       }
 
-      // Set user as authenticated
-      setUserId(authData.user.id);
-      localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
-      setPhoneAuthenticated(true);
+      // **B. Final Insert/Upsert:** Guarantees a canonical authenticated record exists.
+      // This runs whether a merge happened, failed, or no anonymous record existed.
+      const finalRecordPayload = {
+        user_id: newAuthUserId, // Auth ID is now the permanent user_id
+        auth_user_id: newAuthUserId,
+        phone_number: phoneNumber,
+        email: signupEmail,
+        full_name: fullName,
+        last_visit: new Date().toISOString(),
+        visit_count: 1, // Start count at 1 (if new record)
+        user_type: userType,
+        school_id: selectedSchoolId,
+        ...(userType === 'merchant' && { brand_name: brandName })
+      };
 
+      // Use upsert on the canonical key (auth_user_id) to ensure exactly one record exists.
+      const { error: upsertError } = await supabase
+        .from('unique_visitors')
+        .upsert(finalRecordPayload, { onConflict: 'auth_user_id', ignoreDuplicates: false });
+
+      if (upsertError) {
+        console.error('Error ensuring final visitor record on sign up:', upsertError);
+      }
+
+      // Final steps
+      setPhoneAuthenticated(true);
       onSuccess();
       onClose();
     } catch (err) {
@@ -195,11 +217,21 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(true);
     setError('');
 
-    try {
-      // Determine login email depending on chosen method
-      const loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
 
-      // Sign in with Supabase Auth using the selected email
+
+    try {
+
+      const { data: userEmailFromUniqueVisitors } = await supabase.from('unique_visitors').select('email').eq('phone_number', phoneNumber).single();
+      console.log('userEmailFromUniqueVisitors:', userEmailFromUniqueVisitors);
+      
+      let loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
+
+      if (userEmailFromUniqueVisitors && userEmailFromUniqueVisitors.email) {
+        loginEmail = userEmailFromUniqueVisitors.email;
+      }
+
+
+      // 1. Sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password: password
@@ -213,59 +245,86 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         throw new Error('Failed to log in');
       }
 
-      // Update visitor record
+      const loggedInAuthUserId = authData.user.id;
+
+      // **NEW: Consolidate data from Auth Metadata**
+      const authMetadata = authData.user.identities[0].identity_data || {};
+      const existingPhoneNumber = authMetadata.phone_number || '';
+      const existingFullName = authMetadata.full_name || '';
+
+      // Determine the phone number to save: Use the one from the form if provided, otherwise use the existing one.
+      // NOTE: 'phoneNumber' state might be empty if logging in with email.
+      const finalPhoneNumber = existingPhoneNumber;
+
+      // Determine the email to save: Use the one from the auth session if the user logged in via phone number alias.
+      const finalEmail = authData.user.email || '';
+
+      // **2. Set the permanent Auth ID in local storage immediately**
+      setUserId(loggedInAuthUserId);
+      setPhoneAuthenticated(true);
+
+      // **3. Update Visitor Record**
+
+      // The preferred way to find a visitor record for a logged-in user is by Auth ID.
       const { data: visitorData, error: visitorFetchError } = await supabase
         .from('unique_visitors')
-        .select('*')
-        .or(`phone_number.eq.${phoneNumber},auth_user_id.eq.${authData.user.id}`)
+        .select('id, user_id, school_id, visit_count, phone_number, email')
+        .eq('auth_user_id', loggedInAuthUserId)
         .limit(1);
 
       if (visitorFetchError && visitorFetchError.code !== 'PGRST116') {
         console.error('Error fetching visitor record:', visitorFetchError);
       }
 
+      let schoolIdToSet = '';
+
       if (visitorData && visitorData.length > 0) {
-        // Update existing visitor
+        // **A. Update existing visitor**
+        const existingVisitor = visitorData[0];
+        schoolIdToSet = existingVisitor.school_id;
+
+        // Only update fields that should change (visit count, time, and potentially phone/email if they changed)
+        const updatePayload = {
+          last_visit: new Date().toISOString(),
+          visit_count: (existingVisitor.visit_count || 0) + 1,
+          email: finalEmail,
+          phone_number: finalPhoneNumber,
+        };
+
         const { error: updateError } = await supabase
           .from('unique_visitors')
-          .update({
-            auth_user_id: authData.user.id,
-            phone_number: phoneNumber,
-            last_visit: new Date().toISOString(),
-            visit_count: (visitorData[0].visit_count || 0) + 1
-          })
-          .eq('id', visitorData[0].id);
+          .update(updatePayload)
+          .eq('id', existingVisitor.id);
 
         if (updateError) {
-          console.error('Error updating visitor record:', updateError);
+          console.error('Error updating visitor record on login:', updateError);
         }
 
-        // Set user ID to match existing visitor
-        setUserId(visitorData[0].user_id);
-        localStorage.setItem('selectedSchoolId', visitorData[0].school_id);
       } else {
-        // Create new visitor record if no existing visitor found
+        // **B. Create new visitor record** (Crucial Safety Net)
         const { data: newVisitor, error: insertError } = await supabase
           .from('unique_visitors')
           .insert({
-            user_id: authData.user.id,
-            auth_user_id: authData.user.id,
-            phone_number: phoneNumber,
-            full_name: authData.user.user_metadata?.full_name || '',
+            user_id: loggedInAuthUserId,
+            auth_user_id: loggedInAuthUserId,
+            // phone_number: finalPhoneNumber, // Use the consolidated data
+            // email: finalEmail,             // Use the consolidated data
+            full_name: existingFullName,
             last_visit: new Date().toISOString(),
             visit_count: 1
           })
-          .select()
+          .select('school_id')
           .single();
 
         if (insertError) {
-          console.error('Error creating visitor record:', insertError);
+          console.error('Error creating visitor record on login:', insertError);
         } else if (newVisitor) {
-          setUserId(newVisitor.user_id);
+          schoolIdToSet = newVisitor.school_id;
         }
       }
 
-      setPhoneAuthenticated(true);
+      // Final steps
+      localStorage.setItem('selectedSchoolId', schoolIdToSet ?? '');
       onSuccess();
       window.location.reload();
       onClose();
@@ -513,7 +572,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               placeholder="Your Email"
               required
               disabled={loading}
-              icon={<User className="w-4 h-4" />}
+              icon={<Mail className="w-4 h-4" />}
             />
 
           )}
@@ -595,7 +654,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
               {view === 'forgot-password' && (
                 <>
-                  {loading ? 'Sending link...' : 'Send reset link'}
+                  {loading ? 'Sending link...' : 'Confirm'}
                   {!loading && <Send className="w-4 h-4 ml-2" />}
                 </>
               )}

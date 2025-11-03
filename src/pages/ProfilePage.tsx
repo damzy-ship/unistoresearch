@@ -56,11 +56,6 @@ export default function ProfilePage() {
             email: visitorData.email
           };
 
-          // console.log(session.user.email)
-
-          // if (session.user.email !== visitorData.email) {
-          //   handleUpdateEmail(session.user.email || '');
-          // }
 
           setProfile(profileData);
         }
