@@ -52,7 +52,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
 
       {/* Right: actions */}
       <div className="flex items-center">
-        {/* Pay Merchant button - visible always */}
+        {/* Pay Merchant  bbutton - visible always */}
         <button
           onClick={() => navigate('/pay-merchant')}
           aria-label="Pay a merchant"

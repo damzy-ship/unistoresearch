@@ -90,6 +90,7 @@ export default function HomePage() {
           setSelectedSchoolId(storedId);
         } else {
           setShowConfirmUniversityModal(true);
+          
         }
       }
     };

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
 import PaymentModal from './Payment/PaymentModal';
-import { useHostelMode } from '../hooks/useHostelMode';
+// import { useHostelMode } from '../hooks/useHostelMode';
 
 // Sidebar that is fixed on larger screens and slide-in on mobile.
 export default function UserMenu() {
@@ -17,12 +17,13 @@ export default function UserMenu() {
   const [userType, setUserType] = useState<string | null>(null);
   const { currentTheme } = useTheme();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const { hostelMode, setHostelMode } = useHostelMode();
+  // const { hostelMode, setHostelMode } = useHostelMode();
 
   // mobile open state
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session?.user);
