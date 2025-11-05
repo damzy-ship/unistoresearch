@@ -56,7 +56,7 @@ export default function HomePage() {
 
           const fetchedUserType = visitor?.user_type || null;
           setUserType(fetchedUserType);
-          console.log(visitor)
+          // console.log(visitor)
           setIsHostelMerchant(visitor?.is_hostel_merchant || false);
 
           // Prioritize school_id from the database
