@@ -338,15 +338,24 @@ export function useTheme() {
       if (authenticated) {
         try {
           const userId = await getUserId();
-          const { data, error } = await supabase
+
+          // Fetch the latest theme row for this user (do not rely on is_active flag)
+          const { data: rows, error } = await supabase
             .from('user_themes')
             .select('*')
             .eq('user_id', userId)
-            .eq('is_active', true)
-            .single();
+            .order('updated_at', { ascending: false })
+            .limit(1);
 
-          if (data && !error) {
-            const themeData = data.theme_data as Theme;
+          if (error) {
+            console.error('Error fetching user theme:', error);
+            return;
+          }
+
+          const row = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+
+          if (row && row.theme_data) {
+            const themeData = row.theme_data as Theme;
             setCurrentTheme(themeData);
             if (themeData.backgroundTexture) {
               setBackgroundTexture(themeData.backgroundTexture);
@@ -367,7 +376,7 @@ export function useTheme() {
       ...currentTheme,
       backgroundTexture
     }));
-    
+
     // Apply CSS custom properties
     const root = document.documentElement;
     root.style.setProperty('--theme-primary', currentTheme.primary);
@@ -419,26 +428,30 @@ export function useTheme() {
       if (!authenticated) return;
 
       const userId = await getUserId();
-      
-      // Deactivate all existing themes for this user
-      await supabase
-        .from('user_themes')
-        .update({ is_active: false })
-        .eq('user_id', userId);
 
-      // Save new theme
-      await supabase
+      // Upsert (insert or update) the user's theme row using user_id as conflict key.
+      // This avoids creating duplicate rows and instead updates the existing row.
+      const { error } = await supabase
         .from('user_themes')
-        .insert({
-          user_id: userId,
-          theme_data: theme,
-          theme_name: theme.name,
-          is_active: true
-        });
+        .upsert(
+          {
+            user_id: userId,
+            theme_data: theme,
+            theme_name: theme.name,
+            is_active: true
+          },
+          { onConflict: 'user_id' }
+        );
+
+      if (error) {
+        console.error('Error upserting theme to database:', error);
+      }
     } catch (error) {
       console.error('Error saving theme to database:', error);
     }
   };
+
+
 
   const generateAITheme = async (description: string): Promise<Theme | null> => {
     try {
@@ -498,6 +511,7 @@ Requirements:
     }
   };
 
+
   return {
     currentTheme,
     themes,
@@ -507,6 +521,6 @@ Requirements:
     setCustomTheme,
     changeBackgroundTexture,
     generateAITheme,
-    saveThemeToDatabase
+    saveThemeToDatabase,
   };
 }

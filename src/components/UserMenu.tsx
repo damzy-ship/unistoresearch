@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
 import PaymentModal from './Payment/PaymentModal';
+// import { useHostelMode } from '../hooks/useHostelMode';
 
 // Sidebar that is fixed on larger screens and slide-in on mobile.
 export default function UserMenu() {
@@ -16,11 +17,13 @@ export default function UserMenu() {
   const [userType, setUserType] = useState<string | null>(null);
   const { currentTheme } = useTheme();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  // const { hostelMode, setHostelMode } = useHostelMode();
 
   // mobile open state
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session?.user);
@@ -59,7 +62,6 @@ export default function UserMenu() {
 
   const handleSignOut = async () => {
     await signOut();
-    window.location.reload();
   };
 
   const getFirstName = (fullName: string) => fullName.split(' ')[0] || 'User';
@@ -78,6 +80,30 @@ export default function UserMenu() {
       </div>
 
       <div className="p-2 flex-1 overflow-y-auto">
+        {/* <button
+          onClick={() => {
+            setHostelMode(false);
+            setMobileOpen(false);
+            navigate('/');
+          }}
+          className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          Store Mode
+        </button>
+
+        <button
+          onClick={() => {
+            setHostelMode(true);
+            setMobileOpen(false);
+            navigate('/hostel');
+          }}
+          className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          Hostel Mode
+        </button> */}
+
+        {/* <div className="px-3 py-1 text-xs text-gray-500">Current: {hostelMode ? 'Hostel' : 'Store'}</div> */}
+
         <button
           onClick={() => { navigate('/profile'); setMobileOpen(false); }}
           className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
@@ -91,7 +117,7 @@ export default function UserMenu() {
           className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <FileText className="w-4 h-4" />
-          Invoices
+          Transactions
         </button>
 
         {userType === 'merchant' && (

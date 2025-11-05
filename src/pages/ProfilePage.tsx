@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2, Store, BadgeCheck, Clock, XCircle, Edit2, Eye } from 'lucide-react';
+import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2, Store, BadgeCheck, Clock, XCircle, Edit2, Eye, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, UniqueVisitor } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import ThemeCard from '../components/ThemeCard';
 import AIThemeGenerator from '../components/AIThemeGenerator';
 import EditBrandNameModal from '../components/EditBrandNameModal';
+import EditEmailModal from '../components/EditEmailModal';
 import VerifyIDModal from '../components/VerifyIdModal';
 
 
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'themes' | 'textures' | 'ai'>('themes');
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
 
   useEffect(() => {
@@ -28,7 +30,11 @@ export default function ProfilePage() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
+
+
       if (session?.user) {
+
+
         const { data: visitorData, error } = await supabase
           .from('unique_visitors')
           .select('*, user_type, brand_name')
@@ -46,8 +52,10 @@ export default function ProfilePage() {
             user_type: visitorData.user_type,
             brand_name: visitorData.brand_name,
             verification_status: visitorData.verification_status,
-            verification_id: visitorData.verification_id, // Set the new ID
+            verification_id: visitorData.verification_id,
+            email: visitorData.email
           };
+
 
           setProfile(profileData);
         }
@@ -75,6 +83,26 @@ export default function ProfilePage() {
       } else {
         setProfile({ ...profile, brand_name: newBrandName });
         setIsBrandModalOpen(false);
+      }
+    }
+  };
+
+  const handleUpdateEmail = async (newEmail: string) => {
+    if (!profile) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      const { error } = await supabase
+        .from('unique_visitors')
+        .update({ email: newEmail })
+        .eq('auth_user_id', session.user.id);
+
+      if (error) {
+        console.error('Error updating email:', error);
+      } else {
+        setProfile({ ...profile, email: newEmail });
+        setIsEmailModalOpen(false);
       }
     }
   };
@@ -255,6 +283,38 @@ export default function ProfilePage() {
                   </p>
 
                   <div className="space-y-4">
+                    {/* Email Address */}
+                    <div
+                      className="flex items-center gap-3 p-4 rounded-xl"
+                      style={{ backgroundColor: currentTheme.background }}
+                    >
+                      <Mail
+                        className="w-5 h-5"
+                        style={{ color: currentTheme.primary }}
+                      />
+                      <div className="flex-1 text-left">
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: currentTheme.textSecondary }}
+                        >
+                          Email Address
+                        </p>
+                        <p style={{ color: currentTheme.text }}>
+                          {profile.email ? profile.email.slice(0, 5) + "***" + profile.email.slice(-9) : 'Not set'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsEmailModalOpen(true)}
+                        className={`text-sm px-3 py-1 rounded-full font-medium transition-colors duration-200`}
+                        style={{
+                          color: currentTheme.primary,
+                          backgroundColor: currentTheme.primary + '10'
+                        }}
+                      >
+                        Change
+                      </button>
+                    </div>
+
                     {/* Brand Name for Merchants */}
                     {profile.user_type === 'merchant' && (
                       <div
@@ -309,7 +369,7 @@ export default function ProfilePage() {
                         </div>
                         {profile.verification_status === 'pending' && (
                           <div className="flex gap-2">
-                          
+
                             <button
                               onClick={() => setIsVerifyModalOpen(true)}
                               className={`p-2 rounded-full transition-colors duration-200 hover:bg-opacity-20`}
@@ -575,6 +635,15 @@ export default function ProfilePage() {
           currentTheme={currentTheme}
           uniqueId={profile?.full_name || 'user'}
           currentVerificationId={profile?.verification_id}
+        />
+      )}
+
+      {isEmailModalOpen && (
+        <EditEmailModal
+          currentEmail={profile?.email || ''}
+          onClose={() => setIsEmailModalOpen(false)}
+          onSave={handleUpdateEmail}
+          currentTheme={currentTheme}
         />
       )}
     </div>
