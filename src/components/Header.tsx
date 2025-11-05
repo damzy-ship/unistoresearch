@@ -13,6 +13,8 @@ interface HeaderProps {
   isHostelMerchant?: boolean;
 }
 
+const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT;
+
 export default function Header({ showAuth = true, onAuthClick, isHostelMerchant = false }: HeaderProps) {
   const navigate = useNavigate();
   const [userIsAuthenticated, setUserIsAuthenticated] = React.useState(false);
@@ -20,6 +22,8 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
   const { hostelMode, toggleHostelMode } = useHostelMode();
 
   React.useEffect(() => {
+
+    console.log("Current Environment:", ENVIRONMENT);
     const checkAuth = async () => {
       const authenticated = await isAuthenticated();
       setUserIsAuthenticated(authenticated);
@@ -41,16 +45,24 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
   return (
     <div className="w-full flex items-center justify-between py-4">
       {/* Left: Mode toggle always visible */}
-       {isHostelMerchant ?
-       <button
-        onClick={() => {toggleHostelMode(); navigate('/');}}
-        className={`ml-4 flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent text-sm ${hostelMode ? 'bg-[#15202b] text-white' : 'bg-gray-100 text-gray-800'} hover:opacity-90`}
-        aria-label="Toggle hostel mode"
-        title="Switch modes"
-      >
-        <Repeat className="w-4 h-4" />
-        
-      </button> : <div></div>}
+      {isHostelMerchant ?
+        <button
+          onClick={() => { toggleHostelMode(); navigate('/'); }}
+          className={`ml-4 flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent text-sm ${hostelMode ? 'bg-[#15202b] text-white' : 'bg-gray-100 text-gray-800'} hover:opacity-90`}
+          aria-label="Toggle hostel mode"
+          title="Switch modes"
+        >
+          <Repeat className="w-4 h-4" />
+
+        </button> : ENVIRONMENT === "development" ? <button
+          onClick={() => { toggleHostelMode(); navigate('/'); }}
+          className={`ml-4 flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent text-sm ${hostelMode ? 'bg-[#15202b] text-white' : 'bg-gray-100 text-gray-800'} hover:opacity-90`}
+          aria-label="Toggle hostel mode"
+          title="Switch modes"
+        >
+          <Repeat className="w-4 h-4" />
+
+        </button> : <div></div>}
 
       {/* Right: actions */}
       <div className="flex items-center">
@@ -66,13 +78,13 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
           <span className="inline sm:hidden">Make Payment</span>
         </button>
 
-        
+
 
         {showAuth && (
           userIsAuthenticated ? (
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('toggle-user-sidebar'))}
-              className={`lg:hidden p-2 rounded-lg mx-5 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold shadow-sm hover:shadow-md transition-transform transform active:scale-95`} 
+              className={`lg:hidden p-2 rounded-lg mx-5 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
               aria-label="Open user menu"
               title="Menu"
             >
@@ -86,7 +98,7 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
               <LogIn className="w-4 h-4" />
               Sign In
             </button>
-          ) 
+          )
         )}
       </div>
     </div>
