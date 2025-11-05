@@ -5,7 +5,7 @@ import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not
 // import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
 import { History } from 'lucide-react';
-import { getMatchingCategoriesAndFeatures, transformDescriptionForEmbedding } from '../lib/generateEmbedding';
+import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 
 function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -44,28 +44,33 @@ function ProductSearchComponent() {
     setLoading(true);
     setError(null);
 
-    const enhancedDescription = await transformDescriptionForEmbedding(searchQuery);
-    const {categories, features} = await getMatchingCategoriesAndFeatures(searchQuery);
-
+    
     try {
+      const query_category = await categorizePost(searchQuery);
+      const query_search_words = await extractProductKeywordsFromDescription(searchQuery);
+
+      console.log('Query Category:', query_category);
+      console.log('Query Search Words:', query_search_words);
       // Step 1: Call the Supabase Edge Function to get products
       const { data, error: functionError } = await supabase.functions.invoke('semantic-search', {
-        body: { request_text: enhancedDescription, school_id: universityId, query_categories: categories, query_features: features },
+        body: { school_id: universityId, query_category, query_search_words },
       });
 
+      
       if (functionError) {
         throw functionError;
       }
-
+      
       const products: Product[] = data?.results || [];
+      console.log('Search function response data:', data.results);
 
      const { error: logError } = await supabase.from('request_logs').insert([
         {
           request_text: searchQuery,  
           user_id: localStorage.getItem('unistore_user_id'),
           university: university?.short_name,
-          matched_categories: categories,
-          matched_features: features,
+          query_category,
+          query_search_words,
         }
       ]);
 

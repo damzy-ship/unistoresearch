@@ -357,6 +357,20 @@ npm run dev
 npm run build
 ```
 
+### Supabase Redirect URLs (Important for Password Reset)
+
+1. In your Supabase Dashboard go to Authentication → URL Configuration.
+2. Set your "Site URL" to your app base URL (for local dev this might be http://localhost:5173).
+3. Add the full password-reset redirect URL to "Additional Redirect URLs":
+
+  - For local development: http://localhost:5173/update-password
+  - For production: https://your-production-url.com/update-password
+
+4. This must match exactly the URL supplied to `supabase.auth.resetPasswordForEmail(..., { redirectTo })`.
+
+Without this configuration, the password recovery flow will fail to redirect back into the app.
+
+
 ### Database Setup
 1. Create a Supabase project
 2. Run the migrations in `supabase/migrations/`

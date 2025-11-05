@@ -262,6 +262,29 @@
   overflow: hidden;
 }
 
+/* Fullscreen image viewer (Twitter-like) */
+.image-viewer .swiper-button-prev,
+.image-viewer .swiper-button-next {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  width: 40px;
+  height: 40px;
+}
+
+.image-viewer .swiper-button-prev:after,
+.image-viewer .swiper-button-next:after {
+  font-size: 18px;
+}
+
+.image-viewer .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.image-viewer .swiper-pagination-bullet-active {
+  background: #ffffff;
+}
+
 /* Sliding text animation for mobile */
 @media (max-width: 768px) {
   .sliding-text {

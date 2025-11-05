@@ -9,9 +9,10 @@ interface ConfirmContactModalProps {
     onClose: () => void;
     onConfirm: (p: Partial<Product>) => void;
     className?: string;
+    hostelMode?: boolean;
 }
 
-const ConfirmContactModal: React.FC<ConfirmContactModalProps> = ({ isOpen, product, onClose, onConfirm }) => {
+const ConfirmContactModal: React.FC<ConfirmContactModalProps> = ({ isOpen, product, onClose, onConfirm, hostelMode }) => {
     const { currentTheme } = useTheme();
     if (!isOpen || !product) return null;
 
@@ -21,7 +22,7 @@ const ConfirmContactModal: React.FC<ConfirmContactModalProps> = ({ isOpen, produ
             <div className="relative bg-white rounded-xl shadow-xl w-11/12 max-w-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">Confirm contact</h3>
 
-                <div className="flex gap-4">
+                {!hostelMode && <div className="flex gap-4">
                     {product.image_urls && product.image_urls[0] && (
                         <img src={product.image_urls[0]} alt={product.product_description} className="w-28 h-28 object-cover rounded-lg" />
                     )}
@@ -39,7 +40,14 @@ const ConfirmContactModal: React.FC<ConfirmContactModalProps> = ({ isOpen, produ
                             )}
                         </div>
                     </div>
+                </div>}
+
+                {hostelMode && 
+                <div className="py-2 flex flex-col justify-center items-center">
+                    <h4 className="font-bold">Would you still like to get? </h4>
+                    <span className="font-bold text-xl text-indigo-600">[{product.product_description}]</span>
                 </div>
+                }
 
                 <div className="mt-6 flex gap-3 justify-end">
                     <button onClick={() => { localStorage.removeItem('pending_contact_product'); onClose(); }} className="px-4 py-2 rounded-lg border w-full">Cancel</button>

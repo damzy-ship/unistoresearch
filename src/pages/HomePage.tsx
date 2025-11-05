@@ -17,7 +17,10 @@ import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import VerticalProductList from '../components/VerticalProductList';
-
+import CountdownTimer from '../components/CountDownTimer';
+// import { migrateMerchantProductIDs } from '../lib/databaseServices';
+// import { updateMerchantProductAttributes } from '../lib/generateEmbedding';
+// import merchantProductData from '../data/product_data.json';
 
 export default function HomePage() {
   const { currentTheme, backgroundTexture } = useTheme();
@@ -151,8 +154,10 @@ export default function HomePage() {
 
       {selectedSchoolId ?
 
+      //remeber to add back py-8 to main classname after hostel mode launch
+
         <main
-          className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
+          className="flex min-h-screen flex-col items-center justify-center  transition-colors duration-300"
           style={{ backgroundColor: currentTheme.background }}
         >
 
@@ -170,21 +175,23 @@ export default function HomePage() {
           )}
           <Toaster position="top-center" richColors />
 
+          <CountdownTimer />
+
           <div className="w-full flex flex-col items-center justify-center">
             {/* User Menu */}
             <div className="w-full max-w-2xl mx-auto">
               <Header onAuthClick={() => setShowAuthModal(true)} />
             </div>
 
-            {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
-            <h1>Get Matching Categories and Features</h1>
-          </button> */}
+            {/* <WelcomeEmailSender /> */}
+
+
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
-            <h1>UPDATE</h1>
-          </button> */}
-            {/* <button onClick={() => updateAllMerchantProductsFromVisitors()}>
-            <h1>UPDATE ALL MERCHANTS PRODUCTS FROM VISITORS</h1>
-          </button>  */}
+              <h1>UPDATE</h1>
+            </button> */}
+            {/* <button onClick={migrateMerchantProductIDs}>
+              <h1>UPDATE</h1>
+            </button> */}
 
             {/* UniStore Logo */}
             <div className="mb-12 px-2">
@@ -220,7 +227,7 @@ export default function HomePage() {
               categoryId="d5b787f7-e41c-4bd9-b0b9-aa17158a7373"
               schoolId={selectedSchoolId}
               userIsAuthenticated={userIsAuthenticated}
-             />
+            />
 
             <hr className="w-full max-w-2xl bg-yellow-400 h-2" />
             <MerchantCategoriesGrid
