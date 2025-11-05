@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, Loader, CheckCircle, AlertCircle, Image, X } from 'lucide-react';
-import { Product, supabase, UniqueVisitor } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
+import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
-import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 
+interface Product {
+    id: string;
+    merchant_id: string;
+    product_description: string;
+    product_price: string;
+    is_available: boolean;
+    created_at: string;
+    image_urls: string[];
+    embedding: number[]; // New field for the embedding vector
+    search_description: string; // New field for the enhanced description
+}
 
 // Define the maximum number of images allowed
 const MAX_IMAGES = 5;
@@ -18,7 +29,6 @@ export default function MerchantProductPage() {
     const [error, setError] = useState<string | null>(null);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [merchantDetails, setMerchantDetails] = useState<UniqueVisitor | null>(null);
 
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
@@ -26,6 +36,7 @@ export default function MerchantProductPage() {
     const [isAvailable, setIsAvailable] = useState(true);
     const [newFiles, setNewFiles] = useState<File[]>([]); // State for new files to upload
     const [uploadingImages, setUploadingImages] = useState(false);
+
     const { currentTheme } = useTheme();
 
     // Calculate the total number of images that will exist after adding/editing
@@ -36,26 +47,9 @@ export default function MerchantProductPage() {
 
     useEffect(() => {
         if (merchantId) {
-            fetchMerchant();
             fetchProducts();
         }
     }, [merchantId]);
-
-    const fetchMerchant = async () => {
-        try {
-            if (!actual_merchant_id) return null;
-            const { data, error } = await supabase
-                .from('unique_visitors')
-                .select('*')
-                .eq('id', actual_merchant_id)
-                .single();
-            if (error) {
-                console.error('Error fetching merchant:', error);
-                return null;
-            }
-            setMerchantDetails(data);
-        } catch (err) { console.error('Error fetching merchant:', err); }
-    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -63,16 +57,14 @@ export default function MerchantProductPage() {
         try {
             const { data, error } = await supabase
                 .from('merchant_products')
-                .select(`*`)
+                .select('*')
                 .eq('merchant_id', merchantId)
                 .order('created_at', { ascending: false });
 
             if (error) {
                 throw error;
             }
-
-            setProducts(data);
-            // console.log('Fetched products:', data);
+            setProducts(data || []);
         } catch (err) {
             console.error('Error fetching products:', err);
             setError('Failed to load products');
@@ -144,16 +136,15 @@ export default function MerchantProductPage() {
         }
 
         if (newFiles.length > MAX_IMAGES) {
-            setError(`You can only upload a maximum of ${MAX_IMAGES} images. You selected ${newFiles.length}.`);
-            return;
+             setError(`You can only upload a maximum of ${MAX_IMAGES} images. You selected ${newFiles.length}.`);
+             return;
         }
 
         setLoading(true);
         setError(null);
 
         try {
-            const query_category = await categorizePost(productDescription);
-            const query_search_words = await extractProductKeywordsFromDescription(productDescription);
+            const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
             setUploadingImages(true);
             const imageUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, merchantId ? merchantId : "", 'product-images', 'product-images'))) : [];
             setUploadingImages(false);
@@ -167,8 +158,8 @@ export default function MerchantProductPage() {
                     product_price: productPrice,
                     is_available: isAvailable,
                     image_urls: imageUrls,
-                    product_category: query_category,
-                    search_words: query_search_words
+                    embedding: embedding,
+                    search_description: enhancedDescription
                 });
 
             if (dbError) {
@@ -195,20 +186,21 @@ export default function MerchantProductPage() {
 
         const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newFiles.map(file => URL.createObjectURL(file))];
         if (updatedImageUrls.length > MAX_IMAGES) {
-            setError(`You can only have a maximum of ${MAX_IMAGES} images. You are adding ${newFiles.length} new files to your existing ${editingProduct.image_urls.length} images.`);
-            return;
+             setError(`You can only have a maximum of ${MAX_IMAGES} images. You are adding ${newFiles.length} new files to your existing ${editingProduct.image_urls.length} images.`);
+             return;
         }
 
         setLoading(true);
         setError(null);
 
         try {
-            let query_category = editingProduct.product_category;
-            let query_search_words = editingProduct.search_words;
+            let newEmbedding = editingProduct.embedding;
+            let newSearchDescription = editingProduct.search_description;
 
             if (productDescription !== editingProduct.product_description) {
-                query_category = await categorizePost(editingProduct.product_description);
-                query_search_words = await extractProductKeywordsFromDescription(editingProduct.product_description);
+                const { embedding, enhancedDescription } = await generateAndEmbedSingleProduct(productDescription);
+                newEmbedding = embedding;
+                newSearchDescription = enhancedDescription;
             }
 
             setUploadingImages(true);
@@ -224,8 +216,8 @@ export default function MerchantProductPage() {
                     product_price: productPrice,
                     is_available: isAvailable,
                     image_urls: finalImageUrls,
-                    product_category: query_category,
-                    search_words: query_search_words
+                    embedding: newEmbedding,
+                    search_description: newSearchDescription
                 })
                 .eq('id', editingProduct.id);
 
@@ -243,7 +235,6 @@ export default function MerchantProductPage() {
             setLoading(false);
         }
     };
-
 
     const handleToggleAvailability = async (product: Product) => {
         const newAvailability = !product.is_available;
@@ -303,6 +294,7 @@ export default function MerchantProductPage() {
 
     return (
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto my-8 p-6"
+
         >
             <div className="flex justify-between items-center pb-4">
                 <h2 className="text-md sm:text-xl font-semibold text-gray-800">
@@ -461,8 +453,6 @@ export default function MerchantProductPage() {
                                                 <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
-
-
                                         <div className="flex gap-2 mt-4 w-full">
                                             <button
                                                 onClick={() => startEditProduct(product)}
@@ -479,9 +469,7 @@ export default function MerchantProductPage() {
                                             >
                                                 {product.is_available ? 'Set Unavailable' : 'Set Available'}
                                             </button>
-
                                         </div>
-
                                     </div>
                                 </div>
                             ))}

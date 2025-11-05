@@ -17,7 +17,6 @@ import HorizontalProductList from '../components/HorizontalProductList';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import VerticalProductList from '../components/VerticalProductList';
-import CountdownTimer from '../components/CountDownTimer';
 
 
 export default function HomePage() {
@@ -30,7 +29,6 @@ export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null);
   const [, setUserType] = useState<string | null>(null);
-  const [isHostelMerchant, setIsHostelMerchant] = useState(false);
 
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
 
@@ -50,14 +48,12 @@ export default function HomePage() {
         try {
           const { data: visitor } = await supabase
             .from('unique_visitors')
-            .select('user_type, school_id, is_hostel_merchant')
+            .select('user_type, school_id')
             .eq('auth_user_id', session.user.id)
             .single();
 
           const fetchedUserType = visitor?.user_type || null;
           setUserType(fetchedUserType);
-          // console.log(visitor)
-          setIsHostelMerchant(visitor?.is_hostel_merchant || false);
 
           // Prioritize school_id from the database
           if (visitor?.school_id) {
@@ -93,7 +89,6 @@ export default function HomePage() {
           setSelectedSchoolId(storedId);
         } else {
           setShowConfirmUniversityModal(true);
-          
         }
       }
     };
@@ -156,10 +151,8 @@ export default function HomePage() {
 
       {selectedSchoolId ?
 
-      //remeber to add back py-8 to main classname after hostel mode launch
-
         <main
-          className="flex min-h-screen flex-col items-center justify-center transition-colors duration-300"
+          className="flex min-h-screen flex-col items-center justify-center px- py-8 transition-colors duration-300"
           style={{ backgroundColor: currentTheme.background }}
         >
 
@@ -177,23 +170,21 @@ export default function HomePage() {
           )}
           <Toaster position="top-center" richColors />
 
-          <CountdownTimer />
-
           <div className="w-full flex flex-col items-center justify-center">
             {/* User Menu */}
             <div className="w-full max-w-2xl mx-auto">
-              <Header isHostelMerchant={isHostelMerchant} onAuthClick={() => setShowAuthModal(true)}  />
+              <Header onAuthClick={() => setShowAuthModal(true)} />
             </div>
 
-            {/* <WelcomeEmailSender /> */}
-
-
+            {/* <button onClick={() => getMatchingCategoriesAndFeatures("i need a graduation gown for my graduation ceremony")}>
+            <h1>Get Matching Categories and Features</h1>
+          </button> */}
             {/* <button onClick={() => updateMerchantProductAttributes(merchantProductData)}>
-              <h1>UPDATE</h1>
-            </button> */}
-            {/* <button onClick={migrateMerchantProductIDs}>
-              <h1>UPDATE</h1>
-            </button> */}
+            <h1>UPDATE</h1>
+          </button> */}
+            {/* <button onClick={() => updateAllMerchantProductsFromVisitors()}>
+            <h1>UPDATE ALL MERCHANTS PRODUCTS FROM VISITORS</h1>
+          </button>  */}
 
             {/* UniStore Logo */}
             <div className="mb-12 px-2">

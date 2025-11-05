@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Loader, CheckCircle, AlertCircle, Image, X, Search } from 'lucide-react';
+import { Plus, Loader, CheckCircle, AlertCircle, Image, X, Search } from 'lucide-react';
 import { Product, supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';

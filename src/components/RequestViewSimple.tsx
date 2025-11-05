@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, MapPin, MessageSquare, Store } from 'lucide-react';
 import { RequestLog, supabase } from '../lib/supabase';
 import { MerchantWithCategories } from '../lib/gemini';

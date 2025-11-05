@@ -48,15 +48,9 @@ export interface UniqueVisitor {
   user_type?: string;
   school_id?: string;
   brand_name?: string | null;
-  email?: string;
   verification_status?: 'pending' | 'verified' | 'unverified'| null;
   verification_id?: string;
-  hostel_id?: string
-  schools?: School
-  hostels?: Hostel
-  room?: string
-  is_hostel_merchant?: boolean
-  profile_picture?: string
+
 }
 
 export interface Product {
@@ -78,26 +72,7 @@ export interface Product {
     created_at?: string;
     merchant_id?: string;
     actual_merchant_id?: string;
-    unique_visitors?: UniqueVisitor;
-    is_hostel_product: boolean; 
-    hostel_name?: string;
-    room?: string;
-    is_hostel_merchant?: boolean;
-    brand_name?: string | null;
-    product_category?: string;
-    search_words?: string[];
-
-}
-
-export interface HostelsProductUpdates {
-  id: string;
-  post_description: string;
-  post_images: string[];
-  created_at: string;
-  merchant_id: string;
-  unique_visitors?: UniqueVisitor;
-  post_category: string;
-  search_words: string[];
+    brand_name?: string;
 }
 
 export interface RequestLog {
@@ -120,13 +95,6 @@ export interface School {
   created_at: string;
 }
 
-export interface Hostel {
-  id: string
-  name: string
-  school_id: string
-  schools?: School
-}
-
 
 export interface MerchantAnalytics {
   id: string;
@@ -137,15 +105,6 @@ export interface MerchantAnalytics {
   user_id: string;
   created_at?: string;
 }
-
-export interface ProductCategory {
-  id: string;
-  category_name: string;
-  category_image: string;
-  category_list: string[];
-  created_at: string;
-}
-
 
 // Add function to delete a request log
 export async function deleteRequestLog(requestId: string): Promise<{ success: boolean; error?: string }> {

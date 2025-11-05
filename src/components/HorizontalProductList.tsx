@@ -7,11 +7,9 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-import { useHostelMode } from '../hooks/useHostelMode';
 import { Loader } from 'lucide-react';
 import ContactSellerButton from './ContactSellerButton';
 import ContactSellerLink from './ContactSellerLink';
-import ProductImageModal from './ProductImageModal';
 
 
 // Define the props interface
@@ -27,10 +25,8 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [fetchedCategoryName, setCategoryName] = useState<string>('');
-    const [selectedImageModal, setSelectedImageModal] = useState<{ product: Product; imageIndex: number } | null>(null);
     const navigate = useNavigate();
     const { currentTheme } = useTheme();
-    const { hostelMode } = useHostelMode();
 
     useEffect(() => {
         const fetchCategoryName = async () => {
@@ -155,36 +151,28 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                             <div key={product.id}
                                 style={{ backgroundColor: currentTheme.background }}
                                 className="w-48 md:w-60 flex-shrink-0 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100">
-                                <div
-                                    className="relative w-full h-32 md:h-32 cursor-pointer"
-                                    onClick={() => setSelectedImageModal({ product, imageIndex: 0 })}
+                                <Swiper
+                                    modules={[Pagination, Navigation]}
+                                    spaceBetween={10}
+                                    slidesPerView={1}
+                                    pagination={{ clickable: true }}
+                                    navigation
+                                    className="w-full h-32 md:h-32"
+
                                 >
-                                    <Swiper
-                                        modules={[Pagination, Navigation]}
-                                        spaceBetween={10}
-                                        slidesPerView={1}
-                                        pagination={{ clickable: true }}
-                                        navigation
-                                        className="w-full h-full"
-                                        onSlideChange={(swiper) => {
-                                            const currentSlide = swiper.activeIndex;
-                                            setSelectedImageModal(prev => prev ? { ...prev, imageIndex: currentSlide } : null);
-                                        }}
-                                    >
-                                        {product.image_urls.map((url, imgIndex) => (
-                                            <SwiperSlide key={imgIndex}>
-                                                <div className="relative w-full h-full">
-                                                    <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
-                                                    {product.school_short_name && (
-                                                        <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
-                                                            {product.school_short_name}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
-                                </div>
+                                    {product.image_urls.map((url, imgIndex) => (
+                                        <SwiperSlide key={imgIndex}>
+                                            <div className="relative w-full h-full">
+                                                <img src={url} alt={product.product_description} className="w-full h-full object-cover" />
+                                                {product.school_short_name && (
+                                                    <div className="absolute top-2 right-2 bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-md shadow">
+                                                        {product.school_short_name}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
                                 <div className="p-5 flex flex-col flex-grow">
                                     {/* <h3 className="text-xl font-bold mb-1 truncate text-gray-800">{product.product_description}</h3> */}
                                     {product.discount_price ? (
@@ -202,7 +190,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
                                         >₦{product.product_price}</p>
                                     )}
                                     {product.full_name && (
-                                        <p className="text-sm mb-1 flex-grow"
+                                        <p className="text-sm mb-3 flex-grow"
                                             style={{ color: currentTheme.text }}
                                         >
                                             by <span className="font-medium">{product.brand_name ? product.brand_name : product.full_name}</span>
@@ -231,18 +219,6 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
             </div>
 
             {/* Auth handled inside ContactSellerButton */}
-
-            {/* Image Modal */}
-            {selectedImageModal && (
-                <ProductImageModal
-                    images={selectedImageModal.product.image_urls}
-                    initialIndex={selectedImageModal.imageIndex}
-                    isOpen={!!selectedImageModal}
-                    onClose={() => setSelectedImageModal(null)}
-                    productTitle={selectedImageModal.product.product_description}
-                    merchantName={selectedImageModal.product.brand_name || selectedImageModal.product.full_name || 'Unknown Seller'}
-                />
-            )}
         </div>
     );
 };

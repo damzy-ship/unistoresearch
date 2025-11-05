@@ -18,12 +18,12 @@ if (!API_KEY) {
 // Define the interfaces for your product data
 interface MerchantProductAttributes {
   id: string;
-  product_category: string;
-  search_words: string[];
+  product_categories: string[];
+  product_features: string[];
 }
 
 /**
- * Updates the 'product_category' and 'search_words' for a list of merchant products.
+ * Updates the 'product_categories' and 'product_features' for a list of merchant products.
  * @param productsToUpdate An array of objects, each containing the product ID and the new categories and features.
  * @returns A promise that resolves to an array of objects indicating the result of each update.
  */
@@ -33,7 +33,7 @@ export async function updateMerchantProductAttributes(productsToUpdate: Merchant
 
   for (const product of productsToUpdate) {
     try {
-      const { id, product_category, search_words } = product;
+      const { id, product_categories, product_features } = product;
 
       if (!id) {
         console.warn('Skipping product with missing ID:', product);
@@ -45,8 +45,8 @@ export async function updateMerchantProductAttributes(productsToUpdate: Merchant
       const { error } = await supabase
         .from('merchant_products')
         .update({
-          product_category: product_category,
-          search_words: search_words,
+          product_categories: product_categories,
+          product_features: product_features,
         })
         .eq('id', id);
 
@@ -65,6 +65,7 @@ export async function updateMerchantProductAttributes(productsToUpdate: Merchant
   console.log('All updates complete.');
   return results;
 }
+
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
