@@ -39,7 +39,6 @@ function App() {
       style={{ backgroundColor: currentTheme.background }}
     >
       <Router>
-        {/* global sidebar */}
         <div className="lg:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
         <UserMenu />
         <Toaster position="top-center" richColors />

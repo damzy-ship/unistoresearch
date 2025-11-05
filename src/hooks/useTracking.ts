@@ -60,8 +60,9 @@ export async function getUserId(): Promise<string> {
   return userId;
 }
 
-export function setUserId(newUserId: string): void {
+export function setUserId(newUserId: string, actualUserId: string): void {
   localStorage.setItem(USER_ID_STORAGE_KEY, newUserId);
+  localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, actualUserId);
 }
 
 export async function isAuthenticated(): Promise<boolean> {

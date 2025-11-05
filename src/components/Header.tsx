@@ -13,6 +13,8 @@ interface HeaderProps {
   isHostelMerchant?: boolean;
 }
 
+const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT;
+
 export default function Header({ showAuth = true, onAuthClick, isHostelMerchant = false }: HeaderProps) {
   const navigate = useNavigate();
   const [userIsAuthenticated, setUserIsAuthenticated] = React.useState(false);
@@ -20,6 +22,8 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
   const { hostelMode, toggleHostelMode } = useHostelMode();
 
   React.useEffect(() => {
+
+    console.log("Current Environment:", ENVIRONMENT);
     const checkAuth = async () => {
       const authenticated = await isAuthenticated();
       setUserIsAuthenticated(authenticated);
@@ -50,7 +54,7 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
         >
           <Repeat className="w-4 h-4" />
 
-        </button> : <button
+        </button> : ENVIRONMENT === "development" ? <button
           onClick={() => { toggleHostelMode(); navigate('/'); }}
           className={`ml-4 flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent text-sm ${hostelMode ? 'bg-[#15202b] text-white' : 'bg-gray-100 text-gray-800'} hover:opacity-90`}
           aria-label="Toggle hostel mode"
@@ -58,7 +62,7 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
         >
           <Repeat className="w-4 h-4" />
 
-        </button>}
+        </button> : <div></div>}
 
       {/* Right: actions */}
       <div className="flex items-center">

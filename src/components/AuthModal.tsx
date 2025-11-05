@@ -90,8 +90,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     return true;
   };
 
-
-
   const handleSignUp = async () => {
     if (!validateInputs()) return;
 
@@ -135,8 +133,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
       const newAuthUserId = authData.user.id;
 
-      // **2. Set the permanent Auth ID in local storage immediately**
-      setUserId(newAuthUserId);
+
       localStorage.setItem('selectedSchoolId', selectedSchoolId ?? '');
 
       // **3. Merge/Upsert Visitor Record**
@@ -171,6 +168,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         if (updateError) {
           // If the merge update fails, we warn and let the final upsert handle creation/update.
           console.warn('Warning: Failed to merge anonymous record on sign-up.', updateError);
+        } else {
+          // **2. Set the permanent Auth ID in local storage immediately**
+          setUserId(newAuthUserId, existingAnonVisitor.id);
         }
       }
 
@@ -190,12 +190,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       };
 
       // Use upsert on the canonical key (auth_user_id) to ensure exactly one record exists.
-      const { error: upsertError } = await supabase
+      const { data: upsertUserData, error: upsertError } = await supabase
         .from('unique_visitors')
-        .upsert(finalRecordPayload, { onConflict: 'auth_user_id', ignoreDuplicates: false });
+        .upsert(finalRecordPayload, { onConflict: 'auth_user_id', ignoreDuplicates: false })
+        .select('id')
+        .single();
 
       if (upsertError) {
         console.error('Error ensuring final visitor record on sign up:', upsertError);
+      } else {
+        // **2. Set the permanent Auth ID in local storage immediately**
+        setUserId(newAuthUserId, upsertUserData?.id);
       }
 
       // Final steps
@@ -221,13 +226,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     try {
 
-      const { data: userEmailFromUniqueVisitors } = await supabase.from('unique_visitors').select('email').eq('phone_number', phoneNumber).single();
-      console.log('userEmailFromUniqueVisitors:', userEmailFromUniqueVisitors);
+      const { data: userDataFromUniqueVisitors } = await supabase.from('unique_visitors').select('email, id').eq('phone_number', phoneNumber).single();
+      console.log('userDataFromUniqueVisitors:', userDataFromUniqueVisitors);
 
       let loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
 
-      if (userEmailFromUniqueVisitors && userEmailFromUniqueVisitors.email) {
-        loginEmail = userEmailFromUniqueVisitors.email;
+      if (userDataFromUniqueVisitors && userDataFromUniqueVisitors.email) {
+        loginEmail = userDataFromUniqueVisitors.email;
       }
 
 
@@ -260,7 +265,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       const finalEmail = authData.user.email || '';
 
       // **2. Set the permanent Auth ID in local storage immediately**
-      setUserId(loggedInAuthUserId);
+      setUserId(loggedInAuthUserId, userDataFromUniqueVisitors?.id);
       setPhoneAuthenticated(true);
 
       // **3. Update Visitor Record**
