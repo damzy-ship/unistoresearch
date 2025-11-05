@@ -417,7 +417,7 @@ export default function HostelHomePage() {
                     <Toaster position="top-center" richColors />
 
                     <div className="w-full max-w-2xl mx-auto px-2">
-                        <Header onAuthClick={() => setShowAuthModal(true)} />
+                        <Header isHostelMerchant={userIsHostelMerchant} onAuthClick={() => setShowAuthModal(true)} />
                     </div>
 
                     <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">

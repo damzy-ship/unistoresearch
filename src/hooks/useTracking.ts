@@ -33,7 +33,7 @@ export async function getUserId(): Promise<string> {
   let userId = localStorage.getItem(USER_ID_STORAGE_KEY);
 
 
-  if (!userId) {
+  if (!userId || !user_data_id) {
     const school_id = localStorage.getItem('selectedSchoolId');
     userId = generateUniqueId();
     
