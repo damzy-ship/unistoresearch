@@ -10,9 +10,10 @@ import { useHostelMode } from '../hooks/useHostelMode';
 interface HeaderProps {
   showAuth?: boolean;
   onAuthClick?: () => void;
+  isHostelMerchant?: boolean;
 }
 
-export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
+export default function Header({ showAuth = true, onAuthClick, isHostelMerchant = false }: HeaderProps) {
   const navigate = useNavigate();
   const [userIsAuthenticated, setUserIsAuthenticated] = React.useState(false);
   const { currentTheme } = useTheme();
@@ -40,7 +41,8 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
   return (
     <div className="w-full flex items-center justify-between py-4">
       {/* Left: Mode toggle always visible */}
-      <button
+       {isHostelMerchant ?
+       <button
         onClick={() => {toggleHostelMode(); navigate('/');}}
         className={`ml-4 flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent text-sm ${hostelMode ? 'bg-[#15202b] text-white' : 'bg-gray-100 text-gray-800'} hover:opacity-90`}
         aria-label="Toggle hostel mode"
@@ -48,7 +50,7 @@ export default function Header({ showAuth = true, onAuthClick }: HeaderProps) {
       >
         <Repeat className="w-4 h-4" />
         
-      </button>
+      </button> : <div></div>}
 
       {/* Right: actions */}
       <div className="flex items-center">

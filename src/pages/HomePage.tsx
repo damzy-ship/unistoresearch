@@ -30,6 +30,7 @@ export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null);
   const [, setUserType] = useState<string | null>(null);
+  const [isHostelMerchant, setIsHostelMerchant] = useState(false);
 
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
 
@@ -49,12 +50,14 @@ export default function HomePage() {
         try {
           const { data: visitor } = await supabase
             .from('unique_visitors')
-            .select('user_type, school_id')
+            .select('user_type, school_id, is_hostel_merchant')
             .eq('auth_user_id', session.user.id)
             .single();
 
           const fetchedUserType = visitor?.user_type || null;
           setUserType(fetchedUserType);
+          console.log(visitor)
+          setIsHostelMerchant(visitor?.is_hostel_merchant || false);
 
           // Prioritize school_id from the database
           if (visitor?.school_id) {
@@ -179,7 +182,7 @@ export default function HomePage() {
           <div className="w-full flex flex-col items-center justify-center">
             {/* User Menu */}
             <div className="w-full max-w-2xl mx-auto">
-              <Header onAuthClick={() => setShowAuthModal(true)} />
+              <Header isHostelMerchant={isHostelMerchant} onAuthClick={() => setShowAuthModal(true)}  />
             </div>
 
             {/* <WelcomeEmailSender /> */}

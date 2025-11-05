@@ -2,6 +2,7 @@
 import { supabase } from '../lib/supabase';
 
 const USER_ID_STORAGE_KEY = 'unistore_user_id';
+const ACTUAL_USER_ID_STORAGE_KEY = 'unistore_actual_user_id';
 
 const AUTH_SESSION_KEY = 'unistore_authenticated';
 
@@ -12,11 +13,18 @@ export function generateUniqueId(): string {
 export async function getUserId(): Promise<string> {
   // First check if user is authenticated with Supabase
   const { data: { session } } = await supabase.auth.getSession();
+  const user_data_id = localStorage.getItem(ACTUAL_USER_ID_STORAGE_KEY);
 
   if (session?.user?.id) {
     // If authenticated, use the Supabase user ID
     const userId = session.user.id;
-    // console.log(userId) 
+
+    if (!user_data_id) {
+      const { data: user_data } = await supabase.from('unique_visitors').select('id').eq('user_id', session?.user?.id).single();
+
+      // console.log(userId) 
+      localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
+    }
     localStorage.setItem(USER_ID_STORAGE_KEY, userId);
     return userId;
   }
@@ -24,9 +32,29 @@ export async function getUserId(): Promise<string> {
   // If not authenticated, use the stored ID or generate a new one
   let userId = localStorage.getItem(USER_ID_STORAGE_KEY);
 
+
   if (!userId) {
+    const school_id = localStorage.getItem('selectedSchoolId');
     userId = generateUniqueId();
+    
     localStorage.setItem(USER_ID_STORAGE_KEY, userId);
+    const { data: user_data, error: insertError } = await supabase
+      .from('unique_visitors')
+      .insert({
+        user_id: userId,
+        last_visit: new Date().toISOString(),
+        visit_count: 1,
+        school_id: school_id
+      })
+      .select('id')
+      .single();
+
+    if (insertError) {
+      console.error('Error creating visitor record on login:', insertError);
+    } else{
+      localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
+    }
+
   }
 
   return userId;
