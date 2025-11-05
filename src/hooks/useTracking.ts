@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 const USER_ID_STORAGE_KEY = 'unistore_user_id';
+const ACTUAL_USER_ID_STORAGE_KEY = 'unistore_actual_user_id';
+
 const AUTH_SESSION_KEY = 'unistore_authenticated';
 
 export function generateUniqueId(): string {
@@ -11,23 +13,50 @@ export function generateUniqueId(): string {
 export async function getUserId(): Promise<string> {
   // First check if user is authenticated with Supabase
   const { data: { session } } = await supabase.auth.getSession();
-  
+  const user_data_id = localStorage.getItem(ACTUAL_USER_ID_STORAGE_KEY);
+
   if (session?.user?.id) {
     // If authenticated, use the Supabase user ID
     const userId = session.user.id;
-  // console.log(userId)
+
+    if (!user_data_id) {
+      const { data: user_data } = await supabase.from('unique_visitors').select('id').eq('user_id', session?.user?.id).single();
+
+      // console.log(userId) 
+      localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
+    }
     localStorage.setItem(USER_ID_STORAGE_KEY, userId);
     return userId;
   }
-  
+
   // If not authenticated, use the stored ID or generate a new one
   let userId = localStorage.getItem(USER_ID_STORAGE_KEY);
-  
+
+
   if (!userId) {
+    const school_id = localStorage.getItem('selectedSchoolId');
     userId = generateUniqueId();
+    
     localStorage.setItem(USER_ID_STORAGE_KEY, userId);
+    const { data: user_data, error: insertError } = await supabase
+      .from('unique_visitors')
+      .insert({
+        user_id: userId,
+        last_visit: new Date().toISOString(),
+        visit_count: 1,
+        school_id: school_id
+      })
+      .select('id')
+      .single();
+
+    if (insertError) {
+      console.error('Error creating visitor record on login:', insertError);
+    } else{
+      localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
+    }
+
   }
-  
+
   return userId;
 }
 
@@ -57,7 +86,7 @@ export async function signOut(): Promise<void> {
 export async function getUserRequestCount(): Promise<number> {
   try {
     const userId = await getUserId();
-    
+
     const { data, error } = await supabase
       .from('request_logs')
       .select('id', { count: 'exact' })
@@ -75,70 +104,26 @@ export async function getUserRequestCount(): Promise<number> {
   }
 }
 
-export function useTracking() {
-  useEffect(() => {
-    const trackVisitor = async () => {
-      const userId = await getUserId();
-      
-      try {
-        // Check if visitor exists
-        const { data: existingVisitor } = await supabase
-          .from('unique_visitors')
-          .select('*')
-          .eq('user_id', userId)
-          .limit(1);
+// export function useTracking() {
+//   useEffect(() => {
+//     const trackVisitor = async () => {
+//       const userId = await getUserId();
 
-        if (existingVisitor && existingVisitor.length > 0) {
-          // Update existing visitor
-          await supabase
-            .from('unique_visitors')
-            .update({
-              last_visit: new Date().toISOString(),
-              visit_count: existingVisitor[0].visit_count + 1
-            })
-            .eq('user_id', userId);
-        } else {
-          // Create new visitor record
-          try {
-            await supabase
-              .from('unique_visitors')
-              .insert({
-                user_id: userId,
-                first_visit: new Date().toISOString(),
-                last_visit: new Date().toISOString(),
-                visit_count: 1
-              });
-          } catch (insertError: any) {
-            // Handle race condition: if another process already inserted this user_id
-            if (insertError?.code === '23505') {
-              // Fetch the current record and update it
-              const { data: raceConditionVisitor } = await supabase
-                .from('unique_visitors')
-                .select('visit_count')
-                .eq('user_id', userId)
-                .limit(1);
-              
-              if (raceConditionVisitor && raceConditionVisitor.length > 0) {
-                await supabase
-                  .from('unique_visitors')
-                  .update({
-                    last_visit: new Date().toISOString(),
-                    visit_count: raceConditionVisitor[0].visit_count + 1
-                  })
-                  .eq('user_id', userId);
-              }
-            } else {
-              // Re-throw other errors
-              throw insertError;
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error tracking visitor:', error);
-      }
-    };
+//       try {
+//         const { error: rpcError } = await supabase.rpc('track_visitor_upsert', {
+//           p_user_id: userId,
+//         });
+//         console.log('Tracking visitor with ID:', userId);
 
-    trackVisitor();
-  }, []);
+//         if (rpcError) {
+//           throw rpcError;
+//         }
 
-}
+//       } catch (error) {
+//         console.error('Error tracking visitor with RPC:', error);
+//       }
+//     };
+
+//     trackVisitor();
+//   }, []); // Only runs on mount
+// }
