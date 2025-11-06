@@ -11,6 +11,8 @@ interface FilterBarProps {
     showMyProducts: boolean;
     myProductsActive: boolean;
     onToggleMyProducts: () => void;
+    selectedPostType: string;
+    onSelectPostType: (postType: string) => void;
     searchTerm: string | null;
     onClearSearch: () => void;
 }
@@ -25,6 +27,8 @@ export default function FilterBar({
     showMyProducts,
     myProductsActive,
     onToggleMyProducts,
+    selectedPostType,
+    onSelectPostType,
     searchTerm,
     onClearSearch,
 }: FilterBarProps) {
@@ -87,6 +91,16 @@ export default function FilterBar({
                     }`}
                 >
                     All
+                </button>
+                <button
+                    onClick={() => onSelectPostType('request')}
+                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                        selectedPostType === 'request'
+                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white rounded-full shadow-md transition-all duration-200`
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                    Requests
                 </button>
                 {showMyProducts && (
                     <button

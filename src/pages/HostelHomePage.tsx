@@ -47,6 +47,7 @@ export default function HostelHomePage() {
     ]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [myProductsActive, setMyProductsActive] = useState<boolean>(false);
+    const [selectedPostType, setSelectedPostType] = useState<string>('all');
 
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [isSearchView, setIsSearchView] = useState(true);
@@ -135,15 +136,24 @@ export default function HostelHomePage() {
     const displayedFeed = useMemo(() => {
         let filtered = feed.filter((item) => {
             const visitor = item.unique_visitors as UniqueVisitor | undefined;
-            const matchesHostel = selectedHostel === 'all' || !selectedHostel
+            const postType = (item as any).post_type || 'update';
+
+            // For 'request' type posts, don't filter by hostel (they have no hostel)
+            const matchesHostel = postType === 'request'
                 ? true
-                : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel;
+                : (selectedHostel === 'all' || !selectedHostel
+                    ? true
+                    : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel);
 
             const matchesCategory = selectedCategory === 'all' || !selectedCategory
                 ? true
                 : (item.post_category || '').toLowerCase() === selectedCategory.toLowerCase();
 
-            return matchesHostel && matchesCategory;
+            const matchesPostType = selectedPostType === 'all' || !selectedPostType
+                ? true
+                : postType === selectedPostType;
+
+            return matchesHostel && matchesCategory && matchesPostType;
         });
 
         if (myProductsActive && currentVisitor?.id) {
@@ -151,7 +161,7 @@ export default function HostelHomePage() {
         }
 
         return filtered;
-    }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id]);
+    }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id, selectedPostType]);
 
     useEffect(() => {
         const fetchHostels = async () => {
@@ -376,6 +386,7 @@ export default function HostelHomePage() {
         setSearchTerm(null);
         setSelectedHostel('all');
         setSelectedCategory('all');
+        setSelectedPostType('all');
         setMyProductsActive(false);
     };
 
@@ -473,6 +484,8 @@ export default function HostelHomePage() {
                                 setMyProductsActive(!myProductsActive);
                                 setSelectedCategory('all');
                             }}
+                            selectedPostType={selectedPostType}
+                            onSelectPostType={setSelectedPostType}
                             searchTerm={searchTerm}
                             onClearSearch={handleClearSearch}
                         />
