@@ -41,13 +41,13 @@ export default function HostelHomePage() {
         'phones',
         'jewelries',
         'bags',
+        'fragrances',
         'beauty & skincare',
         'hair accessories',
         'others'
     ]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [myProductsActive, setMyProductsActive] = useState<boolean>(false);
-    const [selectedPostType, setSelectedPostType] = useState<string>('all');
 
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [isSearchView, setIsSearchView] = useState(true);
@@ -99,6 +99,8 @@ export default function HostelHomePage() {
                 `)
                 .order('created_at', { ascending: false });
 
+            // console.log('Fetched feed:', data);
+
             if (error) throw error;
 
             type RawUpdate = {
@@ -109,10 +111,16 @@ export default function HostelHomePage() {
                 created_at: string;
                 actual_user_id: string;
                 unique_visitors?: UniqueVisitor;
+                post_type?: string | null;
+                search_words?: string[] | null;
             };
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
+            // Keep request posts even if they don't have hostel/school info; requests may not be tied to a hostel
             const filteredBySchool = (schoolId
-                ? rawList.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === schoolId)
+                ? rawList.filter((d) => {
+                    const uv = d.unique_visitors as UniqueVisitor | undefined;
+                    return (d.post_type === 'request') || (uv?.hostels?.school_id === schoolId);
+                })
                 : rawList);
 
             const mapped: HostelsProductUpdates[] = filteredBySchool.map((d) => ({
@@ -123,6 +131,8 @@ export default function HostelHomePage() {
                 created_at: d.created_at,
                 actual_user_id: d.actual_user_id,
                 unique_visitors: d.unique_visitors,
+                post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
+                search_words: Array.isArray(d.search_words) ? d.search_words : [],
             }));
 
             setFeed(mapped);
@@ -136,24 +146,18 @@ export default function HostelHomePage() {
     const displayedFeed = useMemo(() => {
         let filtered = feed.filter((item) => {
             const visitor = item.unique_visitors as UniqueVisitor | undefined;
-            const postType = (item as any).post_type || 'update';
-
-            // For 'request' type posts, don't filter by hostel (they have no hostel)
-            const matchesHostel = postType === 'request'
+            // Requests should be visible regardless of selected hostel (they may not be tied to a hostel)
+            const matchesHostel = selectedHostel === 'all' || !selectedHostel
                 ? true
-                : (selectedHostel === 'all' || !selectedHostel
+                : item.post_type === 'request'
                     ? true
-                    : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel);
+                    : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel;
 
             const matchesCategory = selectedCategory === 'all' || !selectedCategory
                 ? true
                 : (item.post_category || '').toLowerCase() === selectedCategory.toLowerCase();
 
-            const matchesPostType = selectedPostType === 'all' || !selectedPostType
-                ? true
-                : postType === selectedPostType;
-
-            return matchesHostel && matchesCategory && matchesPostType;
+            return matchesHostel && matchesCategory;
         });
 
         if (myProductsActive && currentVisitor?.id) {
@@ -161,7 +165,7 @@ export default function HostelHomePage() {
         }
 
         return filtered;
-    }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id, selectedPostType]);
+    }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id]);
 
     useEffect(() => {
         const fetchHostels = async () => {
@@ -326,7 +330,7 @@ export default function HostelHomePage() {
 
             if (error) throw error;
 
-            const list = (data || []) as HostelsProductUpdates[];
+            const list = (data || []) as unknown as HostelsProductUpdates[];
 
             const filtered = selectedSchoolId
                 ? list.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId)
@@ -364,8 +368,15 @@ export default function HostelHomePage() {
                     return dateB - dateA;
                 });
 
-                const finalResults = rankedResults.map(({ score, ...rest }) => rest);
-                setSearchResults(finalResults as HostelsProductUpdates[]);
+                const finalResults = (rankedResults as unknown as Record<string, unknown>[]).map(item => {
+                    const rest: Record<string, unknown> = {};
+                    for (const k in item) {
+                        if (k === 'score') continue;
+                        rest[k] = (item as Record<string, unknown>)[k];
+                    }
+                    return rest as unknown as HostelsProductUpdates;
+                });
+                setSearchResults(finalResults);
             } else {
                 setSearchResults(filtered);
             }
@@ -386,7 +397,6 @@ export default function HostelHomePage() {
         setSearchTerm(null);
         setSelectedHostel('all');
         setSelectedCategory('all');
-        setSelectedPostType('all');
         setMyProductsActive(false);
     };
 
@@ -484,8 +494,6 @@ export default function HostelHomePage() {
                                 setMyProductsActive(!myProductsActive);
                                 setSelectedCategory('all');
                             }}
-                            selectedPostType={selectedPostType}
-                            onSelectPostType={setSelectedPostType}
                             searchTerm={searchTerm}
                             onClearSearch={handleClearSearch}
                         />
@@ -523,6 +531,8 @@ export default function HostelHomePage() {
                                             key={item.id}
                                             item={item}
                                             currentUserId={currentVisitor?.id}
+                                            userIsHostelMerchant={userIsHostelMerchant}
+                                            userIsAuthenticated={userIsAuthenticated}
                                             openImageModal={openImageModal}
                                             onDelete={userIsHostelMerchant ? handleDeleteClick : undefined}
                                         />
