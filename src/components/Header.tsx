@@ -23,13 +23,10 @@ export default function Header({ showAuth = true, onAuthClick, isHostelMerchant 
 
   React.useEffect(() => {
 
-    console.log("Current Environment:", ENVIRONMENT);
     const checkAuth = async () => {
       const authenticated = await isAuthenticated();
       setUserIsAuthenticated(authenticated);
     };
-
-
 
     checkAuth();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
