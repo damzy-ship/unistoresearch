@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search, Upload } from 'lucide-react';
 import { UniqueVisitor } from '../../lib/supabase';
 
@@ -11,6 +11,8 @@ interface PostComposerProps {
     onSearch: (text: string) => Promise<void>;
     posting: boolean;
     onImageSearchPrompt: () => void;
+    userIsAuthenticated: boolean;
+    setShowAuthModal: (showAuthModal: boolean) => void;
 }
 
 export default function PostComposer({
@@ -22,6 +24,8 @@ export default function PostComposer({
     onSearch,
     posting,
     onImageSearchPrompt,
+    userIsAuthenticated,
+    setShowAuthModal
 }: PostComposerProps) {
     const [composerText, setComposerText] = useState<string>('');
     const [composerImages, setComposerImages] = useState<File[]>([]);
@@ -42,10 +46,14 @@ export default function PostComposer({
         if (isSearchView) {
             await onSearch(composerText);
         } else {
-            await onPost(composerText, composerImages);
-            setComposerText('');
-            setComposerImages([]);
-            onToggleView(true);
+            if(userIsAuthenticated){
+                await onPost(composerText, composerImages);
+                setComposerText('');
+                setComposerImages([]);
+                onToggleView(true);
+            }else{
+                setShowAuthModal(true)
+            }
         }
     };
 
@@ -54,7 +62,7 @@ export default function PostComposer({
         setComposerImages([]);
     };
 
-    
+
 
     return (
         <div className="p-4 border-b border-gray-800 flex gap-3">
@@ -74,12 +82,12 @@ export default function PostComposer({
                     <textarea
                         value={composerText}
                         onChange={(e) => setComposerText(e.target.value)}
-                        placeholder={isSearchView ? 'What are you looking for?' : 'What are you selling?'}
+                        placeholder={isSearchView ? 'What are you looking for?' : userIsHostelMerchant? 'What are you selling?' : 'Who sells tote bags in hostel?'}
                         className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
                         rows={2}
                     />
                     <div className="ml-3">
-                        {userIsHostelMerchant ? (
+                        {
                             !isSearchView ? (
                                 <button
                                     onClick={() => {
@@ -103,7 +111,7 @@ export default function PostComposer({
                                     <Upload className="w-5 h-5" />
                                 </button>
                             )
-                        ) : null}
+                        }
                     </div>
                 </div>
 
@@ -151,7 +159,7 @@ export default function PostComposer({
                         disabled={posting || (!composerText.trim() && composerImages.length === 0 && !isSearchView)}
                         className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold px-6 py-2 rounded-full transition-colors"
                     >
-                        {isSearchView ? (posting ? 'Searching...' : 'Search') : (posting ? 'Posting...' : 'Post')}
+                        {isSearchView ? (posting ? 'Searching...' : 'Search') : userIsHostelMerchant ? (posting ? 'Posting...' : 'Post') : (posting ? 'Posting request...' : 'Request')}
                     </button>
                 </div>
             </div>

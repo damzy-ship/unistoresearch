@@ -249,7 +249,8 @@ export default function HostelHomePage() {
                     post_images: uploadedUrls,
                     actual_user_id: currentVisitor.id,
                     post_category: postCategory,
-                    search_words: postSearchWords
+                    search_words: postSearchWords,
+                    post_type: userIsHostelMerchant? 'update' : 'request'
                 });
 
             if (error) throw error;
@@ -455,6 +456,8 @@ export default function HostelHomePage() {
                             onSearch={handleSearch}
                             posting={posting}
                             onImageSearchPrompt={() => setShowImageSearchPrompt(true)}
+                            userIsAuthenticated={userIsAuthenticated}
+                            setShowAuthModal={setShowAuthModal}
                         />
 
                         <FilterBar
