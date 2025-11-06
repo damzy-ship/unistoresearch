@@ -78,8 +78,8 @@ export default function HostelHomePage() {
                     post_description,
                     post_images,
                     created_at,
-                    merchant_id,
-                    unique_visitors:merchant_id (
+                    actual_user_id,
+                    unique_visitors:actual_user_id (
                         id,
                         full_name,
                         profile_picture,
@@ -101,7 +101,7 @@ export default function HostelHomePage() {
                 post_images: string[];
                 post_category?: string | null;
                 created_at: string;
-                merchant_id: string;
+                actual_user_id: string;
                 unique_visitors?: UniqueVisitor;
             };
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
@@ -115,7 +115,7 @@ export default function HostelHomePage() {
                 post_images: Array.isArray(d.post_images) ? d.post_images : [],
                 post_category: d.post_category ?? '',
                 created_at: d.created_at,
-                merchant_id: d.merchant_id,
+                actual_user_id: d.actual_user_id,
                 unique_visitors: d.unique_visitors,
             }));
 
@@ -142,7 +142,7 @@ export default function HostelHomePage() {
         });
 
         if (myProductsActive && currentVisitor?.id) {
-            filtered = filtered.filter((item) => item.merchant_id === currentVisitor.id);
+            filtered = filtered.filter((item) => item.actual_user_id === currentVisitor.id);
         }
 
         return filtered;
@@ -242,7 +242,7 @@ export default function HostelHomePage() {
                 .insert({
                     post_description: text.trim(),
                     post_images: uploadedUrls,
-                    merchant_id: currentVisitor.id,
+                    actual_user_id: currentVisitor.id,
                     post_category: postCategory,
                     search_words: postSearchWords
                 });
@@ -284,7 +284,7 @@ export default function HostelHomePage() {
 
             const { data, error } = await supabase
                 .from('hostel_product_updates')
-                .select(`id, post_description, post_images, post_category, search_words, created_at, merchant_id, unique_visitors:merchant_id (id, full_name, profile_picture, phone_number, room, hostel_id, hostels(id, name, school_id), schools(short_name))`)
+                .select(`id, post_description, post_images, post_category, search_words, created_at, actual_user_id, unique_visitors:actual_user_id (id, full_name, profile_picture, phone_number, room, hostel_id, hostels(id, name, school_id), schools(short_name))`)
                 .eq('post_category', postCategory)
                 .order('created_at', { ascending: false });
 

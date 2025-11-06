@@ -59,6 +59,15 @@ export interface UniqueVisitor {
   profile_picture?: string
 }
 
+export interface user_analytics {
+  id: string;
+  actual_user_id: string;
+  event_type: string;
+  event_details: Record<string, any>;
+  current_page_url: string;
+  created_at: string;
+}
+
 export interface Product {
     id: string;
     product_description: string;
@@ -94,7 +103,7 @@ export interface HostelsProductUpdates {
   post_description: string;
   post_images: string[];
   created_at: string;
-  merchant_id: string;
+  actual_user_id: string;
   unique_visitors?: UniqueVisitor;
   post_category: string;
   search_words: string[];
