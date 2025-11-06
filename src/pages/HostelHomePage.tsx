@@ -15,6 +15,7 @@ import FilterBar from '../components/hostel/FilterBar';
 import ImageModal from '../components/hostel/ImageModal';
 import ConfirmDeleteModal from '../components/hostel/ConfirmDeleteModal';
 import LoadingSpinner from '../components/hostel/LoadingSpinner';
+import { getUserId } from '../hooks/useTracking';
 
 export default function HostelHomePage() {
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
@@ -69,6 +70,8 @@ export default function HostelHomePage() {
 
     const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
         try {
+            //added this cause we need to ensure user is tracked
+            await getUserId();
             setLoadingFeed(true);
             const { data, error } = await supabase
                 .from('hostel_product_updates')
@@ -89,7 +92,9 @@ export default function HostelHomePage() {
                         hostel_id,
                         hostels (id, name, school_id),
                         schools (id, short_name)
-                    )
+                    ),
+                    status,
+                    post_type
                 `)
                 .order('created_at', { ascending: false });
 
@@ -284,7 +289,27 @@ export default function HostelHomePage() {
 
             const { data, error } = await supabase
                 .from('hostel_product_updates')
-                .select(`id, post_description, post_images, post_category, search_words, created_at, actual_user_id, unique_visitors:actual_user_id (id, full_name, profile_picture, phone_number, room, hostel_id, hostels(id, name, school_id), schools(short_name))`)
+                .select(`
+                    id,
+                    post_category,
+                    post_description,
+                    post_images,
+                    created_at,
+                    actual_user_id,
+                    unique_visitors:actual_user_id (
+                        id,
+                        full_name,
+                        profile_picture,
+                        phone_number,
+                        room,
+                        is_hostel_merchant,
+                        hostel_id,
+                        hostels (id, name, school_id),
+                        schools (id, short_name)
+                    ),
+                    status,
+                    post_type
+                    `)
                 .eq('post_category', postCategory)
                 .order('created_at', { ascending: false });
 
