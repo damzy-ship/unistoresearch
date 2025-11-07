@@ -71,9 +71,10 @@ export default function HostelHomePage() {
 
 
     const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
+        console.log('Loading feed for school ID:', schoolId);
         try {
             //added this cause we need to ensure user is tracked
-            await getUserId();
+            getUserId();
             setLoadingFeed(true);
             const { data, error } = await supabase
                 .from('hostel_product_updates')
@@ -251,6 +252,7 @@ export default function HostelHomePage() {
     }, [displayedFeed]);
 
     useEffect(() => {
+
         const fetchHostels = async () => {
             if (!selectedSchoolId) return;
             try {
