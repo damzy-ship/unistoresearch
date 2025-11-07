@@ -3,7 +3,7 @@ import React, { useState, useEffect, FC } from 'react';
 // Define the target date: Next week Friday at 00:00:00
 // Current date: Thursday, Oct 30, 2025
 // Next Friday: Nov 7, 2025
-const TARGET_DATE: number = new Date('2025-11-07T23:00:00').getTime(); // Using 'number' for the timestamp
+const TARGET_DATE: number = new Date('2025-11-07T22:00:00').getTime(); // Using 'number' for the timestamp
 
 // --- Interfaces for Type Safety ---
 
@@ -24,6 +24,14 @@ interface TimeRemaining {
 interface TimerSegmentProps {
   value: number;
   label: string;
+}
+
+/**
+ * Interface for the props of the CountdownTimer component.
+ */
+interface CountdownTimerProps {
+  toggleHostelMode: () => void;
+  navigate: (path: string) => void;
 }
 
 // --- Helper function with explicit return type ---
@@ -70,7 +78,7 @@ const TimerSegment: FC<TimerSegmentProps> = ({ value, label }) => (
 /**
  * Main Countdown Timer Component.
  */
-const CountdownTimer: FC = () => {
+const CountdownTimer: FC<CountdownTimerProps> = ({ toggleHostelMode, navigate }) => {
   // Use TimeRemaining interface for the state type
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>(calculateTimeRemaining());
 
@@ -104,17 +112,26 @@ const CountdownTimer: FC = () => {
 
 
       <div className="max-w-4xl mx-auto flex flex-col items-center space-y-4 relative z-10">
-        
-        {/* Title/Header - Hostel Mode Launching */}
-        <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase text-center leading-tight drop-shadow-lg">
-          <span className="bg-orange-800 px-3 py-1 rounded-lg">Hostel Mode</span> Launching In:
-        </h2>
 
         {/* Countdown Display */}
         {expired ? (
-          <div className="text-2xl sm:text-3xl font-extrabold text-white p-4 rounded-lg bg-orange-700 shadow-inner">
-            🎉 Hostel Mode is LIVE! Enjoy! 🎉
+          // --- MODIFIED BLOCK ---
+          // Show the "LIVE" message and a separate link-style button
+          <div className="flex flex-col items-center space-y-2">
+            <div className="text-2xl sm:text-3xl font-extrabold text-white p-4 rounded-lg bg-orange-700 shadow-inner">
+              🎉 Hostel Mode is LIVE! 🎉
+            </div>
+            <button
+              onClick={() => { 
+                toggleHostelMode(); 
+                navigate('/'); 
+              }}
+              className="text-lg font-medium text-white underline hover:text-orange-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded py-1 px-2 transition-colors duration-150"
+            >
+              Explore Now
+            </button>
           </div>
+          // --- END OF MODIFIED BLOCK ---
         ) : (
           <div className="flex justify-center w-full max-w-md">
             <TimerSegment value={days} label="Days" />
