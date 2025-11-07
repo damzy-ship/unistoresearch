@@ -54,14 +54,14 @@ const renderImageGrid = (images: string[], openModal: (images: string[], startIn
 
 interface ProductFeedItemProps {
     item: HostelsProductUpdates;
-    currentUserId?: string;
+    currentVisitor?: UniqueVisitor;
     userIsHostelMerchant?: boolean;
     userIsAuthenticated?: boolean;
     openImageModal: (images: string[], startIndex: number) => void;
     onDelete?: (id: string) => void;
 }
 
-export default function ProductFeedItem({ item, currentUserId, openImageModal, onDelete, userIsHostelMerchant, userIsAuthenticated }: ProductFeedItemProps) {
+export default function ProductFeedItem({ item, currentVisitor, openImageModal, onDelete, userIsHostelMerchant, userIsAuthenticated }: ProductFeedItemProps) {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
     const [showSignInModal, setShowSignInModal] = useState(false);
@@ -76,7 +76,7 @@ export default function ProductFeedItem({ item, currentUserId, openImageModal, o
     const room = visitor?.room ? `Room ${visitor.room}` : '';
     const timeAgo = formatTimeAgo(item.created_at);
 
-    const isOwnPost = currentUserId && visitor?.id === currentUserId;
+    const isOwnPost = currentVisitor?.id && visitor?.id === currentVisitor?.id;
     const isRequest = item.post_type === 'request';
 
     // Unique styling for request posts
@@ -167,7 +167,7 @@ export default function ProductFeedItem({ item, currentUserId, openImageModal, o
                                         onClick={() => {
                                             const phone = visitor?.phone_number;
                                             if (!phone) return;
-                                            const msg = `hi there is have ${item.post_description || ''}`;
+                                            const msg = `hi there, i have ${item.post_description || ''}`;
                                             const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
                                             window.open(whatsappUrl, '_blank');
                                         }}
@@ -195,7 +195,7 @@ export default function ProductFeedItem({ item, currentUserId, openImageModal, o
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     <h3 className="text-xl font-bold text-white mb-2">Become a hostel merchant</h3>
-                                                    <p className="text-gray-400 mb-6 text-sm">You need to become a hostel merchant to be able to contact users.</p>
+                                                    <p className="text-gray-400 mb-6 text-sm">Hi {currentVisitor?.full_name}, you need to become a hostel merchant to be able to contact users.</p>
 
                                                     <div className="flex justify-end gap-3">
                                                         <button
@@ -207,12 +207,12 @@ export default function ProductFeedItem({ item, currentUserId, openImageModal, o
                                                         <button
                                                             onClick={() => {
                                                                 // open whatsapp to admin number with fixed message
-                                                                const whatsappUrl = `https://wa.me/2349082752819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
+                                                                const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
                                                                 window.open(whatsappUrl, '_blank');
                                                             }}
                                                             className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
                                                         >
-                                                            Contact Admin
+                                                            Continue
                                                         </button>
                                                     </div>
                                                 </div>

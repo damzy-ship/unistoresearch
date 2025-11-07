@@ -16,6 +16,7 @@ import ImageModal from '../components/hostel/ImageModal';
 import ConfirmDeleteModal from '../components/hostel/ConfirmDeleteModal';
 import LoadingSpinner from '../components/hostel/LoadingSpinner';
 import { getUserId } from '../hooks/useTracking';
+import PostComposerVuna from '../components/hostel/PostComposerVuna';
 
 export default function HostelHomePage() {
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
@@ -119,7 +120,7 @@ export default function HostelHomePage() {
             const filteredBySchool = (schoolId
                 ? rawList.filter((d) => {
                     const uv = d.unique_visitors as UniqueVisitor | undefined;
-                    return (d.post_type === 'request') || (uv?.hostels?.school_id === schoolId);
+                    return (uv?.schools?.id === schoolId && d.post_type === 'request') || (uv?.hostels?.school_id === schoolId);
                 })
                 : rawList);
 
@@ -241,7 +242,7 @@ export default function HostelHomePage() {
         }
     }, [userIsAuthenticated]);
 
-    const handlePost = async (text: string, images: File[]) => {
+    const handlePost = async (text: string, images: File[], request: boolean = false) => {
         if (!currentVisitor?.id) return;
         if (!text.trim() && images.length === 0) return;
 
@@ -253,7 +254,7 @@ export default function HostelHomePage() {
                 )
                 : [];
 
-            const postCategory = await categorizePost(text.trim());
+            const postCategory = await categorizePost(text.trim(), 'hostel');
             const postSearchWords = await extractProductKeywordsFromDescription(text.trim());
 
             const { error } = await supabase
@@ -264,7 +265,7 @@ export default function HostelHomePage() {
                     actual_user_id: currentVisitor.id,
                     post_category: postCategory,
                     search_words: postSearchWords,
-                    post_type: userIsHostelMerchant? 'update' : 'request'
+                    post_type: request ? 'request' : 'update'
                 });
 
             if (error) throw error;
@@ -331,6 +332,8 @@ export default function HostelHomePage() {
             if (error) throw error;
 
             const list = (data || []) as unknown as HostelsProductUpdates[];
+
+            console.log('Search fetched list:', list);
 
             const filtered = selectedSchoolId
                 ? list.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId)
@@ -465,10 +468,11 @@ export default function HostelHomePage() {
 
                     <div className="w-full max-w-2xl mx-auto px-2">
                         <Header isHostelMerchant={userIsHostelMerchant} onAuthClick={() => setShowAuthModal(true)} />
+
                     </div>
 
                     <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
-                        <PostComposer
+                        {selectedSchoolId !== '1724171a-6664-44fd-aa1e-f509b124ab51' && <PostComposer
                             currentVisitor={currentVisitor}
                             userIsHostelMerchant={userIsHostelMerchant}
                             isSearchView={isSearchView}
@@ -479,7 +483,20 @@ export default function HostelHomePage() {
                             onImageSearchPrompt={() => setShowImageSearchPrompt(true)}
                             userIsAuthenticated={userIsAuthenticated}
                             setShowAuthModal={setShowAuthModal}
-                        />
+                        />}
+                        {selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' && <PostComposerVuna
+                            currentVisitor={currentVisitor}
+                            userIsHostelMerchant={userIsHostelMerchant}
+                            isSearchView={isSearchView}
+                            onToggleView={setIsSearchView}
+                            onPost={handlePost}
+                            onSearch={handleSearch}
+                            posting={posting}
+                            onImageSearchPrompt={() => setShowImageSearchPrompt(true)}
+                            userIsAuthenticated={userIsAuthenticated}
+                            setShowAuthModal={setShowAuthModal}
+                        />}
+
 
                         <FilterBar
                             hostels={hostels}
@@ -530,11 +547,11 @@ export default function HostelHomePage() {
                                         <ProductFeedItem
                                             key={item.id}
                                             item={item}
-                                            currentUserId={currentVisitor?.id}
+                                            currentVisitor={currentVisitor}
                                             userIsHostelMerchant={userIsHostelMerchant}
                                             userIsAuthenticated={userIsAuthenticated}
                                             openImageModal={openImageModal}
-                                            onDelete={userIsHostelMerchant ? handleDeleteClick : undefined}
+                                            onDelete={handleDeleteClick}
                                         />
                                     ))}
                                 </>
