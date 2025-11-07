@@ -107,6 +107,8 @@ export interface HostelsProductUpdates {
   unique_visitors?: UniqueVisitor;
   post_category: string;
   search_words: string[];
+  status?: 'open' | 'fulfilled' | 'cancelled';
+  post_type: 'update' | 'request';
 }
 
 export interface RequestLog {

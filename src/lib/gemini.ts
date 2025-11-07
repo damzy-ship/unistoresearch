@@ -843,6 +843,7 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
       'phones',
       'jewelries',
       'bags',
+      'fragrances',
       'beauty & skincare',
       'hair accessories',
       'others'

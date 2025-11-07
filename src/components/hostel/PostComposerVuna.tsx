@@ -7,7 +7,7 @@ interface PostComposerProps {
     userIsHostelMerchant: boolean;
     isSearchView: boolean;
     onToggleView: (isSearch: boolean) => void;
-    onPost: (text: string, images: File[]) => Promise<void>;
+    onPost: (text: string, images: File[], request: boolean) => Promise<void>;
     onSearch: (text: string) => Promise<void>;
     posting: boolean;
     onImageSearchPrompt: () => void;
@@ -15,15 +15,13 @@ interface PostComposerProps {
     setShowAuthModal: (showAuthModal: boolean) => void;
 }
 
-export default function PostComposer({
+export default function PostComposerVuna({
     currentVisitor,
     userIsHostelMerchant,
     isSearchView,
     onToggleView,
     onPost,
-    onSearch,
     posting,
-    onImageSearchPrompt,
     userIsAuthenticated,
     setShowAuthModal
 }: PostComposerProps) {
@@ -43,17 +41,13 @@ export default function PostComposer({
     };
 
     const handleSubmit = async () => {
-        if (isSearchView) {
-            await onSearch(composerText);
+        if (userIsAuthenticated) {
+            await onPost(composerText, composerImages, true);
+            setComposerText('');
+            setComposerImages([]);
+            onToggleView(true);
         } else {
-            if(userIsAuthenticated){
-                await onPost(composerText, composerImages);
-                setComposerText('');
-                setComposerImages([]);
-                onToggleView(true);
-            }else{
-                setShowAuthModal(true)
-            }
+            setShowAuthModal(true)
         }
     };
 
@@ -82,13 +76,13 @@ export default function PostComposer({
                     <textarea
                         value={composerText}
                         onChange={(e) => setComposerText(e.target.value)}
-                        placeholder={isSearchView ? 'What are you looking for?' : userIsHostelMerchant? 'What are you selling?' : 'Who sells tote bags in hostel?'}
+                        placeholder={isSearchView ? 'Who sells tote bags in hostel?' : 'What are you selling?'}
                         className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
                         rows={2}
                     />
                     <div className="ml-3">
                         {
-                            !isSearchView ?  (
+                            !isSearchView ? (
                                 <button
                                     onClick={() => {
                                         resetComposer();
@@ -110,7 +104,7 @@ export default function PostComposer({
                                 >
                                     <Upload className="w-5 h-5" />
                                 </button>
-                            ): <></>
+                            ) : <></>
                         }
                     </div>
                 </div>
@@ -143,10 +137,9 @@ export default function PostComposer({
                         />
                         <button
                             onClick={() => {
-                                if (isSearchView) onImageSearchPrompt();
-                                else document.getElementById('image-upload')?.click();
+                                document.getElementById('image-upload')?.click();
                             }}
-                            className="text-emerald-300 bg-emerald-600/10 hover:bg-emerald-500/10 p-3 rounded-full transition-colors cursor-pointer"
+                            className="text-emerald-300 hover:bg-emerald-500/10 p-3 rounded-full transition-colors cursor-pointer"
                             aria-label="Add images"
                         >
                             <Camera className="w-5 h-5" />
@@ -157,7 +150,7 @@ export default function PostComposer({
                         disabled={posting || (!composerText.trim() && composerImages.length === 0 && !isSearchView)}
                         className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold px-6 py-2 rounded-full transition-colors"
                     >
-                        {isSearchView ? (posting ? 'Searching...' : 'Search') : (posting ? 'Posting...' : 'Post') }
+                        {isSearchView ? (posting ? 'Posting request...' : 'Request') : (posting ? 'Posting...' : 'Post')}
                     </button>
                 </div>
             </div>
