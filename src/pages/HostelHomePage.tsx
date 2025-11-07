@@ -168,6 +168,88 @@ export default function HostelHomePage() {
         return filtered;
     }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id]);
 
+    // Order the displayed feed into time buckets and shuffle within those buckets
+    // Rules (applied only when NOT showing search results):
+    // - < 2 hours: bucket A (shuffled) -> appears first
+    // - 2 - 10 hours: bucket B (shuffled) -> appears after A
+    // - 10 - 24 hours: bucket C (shuffled) -> appears after B
+    // - 24 hours - 3 days: bucket D (shuffled) -> appears after C
+    // - >= 3 days: bucket E grouped by day (shuffle within each day), days ordered newest -> oldest
+    const orderedDisplayedFeed = useMemo(() => {
+        if (!displayedFeed || displayedFeed.length === 0) return [] as HostelsProductUpdates[];
+
+        const now = Date.now();
+        const H = 60 * 60 * 1000;
+        const bucketsA: HostelsProductUpdates[] = []; // <2 hours
+        const bucketsB: HostelsProductUpdates[] = []; // 2-10 hours
+        const bucketsC: HostelsProductUpdates[] = []; // 10-24 hours
+        const bucketsD: HostelsProductUpdates[] = []; // 24h-72h
+        const bucketsEByDay: Record<string, HostelsProductUpdates[]> = {}; // >=72h grouped by day
+
+        const safeDateMs = (d?: string | null) => {
+            if (!d) return 0;
+            const t = new Date(d).getTime();
+            return Number.isNaN(t) ? 0 : t;
+        };
+
+        for (const item of displayedFeed) {
+            const createdMs = safeDateMs(item.created_at as unknown as string);
+            const age = now - createdMs;
+
+            if (!createdMs || age >= 3 * 24 * H) {
+                // Older than or equal to 3 days -> bucket E
+                const dayKey = createdMs ? new Date(createdMs).toISOString().split('T')[0] : 'unknown';
+                bucketsEByDay[dayKey] = bucketsEByDay[dayKey] || [];
+                bucketsEByDay[dayKey].push(item);
+            } else if (age < 2 * H) {
+                bucketsA.push(item);
+            } else if (age < 10 * H) {
+                bucketsB.push(item);
+            } else if (age < 24 * H) {
+                bucketsC.push(item);
+            } else {
+                // 24h <= age < 72h
+                bucketsD.push(item);
+            }
+        }
+
+        const shuffle = <T,>(arr: T[]) => {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = a[i];
+                a[i] = a[j];
+                a[j] = tmp;
+            }
+            return a;
+        };
+
+        // Shuffle buckets A-D fully
+        const partA = shuffle(bucketsA);
+        const partB = shuffle(bucketsB);
+        const partC = shuffle(bucketsC);
+        const partD = shuffle(bucketsD);
+
+        // For bucket E: shuffle items within each day, then order days newest -> oldest
+        const dayKeys = Object.keys(bucketsEByDay).filter(k => k !== 'unknown');
+        // Sort day keys descending (newer first)
+        dayKeys.sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
+
+        const partE: HostelsProductUpdates[] = [];
+        for (const dayKey of dayKeys) {
+            const group = bucketsEByDay[dayKey] || [];
+            const shuffledGroup = shuffle(group);
+            partE.push(...shuffledGroup);
+        }
+
+        // If there were any unknown-date items, append them last (shuffle them too)
+        if (bucketsEByDay['unknown']) {
+            partE.push(...shuffle(bucketsEByDay['unknown']));
+        }
+
+        return [...partA, ...partB, ...partC, ...partD, ...partE];
+    }, [displayedFeed]);
+
     useEffect(() => {
         const fetchHostels = async () => {
             if (!selectedSchoolId) return;
@@ -457,7 +539,7 @@ export default function HostelHomePage() {
         loadFeed(schoolId);
     };
 
-    const feedToDisplay = searchResults !== null ? searchResults : displayedFeed;
+    const feedToDisplay = searchResults !== null ? searchResults : orderedDisplayedFeed;
     const showLoading = loadingFeed || posting;
 
     return (

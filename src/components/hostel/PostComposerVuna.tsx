@@ -139,7 +139,7 @@ export default function PostComposerVuna({
                             onClick={() => {
                                 document.getElementById('image-upload')?.click();
                             }}
-                            className="text-emerald-300 hover:bg-emerald-500/10 p-3 rounded-full transition-colors cursor-pointer"
+                            className="text-emerald-300 bg-emerald-600/10 hover:bg-emerald-500/10 p-3 rounded-full transition-colors cursor-pointer"
                             aria-label="Add images"
                         >
                             <Camera className="w-5 h-5" />
