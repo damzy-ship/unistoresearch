@@ -15,6 +15,7 @@ import InvoicesPage from './pages/InvoicesPage';
 import ViewInvoicePage from './pages/ViewInvoicePage';
 import PayMerchantPage from './pages/PayMerchantPage';
 import AnnouncementBar from './components/AnnouncementBar';
+import useAnalytics from './hooks/useAnalytics';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
 import AllProductsPage from './pages/AllProductsPage';
@@ -40,6 +41,8 @@ function App() {
     >
       <Router>
         <div className="lg:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
+          {/* analytics loader registers global handlers and records page views */}
+          <AnalyticsLoader />
         <UserMenu />
         <Toaster position="top-center" richColors />
         <AnnouncementBar />
@@ -71,3 +74,8 @@ function App() {
 }
 
 export default App;
+
+function AnalyticsLoader() {
+  useAnalytics();
+  return null;
+}

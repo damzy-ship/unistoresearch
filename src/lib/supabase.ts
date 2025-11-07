@@ -59,11 +59,12 @@ export interface UniqueVisitor {
   profile_picture?: string
 }
 
-export interface user_analytics {
+export interface userAnalytics {
   id: string;
   actual_user_id: string;
   event_type: string;
   event_details: Record<string, any>;
+  event_description: string;
   current_page_url: string;
   created_at: string;
 }
@@ -156,7 +157,6 @@ export interface ProductCategory {
   category_list: string[];
   created_at: string;
 }
-
 
 // Add function to delete a request log
 export async function deleteRequestLog(requestId: string): Promise<{ success: boolean; error?: string }> {
