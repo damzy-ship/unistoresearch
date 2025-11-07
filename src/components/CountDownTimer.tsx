@@ -1,4 +1,6 @@
 import React, { useState, useEffect, FC } from 'react';
+import { useHostelMode } from '../hooks/useHostelMode';
+import { useNavigate } from 'react-router-dom';
 
 // Define the target date: Next week Friday at 00:00:00
 // Current date: Thursday, Oct 30, 2025
@@ -26,20 +28,6 @@ interface TimerSegmentProps {
   label: string;
 }
 
-/**
- * Interface for the props of the CountdownTimer component.
- */
-interface CountdownTimerProps {
-  toggleHostelMode: () => void;
-  navigate: (path: string) => void;
-}
-
-// --- Helper function with explicit return type ---
-
-/**
- * Helper function to calculate time remaining
- * @returns {TimeRemaining} The calculated days, hours, minutes, seconds, and expired status.
- */
 const calculateTimeRemaining = (): TimeRemaining => {
   const now: number = new Date().getTime();
   const distance: number = TARGET_DATE - now;
@@ -78,9 +66,11 @@ const TimerSegment: FC<TimerSegmentProps> = ({ value, label }) => (
 /**
  * Main Countdown Timer Component.
  */
-const CountdownTimer: FC<CountdownTimerProps> = ({ toggleHostelMode, navigate }) => {
+const CountdownTimer = () => {
   // Use TimeRemaining interface for the state type
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>(calculateTimeRemaining());
+  const { toggleHostelMode } = useHostelMode();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // TypeScript automatically infers the return type of setInterval is a NodeJS.Timeout or number, 
@@ -111,7 +101,7 @@ const CountdownTimer: FC<CountdownTimerProps> = ({ toggleHostelMode, navigate })
       }}></div>
 
 
-      <div className="max-w-4xl mx-auto flex flex-col items-center space-y-4 relative z-10">
+      <div className="max-w-4xl mx-auto flex flex-col items-center space-y-3 relative z-10">
 
         {/* Countdown Display */}
         {expired ? (
@@ -141,10 +131,6 @@ const CountdownTimer: FC<CountdownTimerProps> = ({ toggleHostelMode, navigate })
           </div>
         )}
 
-        {/* Target Date Information */}
-        <p className="text-sm text-white opacity-90 pt-2 font-medium">
-          Be ready by: <span className="font-bold text-white">Friday, November 7, 2025</span>
-        </p>
       </div>
 
       {/* Tailwind CSS @keyframe for pulse animation (add to your CSS or global styles if not already present) */}
