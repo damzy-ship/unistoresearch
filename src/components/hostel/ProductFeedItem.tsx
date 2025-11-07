@@ -119,7 +119,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 flex-wrap text-sm">
-                            <span className={nameClass}>{name}</span>
+                            <span className={nameClass}>{isRequest ? name.split(' ')[0] : name}</span>
 
                             {/* Original badge removed, new one is absolute position */}
 
