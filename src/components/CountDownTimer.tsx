@@ -111,7 +111,7 @@ const CountdownTimer: FC<CountdownTimerProps> = ({ toggleHostelMode, navigate })
       }}></div>
 
 
-      <div className="max-w-4xl mx-auto flex flex-col items-center space-y-4 relative z-10">
+      <div className="max-w-4xl mx-auto flex flex-col items-center space-y-3 relative z-10">
 
         {/* Countdown Display */}
         {expired ? (
@@ -141,10 +141,6 @@ const CountdownTimer: FC<CountdownTimerProps> = ({ toggleHostelMode, navigate })
           </div>
         )}
 
-        {/* Target Date Information */}
-        <p className="text-sm text-white opacity-90 pt-2 font-medium">
-          Be ready by: <span className="font-bold text-white">Friday, November 7, 2025</span>
-        </p>
       </div>
 
       {/* Tailwind CSS @keyframe for pulse animation (add to your CSS or global styles if not already present) */}
