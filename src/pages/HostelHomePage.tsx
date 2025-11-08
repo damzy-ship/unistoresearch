@@ -556,7 +556,7 @@ export default function HostelHomePage() {
                     </div>
 
                     <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
-                        {selectedSchoolId !== '1724171a-6664-44fd-aa1e-f509b124ab51' && <PostComposer
+                        <PostComposerVuna
                             currentVisitor={currentVisitor}
                             userIsHostelMerchant={userIsHostelMerchant}
                             isSearchView={isSearchView}
@@ -567,19 +567,7 @@ export default function HostelHomePage() {
                             onImageSearchPrompt={() => setShowImageSearchPrompt(true)}
                             userIsAuthenticated={userIsAuthenticated}
                             setShowAuthModal={setShowAuthModal}
-                        />}
-                        {selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' && <PostComposerVuna
-                            currentVisitor={currentVisitor}
-                            userIsHostelMerchant={userIsHostelMerchant}
-                            isSearchView={isSearchView}
-                            onToggleView={setIsSearchView}
-                            onPost={handlePost}
-                            onSearch={handleSearch}
-                            posting={posting}
-                            onImageSearchPrompt={() => setShowImageSearchPrompt(true)}
-                            userIsAuthenticated={userIsAuthenticated}
-                            setShowAuthModal={setShowAuthModal}
-                        />}
+                        />
 
 
                         <FilterBar
