@@ -110,6 +110,24 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         ...(userType === 'merchant' && { brand_name: brandName })
       };
 
+      function isValidNigerianPhoneNumber(phoneNumber: string) {
+        // This regex pattern looks for:
+        // ^       - Start of the string
+        // \+      - A literal plus sign (+)
+        // 234     - The digits "234"
+        // \d{10}  - Exactly 10 digits (0-9)
+        // $       - End of the string
+        const regex = /^\+234\d{10}$/;
+
+        return regex.test(phoneNumber);
+      }
+
+
+      if (isValidNigerianPhoneNumber(phoneNumber) === false) {
+        console.log(phoneNumber)
+        setError('Phone number not provided or invalid');
+        return;
+      }
       // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: signupEmail,
@@ -126,6 +144,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         }
         throw authError;
       }
+
 
       if (!authData.user) {
         throw new Error('Failed to create user account');
