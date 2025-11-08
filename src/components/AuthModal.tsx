@@ -111,12 +111,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       };
 
       function isValidNigerianPhoneNumber(phoneNumber: string) {
-        // This regex pattern looks for:
-        // ^       - Start of the string
-        // \+      - A literal plus sign (+)
-        // 234     - The digits "234"
-        // \d{10}  - Exactly 10 digits (0-9)
-        // $       - End of the string
         const regex = /^\+234\d{10}$/;
 
         return regex.test(phoneNumber);
