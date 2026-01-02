@@ -43,7 +43,7 @@ export default function PostComposerVuna({
 
     const handleSubmit = async () => {
         if (userIsAuthenticated) {
-            await onPost(composerText, composerImages, true);
+            await onPost(composerText, composerImages, isSearchView);
             setComposerText('');
             setComposerImages([]);
             if (userIsHostelMerchant) {
@@ -82,7 +82,7 @@ export default function PostComposerVuna({
                     className="flex-1 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
                 >
                     <Upload className="w-5 h-5" />
-                    <span>Post Item</span>
+                    <span>Post Product</span>
                 </button>
             </div>
         )

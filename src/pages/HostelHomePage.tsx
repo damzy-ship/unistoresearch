@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Toaster } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-// import Header from '../components/Header';
+import Header from '../components/Header';
 import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
 import { uploadImageToSupabase } from '../lib/databaseServices';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
