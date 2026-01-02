@@ -64,7 +64,7 @@ export default function Header({
             )}
 
             {/* Right: actions */}
-            <div className="flex items-center">
+            <div className="flex items-center ml-auto">
                 {/* Pay Merchant  bbutton - visible always */}
                 {showPayment && (
                     <button
@@ -82,24 +82,24 @@ export default function Header({
 
 
                 {showAuth && (
-                    userIsAuthenticated ? (
-                        <button
-                            onClick={() => window.dispatchEvent(new CustomEvent('toggle-user-sidebar'))}
-                            className={`lg:hidden p-2 rounded-lg mx-5 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
-                            aria-label="Open user menu"
-                            title="Menu"
-                        >
-                            <Menu className="w-6 h-6" />
-                        </button>
-                    ) : (
+                    <>
                         <button
                             onClick={onAuthClick}
-                            className={`flex mx-4 items-center gap-2 px-4 py-2 bg-gradient-to-r ${currentTheme.buttonGradient} hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200`}
+                            className={`hidden lg:flex mx-4 items-center gap-2 px-4 py-2 bg-gradient-to-r ${currentTheme.buttonGradient} hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200`}
                         >
                             <LogIn className="w-4 h-4" />
                             Sign In
                         </button>
-                    )
+
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('toggle-user-sidebar'))}
+                            className={`lg:hidden p-2 rounded-lg mr-2 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
+                            aria-label="Open menu"
+                            title="Menu"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    </>
                 )}
             </div>
         </div>

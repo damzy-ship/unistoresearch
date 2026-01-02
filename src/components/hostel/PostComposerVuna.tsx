@@ -27,7 +27,8 @@ export default function PostComposerVuna({
 }: PostComposerProps) {
     const [composerText, setComposerText] = useState<string>('');
     const [composerImages, setComposerImages] = useState<File[]>([]);
-    const [isExpanded, setIsExpanded] = useState(!userIsHostelMerchant);
+    const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
 
     const onSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,11 +47,7 @@ export default function PostComposerVuna({
             await onPost(composerText, composerImages, isSearchView);
             setComposerText('');
             setComposerImages([]);
-            if (userIsHostelMerchant) {
-                setIsExpanded(false);
-            } else {
-                onToggleView(true);
-            }
+            setIsExpanded(false);
         } else {
             setShowAuthModal(true)
         }
@@ -61,30 +58,80 @@ export default function PostComposerVuna({
         setComposerImages([]);
     };
 
-    if (!isExpanded && userIsHostelMerchant) {
+    if (!isExpanded) {
         return (
-            <div className="p-4 border-b border-gray-800 flex gap-4">
-                <button
-                    onClick={() => {
-                        onToggleView(true);
-                        setIsExpanded(true);
-                    }}
-                    className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                >
-                    <Search className="w-5 h-5 text-gray-400" />
-                    <span>Make Request</span>
-                </button>
-                <button
-                    onClick={() => {
-                        onToggleView(false);
-                        setIsExpanded(true);
-                    }}
-                    className="flex-1 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                >
-                    <Upload className="w-5 h-5" />
-                    <span>Post Product</span>
-                </button>
-            </div>
+            <>
+                <div className="p-4 border-b border-gray-800 flex gap-4">
+                    <button
+                        onClick={() => {
+                            onToggleView(true);
+                            setIsExpanded(true);
+                        }}
+                        className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                    >
+                        <Search className="w-5 h-5 text-gray-400" />
+                        <span>Make Request</span>
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (userIsHostelMerchant) {
+                                onToggleView(false);
+                                setIsExpanded(true);
+                            } else {
+                                setShowBecomeMerchantModal(true);
+                            }
+                        }}
+                        className="flex-1 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                    >
+                        <Upload className="w-5 h-5" />
+                        <span>Post Product</span>
+                    </button>
+                </div>
+
+                {showBecomeMerchantModal && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
+                        onClick={() => setShowBecomeMerchantModal(false)}
+                    >
+                        <div
+                            className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 className="text-xl font-bold text-white mb-2">
+                                {userIsAuthenticated ? 'Become a hostel merchant' : 'Sign in required'}
+                            </h3>
+                            <p className="text-gray-400 mb-6 text-sm">
+                                {userIsAuthenticated
+                                    ? `Hi ${currentVisitor?.full_name || 'User'}, you need to become a hostel merchant to be able to post products.`
+                                    : 'Sign in to be able to post product'}
+                            </p>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setShowBecomeMerchantModal(false)}
+                                    className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (userIsAuthenticated) {
+                                            const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
+                                            window.open(whatsappUrl, '_blank');
+                                        } else {
+                                            setShowBecomeMerchantModal(false);
+                                            setShowAuthModal(true);
+                                        }
+                                    }}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
+                                >
+                                    {userIsAuthenticated ? 'Continue' : 'Sign In'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </>
         )
     }
 
@@ -111,31 +158,16 @@ export default function PostComposerVuna({
                         rows={2}
                     />
                     <div className="ml-3">
-                        {
-                            userIsHostelMerchant ? (
-                                <button
-                                    onClick={() => {
-                                        resetComposer();
-                                        setIsExpanded(false);
-                                    }}
-                                    className="text-gray-400 hover:text-white p-2 rounded-full"
-                                    aria-label="Cancel"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            ) : !isSearchView ? (
-                                <button
-                                    onClick={() => {
-                                        resetComposer();
-                                        onToggleView(true);
-                                    }}
-                                    className="text-gray-400 hover:text-white p-2 rounded-full"
-                                    aria-label="Search mode"
-                                >
-                                    <Search className="w-5 h-5" />
-                                </button>
-                            ) : <></>
-                        }
+                        <button
+                            onClick={() => {
+                                resetComposer();
+                                setIsExpanded(false);
+                            }}
+                            className="text-gray-400 hover:text-white p-2 rounded-full"
+                            aria-label="Cancel"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
 

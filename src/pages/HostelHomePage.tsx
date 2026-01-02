@@ -305,9 +305,13 @@ export default function HostelHomePage() {
             setShowConfirmContactModal(true);
         };
 
+        const onOpenAuth = () => setShowAuthModal(true);
+
         window.addEventListener('pending-contact-available', onPending as EventListener);
+        window.addEventListener('open-auth-modal', onOpenAuth);
         return () => {
             window.removeEventListener('pending-contact-available', onPending as EventListener);
+            window.removeEventListener('open-auth-modal', onOpenAuth);
         };
     }, [loadFeed]);
 
@@ -554,7 +558,7 @@ export default function HostelHomePage() {
                         <Header
                             isHostelMerchant={userIsHostelMerchant}
                             onAuthClick={() => setShowAuthModal(true)}
-                            showAuth={false}
+                            showAuth={true}
                             showToggle={false}
                             showPayment={false}
                         />
