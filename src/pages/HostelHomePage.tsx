@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Toaster } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+// import Header from '../components/Header';
 import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
 import { uploadImageToSupabase } from '../lib/databaseServices';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
@@ -551,7 +551,23 @@ export default function HostelHomePage() {
                     <Toaster position="top-center" richColors />
 
                     <div className="w-full max-w-2xl mx-auto px-2">
-                        <Header isHostelMerchant={userIsHostelMerchant} onAuthClick={() => setShowAuthModal(true)} />
+                        <Header
+                            isHostelMerchant={userIsHostelMerchant}
+                            onAuthClick={() => setShowAuthModal(true)}
+                            showAuth={false}
+                            showToggle={false}
+                            showPayment={false}
+                        />
+
+                        <div className="mb-6 mt-2 text-center">
+                            <h1 className="text-4xl font-bold mb-1">
+                                <span className="text-orange-500">uni</span>
+                                <span className="text-blue-600">store.</span>
+                            </h1>
+                            <p className="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase">
+                                Hostel Mode
+                            </p>
+                        </div>
 
                     </div>
 
