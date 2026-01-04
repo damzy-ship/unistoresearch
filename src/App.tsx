@@ -43,11 +43,11 @@ function App() {
         <div className="lg:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
           {/* analytics loader registers global handlers and records page views */}
           <AnalyticsLoader />
-        <UserMenu />
-        <Toaster position="top-center" richColors />
-        <AnnouncementBar />
+          <UserMenu />
+          <Toaster position="top-center" richColors />
+          <AnnouncementBar />
           <Routes>
-            <Route path="/" element={<HomeEntry />} />
+            <Route path="/" element={<HostelHomePage />} />
             <Route path="/hostel" element={<HostelHomePage />} />
             <Route path="/landing-page" element={<LandingPage />} />
             <Route path="/past-requests" element={<PastRequestsPage />} />

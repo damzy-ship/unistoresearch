@@ -305,9 +305,13 @@ export default function HostelHomePage() {
             setShowConfirmContactModal(true);
         };
 
+        const onOpenAuth = () => setShowAuthModal(true);
+
         window.addEventListener('pending-contact-available', onPending as EventListener);
+        window.addEventListener('open-auth-modal', onOpenAuth);
         return () => {
             window.removeEventListener('pending-contact-available', onPending as EventListener);
+            window.removeEventListener('open-auth-modal', onOpenAuth);
         };
     }, [loadFeed]);
 
@@ -551,7 +555,23 @@ export default function HostelHomePage() {
                     <Toaster position="top-center" richColors />
 
                     <div className="w-full max-w-2xl mx-auto px-2">
-                        <Header isHostelMerchant={userIsHostelMerchant} onAuthClick={() => setShowAuthModal(true)} />
+                        <Header
+                            isHostelMerchant={userIsHostelMerchant}
+                            onAuthClick={() => setShowAuthModal(true)}
+                            showAuth={true}
+                            showToggle={false}
+                            showPayment={false}
+                        />
+
+                        <div className="mb-6 mt-2 text-center">
+                            <h1 className="text-4xl font-bold mb-1">
+                                <span className="text-orange-500">uni</span>
+                                <span className="text-blue-600">store.</span>
+                            </h1>
+                            <p className="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase">
+                                Hostel Mode
+                            </p>
+                        </div>
 
                     </div>
 

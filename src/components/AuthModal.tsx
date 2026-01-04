@@ -118,7 +118,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
 
       if (isValidNigerianPhoneNumber(phoneNumber) === false) {
-        console.log(phoneNumber)
+        // console.log(phoneNumber)
         setError('Phone number not provided or invalid');
         return;
       }
@@ -240,14 +240,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     try {
 
       const { data: userDataFromUniqueVisitors } = await supabase.from('unique_visitors').select('email, id').eq('phone_number', phoneNumber).single();
-      console.log('userDataFromUniqueVisitors:', userDataFromUniqueVisitors);
 
       let loginEmail = authMethod === 'email' ? email.trim() : `${phoneNumber.replace(/\+/g, '')}@phone.unistore.local`;
 
-      if (userDataFromUniqueVisitors && userDataFromUniqueVisitors.email) {
+      if (userDataFromUniqueVisitors && userDataFromUniqueVisitors.email && phoneNumber.length > 7) {
         loginEmail = userDataFromUniqueVisitors.email;
       }
-
 
       // 1. Sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -370,7 +368,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         redirectTo: `${window.location.origin}/update-password`
       });
 
-      console.log(data);
+      // console.log(data);
 
       if (resetError) {
         console.error('Supabase reset error:', resetError);
