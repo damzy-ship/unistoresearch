@@ -67,6 +67,39 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
     const [showSignInModal, setShowSignInModal] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { currentTheme } = useTheme();
+    const [signInContext, setSignInContext] = useState<'merchant' | 'recommend'>('merchant');
+
+    const handleIHaveIt = () => {
+        if (!userIsAuthenticated) {
+            setSignInContext('merchant');
+            setShowSignInModal(true);
+            return;
+        }
+
+        if (userIsHostelMerchant) {
+            const phone = visitor?.phone_number;
+            if (!phone) return;
+            const msg = `hi there, i have ${item.post_description || ''}`;
+            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(whatsappUrl, '_blank');
+        } else {
+            setShowBecomeMerchantModal(true);
+        }
+    };
+
+    const handleRecommend = () => {
+        if (!userIsAuthenticated) {
+            setSignInContext('recommend');
+            setShowSignInModal(true);
+            return;
+        }
+
+        const phone = visitor?.phone_number;
+        if (!phone) return;
+        const msg = `hi there, i have a recommendation for ${item.post_description || ''}`;
+        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+        window.open(whatsappUrl, '_blank');
+    };
 
     const visitor = item.unique_visitors as UniqueVisitor | undefined;
     const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
@@ -76,7 +109,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
     const room = visitor?.room ? `Room ${visitor.room}` : '';
     const timeAgo = formatTimeAgo(item.created_at);
 
-    const isOwnPost = currentVisitor?.id && visitor?.id === currentVisitor?.id;
+    const isOwnPost = currentVisitor?.id && visitor?.id === currentVisitor?.id || currentVisitor?.is_admin;
     const isRequest = item.post_type === 'request';
 
     // Unique styling for request posts
@@ -158,114 +191,94 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                     </div>}
 
                     {!isOwnPost && isRequest && (
-                        <div className="mt-3">
-                            {/* Three states for the "I have it" action */}
-                            {userIsAuthenticated ? (
-                                userIsHostelMerchant ? (
-                                    // Authenticated hostel merchant: open whatsapp to seller
-                                    <button
-                                        onClick={() => {
-                                            const phone = visitor?.phone_number;
-                                            if (!phone) return;
-                                            const msg = `hi there, i have ${item.post_description || ''}`;
-                                            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-                                            window.open(whatsappUrl, '_blank');
-                                        }}
-                                        className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
-                                    >
-                                        I have it
-                                    </button>
-                                ) : (
-                                    // Authenticated but not a hostel merchant: show modal prompting to become one
-                                    <>
-                                        <button
-                                            onClick={() => setShowBecomeMerchantModal(true)}
-                                            className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
-                                        >
-                                            I have it
-                                        </button>
+                        <div className="mt-3 flex gap-2 w-full">
+                            <button
+                                onClick={handleIHaveIt}
+                                className={`flex-1 bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 font-medium`}
+                            >
+                                I have it
+                            </button>
+                            <button
+                                onClick={handleRecommend}
+                                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 font-medium"
+                            >
+                                Recommend
+                            </button>
 
-                                        {showBecomeMerchantModal && (
-                                            <div
-                                                className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
+                            {/* Modals */}
+                            {showBecomeMerchantModal && (
+                                <div
+                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
+                                    onClick={() => setShowBecomeMerchantModal(false)}
+                                >
+                                    <div
+                                        className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <h3 className="text-xl font-bold text-white mb-2">Become a hostel merchant</h3>
+                                        <p className="text-gray-400 mb-6 text-sm">Hi {currentVisitor?.full_name}, you need to become a hostel merchant to be able to contact users.</p>
+
+                                        <div className="flex justify-end gap-3">
+                                            <button
                                                 onClick={() => setShowBecomeMerchantModal(false)}
+                                                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
                                             >
-                                                <div
-                                                    className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    <h3 className="text-xl font-bold text-white mb-2">Become a hostel merchant</h3>
-                                                    <p className="text-gray-400 mb-6 text-sm">Hi {currentVisitor?.full_name}, you need to become a hostel merchant to be able to contact users.</p>
-
-                                                    <div className="flex justify-end gap-3">
-                                                        <button
-                                                            onClick={() => setShowBecomeMerchantModal(false)}
-                                                            className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                // open whatsapp to admin number with fixed message
-                                                                const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
-                                                                window.open(whatsappUrl, '_blank');
-                                                            }}
-                                                            className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
-                                                        >
-                                                            Continue
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )
-                            ) : (
-                                // Not authenticated: prompt to sign in as merchant via modal that triggers AuthModal
-                                <>
-                                    <button
-                                        onClick={() => setShowSignInModal(true)}
-                                        className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}
-                                    >
-                                        I have it
-                                    </button>
-
-                                    {showSignInModal && (
-                                        <div
-                                            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
-                                            onClick={() => setShowSignInModal(false)}
-                                        >
-                                            <div
-                                                className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
-                                                onClick={(e) => e.stopPropagation()}
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
+                                                    window.open(whatsappUrl, '_blank');
+                                                }}
+                                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
                                             >
-                                                <h3 className="text-xl font-bold text-white mb-2">Sign in to contact</h3>
-                                                <p className="text-gray-400 mb-6 text-sm">Sign in as a merchant to be able to contact users.</p>
-
-                                                <div className="flex justify-end gap-3">
-                                                    <button
-                                                        onClick={() => setShowSignInModal(false)}
-                                                        className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            setShowSignInModal(false);
-                                                            setShowAuthModal(true);
-                                                        }}
-                                                        className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
-                                                    >
-                                                        Sign in
-                                                    </button>
-                                                </div>
-                                            </div>
+                                                Continue
+                                            </button>
                                         </div>
-                                    )}
-
-                                    <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />
-                                </>
+                                    </div>
+                                </div>
                             )}
+
+                            {showSignInModal && (
+                                <div
+                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
+                                    onClick={() => setShowSignInModal(false)}
+                                >
+                                    <div
+                                        className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <h3 className="text-xl font-bold text-white mb-2">
+                                            {signInContext === 'recommend' ? 'Sign in to recommend' : 'Sign in to contact'}
+                                        </h3>
+                                        <p className="text-gray-400 mb-6 text-sm">
+                                            {signInContext === 'recommend'
+                                                ? 'Sign in to include your recommendation.'
+                                                : 'Sign in as a merchant to be able to contact users.'}
+                                        </p>
+
+                                        <div className="flex justify-end gap-3">
+                                            <button
+                                                onClick={() => setShowSignInModal(false)}
+                                                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowSignInModal(false);
+                                                    setShowAuthModal(true);
+                                                }}
+                                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
+                                            >
+                                                Sign in
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />
                         </div>
                     )}
 
