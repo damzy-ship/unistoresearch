@@ -49,7 +49,7 @@ export interface UniqueVisitor {
   school_id?: string;
   brand_name?: string | null;
   email?: string;
-  verification_status?: 'pending' | 'verified' | 'unverified'| null;
+  verification_status?: 'pending' | 'verified' | 'unverified' | null;
   verification_id?: string;
   hostel_id?: string
   schools?: School
@@ -57,6 +57,7 @@ export interface UniqueVisitor {
   room?: string
   is_hostel_merchant?: boolean
   profile_picture?: string
+  is_admin?: boolean
 }
 
 export interface userAnalytics {
@@ -70,32 +71,32 @@ export interface userAnalytics {
 }
 
 export interface Product {
-    id: string;
-    product_description: string;
-    product_price: string;
-    image_urls: string[];
-    is_available: boolean;
-    full_name: string;
-    phone_number: string;
-    school_id: string;
-    school_name?: string;
-    school_short_name?: string;
-    discount_price?: string;
-    similarity?: number;
-    is_featured?: boolean;
-    search_description?: string;
-    embedding: number[];
-    created_at?: string;
-    merchant_id?: string;
-    actual_merchant_id?: string;
-    unique_visitors?: UniqueVisitor;
-    is_hostel_product: boolean; 
-    hostel_name?: string;
-    room?: string;
-    is_hostel_merchant?: boolean;
-    brand_name?: string | null;
-    product_category?: string;
-    search_words?: string[];
+  id: string;
+  product_description: string;
+  product_price: string;
+  image_urls: string[];
+  is_available: boolean;
+  full_name: string;
+  phone_number: string;
+  school_id: string;
+  school_name?: string;
+  school_short_name?: string;
+  discount_price?: string;
+  similarity?: number;
+  is_featured?: boolean;
+  search_description?: string;
+  embedding: number[];
+  created_at?: string;
+  merchant_id?: string;
+  actual_merchant_id?: string;
+  unique_visitors?: UniqueVisitor;
+  is_hostel_product: boolean;
+  hostel_name?: string;
+  room?: string;
+  is_hostel_merchant?: boolean;
+  brand_name?: string | null;
+  product_category?: string;
+  search_words?: string[];
 
 }
 

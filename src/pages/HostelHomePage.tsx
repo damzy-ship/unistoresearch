@@ -9,7 +9,7 @@ import AuthModal from '../components/AuthModal';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 import { useHostelMode } from '../hooks/useHostelMode';
-import PostComposer from '../components/hostel/PostComposer';
+// import PostComposer from '../components/hostel/PostComposer';
 import ProductFeedItem from '../components/hostel/ProductFeedItem';
 import FilterBar from '../components/hostel/FilterBar';
 import ImageModal from '../components/hostel/ImageModal';
@@ -281,7 +281,7 @@ export default function HostelHomePage() {
             if (userId) {
                 const { data: visitor } = await supabase
                     .from('unique_visitors')
-                    .select('id, full_name, profile_picture, hostel_id, room, is_hostel_merchant, hostels(*), schools(*)')
+                    .select('id, full_name, profile_picture, hostel_id, room, is_hostel_merchant, hostels(*), schools(*), is_admin')
                     .eq('auth_user_id', userId)
                     .single();
                 setCurrentVisitor(visitor as unknown as UniqueVisitor);
@@ -639,7 +639,7 @@ export default function HostelHomePage() {
                                         <ProductFeedItem
                                             key={item.id}
                                             item={item}
-                                            currentVisitor={currentVisitor}
+                                            currentVisitor={currentVisitor ?? undefined}
                                             userIsHostelMerchant={userIsHostelMerchant}
                                             userIsAuthenticated={userIsAuthenticated}
                                             openImageModal={openImageModal}
