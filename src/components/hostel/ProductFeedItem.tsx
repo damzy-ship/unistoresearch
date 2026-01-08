@@ -109,7 +109,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
     const room = visitor?.room ? `Room ${visitor.room}` : '';
     const timeAgo = formatTimeAgo(item.created_at);
 
-    const isOwnPost = currentVisitor?.id && visitor?.id === currentVisitor?.id || currentVisitor?.is_admin;
+    const isOwnPost = currentVisitor?.id && visitor?.id === currentVisitor?.id;
     const isRequest = item.post_type === 'request';
 
     // Unique styling for request posts
@@ -282,7 +282,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                         </div>
                     )}
 
-                    {isOwnPost && onDelete && (
+                    {(isOwnPost || currentVisitor?.is_admin) && onDelete && (
                         <div className='w-full flex justify-end mt-2'>
                             <button
                                 onClick={() => onDelete(item.id)}
