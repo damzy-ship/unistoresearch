@@ -94,7 +94,8 @@ export default function HostelHomePage() {
                         is_hostel_merchant,
                         hostel_id,
                         hostels (id, name, school_id),
-                        schools (id, short_name)
+                        schools (id, short_name),
+                        brand_name
                     ),
                     status,
                     post_type
@@ -409,7 +410,8 @@ export default function HostelHomePage() {
                         is_hostel_merchant,
                         hostel_id,
                         hostels (id, name, school_id),
-                        schools (id, short_name)
+                        schools (id, short_name),
+                        brand_name
                     ),
                     status,
                     post_type
