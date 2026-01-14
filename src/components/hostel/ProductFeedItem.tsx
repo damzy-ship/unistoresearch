@@ -2,7 +2,7 @@ import { Trash2 } from 'lucide-react';
 import { HostelsProductUpdates, UniqueVisitor } from '../../lib/supabase';
 import ContactSellerButton from '../ContactSellerButton';
 import AuthModal from '../AuthModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
 const formatTimeAgo = (timestamp: string): string => {
@@ -102,9 +102,9 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
     };
 
     const visitor = item.unique_visitors as UniqueVisitor | undefined;
-    const initials = String(visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
+    const initials = String(visitor?.brand_name || visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
     const name = visitor?.full_name || 'User';
-    const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
+    // const handle = `@${name.toLowerCase().replace(/\s/g, '').slice(0, 7)}b`;
     const hostel = visitor?.hostels?.name;
     const room = visitor?.room ? `Room ${visitor.room}` : '';
     const timeAgo = formatTimeAgo(item.created_at);
@@ -129,6 +129,11 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
         setIsConfirmModalOpen(false);
     };
 
+    useEffect(() => {
+        // Reset modals when item changes
+         console.log(visitor)  
+    }, []);
+
     return (
         <article className={articleClass}>
             {/* Request Badge positioned at top-right with pop effect */}
@@ -152,19 +157,19 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 flex-wrap text-sm">
-                            <span className={nameClass}>{isRequest ? name.split(' ')[0] : name}</span>
+                            <span className={nameClass}>{isRequest ? name.split(' ')[0] : visitor?.brand_name || name}</span>
 
                             {/* Original badge removed, new one is absolute position */}
 
-                            <span className={handleClass}>{!isRequest ? handle : ''}</span>
+                            {/* <span classNames={handleClass}>{!isRequest ? handle : ''}</span> */}
                             <span className="text-gray-500">·</span>
                             <span className={isRequest ? 'text-amber-300 font-semibold' : 'text-gray-500'}>{timeAgo} ago</span>
                         </div>
                     </div>
 
-                    {!isRequest && <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
+                    {!isRequest && <div className="flex items-center gap-2 mt-1 text-sm text-gray-400 flex-wrap">
                         <span>{hostel}</span>
-                        <span>·</span>
+                        <span>{'>'}</span>
                         {room && <span>{room}</span>}
                     </div>}
 
