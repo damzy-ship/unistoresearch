@@ -17,6 +17,7 @@ import ConfirmDeleteModal from '../components/hostel/ConfirmDeleteModal';
 import LoadingSpinner from '../components/hostel/LoadingSpinner';
 import { getUserId } from '../hooks/useTracking';
 import PostComposerVuna from '../components/hostel/PostComposerVuna';
+import { sendMassVendorNotification } from '../lib/brevoService';
 
 export default function HostelHomePage() {
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
@@ -346,7 +347,7 @@ export default function HostelHomePage() {
             const postCategory = await categorizePost(text.trim(), 'hostel');
             const postSearchWords = await extractProductKeywordsFromDescription(text.trim());
 
-            const { error } = await supabase
+            const { error: insertError } = await supabase
                 .from('hostel_product_updates')
                 .insert({
                     post_description: text.trim(),
@@ -357,7 +358,24 @@ export default function HostelHomePage() {
                     post_type: request ? 'request' : 'update'
                 });
 
-            if (error) throw error;
+            if (insertError) throw insertError;
+
+            console.log(`[HostelPost] Request successfully logged to Database for user: ${currentVisitor.id}`);
+
+            if (request) {
+                console.log(`[HostelPost] Post is a REQUEST. Triggering mass notification logic...`);
+                const schoolName = currentVisitor.schools?.name || currentVisitor.hostels?.schools?.name ||
+                    currentVisitor.schools?.short_name || currentVisitor.hostels?.schools?.short_name || 'N/A';
+
+                sendMassVendorNotification({
+                    university: schoolName,
+                    request_text: text.trim()
+                }).then(() => {
+                    console.log(`[HostelPost] Notification dispatch attempt finished for: ${schoolName}`);
+                });
+            } else {
+                console.log(`[HostelPost] Post is a regular UPDATE. No notification sent.`);
+            }
 
             await loadFeed();
         } catch (e) {

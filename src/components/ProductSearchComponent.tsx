@@ -12,7 +12,7 @@ function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [universityId, setUniversityId] = useState(null);
+  const [universityId, setUniversityId] = useState<string | null>(null);
   const [university, setUniversity] = useState<School | null>(null);
 
 
@@ -79,15 +79,11 @@ function ProductSearchComponent() {
       console.log('Request log error:', logError);
       }
 
-      // Trigger mass notifications in the background (fire-and-forget)
       sendMassVendorNotification({
-        university: university?.short_name || 'N/A',
+        university: university?.name || university?.short_name || 'N/A',
         request_text: searchQuery
       });
 
-      // Step 2: Store results and navigate to the new page
-      // You can store the results in state management (like Redux, Zustand) or pass them via route state
-      // For this example, we'll use route state to keep it simple.
       navigate('/search-results', { state: { products, searchQuery } });
 
     } catch (err) {
