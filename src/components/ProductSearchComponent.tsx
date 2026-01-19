@@ -6,6 +6,7 @@ import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not
 import { useTheme } from '../hooks/useTheme';
 import { History } from 'lucide-react';
 import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
+import { sendMassVendorNotification } from '../lib/brevoService';
 
 function ProductSearchComponent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -77,6 +78,13 @@ function ProductSearchComponent() {
       if (logError) {
       console.log('Request log error:', logError);
       }
+
+      // Trigger mass notifications in the background (fire-and-forget)
+      sendMassVendorNotification({
+        university: university?.short_name || 'N/A',
+        request_text: searchQuery
+      });
+
       // Step 2: Store results and navigate to the new page
       // You can store the results in state management (like Redux, Zustand) or pass them via route state
       // For this example, we'll use route state to keep it simple.
