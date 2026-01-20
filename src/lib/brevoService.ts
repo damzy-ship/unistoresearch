@@ -96,129 +96,152 @@ export async function sendMassVendorNotification(requestData: {
         const subject = `New Product Request: ${requestData.university}`;
         const htmlContent = `
       <!DOCTYPE html>
-      <html>
-      <head>
-          <meta charset="utf-8">
-          <style>
-              .email-container {
-                  max-width: 600px;
-                  margin: 0 auto;
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                  background-color: #f9fafb;
-                  padding: 20px;
-              }
-              .card {
-                  background-color: #ffffff;
-                  border-radius: 16px;
-                  overflow: hidden;
-                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                  border: 1px solid #e5e7eb;
-              }
-              .header {
-                  padding: 32px 24px;
-                  text-align: center;
-                  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-              }
-              .logo-text {
-                  font-size: 28px;
-                  font-weight: 800;
-                  margin: 0;
-              }
-              .uni { color: #f97316; }
-              .store { color: #2563eb; }
-              .dot { color: #2563eb; }
-              .content {
-                  padding: 32px 24px;
-              }
-              .badge {
-                  display: inline-block;
-                  padding: 6px 12px;
-                  background-color: #eff6ff;
-                  color: #2563eb;
-                  border-radius: 9999px;
-                  font-size: 12px;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                  letter-spacing: 0.05em;
-                  margin-bottom: 16px;
-              }
-              .title {
-                  font-size: 24px;
-                  font-weight: 700;
-                  color: #111827;
-                  margin: 0 0 12px 0;
-              }
-              .description {
-                  font-size: 16px;
-                  line-height: 1.6;
-                  color: #4b5563;
-                  margin: 0 0 24px 0;
-              }
-              .request-box {
-                  background-color: #f8fafc;
-                  border-radius: 12px;
-                  padding: 20px;
-                  margin-bottom: 32px;
-              }
-              .request-text {
-                  font-size: 18px;
-                  font-style: italic;
-                  color: #1e293b;
-                  margin: 0;
-              }
-              .cta-container {
-                  text-align: center;
-              }
-              .button {
-                  display: inline-block;
-                  padding: 14px 32px;
-                  background-color: #2563eb;
-                  color: #ffffff !important;
-                  text-decoration: none;
-                  border-radius: 10px;
-                  font-weight: 600;
-                  font-size: 16px;
-                  transition: background-color 0.2s;
-              }
-              .footer {
-                  padding: 24px;
-                  text-align: center;
-                  font-size: 14px;
-                  color: #9ca3af;
-              }
-          </style>
-      </head>
-      <body>
-          <div class="email-container">
-              <div class="card">
-                  <div class="header">
-                      <h1 class="logo-text">
-                          <span class="uni">uni</span><span class="store">store</span><span class="dot">.</span>
-                      </h1>
-                  </div>
-                  <div class="content">
-                      <div class="badge">Marketplace Notification</div>
-                      <h2 class="title">New Product Request! 🚀</h2>
-                      <p class="description">
-                          A student at <strong>${requestData.university}</strong> is looking for:
-                      </p>
-                      
-                      <div class="request-box">
-                          <p class="request-text">"${requestData.request_text}"</p>
-                      </div>
+<html>
 
-                      <div class="cta-container">
-                          <a href="https://search.unistore.ng" class="button">View & Contact Buyer</a>
-                      </div>
-                  </div>
-                  <div class="footer">
-                      <p>© ${new Date().getFullYear()} Unistore Marketplace. All rights reserved.</p>
-                      <p>Helping students find what they need, faster.</p>
-                  </div>
-              </div>
-          </div>
-      </body>
-      </html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9fafb;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .header {
+            padding: 20px 24px;
+            text-align: left;
+            /* background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); */
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .uni {
+            color: #f97316;
+        }
+
+        .store {
+            color: #2563eb;
+        }
+
+        .dot {
+            color: #2563eb;
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #eff6ff;
+            color: #2563eb;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 12px 0;
+        }
+
+        .description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #4b5563;
+            margin: 0 0 24px 0;
+        }
+
+        .request-box {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+
+        .request-text {
+            font-size: 18px;
+            font-style: italic;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .cta-container {
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #2563eb;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .footer {
+            padding: 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="card">
+            <div class="header">
+                <h1 class="logo-text">
+                    <span class="uni">uni</span><span class="store">store</span><span class="dot">.</span>
+                </h1>
+            </div>
+            <div class="content">
+                <h2 class="title">New Request Alert! 🚀</h2>
+                <p class="description">
+                    A student at <strong>${requestData.university}</strong> is looking for something:
+                </p>
+
+                <div class="request-box">
+                    <p class="request-text">"${requestData.request_text}"</p>
+                </div>
+
+                <p class="description">
+                    Log into your dashboard to see more details and contact the buyer.
+                </p>
+
+                <div class="cta-container">
+                    <a href="https://search.unistore.ng" class="button">View Request</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
     `;
 
         const BATCH_SIZE = 100;
