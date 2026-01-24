@@ -111,6 +111,7 @@ export interface HostelsProductUpdates {
   search_words: string[];
   status?: 'open' | 'fulfilled' | 'cancelled';
   post_type: 'update' | 'request';
+  fulfilled: boolean | null;
 }
 
 export interface RequestLog {
