@@ -176,7 +176,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
             )}
             {isRequest && isFulfilled && (
                 <div className="absolute top-4 right-4 text-[11px] font-extrabold px-3 py-1 rounded-full bg-emerald-400 text-gray-900 shadow-lg shadow-emerald-500/30 z-10 animate-pulse-once">
-                    ✓ FULFILLED
+                    ✓ FOUND
                 </div>
             )}
 
