@@ -99,7 +99,8 @@ export default function HostelHomePage() {
                         brand_name
                     ),
                     status,
-                    post_type
+                    post_type,
+                    fulfilled
                 `)
                 .order('created_at', { ascending: false });
 
@@ -117,6 +118,7 @@ export default function HostelHomePage() {
                 unique_visitors?: UniqueVisitor;
                 post_type?: string | null;
                 search_words?: string[] | null;
+                fulfilled?: boolean | null;
             };
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
             // Keep request posts even if they don't have hostel/school info; requests may not be tied to a hostel
@@ -137,6 +139,7 @@ export default function HostelHomePage() {
                 unique_visitors: d.unique_visitors,
                 post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
                 search_words: Array.isArray(d.search_words) ? d.search_words : [],
+                fulfilled: d.fulfilled ?? null,
             }));
 
             setFeed(mapped);
@@ -355,7 +358,8 @@ export default function HostelHomePage() {
                     actual_user_id: currentVisitor.id,
                     post_category: postCategory,
                     search_words: postSearchWords,
-                    post_type: request ? 'request' : 'update'
+                    post_type: request ? 'request' : 'update',
+                    fulfilled: request ? false : null
                 });
 
             if (insertError) throw insertError;
@@ -432,7 +436,8 @@ export default function HostelHomePage() {
                         brand_name
                     ),
                     status,
-                    post_type
+                    post_type,
+                    fulfilled
                     `)
                 .eq('post_category', postCategory)
                 .order('created_at', { ascending: false });

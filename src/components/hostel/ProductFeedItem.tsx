@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react';
-import { HostelsProductUpdates, UniqueVisitor } from '../../lib/supabase';
+import { HostelsProductUpdates, UniqueVisitor, supabase } from '../../lib/supabase';
 import ContactSellerButton from '../ContactSellerButton';
 import AuthModal from '../AuthModal';
 import { useEffect, useState } from 'react';
@@ -63,11 +63,15 @@ interface ProductFeedItemProps {
 
 export default function ProductFeedItem({ item, currentVisitor, openImageModal, onDelete, userIsHostelMerchant, userIsAuthenticated }: ProductFeedItemProps) {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isFulfillModalOpen, setIsFulfillModalOpen] = useState(false);
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
     const [showSignInModal, setShowSignInModal] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { currentTheme } = useTheme();
     const [signInContext, setSignInContext] = useState<'merchant' | 'recommend'>('merchant');
+
+    // Local state to track fulfilled status, initialized from prop
+    const [isFulfilled, setIsFulfilled] = useState(item.fulfilled || false);
 
     const handleIHaveIt = () => {
         if (!userIsAuthenticated) {
@@ -101,6 +105,21 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
         window.open(whatsappUrl, '_blank');
     };
 
+    const handleMarkFulfilled = async () => {
+        try {
+            const { error } = await supabase
+                .from('hostel_product_updates')
+                .update({ fulfilled: true })
+                .eq('id', item.id);
+
+            if (error) throw error;
+            setIsFulfilled(true);
+            setIsFulfillModalOpen(false);
+        } catch (error) {
+            console.error('Error marking request as fulfilled:', error);
+        }
+    };
+
     const visitor = item.unique_visitors as UniqueVisitor | undefined;
     const initials = String(visitor?.brand_name || visitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
     const name = visitor?.full_name || 'User';
@@ -111,16 +130,29 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
 
     const isOwnPost = currentVisitor?.id && visitor?.id === currentVisitor?.id;
     const isRequest = item.post_type === 'request';
+    const isAdmin = currentVisitor?.is_admin === true;
 
     // Unique styling for request posts
-    const articleClass = isRequest
-        ? 'border-b border-gray-700 border-l-4 border-l-amber-500 p-4 bg-gray-900/40 hover:bg-gray-900/50 transition-colors relative' // Unique Request BG/Border
-        : 'border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors relative'; // Preserved non-request BG/Border
+    let articleClass = 'border-b border-gray-800 p-4 hover:bg-gray-800/30 transition-colors relative'; // Default
+    let avatarBgClass = 'bg-[#253341]';
+    let initialsTextColor = 'text-[#8b98a5]';
+    let nameClass = 'font-bold text-white hover:underline cursor-pointer';
 
-    const avatarBgClass = isRequest ? 'bg-amber-500' : 'bg-[#253341]'; // Unique Request Initials BG
-    const initialsTextColor = isRequest ? 'text-gray-900' : 'text-[#8b98a5]'; // Unique Request Initials Color
-    const nameClass = isRequest ? 'font-bold text-amber-300 hover:underline cursor-pointer' : 'font-bold text-white hover:underline cursor-pointer'; // Unique Request Name Color
-    const handleClass = isRequest ? 'text-amber-500/70' : 'text-gray-500'; // Unique Request Handle Color
+    if (isRequest) {
+        if (isFulfilled) {
+            // FULFILLED REQUEST STYLING (Green Theme)
+            articleClass = 'border-b border-gray-700 border-l-4 border-l-emerald-500 p-4 bg-gray-900/40 hover:bg-gray-900/50 transition-colors relative';
+            avatarBgClass = 'bg-emerald-500';
+            initialsTextColor = 'text-gray-900';
+            nameClass = 'font-bold text-emerald-300 hover:underline cursor-pointer';
+        } else {
+            // ACTIVE REQUEST STYLING (Amber Theme)
+            articleClass = 'border-b border-gray-700 border-l-4 border-l-amber-500 p-4 bg-gray-900/40 hover:bg-gray-900/50 transition-colors relative';
+            avatarBgClass = 'bg-amber-500';
+            initialsTextColor = 'text-gray-900';
+            nameClass = 'font-bold text-amber-300 hover:underline cursor-pointer';
+        }
+    }
 
     const handleDeleteConfirm = () => {
         if (onDelete) {
@@ -129,17 +161,22 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
         setIsConfirmModalOpen(false);
     };
 
-    useEffect(() => {
-        // Reset modals when item changes
-         console.log(visitor)  
-    }, []);
+    // useEffect(() => {
+    //     // Reset modals when item changes
+    //     console.log(visitor)
+    // }, []);
 
     return (
         <article className={articleClass}>
             {/* Request Badge positioned at top-right with pop effect */}
-            {isRequest && (
+            {isRequest && !isFulfilled && (
                 <div className="absolute top-4 right-4 text-[11px] font-extrabold px-3 py-1 rounded-full bg-amber-400 text-gray-900 shadow-lg shadow-amber-500/30 z-10 animate-pulse-once">
                     ✨ REQUEST
+                </div>
+            )}
+            {isRequest && isFulfilled && (
+                <div className="absolute top-4 right-4 text-[11px] font-extrabold px-3 py-1 rounded-full bg-emerald-400 text-gray-900 shadow-lg shadow-emerald-500/30 z-10 animate-pulse-once">
+                    ✓ FULFILLED
                 </div>
             )}
 
@@ -163,7 +200,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
 
                             {/* <span classNames={handleClass}>{!isRequest ? handle : ''}</span> */}
                             <span className="text-gray-500">·</span>
-                            <span className={isRequest ? 'text-amber-300 font-semibold' : 'text-gray-500'}>{timeAgo} ago</span>
+                            <span className={isRequest ? (isFulfilled ? 'text-emerald-300 font-semibold' : 'text-amber-300 font-semibold') : 'text-gray-500'}>{timeAgo} ago</span>
                         </div>
                     </div>
 
@@ -175,7 +212,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
 
                     {/* Adjusted text color for request description */}
                     {item.post_description && (
-                        <p className={isRequest ? 'text-amber-100 mt-2 text-[15px] leading-normal whitespace-pre-wrap' : 'text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap'}>
+                        <p className={isRequest ? (isFulfilled ? 'text-emerald-100 mt-2 text-[15px] leading-normal whitespace-pre-wrap' : 'text-amber-100 mt-2 text-[15px] leading-normal whitespace-pre-wrap') : 'text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap'}>
                             {item.post_description}
                         </p>
                     )}
@@ -195,7 +232,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                         </ContactSellerButton>
                     </div>}
 
-                    {!isOwnPost && isRequest && (
+                    {!isOwnPost && isRequest && !isFulfilled && (
                         <div className="mt-3 flex gap-2 w-full">
                             <button
                                 onClick={handleIHaveIt}
@@ -287,16 +324,28 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                         </div>
                     )}
 
-                    {(isOwnPost || currentVisitor?.is_admin) && onDelete && (
-                        <div className='w-full flex justify-end mt-2'>
-                            <button
-                                onClick={() => onDelete(item.id)}
-                                className="flex items-center gap-1.5 px-3 py-1 text-sm font-semibold rounded-lg text-red-500 border border-red-500 hover:bg-red-500/10 transition-colors"
-                                aria-label="Delete post"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                                Delete Post
-                            </button>
+                    {(isOwnPost || isAdmin) && onDelete && (
+                        <div className='w-full flex justify-end mt-2 gap-2'>
+                            {isAdmin && isRequest && !isFulfilled && (
+                                <button
+                                    onClick={() => setIsFulfillModalOpen(true)}
+                                    className="flex items-center gap-1.5 px-3 py-1 text-sm font-semibold rounded-lg text-emerald-500 border border-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                                    aria-label="Mark as fulfilled"
+                                >
+                                    ✓ Fulfilled
+                                </button>
+                            )}
+
+                            {!isFulfilled && (
+                                <button
+                                    onClick={() => onDelete(item.id)}
+                                    className="flex items-center gap-1.5 px-3 py-1 text-sm font-semibold rounded-lg text-red-500 border border-red-500 hover:bg-red-500/10 transition-colors"
+                                    aria-label="Delete post"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    {isAdmin ? 'Delete' : 'Delete Post'}
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -336,11 +385,39 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                     </div>
                 </div>
             )}
+            {isFulfillModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
+                    onClick={() => setIsFulfillModalOpen(false)}
+                >
+                    <div
+                        className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                            ✓ Confirm Fulfillment
+                        </h3>
+                        <p className="text-gray-400 mb-6 text-sm">
+                            Are you sure you want to mark this request as fulfilled? This will hide action buttons for other users.
+                        </p>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsFulfillModalOpen(false)}
+                                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleMarkFulfilled}
+                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20"
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </article>
-
-
     );
 }
-
-// NOTE: Tailwind CSS classes like 'animate-pulse-once' are assumed to be defined
-// or equivalent to what you use in your project for a single, eye-catching animation.
