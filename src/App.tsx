@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme';
-import HomePage from './pages/HomePage';
+// import HomePage from './pages/HomePage';
 import PastRequestsPage from './pages/PastRequestsPage';
 import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
@@ -23,13 +23,13 @@ import CategoryProductsPage from './pages/CategoryProductsPage';
 import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import UserMenu from './components/UserMenu';
 import HostelHomePage from './pages/HostelHomePage';
-import { useHostelMode } from './hooks/useHostelMode';
+// import { useHostelMode } from './hooks/useHostelMode';
 
-function HomeEntry() {
-  const { hostelMode } = useHostelMode();
-  if (hostelMode) return <Navigate to="/hostel" replace />;
-  return <HomePage />;
-}
+// function HomeEntry() {
+//   const { hostelMode } = useHostelMode();
+//   if (hostelMode) return <Navigate to="/hostel" replace />;
+//   return <HomePage />;
+// }
 
 function App() {
   const { currentTheme } = useTheme();

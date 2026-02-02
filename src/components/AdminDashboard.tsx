@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Users, MessageSquare, Store, Tag, School, CreditCard, Zap } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, MessageSquare, Tag, School, CreditCard } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase, UniqueVisitor, RequestLog, Merchant } from '../lib/supabase';
+import { supabase, UniqueVisitor, RequestLog } from '../lib/supabase';
 import LoginForm from './admin/LoginForm';
 import OverviewTab from './admin/OverviewTab';
 import VisitorsTab from './admin/VisitorsTab';
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   });
   const [visitors, setVisitors] = useState<UniqueVisitor[]>([]);
   const [requests, setRequests] = useState<RequestLog[]>([]);
-  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  // const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [loading, setLoading] = useState(false);
   type TabId = 'overview' | 'visitors' | 'requests' | 'merchants' | 'categories' | 'schools' | 'real-time' | 'invoices';
   const [activeTab, setActiveTab] = useState<TabId>('overview');
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
 
       if (visitorsData) setVisitors(visitorsData);
       if (requestsData) setRequests(requestsData);
-      if (merchantsData) setMerchants(merchantsData);
+      // if (merchantsData) setMerchants(merchantsData);
 
       // Calculate stats
       const today = new Date().toISOString().split('T')[0];
@@ -223,8 +223,8 @@ export default function AdminDashboard() {
               key={id}
               onClick={() => handleTabChange(id as TabId)}
               className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${activeTab === id
-                  ? 'bg-white text-orange-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-white text-orange-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
             >
               <Icon className="w-4 h-4" />
@@ -239,6 +239,7 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <>
+
             {activeTab === 'overview' && <OverviewTab stats={stats} />}
             {activeTab === 'visitors' && <VisitorsTab visitors={visitors} />}
             {activeTab === 'requests' && <RequestsTab requests={requests} onRefresh={fetchData} />}

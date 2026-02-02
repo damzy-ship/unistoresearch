@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Store, MapPin, ExternalLink, Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Store, ExternalLink, Award } from 'lucide-react';
 import { MerchantWithCategories } from '../lib/gemini';
-import { getUserRequestCount, isAuthenticated } from '../hooks/useTracking';
+import { isAuthenticated } from '../hooks/useTracking';
 import AuthModal from './AuthModal';
 import StarRating from './StarRating';
 import { trackContactInteraction } from '../lib/ratingService';
@@ -39,7 +39,7 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
   const contactSeller = async (seller: MerchantWithCategories) => {
     // Track the contact interaction for rating prompts
     await trackContactInteraction(seller.id, requestId);
-    
+
     const message = `Hi! I'm looking for the following from ${university} University: ${requestText}`;
     const whatsappUrl = `https://wa.me/${seller.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
@@ -107,7 +107,7 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
             <p className="text-gray-600 mb-4">
               We couldn't find any sellers matching your request at the moment.
             </p>
-            
+
             <div className="space-y-3">
               <button
                 onClick={() => {
@@ -120,11 +120,11 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
               >
                 Contact us directly
               </button>
-              
+
               <div className="text-center">
                 <span className="text-sm text-gray-500">or</span>
               </div>
-              
+
               <button
                 onClick={() => window.open("https://unistore.ng", "_blank")}
                 className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"

@@ -58,13 +58,13 @@ export default function ProductGallery({ merchantId, editable = false, className
         setError('File size exceeds 5MB limit');
         return;
       }
-      
+
       // Check file type
       if (!file.type.startsWith('image/')) {
         setError('Only image files are allowed');
         return;
       }
-      
+
       setSelectedFile(file);
       setShowLabelInput(true);
       setError(null);
@@ -73,29 +73,29 @@ export default function ProductGallery({ merchantId, editable = false, className
 
   const handleUpload = async () => {
     if (!selectedFile) return;
-    
+
     setUploading(true);
     setError(null);
-    
+
     try {
       // 1. Upload file to Supabase Storage
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${merchantId}_${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
+
+      const { error: uploadError } = await supabase.storage
         .from('product_images')
         .upload(filePath, selectedFile);
-      
+
       if (uploadError) {
         throw new Error(`Error uploading image: ${uploadError.message}`);
       }
-      
+
       // 2. Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('product_images')
         .getPublicUrl(filePath);
-      
+
       // 3. Store metadata in database
       const { error: dbError } = await supabase
         .from('merchant_product_images')
@@ -104,19 +104,19 @@ export default function ProductGallery({ merchantId, editable = false, className
           image_url: publicUrl,
           label: newImageLabel || null
         });
-      
+
       if (dbError) {
         throw new Error(`Error storing image metadata: ${dbError.message}`);
       }
-      
+
       // 4. Refresh images
       fetchImages();
-      
+
       // 5. Reset form
       setSelectedFile(null);
       setNewImageLabel('');
       setShowLabelInput(false);
-      
+
     } catch (err) {
       console.error('Error uploading image:', err);
       setError(err instanceof Error ? err.message : 'Failed to upload image');
@@ -132,11 +132,11 @@ export default function ProductGallery({ merchantId, editable = false, className
         .from('merchant_product_images')
         .delete()
         .eq('id', imageId);
-      
+
       if (dbError) {
         throw new Error(`Error deleting image metadata: ${dbError.message}`);
       }
-      
+
       // 2. Delete from storage (extract file path from URL)
       // This is a bit tricky as we need to extract the file name from the URL
       const fileName = imageUrl.split('/').pop();
@@ -144,16 +144,16 @@ export default function ProductGallery({ merchantId, editable = false, className
         const { error: storageError } = await supabase.storage
           .from('product_images')
           .remove([fileName]);
-        
+
         if (storageError) {
           console.warn('Error deleting image file:', storageError);
           // Continue anyway as the metadata is deleted
         }
       }
-      
+
       // 3. Refresh images
       fetchImages();
-      
+
     } catch (err) {
       console.error('Error deleting image:', err);
       setError(err instanceof Error ? err.message : 'Failed to delete image');
@@ -178,7 +178,7 @@ export default function ProductGallery({ merchantId, editable = false, className
     return (
       <div className={`text-center py-8 ${className}`}>
         <div className="text-red-500 mb-2">{error}</div>
-        <button 
+        <button
           onClick={fetchImages}
           className="text-orange-600 hover:text-orange-700 font-medium"
         >
@@ -195,27 +195,27 @@ export default function ProductGallery({ merchantId, editable = false, className
           {error}
         </div>
       )}
-      
+
       {/* Image Grid */}
       {images.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {images.map((image) => (
-            <div 
-              key={image.id} 
+            <div
+              key={image.id}
               className="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square"
             >
-              <img 
-                src={image.image_url} 
-                alt={image.label || 'Product image'} 
+              <img
+                src={image.image_url}
+                alt={image.label || 'Product image'}
                 className="w-full h-full object-cover"
               />
-              
+
               {image.label && (
                 <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm truncate">
                   {image.label}
                 </div>
               )}
-              
+
               {editable && (
                 <button
                   onClick={() => handleDeleteImage(image.id, image.image_url)}
@@ -234,7 +234,7 @@ export default function ProductGallery({ merchantId, editable = false, className
           <p className="text-gray-500">No product images available</p>
         </div>
       )}
-      
+
       {/* Upload Controls (only shown when editable) */}
       {editable && (
         <div className="mt-4">
@@ -243,10 +243,10 @@ export default function ProductGallery({ merchantId, editable = false, className
               <label className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
                 <Plus className="w-4 h-4" />
                 Add Product Image
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
                   onChange={handleFileChange}
                   disabled={uploading}
                 />
@@ -267,7 +267,7 @@ export default function ProductGallery({ merchantId, editable = false, className
                   disabled={uploading}
                 />
               </div>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={handleCancelUpload}
