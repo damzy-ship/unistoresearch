@@ -59,9 +59,10 @@ interface ProductFeedItemProps {
     userIsAuthenticated?: boolean;
     openImageModal: (images: string[], startIndex: number) => void;
     onDelete?: (id: string) => void;
+    discountValue?: number;
 }
 
-export default function ProductFeedItem({ item, currentVisitor, openImageModal, onDelete, userIsHostelMerchant, userIsAuthenticated }: ProductFeedItemProps) {
+export default function ProductFeedItem({ item, currentVisitor, openImageModal, onDelete, userIsHostelMerchant, userIsAuthenticated, discountValue }: ProductFeedItemProps) {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isFulfillModalOpen, setIsFulfillModalOpen] = useState(false);
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
@@ -215,6 +216,27 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                         <p className={isRequest ? (isFulfilled ? 'text-emerald-100 mt-2 text-[15px] leading-normal whitespace-pre-wrap' : 'text-amber-100 mt-2 text-[15px] leading-normal whitespace-pre-wrap') : 'text-white mt-2 text-[15px] leading-normal whitespace-pre-wrap'}>
                             {item.post_description}
                         </p>
+                    )}
+
+                    {item.price != null && (
+                        <div className="mt-2 text-sm font-medium">
+                            <div className="flex items-center gap-2">
+                                {discountValue && discountValue > 0 ? (
+                                    <>
+                                        <span className="text-gray-400 line-through text-xs">
+                                            ₦{item.price.toLocaleString()}
+                                        </span>
+                                        <span className="text-emerald-400 font-bold text-base">
+                                            ₦{Math.max(0, item.price - discountValue).toLocaleString()}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-emerald-400">
+                                        ₦{item.price.toLocaleString()}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
                     )}
 
                     {renderImageGrid(item.post_images, openImageModal)}

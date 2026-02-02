@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
+import { supabase, HostelsProductUpdates, UniqueVisitor, Coupon } from '../lib/supabase';
 import { uploadImageToSupabase } from '../lib/databaseServices';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import AuthModal from '../components/AuthModal';
 import ConfirmContactModal from '../components/ConfirmContactModal';
-import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
+import { categorizePost, extractProductKeywordsFromDescription, extractPriceFromHostelPost } from '../lib/gemini';
 import { useHostelMode } from '../hooks/useHostelMode';
 // import PostComposer from '../components/hostel/PostComposer';
 import ProductFeedItem from '../components/hostel/ProductFeedItem';
@@ -18,6 +18,7 @@ import LoadingSpinner from '../components/hostel/LoadingSpinner';
 import { getUserId } from '../hooks/useTracking';
 import PostComposerVuna from '../components/hostel/PostComposerVuna';
 import { sendMassVendorNotification } from '../lib/brevoService';
+import { CouponGameModal } from '../components/hostel/CouponGameModal';
 
 export default function HostelHomePage() {
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
@@ -59,16 +60,96 @@ export default function HostelHomePage() {
     const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
     const [pendingContactProduct, setPendingContactProduct] = useState(null);
 
+    const [couponModalOpen, setCouponModalOpen] = useState(false);
+    const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
+    const [couponCodeInput, setCouponCodeInput] = useState('');
+    const [verifyingCoupon, setVerifyingCoupon] = useState(false);
+
     const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (!activeCoupon?.claimedAt) {
+            setTimeRemaining(null);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+            const expiryTime = activeCoupon.claimedAt! + oneHour;
+            const diff = expiryTime - now;
+
+            if (diff <= 0) {
+                // Expire
+                setActiveCoupon(null);
+                localStorage.removeItem('hostel_coupon');
+                toast.info('Coupon expired');
+                clearInterval(interval);
+                setTimeRemaining(null);
+            } else {
+                setTimeRemaining(diff);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [activeCoupon]);
+
+    const formatTime = (ms: number) => {
+        const minutes = Math.floor(ms / 60000);
+        const seconds = Math.floor((ms % 60000) / 1000);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
     const navigate = useNavigate();
     const { toggleHostelMode } = useHostelMode();
-
     const userIsHostelMerchant = currentVisitor?.is_hostel_merchant === true;
+
+    const handleGameCouponClaimed = (coupon: Coupon) => {
+        const couponWithLimit = { ...coupon, claimedAt: Date.now() };
+        setActiveCoupon(couponWithLimit as Coupon);
+        localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
+        setCouponModalOpen(false);
+        toast.success('Gift claimed! Prices slashed! 📉');
+    };
+
+    const handleVerifyCoupon = async () => {
+        if (!couponCodeInput.trim()) return;
+        setVerifyingCoupon(true);
+        try {
+            const { data, error } = await supabase
+                .from('coupons')
+                .select('*')
+                .eq('code', couponCodeInput.trim())
+                .single();
+
+            if (error) throw error;
+
+            if (data) {
+                const couponWithLimit = { ...data, claimedAt: Date.now() };
+                setActiveCoupon(couponWithLimit as Coupon);
+                // Persist to local storage
+                localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
+
+                setCouponModalOpen(false);
+                setCouponCodeInput('');
+                toast.success('Coupon applied successfully!');
+            } else {
+                toast.error('Invalid coupon code');
+            }
+        } catch (e) {
+            console.error('Coupon verification failed', e);
+            // toast.error('Invalid coupon code');
+        } finally {
+            setVerifyingCoupon(false);
+        }
+    };
+
 
 
     const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
@@ -80,28 +161,29 @@ export default function HostelHomePage() {
             const { data, error } = await supabase
                 .from('hostel_product_updates')
                 .select(`
-                    id,
-                    post_category,
-                    post_description,
-                    post_images,
-                    created_at,
-                    actual_user_id,
-                    unique_visitors:actual_user_id (
-                        id,
-                        full_name,
-                        profile_picture,
-                        phone_number,
-                        room,
-                        is_hostel_merchant,
-                        hostel_id,
-                        hostels (id, name, school_id),
-                        schools (id, short_name),
-                        brand_name
-                    ),
-                    status,
-                    post_type,
-                    fulfilled
-                `)
+            id,
+            post_category,
+            post_description,
+            post_images,
+            created_at,
+            actual_user_id,
+            unique_visitors:actual_user_id (
+            id,
+            full_name,
+            profile_picture,
+            phone_number,
+            room,
+            is_hostel_merchant,
+            hostel_id,
+            hostels (id, name, school_id),
+            schools (id, short_name),
+            brand_name
+            ),
+            status,
+            post_type,
+            fulfilled,
+            price
+            `)
                 .order('created_at', { ascending: false });
 
             // console.log('Fetched feed:', data);
@@ -119,6 +201,7 @@ export default function HostelHomePage() {
                 post_type?: string | null;
                 search_words?: string[] | null;
                 fulfilled?: boolean | null;
+                price?: number | null;
             };
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
             // Keep request posts even if they don't have hostel/school info; requests may not be tied to a hostel
@@ -140,6 +223,7 @@ export default function HostelHomePage() {
                 post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
                 search_words: Array.isArray(d.search_words) ? d.search_words : [],
                 fulfilled: d.fulfilled ?? null,
+                price: d.price ?? 0
             }));
 
             setFeed(mapped);
@@ -321,6 +405,34 @@ export default function HostelHomePage() {
     }, [loadFeed]);
 
     useEffect(() => {
+        // Coupon Persistence Check
+        const storedCoupon = localStorage.getItem('hostel_coupon');
+        let isValidCoupon = false;
+
+        if (storedCoupon) {
+            try {
+                const parsed = JSON.parse(storedCoupon);
+                const oneHour = 60 * 60 * 1000;
+                if (Date.now() - parsed.claimedAt < oneHour) {
+                    setActiveCoupon(parsed);
+                    isValidCoupon = true;
+                } else {
+                    // Expired
+                    localStorage.removeItem('hostel_coupon');
+                    toast.info('Your coupon has expired.');
+                }
+            } catch (e) {
+                localStorage.removeItem('hostel_coupon');
+            }
+        }
+
+        // Welcome: Open coupon modal if no active/valid coupon found
+        if (!isValidCoupon) {
+            setCouponModalOpen(true);
+        }
+    }, []);
+
+    useEffect(() => {
         if (!userIsAuthenticated) return;
         const raw = localStorage.getItem('pending_contact_product');
         if (raw) {
@@ -349,6 +461,7 @@ export default function HostelHomePage() {
 
             const postCategory = await categorizePost(text.trim(), 'hostel');
             const postSearchWords = await extractProductKeywordsFromDescription(text.trim());
+            const extractedPrice = await extractPriceFromHostelPost(text.trim());
 
             const { error: insertError } = await supabase
                 .from('hostel_product_updates')
@@ -359,7 +472,8 @@ export default function HostelHomePage() {
                     post_category: postCategory,
                     search_words: postSearchWords,
                     post_type: request ? 'request' : 'update',
-                    fulfilled: request ? false : null
+                    fulfilled: request ? false : null,
+                    price: extractedPrice
                 });
 
             if (insertError) throw insertError;
@@ -417,28 +531,28 @@ export default function HostelHomePage() {
             const { data, error } = await supabase
                 .from('hostel_product_updates')
                 .select(`
-                    id,
-                    post_category,
-                    post_description,
-                    post_images,
-                    created_at,
-                    actual_user_id,
-                    unique_visitors:actual_user_id (
-                        id,
-                        full_name,
-                        profile_picture,
-                        phone_number,
-                        room,
-                        is_hostel_merchant,
-                        hostel_id,
-                        hostels (id, name, school_id),
-                        schools (id, short_name),
-                        brand_name
-                    ),
-                    status,
-                    post_type,
-                    fulfilled
-                    `)
+            id,
+            post_category,
+            post_description,
+            post_images,
+            created_at,
+            actual_user_id,
+            unique_visitors:actual_user_id (
+            id,
+            full_name,
+            profile_picture,
+            phone_number,
+            room,
+            is_hostel_merchant,
+            hostel_id,
+            hostels (id, name, school_id),
+            schools (id, short_name),
+            brand_name
+            ),
+            status,
+            post_type,
+            fulfilled
+            `)
                 .eq('post_category', postCategory)
                 .order('created_at', { ascending: false });
 
@@ -685,12 +799,50 @@ export default function HostelHomePage() {
                                             userIsAuthenticated={userIsAuthenticated}
                                             openImageModal={openImageModal}
                                             onDelete={handleDeleteClick}
+                                            discountValue={activeCoupon?.value}
                                         />
                                     ))}
                                 </>
                             )}
                         </div>
                     </div>
+
+                    {/* NEW Gamified Coupon Modal */}
+                    <CouponGameModal
+                        isOpen={couponModalOpen}
+                        onClose={() => setCouponModalOpen(false)}
+                        onCouponClaimed={handleGameCouponClaimed}
+                    />
+
+                    {/* Old manual modal removed or commented out.
+                If we want to support manual entry (e.g. "I already have a code"),
+                we could add a small link in the GameModal to switch to manual mode.
+                For now, replacing entirely as per "I want the modal to be a modal showing all unclaimed coupons".
+            */}
+
+                    {/* Coupon Timer Pill */}
+                    {activeCoupon && timeRemaining !== null && (
+                        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-4 fade-in duration-500 pointer-events-none">
+                            <div className="bg-gray-900/90 backdrop-blur-md border border-purple-500/30 shadow-lg shadow-purple-500/10 rounded-full px-5 py-2 flex items-center gap-3 pointer-events-auto">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xl">🎟️</span>
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">Coupon Active</p>
+                                        {/* <p className="text-sm font-bold text-white flex items-center gap-1 leading-tight">
+                                            <span className="text-purple-400">(-₦{activeCoupon.value})</span>
+                                        </p> */}
+                                    </div>
+                                </div>
+                                <div className="h-8 w-px bg-gray-700"></div>
+                                <div className="text-right min-w-[60px]">
+                                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">Expires</p>
+                                    <p className={`text-sm font-mono font-bold leading-tight ${timeRemaining < 300000 ? 'text-red-400 animate-pulse' : 'text-emerald-400'}`}>
+                                        {formatTime(timeRemaining)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <ImageModal
                         isOpen={imageModalOpen}

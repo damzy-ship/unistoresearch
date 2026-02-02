@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from './supabase';
 import { fetchExistingCategories } from './categoryService';
-import { transformDescriptionForEmbedding } from './generateEmbedding';
+// import { transformDescriptionForEmbedding } from './generateEmbedding';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -803,22 +803,59 @@ Extract information now:`;
       jsonText = text.slice(3, -3).trim();
     }
 
-    // Parse JSON response
-    const extractedData = JSON.parse(jsonText);
+    try {
+      const result = JSON.parse(jsonText);
+      return {
+        price: typeof result.price === 'number' ? result.price : undefined,
+        location: typeof result.location === 'string' ? result.location : undefined,
+        category: typeof result.category === 'string' ? result.category : undefined,
+        contact_phone: typeof result.contact_phone === 'string' ? result.contact_phone : undefined,
+        success: true
+      };
+    } catch (e) {
+      console.error('Failed to parse extraction result:', e);
+      return { success: false, error: 'Failed to parse JSON' };
+    }
 
-    return {
-      price: extractedData.price || null,
-      location: extractedData.location || null,
-      category: extractedData.category || null,
-      contact_phone: extractedData.contact_phone || null,
-      success: true
-    };
   } catch (error) {
-    console.error('Error extracting product info with Gemini:', error);
+    console.error('Error identifying product info with Gemini:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to extract product information'
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
+  }
+}
+
+/**
+ * Extract price from hostel product post text
+ */
+export async function extractPriceFromHostelPost(description: string): Promise<number | null> {
+  if (!genAI) return null;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const prompt = `
+    Extract the price from this text. Return ONLY the number.
+    If multiple prices, return the main product price.
+    If no price, return null. 
+    Ignore currency symbols like 'N', 'NGN', 'naira'.
+    
+    Text: "${description}"
+    
+    Response (number or null):
+    `;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim();
+
+    if (text.toLowerCase() === 'null') return null;
+
+    const price = parseInt(text.replace(/[^0-9]/g, ''));
+    return isNaN(price) ? null : price;
+  } catch (error) {
+    console.error('Error extracting price:', error);
+    return null;
   }
 }
 

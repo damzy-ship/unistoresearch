@@ -112,6 +112,7 @@ export interface HostelsProductUpdates {
   status?: 'open' | 'fulfilled' | 'cancelled';
   post_type: 'update' | 'request';
   fulfilled: boolean | null;
+  price: number
 }
 
 export interface RequestLog {
@@ -174,7 +175,15 @@ export async function deleteRequestLog(requestId: string): Promise<{ success: bo
     }
     return { success: true };
   } catch (error) {
-    console.error('Unexpected error deleting request log:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  value: number;
+  claimed: boolean;
+  created_at: string;
+  claimedAt?: number;
 }
