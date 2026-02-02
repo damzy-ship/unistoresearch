@@ -121,6 +121,7 @@ Generate categories now:`;
 
     } catch (parseError) {
       console.error('Failed to parse Gemini response:', jsonText);
+      console.error('Parse error:', parseError);
       return {
         categories: [],
         success: false,
@@ -205,6 +206,7 @@ Generate categories for this request:`;
         .slice(0, 5);
 
     } catch (parseError) {
+      console.error('Parse error:', parseError);
       console.error('Failed to parse Gemini response for category generation:', jsonText);
       return {
         categories: [],
@@ -309,6 +311,7 @@ Return semantic matches:`;
       semanticMatches = semanticMatches.filter(match => catalogCategories.includes(match));
 
     } catch (parseError) {
+      console.error('Parse error:', parseError);
       console.error('Failed to parse semantic matching response:', jsonText);
       return [];
     }

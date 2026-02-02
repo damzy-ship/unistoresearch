@@ -62,8 +62,8 @@ export default function HostelHomePage() {
 
     const [couponModalOpen, setCouponModalOpen] = useState(false);
     const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
-    const [couponCodeInput, setCouponCodeInput] = useState('');
-    const [verifyingCoupon, setVerifyingCoupon] = useState(false);
+    // const [couponCodeInput, setCouponCodeInput] = useState('');
+    // const [_, setVerifyingCoupon] = useState(false);
 
     const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
@@ -118,37 +118,37 @@ export default function HostelHomePage() {
         toast.success('Gift claimed! Prices slashed! 📉');
     };
 
-    const handleVerifyCoupon = async () => {
-        if (!couponCodeInput.trim()) return;
-        setVerifyingCoupon(true);
-        try {
-            const { data, error } = await supabase
-                .from('coupons')
-                .select('*')
-                .eq('code', couponCodeInput.trim())
-                .single();
+    // const handleVerifyCoupon = async () => {
+    //     if (!couponCodeInput.trim()) return;
+    //     setVerifyingCoupon(true);
+    //     try {
+    //         const { data, error } = await supabase
+    //             .from('coupons')
+    //             .select('*')
+    //             .eq('code', couponCodeInput.trim())
+    //             .single();
 
-            if (error) throw error;
+    //         if (error) throw error;
 
-            if (data) {
-                const couponWithLimit = { ...data, claimedAt: Date.now() };
-                setActiveCoupon(couponWithLimit as Coupon);
-                // Persist to local storage
-                localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
+    //         if (data) {
+    //             const couponWithLimit = { ...data, claimedAt: Date.now() };
+    //             setActiveCoupon(couponWithLimit as Coupon);
+    //             // Persist to local storage
+    //             localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
 
-                setCouponModalOpen(false);
-                setCouponCodeInput('');
-                toast.success('Coupon applied successfully!');
-            } else {
-                toast.error('Invalid coupon code');
-            }
-        } catch (e) {
-            console.error('Coupon verification failed', e);
-            // toast.error('Invalid coupon code');
-        } finally {
-            setVerifyingCoupon(false);
-        }
-    };
+    //             setCouponModalOpen(false);
+    //             setCouponCodeInput('');
+    //             toast.success('Coupon applied successfully!');
+    //         } else {
+    //             toast.error('Invalid coupon code');
+    //         }
+    //     } catch (e) {
+    //         console.error('Coupon verification failed', e);
+    //         // toast.error('Invalid coupon code');
+    //     } finally {
+    //         setVerifyingCoupon(false);
+    //     }
+    // };
 
 
 
@@ -422,6 +422,7 @@ export default function HostelHomePage() {
                     toast.info('Your coupon has expired.');
                 }
             } catch (e) {
+                console.error('Error parsing coupon', e);
                 localStorage.removeItem('hostel_coupon');
             }
         }
@@ -810,7 +811,7 @@ export default function HostelHomePage() {
                     {/* NEW Gamified Coupon Modal */}
                     <CouponGameModal
                         isOpen={couponModalOpen}
-                        onClose={() => setCouponModalOpen(false)}
+                        // onClose={() => setCouponModalOpen(false)}
                         onCouponClaimed={handleGameCouponClaimed}
                     />
 

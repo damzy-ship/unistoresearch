@@ -7,7 +7,6 @@ import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
 import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
-import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
@@ -55,7 +54,6 @@ function App() {
             <Route path="/sellers" element={<SellersPage />} />
             <Route path="/merchants" element={<PublicMerchantsPage />} />
             <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/test-categories" element={<CategoryTest />} />
             <Route path="/payment/:merchantId" element={<PaymentPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />

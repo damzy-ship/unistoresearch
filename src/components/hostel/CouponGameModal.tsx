@@ -5,11 +5,10 @@ import { toast } from 'sonner';
 
 interface CouponGameModalProps {
     isOpen: boolean;
-    onClose: () => void;
     onCouponClaimed: (coupon: Coupon) => void;
 }
 
-export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onClose, onCouponClaimed }) => {
+export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCouponClaimed }) => {
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -39,6 +38,7 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onClos
                         localStorage.removeItem('hostel_coupon_pending');
                     }
                 } catch (e) {
+                    console.error(e);
                     localStorage.removeItem('hostel_coupon_pending');
                 }
             }
@@ -76,9 +76,9 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onClos
         }, 800);
     };
 
-    const updateCouponStatus = async (id: string) => {
-        // Optimistically update, but we really should sync with DB
-    };
+    // const updateCouponStatus = async (id: string) => {
+    //     // Optimistically update, but we really should sync with DB
+    // };
 
     const handleContinue = async () => {
         if (!activeCoupon) return;
@@ -92,6 +92,7 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onClos
             // Let's keep it to prevent re-picking even after claiming (until expiry).
             onCouponClaimed(activeCoupon);
         } catch (e) {
+            console.error(e);
             toast.error("Failed to claim. Please screenshot and contact support.");
         }
     };

@@ -2,7 +2,7 @@ import { Trash2 } from 'lucide-react';
 import { HostelsProductUpdates, UniqueVisitor, supabase } from '../../lib/supabase';
 import ContactSellerButton from '../ContactSellerButton';
 import AuthModal from '../AuthModal';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
 const formatTimeAgo = (timestamp: string): string => {
