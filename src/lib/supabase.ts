@@ -185,5 +185,6 @@ export interface Coupon {
   value: number;
   claimed: boolean;
   created_at: string;
-  claimedAt?: number;
+  claimed_by: string;
+  school_id: string;
 }
