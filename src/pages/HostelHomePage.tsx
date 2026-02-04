@@ -119,6 +119,7 @@ export default function HostelHomePage() {
                 post_type?: string | null;
                 search_words?: string[] | null;
                 fulfilled?: boolean | null;
+                status?: string | null;
             };
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
             // Keep request posts even if they don't have hostel/school info; requests may not be tied to a hostel
@@ -140,6 +141,7 @@ export default function HostelHomePage() {
                 post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
                 search_words: Array.isArray(d.search_words) ? d.search_words : [],
                 fulfilled: d.fulfilled ?? null,
+                status: d.status as 'open' | 'fulfilled' | 'cancelled' | 'hide' | undefined,
             }));
 
             setFeed(mapped);
@@ -163,6 +165,13 @@ export default function HostelHomePage() {
             const matchesCategory = selectedCategory === 'all' || !selectedCategory
                 ? true
                 : (item.post_category || '').toLowerCase() === selectedCategory.toLowerCase();
+
+            const isHidden = item.status === 'hide';
+            if (isHidden) {
+                const isAdmin = currentVisitor?.is_admin;
+                const isOwner = currentVisitor?.id === item.actual_user_id;
+                if (!isAdmin && !isOwner) return false;
+            }
 
             return matchesHostel && matchesCategory;
         });
@@ -448,9 +457,19 @@ export default function HostelHomePage() {
 
             console.log('Search fetched list:', list);
 
-            const filtered = selectedSchoolId
-                ? list.filter((d) => (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId)
-                : list;
+            const filtered = list.filter((d) => {
+                const schoolMatch = selectedSchoolId
+                    ? (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId
+                    : true;
+
+                const isHidden = d.status === 'hide';
+                if (isHidden) {
+                    const isAdmin = currentVisitor?.is_admin;
+                    const isOwner = currentVisitor?.id === d.actual_user_id;
+                    if (!isAdmin && !isOwner) return false;
+                }
+                return schoolMatch;
+            });
 
             if (postSearchWords.length > 0) {
                 const rankedResults = filtered.map(item => {

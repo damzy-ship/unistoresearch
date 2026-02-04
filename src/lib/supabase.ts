@@ -109,7 +109,7 @@ export interface HostelsProductUpdates {
   unique_visitors?: UniqueVisitor;
   post_category: string;
   search_words: string[];
-  status?: 'open' | 'fulfilled' | 'cancelled';
+  status?: 'open' | 'fulfilled' | 'cancelled' | 'hide';
   post_type: 'update' | 'request';
   fulfilled: boolean | null;
 }
