@@ -7,7 +7,7 @@ import { uploadImageToSupabase } from '../lib/databaseServices';
 import ConfirmUniversityModal from '../components/ConfirmUniversityModal';
 import AuthModal from '../components/AuthModal';
 import ConfirmContactModal from '../components/ConfirmContactModal';
-import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
+import { categorizePost, extractPriceFromHostelPost, extractProductKeywordsFromDescription } from '../lib/gemini';
 import { useHostelMode } from '../hooks/useHostelMode';
 // import PostComposer from '../components/hostel/PostComposer';
 import ProductFeedItem from '../components/hostel/ProductFeedItem';
@@ -358,6 +358,7 @@ export default function HostelHomePage() {
 
             const postCategory = await categorizePost(text.trim(), 'hostel');
             const postSearchWords = await extractProductKeywordsFromDescription(text.trim());
+            const extractedPrice = await extractPriceFromHostelPost(text.trim());
 
             const { error: insertError } = await supabase
                 .from('hostel_product_updates')
@@ -368,7 +369,8 @@ export default function HostelHomePage() {
                     post_category: postCategory,
                     search_words: postSearchWords,
                     post_type: request ? 'request' : 'update',
-                    fulfilled: request ? false : null
+                    fulfilled: request ? false : null,
+                    price: extractedPrice
                 });
 
             if (insertError) throw insertError;
