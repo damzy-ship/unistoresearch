@@ -20,6 +20,10 @@ import PostComposerVuna from '../components/hostel/PostComposerVuna';
 import { sendMassVendorNotification } from '../lib/brevoService';
 import { CouponGameModal } from '../components/hostel/CouponGameModal';
 
+interface ActiveCoupon extends Coupon {
+    claimed_at: number;
+}
+
 export default function HostelHomePage() {
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
     const [posting, setPosting] = useState<boolean>(false);
@@ -58,10 +62,10 @@ export default function HostelHomePage() {
     const [searchResults, setSearchResults] = useState<HostelsProductUpdates[] | null>(null);
     const [searchTerm, setSearchTerm] = useState<string | null>(null);
     const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
-    const [pendingContactProduct, setPendingContactProduct] = useState(null);
+    const [pendingContactProduct, setPendingContactProduct] = useState<HostelsProductUpdates | null>(null);
 
     const [couponModalOpen, setCouponModalOpen] = useState(false);
-    const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
+    const [activeCoupon, setActiveCoupon] = useState<ActiveCoupon | null>(null);
     // const [couponCodeInput, setCouponCodeInput] = useState('');
     // const [_, setVerifyingCoupon] = useState(false);
 
@@ -74,7 +78,7 @@ export default function HostelHomePage() {
     const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
 
     useEffect(() => {
-        if (!activeCoupon?.claimedAt) {
+        if (!activeCoupon?.claimed_at) {
             setTimeRemaining(null);
             return;
         }
@@ -82,7 +86,7 @@ export default function HostelHomePage() {
         const interval = setInterval(() => {
             const now = Date.now();
             const oneHour = 60 * 60 * 1000;
-            const expiryTime = activeCoupon.claimedAt! + oneHour;
+            const expiryTime = activeCoupon.claimed_at! + oneHour;
             const diff = expiryTime - now;
 
             if (diff <= 0) {
@@ -111,8 +115,8 @@ export default function HostelHomePage() {
     const userIsHostelMerchant = currentVisitor?.is_hostel_merchant === true;
 
     const handleGameCouponClaimed = (coupon: Coupon) => {
-        const couponWithLimit = { ...coupon, claimedAt: Date.now() };
-        setActiveCoupon(couponWithLimit as Coupon);
+        const couponWithLimit: ActiveCoupon = { ...coupon, claimed_at: Date.now() };
+        setActiveCoupon(couponWithLimit);
         localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
         setCouponModalOpen(false);
         toast.success('Gift claimed! Prices slashed! 📉');
@@ -131,7 +135,7 @@ export default function HostelHomePage() {
     //         if (error) throw error;
 
     //         if (data) {
-    //             const couponWithLimit = { ...data, claimedAt: Date.now() };
+    //             const couponWithLimit = { ...data, claimed_at: Date.now() };
     //             setActiveCoupon(couponWithLimit as Coupon);
     //             // Persist to local storage
     //             localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
@@ -422,7 +426,7 @@ export default function HostelHomePage() {
             try {
                 const parsed = JSON.parse(storedCoupon);
                 const oneHour = 60 * 60 * 1000;
-                if (Date.now() - parsed.claimedAt < oneHour) {
+                if (Date.now() - parsed.claimed_at < oneHour) {
                     setActiveCoupon(parsed);
                     isValidCoupon = true;
                 } else {
