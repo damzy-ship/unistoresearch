@@ -348,7 +348,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
 
                     {(isOwnPost || isAdmin) && onDelete && (
                         <div className='w-full flex justify-end mt-2 gap-2'>
-                            {isAdmin && isRequest && !isFulfilled && (
+                            {(isAdmin || isOwnPost) && isRequest && !isFulfilled && (
                                 <button
                                     onClick={() => setIsFulfillModalOpen(true)}
                                     className="flex items-center gap-1.5 px-3 py-1 text-sm font-semibold rounded-lg text-emerald-500 border border-emerald-500 hover:bg-emerald-500/10 transition-colors"
