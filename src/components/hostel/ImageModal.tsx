@@ -4,24 +4,23 @@ import { useState } from 'react';
 interface ImageModalProps {
     isOpen: boolean;
     images: string[];
-    initialIndex?: number;
+    activeIndex: number;
     onClose: () => void;
+    onIndexChange: (index: number) => void;
     description?: string;
 }
 
-export default function ImageModal({ isOpen, images, initialIndex = 0, onClose, description }: ImageModalProps) {
-    const [activeIndex, setActiveIndex] = useState(initialIndex);
-
+export default function ImageModal({ isOpen, images, activeIndex, onClose, onIndexChange, description }: ImageModalProps) {
     if (!isOpen) return null;
 
     const handlePrevious = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+        onIndexChange(activeIndex === 0 ? images.length - 1 : activeIndex - 1);
     };
 
     const handleNext = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+        onIndexChange(activeIndex === images.length - 1 ? 0 : activeIndex + 1);
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation();
@@ -87,7 +86,7 @@ export default function ImageModal({ isOpen, images, initialIndex = 0, onClose, 
                                 key={index}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setActiveIndex(index);
+                                    onIndexChange(index);
                                 }}
                                 className={`w-2 h-2 rounded-full transition-all ${index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
                                     }`}

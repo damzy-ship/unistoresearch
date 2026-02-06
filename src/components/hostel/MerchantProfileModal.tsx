@@ -8,7 +8,6 @@ interface MerchantProfileModalProps {
     onClose: () => void;
     merchant: UniqueVisitor | null;
     currentVisitor?: UniqueVisitor | null;
-    onContact: (type: 'whatsapp' | 'call', product: HostelsProductUpdates) => void;
     onProductClick: (product: HostelsProductUpdates) => void;
 }
 

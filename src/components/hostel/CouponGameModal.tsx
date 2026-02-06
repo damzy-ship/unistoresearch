@@ -68,6 +68,7 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
 
     const handleContinue = async () => {
         if (!activeCoupon) return;
+        const userId = localStorage.getItem('unistore_actual_user_id');
         try {
             // If user not signed in, we can't claim against their ID officially.
             // But we can mark it claimed=true?
@@ -76,12 +77,15 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
             // Supabase RLS might block if no auth.
             // Assuming RLS allows update if policy matches or if using public logic (risky but possible).
             // Let's try to update.
-            const updates: any = { claimed: true, claimed_at: Date.now() };
+            const updates: any = { claimed: true, claimed_at: new Date().toISOString(), claimed_by: userId };
             if (userId) updates.claimed_by = userId;
 
             const { error } = await supabase.from('coupons').update(updates).eq('id', activeCoupon.id);
 
             if (error) throw error;
+
+            // Save to localStorage for guest tracking / persistence
+            localStorage.setItem('hostel_coupon_id', activeCoupon.id);
 
             onCouponClaimed(activeCoupon);
         } catch (e) {
@@ -145,8 +149,8 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
                                         } : {}}
                                         onClick={() => handleCardClick(coupon)}
                                         className={`relative w-full aspect-[2/3] md:w-56 md:h-80 transition-all duration-300 ${(selectedCardId && selectedCardId !== coupon.id) || (coupon.claimed && !selectedCardId)
-                                                ? 'cursor-default' // Claimed or other selected
-                                                : 'cursor-pointer'
+                                            ? 'cursor-default' // Claimed or other selected
+                                            : 'cursor-pointer'
                                             } ${selectedCardId && selectedCardId !== coupon.id ? 'opacity-0 scale-0 pointer-events-none' : ''
                                             }`}
                                         style={{ transformStyle: 'preserve-3d' }}
