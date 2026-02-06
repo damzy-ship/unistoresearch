@@ -17,12 +17,11 @@ import ConfirmDeleteModal from '../components/hostel/ConfirmDeleteModal';
 import LoadingSpinner from '../components/hostel/LoadingSpinner';
 import { getUserId } from '../hooks/useTracking';
 import PostComposerVuna from '../components/hostel/PostComposerVuna';
-import { sendMassVendorNotification } from '../lib/brevoService';
 import { CouponGameModal } from '../components/hostel/CouponGameModal';
-
-interface ActiveCoupon extends Coupon {
-    claimed_at: number;
-}
+import { sendMassVendorNotification } from '../lib/brevoService';
+import RequestsCarousel from '../components/hostel/RequestsCarousel';
+import LiveActivityHub from '../components/hostel/LiveActivityHub';
+import MerchantProfileModal from '../components/hostel/MerchantProfileModal';
 
 export default function HostelHomePage() {
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
@@ -60,12 +59,15 @@ export default function HostelHomePage() {
     const [isSearchView, setIsSearchView] = useState(true);
     const [showImageSearchPrompt, setShowImageSearchPrompt] = useState(false);
     const [searchResults, setSearchResults] = useState<HostelsProductUpdates[] | null>(null);
+
+    const [merchantModalOpen, setMerchantModalOpen] = useState(false);
+    const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
     const [searchTerm, setSearchTerm] = useState<string | null>(null);
     const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
     const [pendingContactProduct, setPendingContactProduct] = useState<HostelsProductUpdates | null>(null);
 
     const [couponModalOpen, setCouponModalOpen] = useState(false);
-    const [activeCoupon, setActiveCoupon] = useState<ActiveCoupon | null>(null);
+    const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
     // const [couponCodeInput, setCouponCodeInput] = useState('');
     // const [_, setVerifyingCoupon] = useState(false);
 
@@ -115,44 +117,12 @@ export default function HostelHomePage() {
     const userIsHostelMerchant = currentVisitor?.is_hostel_merchant === true;
 
     const handleGameCouponClaimed = (coupon: Coupon) => {
-        const couponWithLimit: ActiveCoupon = { ...coupon, claimed_at: Date.now() };
+        // Optimistic update
+        const couponWithLimit: Coupon = { ...coupon, claimed_at: Date.now() };
         setActiveCoupon(couponWithLimit);
-        localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
         setCouponModalOpen(false);
         toast.success('Gift claimed! Prices slashed! 📉');
     };
-
-    // const handleVerifyCoupon = async () => {
-    //     if (!couponCodeInput.trim()) return;
-    //     setVerifyingCoupon(true);
-    //     try {
-    //         const { data, error } = await supabase
-    //             .from('coupons')
-    //             .select('*')
-    //             .eq('code', couponCodeInput.trim())
-    //             .single();
-
-    //         if (error) throw error;
-
-    //         if (data) {
-    //             const couponWithLimit = { ...data, claimed_at: Date.now() };
-    //             setActiveCoupon(couponWithLimit as Coupon);
-    //             // Persist to local storage
-    //             localStorage.setItem('hostel_coupon', JSON.stringify(couponWithLimit));
-
-    //             setCouponModalOpen(false);
-    //             setCouponCodeInput('');
-    //             toast.success('Coupon applied successfully!');
-    //         } else {
-    //             toast.error('Invalid coupon code');
-    //         }
-    //     } catch (e) {
-    //         console.error('Coupon verification failed', e);
-    //         // toast.error('Invalid coupon code');
-    //     } finally {
-    //         setVerifyingCoupon(false);
-    //     }
-    // };
 
 
 
@@ -418,33 +388,68 @@ export default function HostelHomePage() {
     }, [loadFeed]);
 
     useEffect(() => {
-        // Coupon Persistence Check
-        const storedCoupon = localStorage.getItem('hostel_coupon');
-        let isValidCoupon = false;
+        const fetchActiveCoupon = async () => {
+            if (!currentVisitor?.id) return;
 
-        if (storedCoupon) {
-            try {
-                const parsed = JSON.parse(storedCoupon);
+            const { data, error } = await supabase
+                .from('coupons')
+                .select('*')
+                .eq('claimed_by', currentVisitor.id)
+                .order('claimed_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (data) {
                 const oneHour = 60 * 60 * 1000;
-                if (Date.now() - parsed.claimed_at < oneHour) {
-                    setActiveCoupon(parsed);
-                    isValidCoupon = true;
+                // Check if still valid
+                if (Date.now() - data.claimed_at < oneHour) {
+                    setActiveCoupon(data as Coupon);
                 } else {
-                    // Expired
-                    localStorage.removeItem('hostel_coupon');
-                    toast.info('Your coupon has expired.');
+                    // Optionally expire explicitly if needed, but UI will handle hiding
+                    setActiveCoupon(null);
                 }
-            } catch (e) {
-                console.error('Error parsing coupon', e);
-                localStorage.removeItem('hostel_coupon');
+            } else {
+                if (!loadingFeed) setCouponModalOpen(true);
+            }
+        };
+
+        if (userIsAuthenticated) {
+            fetchActiveCoupon();
+        } else {
+            // For non-authenticated users, maybe we check local storage OR just open modal
+            // But if we want DB persistence, they need to be logged in effectively to claim against a user ID.
+            // If visitor ID tracks them, we use that.
+            // Current visitor is based on AUTH user ID.
+            // If not auth, we might not have a stable ID to claim against in DB unless we use cookies/device ID.
+            // Requirement: "fetch from db".
+            // If user is guest, 'claimed_by' might need a visitor ID or we only allow logged in users?
+            // Assuming logged in for now based on 'currentVisitor'.
+        }
+
+        // If not authenticated, we might still pop the modal but they can't claim permanently?
+        // Or we use the localStorage fallback for guests?
+        // "fetch from db" implies we check DB.
+
+    }, [currentVisitor?.id, userIsAuthenticated]);
+
+    useEffect(() => {
+        // Show modal if no active coupon and school selected
+        if (!activeCoupon && selectedSchoolId && !loadingFeed) {
+            // setCouponModalOpen(true); // Don't auto open immediately, let the user browse or maybe trigger
+            // Or auto open? Original was:
+            // if (!isValidCoupon) setCouponModalOpen(true);
+
+            // Let's rely on the fetchActiveCoupon to determine if we should open.
+            // If fetched and nothing active, open.
+
+            if (userIsAuthenticated && !activeCoupon) {
+                setCouponModalOpen(true);
+            } else if (!userIsAuthenticated) {
+                // Guest
+                setCouponModalOpen(true);
             }
         }
-
-        // Welcome: Open coupon modal if no active/valid coupon found
-        if (!isValidCoupon) {
-            setCouponModalOpen(true);
-        }
-    }, []);
+    }, [activeCoupon, selectedSchoolId, userIsAuthenticated, loadingFeed]);
 
     useEffect(() => {
         if (!userIsAuthenticated) return;
@@ -701,6 +706,80 @@ export default function HostelHomePage() {
         ) : null
     );
 
+    const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
+    const [imageModalDescription, setImageModalDescription] = useState<string>('');
+
+    const handleRequestContact = (type: 'merchant' | 'recommend', item: HostelsProductUpdates) => {
+        if (!userIsAuthenticated) {
+            setShowAuthModal(true);
+            return;
+        }
+
+        const visitor = item.unique_visitors as UniqueVisitor | undefined;
+        const phone = visitor?.phone_number;
+        if (!phone) {
+            toast.error('Contact not available');
+            return;
+        }
+
+        if (type === 'merchant') {
+            if (!userIsHostelMerchant) {
+                setShowBecomeMerchantModal(true);
+                return;
+            }
+            const msg = `hi there, i have ${item.post_description || ''}`;
+            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(whatsappUrl, '_blank');
+        } else if (type === 'recommend') {
+            const msg = `hi there, i have a recommendation for ${item.post_description || ''}`;
+            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    };
+
+    const handleUserClick = (user: UniqueVisitor) => {
+        setSelectedMerchant(user);
+        setMerchantModalOpen(true);
+    };
+
+    const handleProductClick = (product: HostelsProductUpdates) => {
+        // Close merchant modal and navigate to product or open image modal
+        setMerchantModalOpen(false);
+        // Reuse existing image modal logic
+        const images = product.post_images || [];
+        if (images.length > 0) {
+            setImageModalImages(images);
+            setImageModalActive(0);
+            setImageModalDescription(product.post_description || '');
+            setImageModalOpen(true);
+        }
+    };
+
+    // Using existing DELETE logic, just exposing it.
+    const handleDeleteRequest = (item: HostelsProductUpdates) => {
+        setDeletePostId(item.id);
+        setDeleteModalOpen(true);
+    };
+
+    const handleFulfillRequest = async (item: HostelsProductUpdates) => {
+        try {
+            const { error } = await supabase
+                .from('hostel_product_updates')
+                .update({ fulfilled: true })
+                .eq('id', item.id);
+
+            if (error) throw error;
+
+            toast.success('Request marked as fulfilled!');
+
+            // Update local state
+            setFeed(prev => prev.map(p => p.id === item.id ? { ...p, fulfilled: true } : p));
+        } catch (error) {
+            console.error('Error fulfilling request:', error);
+            toast.error('Failed to update request');
+        }
+    };
+
     const handleConfirmUniversity = (schoolId: string) => {
         localStorage.setItem('selectedSchoolId', schoolId);
         setSelectedSchoolId(schoolId);
@@ -709,6 +788,11 @@ export default function HostelHomePage() {
     };
 
     const feedToDisplay = searchResults !== null ? searchResults : orderedDisplayedFeed;
+
+    // Split feed into Requests and Products
+    const requestItems = feedToDisplay.filter(item => item.post_type === 'request');
+    const productItems = feedToDisplay.filter(item => item.post_type !== 'request');
+
     const showLoading = loadingFeed || posting;
 
     return (
@@ -786,12 +870,50 @@ export default function HostelHomePage() {
                             onClearSearch={handleClearSearch}
                         />
 
+
+                        {/* New Live Activity & Requests Section */}
+                        {!loadingFeed && !searchTerm && (
+                            <>
+                                <LiveActivityHub onUserClick={handleUserClick} />
+                                <RequestsCarousel
+                                    requests={requestItems}
+                                    onItemClick={(item) => {
+                                        // Optional: logging for now
+                                        console.log("Clicked request", item.id);
+                                    }}
+                                    currentVisitor={currentVisitor}
+                                    onContact={handleRequestContact}
+                                    onDelete={handleDeleteRequest}
+                                    onFulfill={handleFulfillRequest}
+                                />
+                            </>
+                        )}
+
+
+
+                        {/* If searching, we might still want to see requests that match?
+                            The 'requestItems' and 'productItems' are derived from 'feedToDisplay' which obeys search.
+                            So if we search, 'requestItems' will contain matching requests. 
+                            We display them in the carousel if simpler, or just in the list?
+                            
+                            Design decision: "all updates of type request, can be put in a horizontall scrollable way"
+                            So we keep them horizontal even in search, or revert to list?
+                            Let's keep horizontal for consistency if possible, OR just dump everything in list for search.
+                            
+                            Actually, if searching, user usually expects a list.
+                            But user said "all updates of type request, can be put in a horizontall scrollable way"
+                            Let's sticky to: 
+                            - Sticky horizontal requests at top (if any match)
+                            - Vertical products below
+                        */}
+
+
                         <div className="flex flex-col">
                             {showLoading ? (
                                 <LoadingSpinner />
                             ) : (
                                 <>
-                                    {feedToDisplay.length === 0 && (
+                                    {requestItems.length === 0 && productItems.length === 0 && (
                                         <div className="p-4 text-sm text-[#8b98a5] text-center">
                                             {searchResults !== null ? (
                                                 <>
@@ -814,7 +936,7 @@ export default function HostelHomePage() {
                                         </div>
                                     )}
 
-                                    {feedToDisplay.map((item) => (
+                                    {productItems.map((item) => (
                                         <ProductFeedItem
                                             key={item.id}
                                             item={item}
@@ -834,8 +956,10 @@ export default function HostelHomePage() {
                     {/* NEW Gamified Coupon Modal */}
                     <CouponGameModal
                         isOpen={couponModalOpen}
-                        // onClose={() => setCouponModalOpen(false)}
+                        onClose={() => setCouponModalOpen(false)}
                         onCouponClaimed={handleGameCouponClaimed}
+                        schoolId={selectedSchoolId || localStorage.getItem('selectedSchoolId') || ''}
+                        userId={currentVisitor?.id}
                     />
 
                     {/* Old manual modal removed or commented out.
@@ -858,21 +982,61 @@ export default function HostelHomePage() {
                                     </div>
                                 </div>
                                 <div className="h-8 w-px bg-gray-700"></div>
-                                <div className="text-right min-w-[60px]">
-                                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">Expires</p>
-                                    <p className={`text-sm font-mono font-bold leading-tight ${timeRemaining < 300000 ? 'text-red-400 animate-pulse' : 'text-emerald-400'}`}>
-                                        {formatTime(timeRemaining)}
-                                    </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Become Merchant Modal for Request Interactions */}
+                    {showBecomeMerchantModal && (
+                        <div
+                            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
+                            onClick={() => setShowBecomeMerchantModal(false)}
+                        >
+                            <div
+                                className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <h3 className="text-xl font-bold text-white mb-2">Become a hostel merchant</h3>
+                                <p className="text-gray-400 mb-6 text-sm">Hi {currentVisitor?.full_name}, you need to become a hostel merchant to be able to contact users.</p>
+
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        onClick={() => setShowBecomeMerchantModal(false)}
+                                        className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
+                                            window.open(whatsappUrl, '_blank');
+                                        }}
+                                        className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
+                                    >
+                                        Continue
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     )}
+
+
+
+                    <MerchantProfileModal
+                        isOpen={merchantModalOpen}
+                        onClose={() => setMerchantModalOpen(false)}
+                        merchant={selectedMerchant}
+                        currentVisitor={currentVisitor}
+                        onContact={(type, prod) => handleRequestContact(type, prod)}
+                        onProductClick={handleProductClick}
+                    />
 
                     <ImageModal
                         isOpen={imageModalOpen}
                         images={imageModalImages}
                         initialIndex={imageModalActive}
                         onClose={() => setImageModalOpen(false)}
+                        description={imageModalDescription}
                     />
 
                     {ImageSearchPrompt()}
@@ -908,7 +1072,7 @@ export default function HostelHomePage() {
                         onConfirm={handleDeleteConfirm}
                         deleting={deleting}
                     />
-                </main>
+                </main >
             ) : (
                 <ConfirmUniversityModal
                     isOpen={showConfirmUniversityModal}

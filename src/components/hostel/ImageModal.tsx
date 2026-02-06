@@ -6,9 +6,10 @@ interface ImageModalProps {
     images: string[];
     initialIndex?: number;
     onClose: () => void;
+    description?: string;
 }
 
-export default function ImageModal({ isOpen, images, initialIndex = 0, onClose }: ImageModalProps) {
+export default function ImageModal({ isOpen, images, initialIndex = 0, onClose, description }: ImageModalProps) {
     const [activeIndex, setActiveIndex] = useState(initialIndex);
 
     if (!isOpen) return null;
@@ -88,12 +89,20 @@ export default function ImageModal({ isOpen, images, initialIndex = 0, onClose }
                                     e.stopPropagation();
                                     setActiveIndex(index);
                                 }}
-                                className={`w-2 h-2 rounded-full transition-all ${
-                                    index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
-                                }`}
+                                className={`w-2 h-2 rounded-full transition-all ${index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                                    }`}
                                 aria-label={`Go to image ${index + 1}`}
                             />
                         ))}
+                    </div>
+                )}
+                {description && (
+                    <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
+                        <div className="inline-block bg-black/70 backdrop-blur-sm px-6 py-3 rounded-xl max-w-2xl mx-4 pointer-events-auto">
+                            <p className="text-white text-sm md:text-base font-medium leading-relaxed">
+                                {description}
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>

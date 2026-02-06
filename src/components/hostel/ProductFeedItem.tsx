@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { HostelsProductUpdates, UniqueVisitor, supabase } from '../../lib/supabase';
 import ContactSellerButton from '../ContactSellerButton';
 import AuthModal from '../AuthModal';
@@ -168,7 +169,13 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
     // }, []);
 
     return (
-        <article className={articleClass}>
+        <motion.article
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
+            className={articleClass}
+        >
             {/* Request Badge positioned at top-right with pop effect */}
             {isRequest && !isFulfilled && (
                 <div className="absolute top-4 right-4 text-[11px] font-extrabold px-3 py-1 rounded-full bg-amber-400 text-gray-900 shadow-lg shadow-amber-500/30 z-10 animate-pulse-once">
@@ -440,6 +447,6 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                     </div>
                 </div>
             )}
-        </article>
+        </motion.article>
     );
 }
