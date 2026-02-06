@@ -37,6 +37,7 @@ interface HostelModalsProps {
     handleGameCouponClaimed: (coupon: Coupon) => void;
     selectedSchoolId: string | null;
     currentVisitorId?: string;
+    activeCoupon?: Coupon | null;
 
     merchantModalOpen: boolean;
     setMerchantModalOpen: (open: boolean) => void;
@@ -74,6 +75,7 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
     handleGameCouponClaimed,
     selectedSchoolId,
     currentVisitorId,
+    activeCoupon,
     merchantModalOpen,
     setMerchantModalOpen,
     selectedMerchant,
@@ -126,6 +128,7 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
                 onCouponClaimed={handleGameCouponClaimed}
                 schoolId={selectedSchoolId || ''}
                 userId={currentVisitorId}
+                activeCoupon={activeCoupon}
             />
 
             <MerchantProfileModal

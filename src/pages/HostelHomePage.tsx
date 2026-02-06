@@ -100,7 +100,8 @@ export default function HostelHomePage() {
         couponModalOpen,
         setCouponModalOpen,
         handleGameCouponClaimed,
-        activeCoupon
+        activeCoupon,
+        timeRemaining
     } = useHostelCoupons(currentVisitor, userIsAuthenticated, selectedSchoolId, loadingFeed);
 
 
@@ -435,6 +436,7 @@ export default function HostelHomePage() {
                 handleGameCouponClaimed={handleGameCouponClaimed}
                 selectedSchoolId={selectedSchoolId}
                 currentVisitorId={currentVisitor?.id}
+                activeCoupon={activeCoupon}
                 merchantModalOpen={merchantModalOpen}
                 setMerchantModalOpen={setMerchantModalOpen}
                 selectedMerchant={selectedMerchant}
@@ -445,6 +447,26 @@ export default function HostelHomePage() {
                 userIsHostelMerchant={userIsHostelMerchant}
                 onContactSeller={(item) => handleRequestContact('merchant', item)}
             />
+
+            {/* Active Coupon Floating Timer */}
+            {activeCoupon && timeRemaining !== null && (
+                <div
+                    className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-gray-900/90 backdrop-blur-md border border-emerald-500/30 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 cursor-pointer hover:scale-105 transition-transform animate-in slide-in-from-bottom-10 fade-in duration-300"
+                    onClick={() => setCouponModalOpen(true)}
+                >
+                    <div className="flex flex-col items-start">
+                        <span className="text-xs text-emerald-400 font-bold tracking-wider uppercase">Active Coupon</span>
+                        <div className="font-mono text-lg font-bold leading-none">
+                            {Math.floor(timeRemaining / 60000)}m {Math.floor((timeRemaining % 60000) / 1000)}s
+                        </div>
+                    </div>
+                    <div className="h-8 w-px bg-gray-700"></div>
+                    <div className="text-right">
+                        <div className="text-xs text-gray-400">Value</div>
+                        <div className="font-bold text-white">₦{activeCoupon.value.toLocaleString()}</div>
+                    </div>
+                </div>
+            )}
 
             {/* Image Search Placeholder Prompt */}
             {showImageSearchPrompt && (

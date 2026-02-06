@@ -9,24 +9,24 @@ interface CouponGameModalProps {
     schoolId: string;
     userId?: string;
     onClose: () => void;
+    activeCoupon?: Coupon | null;
 }
 
-export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCouponClaimed, schoolId, userId, onClose }) => {
+export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCouponClaimed, schoolId, userId, onClose, activeCoupon: existingCoupon }) => {
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
     const [revealed, setRevealed] = useState(false);
     const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
 
-    // Check for pending coupon? Moving to purely DB driven for simplicity/consistency.
-    // If we want to persist a "picked but not claimed" state, we'd need a DB field or local storage.
-    // Given the request to move away from local storage, we'll reset on close/reopen unless claimed.
-
     useEffect(() => {
-        if (isOpen && schoolId) {
+        if (existingCoupon) {
+            setActiveCoupon(existingCoupon);
+            setRevealed(true);
+        } else if (isOpen && schoolId) {
             fetchCoupons();
         }
-    }, [isOpen, schoolId]);
+    }, [isOpen, schoolId, existingCoupon]);
 
     const [cardPicked, setCardPicked] = useState(false);
 

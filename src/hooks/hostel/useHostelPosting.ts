@@ -16,7 +16,7 @@ export function useHostelPosting(
     /**
      * Handles the creation of a new post or request.
      */
-    const handlePost = async (text: string, images: File[], request: boolean = false) => {
+    const handlePost = async (text: string, images: File[], request: boolean = false, merchantId?: string) => {
         if (!currentVisitor?.id) return;
         if (!text.trim() && images.length === 0) return;
 
@@ -32,12 +32,15 @@ export function useHostelPosting(
             const postSearchWords = await extractProductKeywordsFromDescription(text.trim());
             const extractedPrice = await extractPriceFromHostelPost(text.trim());
 
+            // Use provided merchantId or fall back to current visitor's ID
+            const posterId = merchantId || currentVisitor.id;
+
             const { error: insertError } = await supabase
                 .from('hostel_product_updates')
                 .insert({
                     post_description: text.trim(),
                     post_images: uploadedUrls,
-                    actual_user_id: currentVisitor.id,
+                    actual_user_id: posterId,
                     post_category: postCategory,
                     search_words: postSearchWords,
                     post_type: request ? 'request' : 'update',
