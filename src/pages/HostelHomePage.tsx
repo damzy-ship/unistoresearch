@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Toaster, toast } from 'sonner';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { Toaster } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
 import { uploadImageToSupabase } from '../lib/databaseServices';
@@ -8,120 +9,282 @@ import AuthModal from '../components/AuthModal';
 import ConfirmContactModal from '../components/ConfirmContactModal';
 import { categorizePost, extractPriceFromHostelPost, extractProductKeywordsFromDescription } from '../lib/gemini';
 import { useHostelMode } from '../hooks/useHostelMode';
-// Components
-import PostComposerVuna from '../components/hostel/PostComposerVuna';
-import FilterBar from '../components/hostel/FilterBar';
+// import PostComposer from '../components/hostel/PostComposer';
 import ProductFeedItem from '../components/hostel/ProductFeedItem';
-import RequestsCarousel from '../components/hostel/RequestsCarousel';
-import LiveActivityHub from '../components/hostel/LiveActivityHub';
+import FilterBar from '../components/hostel/FilterBar';
+import ImageModal from '../components/hostel/ImageModal';
+import ConfirmDeleteModal from '../components/hostel/ConfirmDeleteModal';
 import LoadingSpinner from '../components/hostel/LoadingSpinner';
-import { HostelHeader } from '../components/hostel/HostelHeader';
-import { HostelModals } from '../components/hostel/HostelModals';
-import BannerSlider from '../components/hostel/BannerSlider';
-// Hooks
-import { useHostelFeed } from '../hooks/hostel/useHostelFeed';
-import { useHostelCoupons } from '../hooks/hostel/useHostelCoupons';
-import { useHostelSearch } from '../hooks/hostel/useHostelSearch';
-import { useHostelPosting } from '../hooks/hostel/useHostelPosting';
+import { getUserId } from '../hooks/useTracking';
+import PostComposerVuna from '../components/hostel/PostComposerVuna';
+import { sendMassVendorNotification } from '../lib/brevoService';
 
-/**
- * Main Hostel Home Page Component.
- * Refactored to use custom hooks for logic separation and smaller components for UI.
- */
 export default function HostelHomePage() {
-    // --- Global State / Refs ---
-    const { toggleHostelMode } = useHostelMode(); // Ensure this is available if needed (used in original?)
-
-    // --- Local Page State ---
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
-    const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
+    const [posting, setPosting] = useState<boolean>(false);
+    const [feed, setFeed] = useState<HostelsProductUpdates[]>([]);
+    const [loadingFeed, setLoadingFeed] = useState<boolean>(true);
+
+    const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
+    const [imageModalImages, setImageModalImages] = useState<string[]>([]);
+    const [imageModalActive, setImageModalActive] = useState<number>(0);
+
     const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
     const [showConfirmUniversityModal, setShowConfirmUniversityModal] = useState(false);
-    const [hostels, setHostels] = useState<Array<{ id: string; name: string }>>([]);
 
-    // Filters
+    const [hostels, setHostels] = useState<Array<{ id: string; name: string }>>([]);
     const [selectedHostel, setSelectedHostel] = useState<string>('all');
     const [categories] = useState<string[]>([
-        'food & snacks', 'clothing', 'shoes', 'caps', 'gadgets', 'phones',
-        'jewelries', 'bags', 'fragrances', 'beauty & skincare', 'hair accessories', 'others'
+        'food & snacks',
+        'clothing',
+        'shoes',
+        'caps',
+        'gadgets',
+        'phones',
+        'jewelries',
+        'bags',
+        'fragrances',
+        'beauty & skincare',
+        'hair accessories',
+        'others'
     ]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [myProductsActive, setMyProductsActive] = useState<boolean>(false);
 
-    // Modals & User Interaction State
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [isSearchView, setIsSearchView] = useState(true);
+    const [showImageSearchPrompt, setShowImageSearchPrompt] = useState(false);
+    const [searchResults, setSearchResults] = useState<HostelsProductUpdates[] | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string | null>(null);
     const [showConfirmContactModal, setShowConfirmContactModal] = useState(false);
-    const [pendingContactProduct, setPendingContactProduct] = useState<HostelsProductUpdates | null>(null);
-    const [merchantModalOpen, setMerchantModalOpen] = useState(false);
-    const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
-    const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
+    const [pendingContactProduct, setPendingContactProduct] = useState(null);
 
-    // Image Modal
-    const [imageModalOpen, setImageModalOpen] = useState(false);
-    const [imageModalImages, setImageModalImages] = useState<string[]>([]);
-    const [imageModalActive, setImageModalActive] = useState(0);
-    const [imageModalDescription, setImageModalDescription] = useState<string>('');
+    const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
 
-    // Deletion
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const navigate = useNavigate();
+    const { toggleHostelMode } = useHostelMode();
 
-    // --- Custom Hooks ---
-
-    // 1. Feed Logic
-    const {
-        feed,
-        loadingFeed,
-        setLoadingFeed,
-        loadFeed,
-        orderedDisplayedFeed,
-        setFeed
-    } = useHostelFeed(selectedSchoolId, selectedHostel, selectedCategory, myProductsActive, currentVisitor);
-
-    // 2. Search Logic
-    const {
-        isSearchView,
-        setIsSearchView,
-        showImageSearchPrompt,
-        setShowImageSearchPrompt,
-        searchResults,
-        setSearchResults,
-        searchTerm,
-        setSearchTerm,
-        handleSearch,
-        handleClearSearch
-    } = useHostelSearch(currentVisitor, selectedSchoolId, setLoadingFeed, (val) => { /* no-op for posting status in search? or add setter */ });
-
-    // 3. Posting Logic
-    const {
-        posting,
-        setPosting,
-        handlePost
-    } = useHostelPosting(currentVisitor, loadFeed);
-
-    // 4. Coupon Logic
-    const {
-        couponModalOpen,
-        setCouponModalOpen,
-        handleGameCouponClaimed,
-        activeCoupon,
-        setActiveCoupon,
-        timeRemaining
-    } = useHostelCoupons(currentVisitor, userIsAuthenticated, selectedSchoolId, loadingFeed);
-
-
-    // --- Derived State for UI ---
     const userIsHostelMerchant = currentVisitor?.is_hostel_merchant === true;
-    const feedToDisplay = searchResults !== null ? searchResults : orderedDisplayedFeed;
-    const requestItems = feedToDisplay.filter(item => item.post_type === 'request');
-    const productItems = feedToDisplay.filter(item => item.post_type !== 'request');
-    const showLoading = loadingFeed || posting;
 
-    // --- Side Effects ---
 
-    // Initialize User & School
+    const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
+        console.log('Loading feed for school ID:', schoolId);
+        try {
+            //added this cause we need to ensure user is tracked
+            getUserId();
+            setLoadingFeed(true);
+            const { data, error } = await supabase
+                .from('hostel_product_updates')
+                .select(`
+                    id,
+                    post_category,
+                    post_description,
+                    post_images,
+                    created_at,
+                    actual_user_id,
+                    unique_visitors:actual_user_id (
+                        id,
+                        full_name,
+                        profile_picture,
+                        phone_number,
+                        room,
+                        is_hostel_merchant,
+                        hostel_id,
+                        hostels (id, name, school_id),
+                        schools (id, short_name),
+                        brand_name
+                    ),
+                    status,
+                    post_type,
+                    fulfilled
+                `)
+                .order('created_at', { ascending: false });
+
+            // console.log('Fetched feed:', data);
+
+            if (error) throw error;
+
+            type RawUpdate = {
+                id: string;
+                post_description: string;
+                post_images: string[];
+                post_category?: string | null;
+                created_at: string;
+                actual_user_id: string;
+                unique_visitors?: UniqueVisitor;
+                post_type?: string | null;
+                search_words?: string[] | null;
+                fulfilled?: boolean | null;
+                status?: string | null;
+            };
+            const rawList: RawUpdate[] = (data || []) as RawUpdate[];
+            // Keep request posts even if they don't have hostel/school info; requests may not be tied to a hostel
+            const filteredBySchool = (schoolId
+                ? rawList.filter((d) => {
+                    const uv = d.unique_visitors as UniqueVisitor | undefined;
+                    return (uv?.schools?.id === schoolId && d.post_type === 'request') || (uv?.hostels?.school_id === schoolId);
+                })
+                : rawList);
+
+            const mapped: HostelsProductUpdates[] = filteredBySchool.map((d) => ({
+                id: d.id,
+                post_description: d.post_description,
+                post_images: Array.isArray(d.post_images) ? d.post_images : [],
+                post_category: d.post_category ?? '',
+                created_at: d.created_at,
+                actual_user_id: d.actual_user_id,
+                unique_visitors: d.unique_visitors,
+                post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
+                search_words: Array.isArray(d.search_words) ? d.search_words : [],
+                fulfilled: d.fulfilled ?? null,
+                status: d.status as 'open' | 'fulfilled' | 'cancelled' | 'hide' | undefined,
+            }));
+
+            setFeed(mapped);
+        } catch (e) {
+            console.error('Failed to load feed', e);
+        } finally {
+            setLoadingFeed(false);
+        }
+    }, [selectedSchoolId]);
+
+    const displayedFeed = useMemo(() => {
+        let filtered = feed.filter((item) => {
+            const visitor = item.unique_visitors as UniqueVisitor | undefined;
+            // Requests should be visible regardless of selected hostel (they may not be tied to a hostel)
+            const matchesHostel = selectedHostel === 'all' || !selectedHostel
+                ? true
+                : item.post_type === 'request'
+                    ? true
+                    : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel;
+
+            const matchesCategory = selectedCategory === 'all' || !selectedCategory
+                ? true
+                : (item.post_category || '').toLowerCase() === selectedCategory.toLowerCase();
+
+            const isHidden = item.status === 'hide';
+            if (isHidden) {
+                const isAdmin = currentVisitor?.is_admin;
+                const isOwner = currentVisitor?.id === item.actual_user_id;
+                if (!isAdmin && !isOwner) return false;
+            }
+
+            return matchesHostel && matchesCategory;
+        });
+
+        if (myProductsActive && currentVisitor?.id) {
+            filtered = filtered.filter((item) => item.actual_user_id === currentVisitor.id);
+        }
+
+        return filtered;
+    }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id]);
+
+    // Order the displayed feed into time buckets and shuffle within those buckets
+    // Rules (applied only when NOT showing search results):
+    // - < 2 hours: bucket A (shuffled) -> appears first
+    // - 2 - 10 hours: bucket B (shuffled) -> appears after A
+    // - 10 - 24 hours: bucket C (shuffled) -> appears after B
+    // - 24 hours - 3 days: bucket D (shuffled) -> appears after C
+    // - >= 3 days: bucket E grouped by day (shuffle within each day), days ordered newest -> oldest
+    const orderedDisplayedFeed = useMemo(() => {
+        if (!displayedFeed || displayedFeed.length === 0) return [] as HostelsProductUpdates[];
+
+        const now = Date.now();
+        const H = 60 * 60 * 1000;
+        const bucketsA: HostelsProductUpdates[] = []; // <2 hours
+        const bucketsB: HostelsProductUpdates[] = []; // 2-10 hours
+        const bucketsC: HostelsProductUpdates[] = []; // 10-24 hours
+        const bucketsD: HostelsProductUpdates[] = []; // 24h-72h
+        const bucketsEByDay: Record<string, HostelsProductUpdates[]> = {}; // >=72h grouped by day
+
+        const safeDateMs = (d?: string | null) => {
+            if (!d) return 0;
+            const t = new Date(d).getTime();
+            return Number.isNaN(t) ? 0 : t;
+        };
+
+        for (const item of displayedFeed) {
+            const createdMs = safeDateMs(item.created_at as unknown as string);
+            const age = now - createdMs;
+
+            if (!createdMs || age >= 3 * 24 * H) {
+                // Older than or equal to 3 days -> bucket E
+                const dayKey = createdMs ? new Date(createdMs).toISOString().split('T')[0] : 'unknown';
+                bucketsEByDay[dayKey] = bucketsEByDay[dayKey] || [];
+                bucketsEByDay[dayKey].push(item);
+            } else if (age < 2 * H) {
+                bucketsA.push(item);
+            } else if (age < 10 * H) {
+                bucketsB.push(item);
+            } else if (age < 24 * H) {
+                bucketsC.push(item);
+            } else {
+                // 24h <= age < 72h
+                bucketsD.push(item);
+            }
+        }
+
+        const shuffle = <T,>(arr: T[]) => {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = a[i];
+                a[i] = a[j];
+                a[j] = tmp;
+            }
+            return a;
+        };
+
+        // Shuffle buckets A-D fully
+        const partA = shuffle(bucketsA);
+        const partB = shuffle(bucketsB);
+        const partC = shuffle(bucketsC);
+        const partD = shuffle(bucketsD);
+
+        // For bucket E: shuffle items within each day, then order days newest -> oldest
+        const dayKeys = Object.keys(bucketsEByDay).filter(k => k !== 'unknown');
+        // Sort day keys descending (newer first)
+        dayKeys.sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
+
+        const partE: HostelsProductUpdates[] = [];
+        for (const dayKey of dayKeys) {
+            const group = bucketsEByDay[dayKey] || [];
+            const shuffledGroup = shuffle(group);
+            partE.push(...shuffledGroup);
+        }
+
+        // If there were any unknown-date items, append them last (shuffle them too)
+        if (bucketsEByDay['unknown']) {
+            partE.push(...shuffle(bucketsEByDay['unknown']));
+        }
+
+        return [...partA, ...partB, ...partC, ...partD, ...partE];
+    }, [displayedFeed]);
+
+    useEffect(() => {
+
+        const fetchHostels = async () => {
+            if (!selectedSchoolId) return;
+            try {
+                const { data, error } = await supabase
+                    .from('hostels')
+                    .select('id, name')
+                    .eq('school_id', selectedSchoolId)
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+                setHostels((data || []) as Array<{ id: string; name: string }>);
+            } catch (e) {
+                console.error('Failed to fetch hostels', e);
+            }
+        };
+        fetchHostels();
+    }, [selectedSchoolId]);
+
     useEffect(() => {
         const init = async () => {
             const { data: { session } } = await supabase.auth.getSession();
@@ -136,6 +299,7 @@ export default function HostelHomePage() {
                     .eq('auth_user_id', userId)
                     .single();
                 setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                // setIsSearchView(!visitor?.is_hostel_merchant);
             }
 
             const storedId = localStorage.getItem('selectedSchoolId');
@@ -149,12 +313,12 @@ export default function HostelHomePage() {
         };
         init();
 
-        // Event Listeners for cross-component communication
         const onPending = (e: Event) => {
             const detail = (e as CustomEvent).detail;
             setPendingContactProduct(detail);
             setShowConfirmContactModal(true);
         };
+
         const onOpenAuth = () => setShowAuthModal(true);
 
         window.addEventListener('pending-contact-available', onPending as EventListener);
@@ -165,7 +329,6 @@ export default function HostelHomePage() {
         };
     }, [loadFeed]);
 
-    // Pending Contact LocalStorage Check
     useEffect(() => {
         if (!userIsAuthenticated) return;
         const raw = localStorage.getItem('pending_contact_product');
@@ -255,23 +418,123 @@ export default function HostelHomePage() {
             const postCategory = await categorizePost(q, 'hostel');
             const postSearchWords = await extractProductKeywordsFromDescription(q);
 
-                if (error) throw error;
-                setHostels((data || []) as Array<{ id: string; name: string }>);
-            } catch (e) {
-                console.error('Failed to fetch hostels', e);
+            if (!postCategory) {
+                console.warn('Could not determine post category for the query.');
+                setSearchResults([]);
+                setSearchTerm(q);
+                return;
             }
-        };
-        fetchHostels();
-    }, [selectedSchoolId]);
 
+            const { data, error } = await supabase
+                .from('hostel_product_updates')
+                .select(`
+                    id,
+                    post_category,
+                    post_description,
+                    post_images,
+                    created_at,
+                    actual_user_id,
+                    unique_visitors:actual_user_id (
+                        id,
+                        full_name,
+                        profile_picture,
+                        phone_number,
+                        room,
+                        is_hostel_merchant,
+                        hostel_id,
+                        hostels (id, name, school_id),
+                        schools (id, short_name),
+                        brand_name
+                    ),
+                    status,
+                    post_type,
+                    fulfilled
+                    `)
+                .eq('post_category', postCategory)
+                .order('created_at', { ascending: false });
 
-    // --- Event Handlers ---
+            if (error) throw error;
 
-    const handleConfirmUniversity = (schoolId: string) => {
-        localStorage.setItem('selectedSchoolId', schoolId);
-        setSelectedSchoolId(schoolId);
-        setShowConfirmUniversityModal(false);
-        loadFeed(schoolId);
+            const list = (data || []) as unknown as HostelsProductUpdates[];
+
+            console.log('Search fetched list:', list);
+
+            const filtered = list.filter((d) => {
+                const schoolMatch = selectedSchoolId
+                    ? (d.unique_visitors as UniqueVisitor | undefined)?.hostels?.school_id === selectedSchoolId
+                    : true;
+
+                const isHidden = d.status === 'hide';
+                if (isHidden) {
+                    const isAdmin = currentVisitor?.is_admin;
+                    const isOwner = currentVisitor?.id === d.actual_user_id;
+                    if (!isAdmin && !isOwner) return false;
+                }
+                return schoolMatch;
+            });
+
+            if (postSearchWords.length > 0) {
+                const rankedResults = filtered.map(item => {
+                    const itemSearchWords: string[] = Array.isArray(item.search_words) ? item.search_words : [];
+                    let score = 0;
+
+                    for (const queryWord of postSearchWords) {
+                        // Normalize for case-insensitive matching
+                        const lowerQueryWord = queryWord.toLowerCase();
+
+                        // Check if ANY of the item's search words contain the query word
+                        const matchFound = itemSearchWords.some(itemWord =>
+                            itemWord.toLowerCase().includes(lowerQueryWord)
+                        );
+
+                        if (matchFound) {
+                            score += 1;
+                        }
+                    }
+
+                    return { ...item, score };
+                });
+
+                rankedResults.sort((a, b) => {
+                    if (b.score !== a.score) {
+                        return b.score - a.score;
+                    }
+
+                    const dateA = new Date(a.created_at).getTime();
+                    const dateB = new Date(b.created_at).getTime();
+                    return dateB - dateA;
+                });
+
+                const finalResults = (rankedResults as unknown as Record<string, unknown>[]).map(item => {
+                    const rest: Record<string, unknown> = {};
+                    for (const k in item) {
+                        if (k === 'score') continue;
+                        rest[k] = (item as Record<string, unknown>)[k];
+                    }
+                    return rest as unknown as HostelsProductUpdates;
+                });
+                setSearchResults(finalResults);
+            } else {
+                setSearchResults(filtered);
+            }
+
+            setSearchTerm(q);
+        } catch (e) {
+            console.error('Search failed', e);
+            setSearchResults([]);
+            setSearchTerm(q);
+        } finally {
+            setPosting(false);
+            setLoadingFeed(false);
+        }
+    };
+
+    const handleClearSearch = () => {
+        setSearchResults(null);
+        setSearchTerm(null);
+        setSelectedHostel('all');
+        setSelectedCategory('all');
+        setMyProductsActive(false);
     };
 
     const handleDeleteClick = (postId: string) => {
@@ -281,6 +544,7 @@ export default function HostelHomePage() {
 
     const handleDeleteConfirm = async () => {
         if (!deletePostId) return;
+
         try {
             setDeleting(true);
             const { error } = await supabase
@@ -290,7 +554,6 @@ export default function HostelHomePage() {
 
             if (error) throw error;
 
-            // Optimistic update
             setFeed((prev) => prev.filter((item) => item.id !== deletePostId));
             if (searchResults) {
                 setSearchResults((prev) => prev ? prev.filter((item) => item.id !== deletePostId) : null);
@@ -304,73 +567,32 @@ export default function HostelHomePage() {
         }
     };
 
-    const handleRequestContact = (type: 'merchant' | 'recommend', item: HostelsProductUpdates) => {
-        if (!userIsAuthenticated) {
-            setShowAuthModal(true);
-            return;
-        }
+    const ImageSearchPrompt = () => (
+        showImageSearchPrompt ? (
+            <div
+                className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center"
+                onClick={() => setShowImageSearchPrompt(false)}
+            >
+                <div className="bg-gray-900 p-6 rounded-2xl max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
+                    <h3 className="text-white text-lg font-semibold">Find products using images</h3>
+                    <p className="text-gray-400 mt-2">(Coming soon...)</p>
+                    <div className="mt-4">
+                        <button onClick={() => setShowImageSearchPrompt(false)} className="px-4 py-2 bg-emerald-500 text-white rounded-full">Close</button>
+                    </div>
+                </div>
+            </div>
+        ) : null
+    );
 
-        const visitor = item.unique_visitors as UniqueVisitor | undefined;
-        const phone = visitor?.phone_number;
-        if (!phone) {
-            toast.error('Contact not available');
-            return;
-        }
-
-        if (type === 'merchant') {
-            if (!userIsHostelMerchant) {
-                setShowBecomeMerchantModal(true);
-                return;
-            }
-            const msg = `hi there, i have ${item.post_description || ''}`;
-            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-            window.open(whatsappUrl, '_blank');
-        } else if (type === 'recommend') {
-            const msg = `hi there, i have a recommendation for ${item.post_description || ''}`;
-            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-            window.open(whatsappUrl, '_blank');
-        }
+    const handleConfirmUniversity = (schoolId: string) => {
+        localStorage.setItem('selectedSchoolId', schoolId);
+        setSelectedSchoolId(schoolId);
+        setShowConfirmUniversityModal(false);
+        loadFeed(schoolId);
     };
 
-    const handleUserClick = (user: UniqueVisitor) => {
-        setSelectedMerchant(user);
-        setMerchantModalOpen(true);
-    };
-
-    const handleProductClick = (product: HostelsProductUpdates) => {
-        setMerchantModalOpen(false);
-        const images = product.post_images || [];
-        if (images.length > 0) {
-            setImageModalImages(images);
-            setImageModalActive(0);
-            setImageModalDescription(product.post_description || '');
-            setImageModalOpen(true);
-        }
-    };
-
-    const handleFulfillRequest = async (item: HostelsProductUpdates) => {
-        try {
-            const { error } = await supabase
-                .from('hostel_product_updates')
-                .update({ fulfilled: true })
-                .eq('id', item.id);
-
-            if (error) throw error;
-            toast.success('Request marked as fulfilled!');
-            setFeed(prev => prev.map(p => p.id === item.id ? { ...p, fulfilled: true } : p));
-        } catch (error) {
-            console.error('Error fulfilling request:', error);
-            toast.error('Failed to update request');
-        }
-    };
-
-    const openImageModal = (images: string[], startIndex: number) => {
-        setImageModalImages(images);
-        setImageModalActive(startIndex);
-        setImageModalOpen(true);
-    };
-
-    // --- Render ---
+    const feedToDisplay = searchResults !== null ? searchResults : orderedDisplayedFeed;
+    const showLoading = loadingFeed || posting;
 
     return (
         <>
@@ -387,61 +609,35 @@ export default function HostelHomePage() {
                             showPayment={false}
                         />
 
-                        {/* Title & Badge */}
-                        <HostelHeader
-                            currentVisitor={currentVisitor}
-                            userIsHostelMerchant={userIsHostelMerchant}
-                        />
-
-                        {/* Promotional Slider */}
-                        {selectedSchoolId && (
-                            <div className="px-4 mb-2">
-                                {/* Vuna Students (Food + Discounts) */}
-                                {selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' && (
-                                    <BannerSlider
-                                        slides={[
-                                            {
-                                                id: 'vuna-1',
-                                                image: '/images/banner_food.png',
-                                                title: 'Food & Discounts Day',
-                                                subtitle: 'Delicious deals you currently cannot resist!'
-                                            },
-                                            {
-                                                id: 'vuna-2',
-                                                image: '/images/banner_discounts.png',
-                                                title: 'Special Offers',
-                                                subtitle: 'Exclusive discounts just for you.'
-                                            }
-                                        ]}
-                                    />
+                        <div className="mb-6 mt-2 text-center">
+                            <h1 className="text-4xl font-bold mb-1 flex items-center justify-center gap-2 flex-wrap">
+                                <span>
+                                    <span className="text-orange-500">uni</span>
+                                    <span className="text-blue-600">store.</span>
+                                </span>
+                                {(currentVisitor?.is_admin || userIsHostelMerchant) && (
+                                    <div className="flex items-center gap-1.5 align-middle">
+                                        {currentVisitor?.is_admin && (
+                                            <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 text-xs border border-rose-200 flex items-center shadow-sm">
+                                                Admin
+                                            </span>
+                                        )}
+                                        {userIsHostelMerchant && (
+                                            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 text-xs border border-blue-200 flex items-center shadow-sm">
+                                                Seller
+                                            </span>
+                                        )}
+                                    </div>
                                 )}
+                            </h1>
+                            <p className="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase">
+                                Hostel Mode
+                            </p>
+                        </div>
 
-                                {/* BHU Students (Fashion + Discounts) */}
-                                {selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' && (
-                                    <BannerSlider
-                                        slides={[
-                                            {
-                                                id: 'bhu-1',
-                                                // Typo in filename as per existing assets
-                                                image: '/images/benner_fashion.png',
-                                                title: 'Fashion & Discounts Day',
-                                                subtitle: 'Upgrade your style with amazing deals!'
-                                            },
-                                            {
-                                                id: 'bhu-2',
-                                                image: '/images/banner_discounts.png',
-                                                title: 'Special Offers',
-                                                subtitle: 'Grab the best prices on top brands.'
-                                            }
-                                        ]}
-                                    />
-                                )}
-                            </div>
-                        )}
                     </div>
 
                     <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
-                        {/* Composer & Search */}
                         <PostComposerVuna
                             currentVisitor={currentVisitor}
                             userIsHostelMerchant={userIsHostelMerchant}
@@ -455,7 +651,7 @@ export default function HostelHomePage() {
                             setShowAuthModal={setShowAuthModal}
                         />
 
-                        {/* Filtering */}
+
                         <FilterBar
                             hostels={hostels}
                             selectedHostel={selectedHostel}
@@ -470,158 +666,101 @@ export default function HostelHomePage() {
                                 setSelectedCategory('all');
                             }}
                             searchTerm={searchTerm}
-                            onClearSearch={() => {
-                                handleClearSearch();
-                                setSelectedHostel('all');
-                                setSelectedCategory('all');
-                                setMyProductsActive(false);
-                            }}
+                            onClearSearch={handleClearSearch}
                         />
 
-                        {/* Activity & Requests (only if not searching, or show anyway?) */}
-                        {!loadingFeed && !searchTerm && (
-                            <>
-                                <LiveActivityHub onUserClick={handleUserClick} />
-                                <RequestsCarousel
-                                    requests={requestItems}
-                                    onItemClick={(item) => console.log("Clicked request", item.id)}
-                                    currentVisitor={currentVisitor}
-                                    onContact={handleRequestContact}
-                                    onDelete={(item) => handleDeleteClick(item.id)}
-                                    onFulfill={handleFulfillRequest}
-                                />
-                            </>
-                        )}
-
-                        {/* Product Feed */}
-                        <div className="pb-24">
+                        <div className="flex flex-col">
                             {showLoading ? (
                                 <LoadingSpinner />
                             ) : (
-                                <div className="divide-y divide-gray-800">
-                                    {(searchTerm ? feedToDisplay : productItems).map((item) => (
+                                <>
+                                    {feedToDisplay.length === 0 && (
+                                        <div className="p-4 text-sm text-[#8b98a5] text-center">
+                                            {searchResults !== null ? (
+                                                <>
+                                                    No results for product. Would you like to check the main store for the product?
+                                                    <div className="mt-3">
+                                                        <button
+                                                            onClick={() => {
+                                                                toggleHostelMode();
+                                                                navigate('/');
+                                                            }}
+                                                            className="bg-emerald-500 text-white px-4 py-2 rounded-full"
+                                                        >
+                                                            Yes, take me to store
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                'No updates yet.'
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {feedToDisplay.map((item) => (
                                         <ProductFeedItem
                                             key={item.id}
                                             item={item}
-                                            currentVisitor={currentVisitor}
+                                            currentVisitor={currentVisitor ?? undefined}
                                             userIsHostelMerchant={userIsHostelMerchant}
                                             userIsAuthenticated={userIsAuthenticated}
                                             openImageModal={openImageModal}
-                                            onDelete={() => handleDeleteClick(item.id)}
-                                            discountValue={activeCoupon?.value || 0}
-                                            onContactMerchant={(item) => handleRequestContact('merchant', item)}
-                                            onRecommend={(item) => handleRequestContact('recommend', item)}
-                                            onUserClick={handleUserClick}
+                                            onDelete={handleDeleteClick}
                                         />
                                     ))}
-
-                                    {!showLoading && feedToDisplay.length === 0 && (
-                                        <div className="text-center py-12 text-gray-400">
-                                            {searchTerm ? 'No matches found.' : 'No updates yet. Be the first to post!'}
-                                        </div>
-                                    )}
-                                </div>
+                                </>
                             )}
                         </div>
                     </div>
+
+                    <ImageModal
+                        isOpen={imageModalOpen}
+                        images={imageModalImages}
+                        initialIndex={imageModalActive}
+                        onClose={() => setImageModalOpen(false)}
+                    />
+
+                    {ImageSearchPrompt()}
+
+                    <AuthModal
+                        isOpen={showAuthModal}
+                        onClose={() => setShowAuthModal(false)}
+                        onSuccess={() => setUserIsAuthenticated(true)}
+                    />
+
+                    <ConfirmContactModal
+                        isOpen={showConfirmContactModal}
+                        product={pendingContactProduct || undefined}
+                        onClose={() => {
+                            setShowConfirmContactModal(false);
+                            setPendingContactProduct(null);
+                            localStorage.removeItem('pending_contact_product');
+                        }}
+                        onConfirm={() => {
+                            setShowConfirmContactModal(false);
+                            setPendingContactProduct(null);
+                            localStorage.removeItem('pending_contact_product');
+                        }}
+                        hostelMode={true}
+                    />
+
+                    <ConfirmDeleteModal
+                        isOpen={deleteModalOpen}
+                        onClose={() => {
+                            setDeleteModalOpen(false);
+                            setDeletePostId(null);
+                        }}
+                        onConfirm={handleDeleteConfirm}
+                        deleting={deleting}
+                    />
                 </main>
-            ) : null}
-
-            {/* All Modals */}
-            <HostelModals
-                showConfirmUniversityModal={showConfirmUniversityModal}
-                setShowConfirmUniversityModal={setShowConfirmUniversityModal}
-                onConfirmUniversity={handleConfirmUniversity}
-                showAuthModal={showAuthModal}
-                setShowAuthModal={setShowAuthModal}
-                showConfirmContactModal={showConfirmContactModal}
-                setShowConfirmContactModal={setShowConfirmContactModal}
-                pendingContactProduct={pendingContactProduct}
-                imageModalOpen={imageModalOpen}
-                setImageModalOpen={setImageModalOpen}
-                imageModalImages={imageModalImages}
-                imageModalActive={imageModalActive}
-                setImageModalActive={setImageModalActive}
-                imageModalDescription={imageModalDescription}
-                deleteModalOpen={deleteModalOpen}
-                setDeleteModalOpen={setDeleteModalOpen}
-                handleDeleteConfirm={handleDeleteConfirm}
-                deleting={deleting}
-                couponModalOpen={couponModalOpen}
-                setCouponModalOpen={setCouponModalOpen}
-                handleGameCouponClaimed={handleGameCouponClaimed}
-                selectedSchoolId={selectedSchoolId}
-                currentVisitorId={currentVisitor?.id}
-                activeCoupon={activeCoupon}
-                merchantModalOpen={merchantModalOpen}
-                setMerchantModalOpen={setMerchantModalOpen}
-                selectedMerchant={selectedMerchant}
-                currentVisitor={currentVisitor}
-                onProductClick={handleProductClick}
-                showBecomeMerchantModal={showBecomeMerchantModal}
-                setShowBecomeMerchantModal={setShowBecomeMerchantModal}
-                userIsHostelMerchant={userIsHostelMerchant}
-                onContactSeller={(item) => handleRequestContact('merchant', item)}
-            />
-
-            {/* Active Coupon Floating Timer */}
-            {activeCoupon && timeRemaining !== null && (
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-4 fade-in duration-500 pointer-events-none group">
-                    <div className="bg-gray-900/90 backdrop-blur-md border border-purple-500/30 shadow-lg shadow-purple-500/10 rounded-full pl-5 pr-2 py-2 flex items-center gap-3 pointer-events-auto relative">
-                        <div
-                            className="flex items-center gap-2 cursor-pointer"
-                            onClick={() => setCouponModalOpen(true)}
-                        >
-                            <span className="text-xl">
-                                {activeCoupon.type === 'product' ? '🎁' : '🎟️'}
-                            </span>
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">
-                                    {activeCoupon.type === 'product' ? 'Gift Unlocked' : 'Coupon Active'}
-                                </p>
-                                {activeCoupon.type !== 'product' && (
-                                    <p className="text-[10px] text-white font-bold leading-tight">
-                                        -₦{activeCoupon.value.toLocaleString()}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                        <div className="h-8 w-px bg-gray-700"></div>
-                        <div className="text-right min-w-[60px] mr-2">
-                            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">Expires</p>
-                            <p className={`text-sm font-mono font-bold leading-tight ${timeRemaining < 300000 ? 'text-red-400 animate-pulse' : 'text-emerald-400'}`}>
-                                {Math.floor(timeRemaining / 60000)}m {Math.floor((timeRemaining % 60000) / 1000)}s
-                            </p>
-                        </div>
-
-                        {/* Close Button */}
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveCoupon(null);
-                            }}
-                            className="p-1.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Image Search Placeholder Prompt */}
-            {showImageSearchPrompt && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center"
-                    onClick={() => setShowImageSearchPrompt(false)}
-                >
-                    <div className="bg-gray-900 p-6 rounded-2xl max-w-md w-full text-center" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-white text-lg font-semibold">Find products using images</h3>
-                        <p className="text-gray-400 mt-2">(Coming soon...)</p>
-                        <div className="mt-4">
-                            <button onClick={() => setShowImageSearchPrompt(false)} className="px-4 py-2 bg-emerald-500 text-white rounded-full">Close</button>
-                        </div>
-                    </div>
-                </div>
+            ) : (
+                <ConfirmUniversityModal
+                    isOpen={showConfirmUniversityModal}
+                    onClose={() => setShowConfirmUniversityModal(false)}
+                    initialSchoolId={selectedSchoolId}
+                    onConfirm={handleConfirmUniversity}
+                />
             )}
         </>
     );

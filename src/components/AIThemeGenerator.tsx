@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Sparkles, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Send, RefreshCw } from 'lucide-react';
 import { Theme } from '../hooks/useTheme';
 
 interface AIThemeGeneratorProps {
@@ -21,7 +21,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
 
     setIsGenerating(true);
     setError('');
-
+    
     try {
       const theme = await onThemeGenerated(description);
       if (theme) {
@@ -44,7 +44,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
 
   const examplePrompts = [
     "A warm sunset theme with orange and pink colors",
-    "Dark cyberpunk theme with neon green accents",
+    "Dark cyberpunk theme with neon green accents", 
     "Minimalist theme inspired by Japanese zen gardens",
     "Ocean-inspired theme with blues and teals",
     "Autumn forest theme with warm browns and golds"
@@ -52,7 +52,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
 
   return (
     <div>
-      <h4
+      <h4 
         className="text-lg font-semibold mb-6"
         style={{ color: currentTheme.text }}
       >
@@ -62,7 +62,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
       <div className="space-y-6">
         {/* Description Input */}
         <div>
-          <label
+          <label 
             className="block text-sm font-medium mb-2"
             style={{ color: currentTheme.text }}
           >
@@ -83,7 +83,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
             maxLength={200}
           />
           <div className="flex justify-between items-center mt-2">
-            <p
+            <p 
               className="text-xs"
               style={{ color: currentTheme.textSecondary }}
             >
@@ -94,7 +94,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
 
         {/* Example Prompts */}
         <div>
-          <p
+          <p 
             className="text-sm font-medium mb-3"
             style={{ color: currentTheme.text }}
           >
@@ -147,7 +147,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
 
         {/* Error Message */}
         {error && (
-          <div
+          <div 
             className="p-4 rounded-lg border"
             style={{
               backgroundColor: '#fef2f2',
@@ -162,7 +162,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
 
         {/* Generated Theme Preview */}
         {generatedTheme && (
-          <div
+          <div 
             className="p-6 rounded-xl border-2 shadow-lg"
             style={{
               backgroundColor: generatedTheme.surface,
@@ -170,7 +170,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
             }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h5
+              <h5 
                 className="text-lg font-semibold"
                 style={{ color: generatedTheme.text }}
               >
@@ -189,26 +189,26 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
                 Try Again
               </button>
             </div>
-
+            
             {/* Theme Preview */}
             <div className="space-y-3 mb-4">
-              <div
+              <div 
                 className="h-4 rounded"
-                style={{
+                style={{ 
                   background: `linear-gradient(135deg, ${generatedTheme.primary}, ${generatedTheme.secondary})`
                 }}
               />
-              <div
+              <div 
                 className="h-3 rounded w-3/4"
                 style={{ backgroundColor: generatedTheme.text + '40' }}
               />
-              <div
+              <div 
                 className="h-3 rounded w-1/2"
                 style={{ backgroundColor: generatedTheme.textSecondary + '40' }}
               />
-              <div
+              <div 
                 className="h-8 rounded-lg flex items-center justify-center text-white font-medium"
-                style={{
+                style={{ 
                   background: `linear-gradient(135deg, ${generatedTheme.primary}, ${generatedTheme.accent})`
                 }}
               >
@@ -216,9 +216,9 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
               </div>
             </div>
 
-            <div
+            <div 
               className="text-sm p-3 rounded-lg"
-              style={{
+              style={{ 
                 backgroundColor: generatedTheme.primary + '10',
                 color: generatedTheme.text
               }}
@@ -229,9 +229,9 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
         )}
 
         {/* Info */}
-        <div
+        <div 
           className="text-sm p-4 rounded-lg"
-          style={{
+          style={{ 
             backgroundColor: currentTheme.primary + '10',
             color: currentTheme.text
           }}

@@ -364,7 +364,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
     try {
       // Use Supabase to send a password reset email
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+      const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
         redirectTo: `${window.location.origin}/update-password`
       });
 

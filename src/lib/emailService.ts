@@ -4,7 +4,7 @@
  * Converts a standard string to a Base64URL encoded string.
  * This is necessary because the Pica API requires Base64URL, not standard Base64 (btoa).
  * Base64URL replaces '+', '/', and removes trailing '=' characters.
- */
+ */ 
 const base64urlEncode = (str: string): string => {
     // 1. Convert UTF-8 characters to a format btoa can handle (Latin1/Binary String)
     let encoded = btoa(unescape(encodeURIComponent(str))); // ⬅️ THIS IS THE FIX
@@ -76,7 +76,6 @@ export const sendPicaEmail = async ({ to, subject, body, from }: SendEmailParams
             // Attempt to extract a meaningful error message from the body
             errorMessage = errorBody.message || errorBody.error?.message || errorMessage;
         } catch (e) {
-            console.error('Error parsing response body:', e);
             // Ignore if response body isn't JSON
         }
         throw new Error(errorMessage);

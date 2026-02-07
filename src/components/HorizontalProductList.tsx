@@ -7,7 +7,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-// import { useHostelMode } from '../hooks/useHostelMode';
+import { useHostelMode } from '../hooks/useHostelMode';
 import { Loader } from 'lucide-react';
 import ContactSellerButton from './ContactSellerButton';
 import ContactSellerLink from './ContactSellerLink';
@@ -30,7 +30,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
     const [selectedImageModal, setSelectedImageModal] = useState<{ product: Product; imageIndex: number } | null>(null);
     const navigate = useNavigate();
     const { currentTheme } = useTheme();
-    // const { hostelMode } = useHostelMode();
+    const { hostelMode } = useHostelMode();
 
     useEffect(() => {
         const fetchCategoryName = async () => {

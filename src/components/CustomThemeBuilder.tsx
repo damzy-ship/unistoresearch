@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Palette, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Palette, Save, RefreshCw } from 'lucide-react';
 import { Theme, useTheme } from '../hooks/useTheme';
 
 interface CustomThemeBuilderProps {
@@ -30,7 +30,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
     try {
       // Create a description based on selected colors
       const description = `Create a theme with primary color ${customTheme.primary}, secondary color ${customTheme.secondary}, and accent color ${customTheme.accent}. The background should be ${customTheme.background} and surface should be ${customTheme.surface}.`;
-
+      
       const aiTheme = await generateAITheme(description);
       if (aiTheme) {
         // Override AI theme with user's selected colors
@@ -44,7 +44,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
           background: customTheme.background || aiTheme.background,
           surface: customTheme.surface || aiTheme.surface,
         };
-
+        
         onThemeChange(finalTheme);
       }
     } catch (error) {
@@ -66,7 +66,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
 
   return (
     <div>
-      <h4
+      <h4 
         className="text-lg font-semibold mb-6"
         style={{ color: currentTheme.text }}
       >
@@ -84,13 +84,13 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
             { key: 'surface', label: 'Surface Color', description: 'Card backgrounds' }
           ].map(({ key, label, description }) => (
             <div key={key} className="space-y-2">
-              <label
+              <label 
                 className="block text-sm font-medium"
                 style={{ color: currentTheme.text }}
               >
                 {label}
               </label>
-              <p
+              <p 
                 className="text-xs"
                 style={{ color: currentTheme.textSecondary }}
               >
@@ -122,31 +122,31 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
         </div>
 
         {/* Preview */}
-        <div
+        <div 
           className="p-6 rounded-xl border-2"
           style={{
             backgroundColor: customTheme.surface || currentTheme.surface,
             borderColor: customTheme.primary || currentTheme.primary
           }}
         >
-          <h5
+          <h5 
             className="text-lg font-semibold mb-4"
             style={{ color: customTheme.primary || currentTheme.primary }}
           >
             Theme Preview
           </h5>
           <div className="space-y-3">
-            <div
+            <div 
               className="h-4 rounded"
-              style={{
+              style={{ 
                 background: `linear-gradient(135deg, ${customTheme.primary || currentTheme.primary}, ${customTheme.secondary || currentTheme.secondary})`
               }}
             />
-            <div
+            <div 
               className="h-3 rounded w-3/4"
               style={{ backgroundColor: (customTheme.primary || currentTheme.primary) + '40' }}
             />
-            <div
+            <div 
               className="h-3 rounded w-1/2"
               style={{ backgroundColor: (customTheme.accent || currentTheme.accent) + '40' }}
             />
@@ -172,7 +172,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
               </>
             )}
           </button>
-
+          
           <button
             onClick={resetToDefault}
             className="px-6 py-3 border border-gray-300 rounded-xl font-medium transition-colors hover:bg-gray-50"
@@ -187,9 +187,9 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
           </button>
         </div>
 
-        <div
+        <div 
           className="text-sm p-4 rounded-lg"
-          style={{
+          style={{ 
             backgroundColor: currentTheme.primary + '10',
             color: currentTheme.text
           }}

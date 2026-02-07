@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import BuyNowButton from '../components/Payment/BuyNowButton';
@@ -16,18 +16,18 @@ interface Merchant {
 
 export default function PayMerchantPage() {
     const { currentTheme } = useTheme();
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const [merchants, setMerchants] = useState<Merchant[]>([]);
-    const [_, setFilteredMerchants] = useState<Merchant[]>([]);
-    let search = ''
+    const [filteredMerchants, setFilteredMerchants] = useState<Merchant[]>([]);
+    const [search, setSearch] = useState('');
     const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
-    const [___, setIsDropdownOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [__, setSessionUser] = useState<any>(null);
+    const [sessionUser, setSessionUser] = useState<any>(null);
     const [currentUserData, setCurrentUserData] = useState<any>(null);
 
     const [formData, setFormData] = useState({
@@ -250,7 +250,7 @@ export default function PayMerchantPage() {
                                             setFormData(prev => ({ ...prev, phoneNumber: value }));
                                             if (!validatePhoneNumber(value) && value !== '') {
                                                 setErrors(prev => ({ ...prev, phoneNumber: 'Please enter a valid Nigerian phone number' }));
-                                            } else {
+                                            } else { 
                                                 setErrors(prev => ({ ...prev, phoneNumber: '' }));
                                             }
                                         }}
@@ -265,7 +265,7 @@ export default function PayMerchantPage() {
                                     {errors.phoneNumber && <div className="text-xs text-red-500 mt-1">{errors.phoneNumber}</div>}
                                 </div>
                             )}
-
+                            
                             <div>
                                 <label className="block text-sm font-medium mb-1" style={{ color: currentTheme.textSecondary }}>
                                     Amount To Pay

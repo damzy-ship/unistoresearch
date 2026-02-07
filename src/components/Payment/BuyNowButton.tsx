@@ -88,14 +88,14 @@ const BuyNowButton: React.FC<InvoiceDataProps> = (InvoiceData) => {
             return;
         }
 
-        if (!isPaystackLoaded || !(window as any).PaystackPop) {
+        if (!isPaystackLoaded || !window.PaystackPop) {
             setMessage('Paystack script is not loaded yet. Please try again.');
             return;
         }
 
 
         // Initialize the Paystack payment handler.
-        const handler = (window as any).PaystackPop.setup({
+        const handler = window.PaystackPop.setup({
             key: PAYSTACK_PUBLIC_KEY,
             email: email,
             name: InvoiceData?.customer_name || 'Guest User',

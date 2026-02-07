@@ -9,7 +9,7 @@ interface ConfirmUniversityModalProps {
   onConfirm: (schoolId: string) => void;
 }
 
-export default function ConfirmUniversityModal({ isOpen, initialSchoolId, onConfirm }: ConfirmUniversityModalProps) {
+export default function ConfirmUniversityModal({ isOpen, onClose, initialSchoolId, onConfirm }: ConfirmUniversityModalProps) {
   const { currentTheme } = useTheme();
   const [selectedUniversity, setSelectedUniversity] = useState<string>(initialSchoolId || '');
 
