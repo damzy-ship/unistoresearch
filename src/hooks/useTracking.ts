@@ -36,7 +36,7 @@ export async function getUserId(): Promise<string> {
   if (!userId || !user_data_id) {
     const school_id = localStorage.getItem('selectedSchoolId');
     userId = generateUniqueId();
-    
+
     localStorage.setItem(USER_ID_STORAGE_KEY, userId);
     const { data: user_data, error: insertError } = await supabase
       .from('unique_visitors')
@@ -51,7 +51,7 @@ export async function getUserId(): Promise<string> {
 
     if (insertError) {
       console.error('Error creating visitor record on login:', insertError);
-    } else{
+    } else {
       localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
     }
 
@@ -80,7 +80,16 @@ export function setPhoneAuthenticated(authenticated: boolean): void {
 
 export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
+
+  // Preserve coupon data
+  const couponId = localStorage.getItem('hostel_coupon_id');
+  const lastPlayed = localStorage.getItem('hostel_coupon_last_played');
+
   localStorage.clear();
+
+  if (couponId) localStorage.setItem('hostel_coupon_id', couponId);
+  if (lastPlayed) localStorage.setItem('hostel_coupon_last_played', lastPlayed);
+
   window.location.reload();
 }
 

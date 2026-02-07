@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2, Store, BadgeCheck, Clock, XCircle, Edit2, Eye, Mail } from 'lucide-react';
+import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2, Store, BadgeCheck, Clock, XCircle, Edit2, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, UniqueVisitor } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';

@@ -18,7 +18,7 @@ export default function MerchantProductPage() {
     const [error, setError] = useState<string | null>(null);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [merchantDetails, setMerchantDetails] = useState<UniqueVisitor | null>(null);
+    const [_, setMerchantDetails] = useState<UniqueVisitor | null>(null);
 
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');

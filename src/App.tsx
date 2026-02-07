@@ -1,13 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme';
-import HomePage from './pages/HomePage';
+// import HomePage from './pages/HomePage';
 import PastRequestsPage from './pages/PastRequestsPage';
 import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
 import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
-import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
@@ -23,13 +22,14 @@ import CategoryProductsPage from './pages/CategoryProductsPage';
 import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import UserMenu from './components/UserMenu';
 import HostelHomePage from './pages/HostelHomePage';
-import { useHostelMode } from './hooks/useHostelMode';
+import AdminCouponsPage from './pages/AdminCouponsPage';
+// import { useHostelMode } from './hooks/useHostelMode';
 
-function HomeEntry() {
-  const { hostelMode } = useHostelMode();
-  if (hostelMode) return <Navigate to="/hostel" replace />;
-  return <HomePage />;
-}
+// function HomeEntry() {
+//   const { hostelMode } = useHostelMode();
+//   if (hostelMode) return <Navigate to="/hostel" replace />;
+//   return <HomePage />;
+// }
 
 function App() {
   const { currentTheme } = useTheme();
@@ -55,7 +55,6 @@ function App() {
             <Route path="/sellers" element={<SellersPage />} />
             <Route path="/merchants" element={<PublicMerchantsPage />} />
             <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/test-categories" element={<CategoryTest />} />
             <Route path="/payment/:merchantId" element={<PaymentPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />
@@ -65,7 +64,9 @@ function App() {
             <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
             <Route path="/all-products" element={<AllProductsPage />} />
             <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
+            <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
             <Route path="/update-password" element={<UpdatePasswordPage />} />
+            <Route path="/admin-coupons" element={<AdminCouponsPage />} />
           </Routes>
         </div>
       </Router>

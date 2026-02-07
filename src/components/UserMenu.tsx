@@ -15,6 +15,7 @@ export default function UserMenu() {
   const [userId, setUserId] = useState<string | null>(null);
   const [actualUserId, setActualUserId] = useState<string | null>(null);
   const [userType, setUserType] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { currentTheme } = useTheme();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   // const { hostelMode, setHostelMode } = useHostelMode();
@@ -32,13 +33,14 @@ export default function UserMenu() {
         setUserId(session.user.id);
         const { data: visitorData } = await supabase
           .from('unique_visitors')
-          .select('user_type, full_name, auth_user_id, id')
+          .select('user_type, full_name, auth_user_id, id, is_admin')
           .eq('auth_user_id', session.user.id)
           .single();
 
-        const typedVisitor = visitorData as { user_type?: string; full_name?: string; id?: string } | null;
+        const typedVisitor = visitorData as { user_type?: string; full_name?: string; id?: string, is_admin?: boolean } | null;
         setUserType(typedVisitor?.user_type || null);
         setActualUserId(typedVisitor?.id || null);
+        setIsAdmin(typedVisitor?.is_admin || false);
         const name = typedVisitor?.full_name || session.user.user_metadata?.full_name || '';
         setUserName(name);
       }
@@ -138,6 +140,16 @@ export default function UserMenu() {
               <LogOut className="w-4 h-4" />
               Sign Out
             </button>
+
+            {isAdmin && (
+              <button
+                onClick={() => { navigate('/admin-coupons'); setMobileOpen(false); }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors mt-2 border-t border-gray-100"
+              >
+                <Box className="w-4 h-4" />
+                Manage Coupons
+              </button>
+            )}
           </>
         )}
       </div>
