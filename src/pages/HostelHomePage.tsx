@@ -12,6 +12,7 @@ import LiveActivityHub from '../components/hostel/LiveActivityHub';
 import LoadingSpinner from '../components/hostel/LoadingSpinner';
 import { HostelHeader } from '../components/hostel/HostelHeader';
 import { HostelModals } from '../components/hostel/HostelModals';
+import BannerSlider from '../components/hostel/BannerSlider';
 // Hooks
 import { useHostelFeed } from '../hooks/hostel/useHostelFeed';
 import { useHostelCoupons } from '../hooks/hostel/useHostelCoupons';
@@ -323,6 +324,52 @@ export default function HostelHomePage() {
                             currentVisitor={currentVisitor}
                             userIsHostelMerchant={userIsHostelMerchant}
                         />
+
+                        {/* Promotional Slider */}
+                        {selectedSchoolId && (
+                            <div className="px-4 mb-2">
+                                {/* Vuna Students (Food + Discounts) */}
+                                {selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' && (
+                                    <BannerSlider
+                                        slides={[
+                                            {
+                                                id: 'vuna-1',
+                                                image: '/images/banner_food.png',
+                                                title: 'Food & Discounts Day',
+                                                subtitle: 'Delicious deals you currently cannot resist!'
+                                            },
+                                            {
+                                                id: 'vuna-2',
+                                                image: '/images/banner_discounts.png',
+                                                title: 'Special Offers',
+                                                subtitle: 'Exclusive discounts just for you.'
+                                            }
+                                        ]}
+                                    />
+                                )}
+
+                                {/* BHU Students (Fashion + Discounts) */}
+                                {selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' && (
+                                    <BannerSlider
+                                        slides={[
+                                            {
+                                                id: 'bhu-1',
+                                                // Typo in filename as per existing assets
+                                                image: '/images/benner_fashion.png',
+                                                title: 'Fashion & Discounts Day',
+                                                subtitle: 'Upgrade your style with amazing deals!'
+                                            },
+                                            {
+                                                id: 'bhu-2',
+                                                image: '/images/banner_discounts.png',
+                                                title: 'Special Offers',
+                                                subtitle: 'Grab the best prices on top brands.'
+                                            }
+                                        ]}
+                                    />
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="max-w-2xl mx-auto border-x border-gray-800 min-h-screen">
