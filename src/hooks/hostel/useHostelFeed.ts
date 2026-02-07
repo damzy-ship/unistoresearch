@@ -92,7 +92,7 @@ export function useHostelFeed(
                 search_words: Array.isArray(d.search_words) ? d.search_words : [],
                 fulfilled: d.fulfilled ?? null,
                 status: d.status as 'open' | 'fulfilled' | 'cancelled' | 'hide' | undefined,
-                price: d.price ?? 0
+                price: d.price
             }));
 
             setFeed(mapped);

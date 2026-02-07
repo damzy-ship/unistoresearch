@@ -101,6 +101,7 @@ export default function HostelHomePage() {
         setCouponModalOpen,
         handleGameCouponClaimed,
         activeCoupon,
+        setActiveCoupon,
         timeRemaining
     } = useHostelCoupons(currentVisitor, userIsAuthenticated, selectedSchoolId, loadingFeed);
 
@@ -450,20 +451,44 @@ export default function HostelHomePage() {
 
             {/* Active Coupon Floating Timer */}
             {activeCoupon && timeRemaining !== null && (
-                <div
-                    className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-gray-900/90 backdrop-blur-md border border-emerald-500/30 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 cursor-pointer hover:scale-105 transition-transform animate-in slide-in-from-bottom-10 fade-in duration-300"
-                    onClick={() => setCouponModalOpen(true)}
-                >
-                    <div className="flex flex-col items-start">
-                        <span className="text-xs text-emerald-400 font-bold tracking-wider uppercase">Active Coupon</span>
-                        <div className="font-mono text-lg font-bold leading-none">
-                            {Math.floor(timeRemaining / 60000)}m {Math.floor((timeRemaining % 60000) / 1000)}s
+                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-4 fade-in duration-500 pointer-events-none group">
+                    <div className="bg-gray-900/90 backdrop-blur-md border border-purple-500/30 shadow-lg shadow-purple-500/10 rounded-full pl-5 pr-2 py-2 flex items-center gap-3 pointer-events-auto relative">
+                        <div
+                            className="flex items-center gap-2 cursor-pointer"
+                            onClick={() => setCouponModalOpen(true)}
+                        >
+                            <span className="text-xl">
+                                {activeCoupon.type === 'product' ? '🎁' : '🎟️'}
+                            </span>
+                            <div>
+                                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">
+                                    {activeCoupon.type === 'product' ? 'Gift Unlocked' : 'Coupon Active'}
+                                </p>
+                                {activeCoupon.type !== 'product' && (
+                                    <p className="text-[10px] text-white font-bold leading-tight">
+                                        -₦{activeCoupon.value.toLocaleString()}
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                    <div className="h-8 w-px bg-gray-700"></div>
-                    <div className="text-right">
-                        <div className="text-xs text-gray-400">Value</div>
-                        <div className="font-bold text-white">₦{activeCoupon.value.toLocaleString()}</div>
+                        <div className="h-8 w-px bg-gray-700"></div>
+                        <div className="text-right min-w-[60px] mr-2">
+                            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider leading-tight">Expires</p>
+                            <p className={`text-sm font-mono font-bold leading-tight ${timeRemaining < 300000 ? 'text-red-400 animate-pulse' : 'text-emerald-400'}`}>
+                                {Math.floor(timeRemaining / 60000)}m {Math.floor((timeRemaining % 60000) / 1000)}s
+                            </p>
+                        </div>
+
+                        {/* Close Button */}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveCoupon(null);
+                            }}
+                            className="p-1.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                     </div>
                 </div>
             )}

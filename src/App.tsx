@@ -22,6 +22,7 @@ import CategoryProductsPage from './pages/CategoryProductsPage';
 import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import UserMenu from './components/UserMenu';
 import HostelHomePage from './pages/HostelHomePage';
+import AdminCouponsPage from './pages/AdminCouponsPage';
 // import { useHostelMode } from './hooks/useHostelMode';
 
 // function HomeEntry() {
@@ -63,7 +64,9 @@ function App() {
             <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
             <Route path="/all-products" element={<AllProductsPage />} />
             <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
+            <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
             <Route path="/update-password" element={<UpdatePasswordPage />} />
+            <Route path="/admin-coupons" element={<AdminCouponsPage />} />
           </Routes>
         </div>
       </Router>

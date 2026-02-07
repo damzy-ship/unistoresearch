@@ -186,7 +186,8 @@ export interface Coupon {
   claimed: boolean;
   created_at: string;
   claimed_by: string; // UUID of unique visitors
-  claimed_at: string;
+  claimed_at: number;
   school_id: string;
-  type?: 'discount' | 'product'
+  type?: 'discount' | 'product';
+  product_id?: string;
 }

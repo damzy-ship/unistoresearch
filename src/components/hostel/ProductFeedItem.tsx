@@ -213,15 +213,15 @@ export default function ProductFeedItem({
                                 {discountValue && discountValue > 0 ? (
                                     <>
                                         <span className="text-gray-400 line-through text-xs">
-                                            ₦{item.price.toLocaleString()}
+                                            ₦{Number(item.price).toLocaleString()}
                                         </span>
                                         <span className="text-emerald-400 font-bold text-base">
-                                            ₦{Math.max(0, item.price - discountValue).toLocaleString()}
+                                            ₦{Math.max(0, Number(item.price) - discountValue).toLocaleString()}
                                         </span>
                                     </>
                                 ) : (
                                     <span className="text-emerald-400">
-                                        ₦{item.price.toLocaleString()}
+                                        ₦{Number(item.price).toLocaleString()}
                                     </span>
                                 )}
                             </div>

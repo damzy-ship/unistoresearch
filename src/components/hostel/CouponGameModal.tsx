@@ -176,10 +176,12 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
                                             className="absolute inset-0 w-full h-full bg-gray-900 rounded-xl md:rounded-2xl border-2 border-emerald-500 flex flex-col items-center justify-center p-2"
                                             style={{ transform: "rotateY(180deg)", backfaceVisibility: 'hidden' }}
                                         >
-                                            <div className="text-xs text-emerald-400 uppercase tracking-widest mb-1">You Won</div>
+                                            <div className="text-xs text-emerald-400 uppercase tracking-widest mb-1">
+                                                {coupon.type === 'product' ? 'Free Gift' : 'You Won'}
+                                            </div>
                                             <div className="text-xl md:text-2xl font-bold text-white mb-2">{coupon.code}</div>
                                             <div className="text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">
-                                                -₦{coupon.value.toLocaleString()}
+                                                {coupon.type === 'product' ? 'FREE ITEM' : `-₦${coupon.value.toLocaleString()}`}
                                             </div>
                                         </div>
                                     </motion.div>
@@ -189,6 +191,7 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
                     </motion.div>
                 )}
 
+                {/* Revealed Phase - The Modal */}
                 {/* Revealed Phase - The Modal */}
                 {revealed && activeCoupon && (
                     <motion.div
@@ -209,6 +212,13 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
                             animate={{ opacity: 1, y: 0, transition: { delay: 0.3 } }}
                             className="w-full flex flex-col items-center relative z-10"
                         >
+                            {/* Close Button for Revealed Modal */}
+                            <button
+                                onClick={onClose}
+                                className="absolute -top-2 -right-2 z-50 p-2 bg-gray-800/50 rounded-full hover:bg-gray-700 text-white transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                             {/* Confetti/Rays effects */}
                             <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none -z-10"></div>
 
@@ -218,18 +228,20 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
                                 transition={{ delay: 0.5, type: "spring" }}
                                 className="bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black text-2xl md:text-3xl py-2 px-6 rounded-full inline-block mb-6 shadow-xl"
                             >
-                                YOU WON!
+                                {activeCoupon.type === 'product' ? 'GIFT UNLOCKED!' : 'YOU WON!'}
                             </motion.div>
 
-                            <h3 className="text-xl text-gray-400 uppercase tracking-widest mb-2">Coupon Code</h3>
+                            <h3 className="text-xl text-gray-400 uppercase tracking-widest mb-2">
+                                {activeCoupon.type === 'product' ? 'Claim Code' : 'Coupon Code'}
+                            </h3>
                             <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-6 mb-6 w-full">
                                 <code className="text-4xl md:text-5xl font-mono text-purple-400 font-bold tracking-wider break-all">
                                     {activeCoupon.code}
                                 </code>
                             </div>
 
-                            <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 mb-8">
-                                -₦{activeCoupon.value.toLocaleString()}
+                            <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 mb-8 uppercase">
+                                {activeCoupon.type === 'product' ? 'FREE ITEM' : `-₦${activeCoupon.value.toLocaleString()}`}
                             </div>
 
                             <div className="bg-purple-900/30 p-4 rounded-xl border border-purple-500/30 mb-8 text-sm text-left space-y-2 w-full">
@@ -241,12 +253,19 @@ export const CouponGameModal: React.FC<CouponGameModalProps> = ({ isOpen, onCoup
                                 </ol>
                             </div>
 
-                            <button
-                                onClick={handleContinue}
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xl py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
-                            >
-                                Claim & Start Shopping →
-                            </button>
+                            {!activeCoupon.claimed && (
+                                <button
+                                    onClick={handleContinue}
+                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xl py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
+                                >
+                                    {activeCoupon.type === 'product' ? 'Claim Free Gift →' : 'Claim & Start Shopping →'}
+                                </button>
+                            )}
+                            {activeCoupon.claimed && (
+                                <div className="text-gray-400 font-medium mt-4">
+                                    Coupon Claimed ✅
+                                </div>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}

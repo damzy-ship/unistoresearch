@@ -117,9 +117,13 @@ export function useHostelCoupons(
 
             // Pop modal if no active coupon found
             if (!couponToSet && !loadingFeed && selectedSchoolId) {
-                // Determine if we should really open it? 
-                // The original logic opened it if no active coupon & valid school & not loading
-                setCouponModalOpen(true);
+                // Check if user played today
+                const lastPlayed = localStorage.getItem('hostel_coupon_last_played');
+                const today = new Date().toDateString();
+
+                if (lastPlayed !== today) {
+                    setCouponModalOpen(true);
+                }
             }
         };
 
@@ -159,10 +163,13 @@ export function useHostelCoupons(
     }, [activeCoupon]);
 
     const handleGameCouponClaimed = (coupon: Coupon) => {
-        const couponWithLimit: Coupon = { ...coupon, claimed_at: new Date().toISOString() };
+        const couponWithLimit: Coupon = { ...coupon, claimed_at: Date.now() }; // Store as timestamp
         setActiveCoupon(couponWithLimit);
+        localStorage.setItem('hostel_coupon_last_played', new Date().toDateString());
+        localStorage.setItem('hostel_coupon_id', coupon.id); // Valid for guest persistence if needed
         setCouponModalOpen(false);
-        toast.success('Gift claimed! Prices slashed! 📉');
+        const msg = coupon.type === 'product' ? 'Gift Unlocked! 🎁' : 'Gift claimed! Prices slashed! 📉';
+        toast.success(msg);
     };
 
     return {
