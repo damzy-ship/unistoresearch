@@ -48,9 +48,9 @@ export async function storeMerchantCategories(merchantId: string, categoryNames:
     // Use upsert to handle duplicates gracefully
     const { error: insertError } = await supabase
       .from('merchant_categories')
-      .upsert(merchantCategories, {
+      .upsert(merchantCategories, { 
         onConflict: 'merchant_id,category_id',
-        ignoreDuplicates: true
+        ignoreDuplicates: true 
       });
 
     if (insertError) {
@@ -191,7 +191,7 @@ async function insertCategory(categoryName: string): Promise<boolean> {
 /**
  * Generate and process categories for a seller description
  */
-export async function processSellerCategories(sellerDescription: string): Promise<{
+export async function processSellerCategories(sellerDescription: string, merchantId?: string): Promise<{
   categories: string[];
   success: boolean;
   error?: string;
@@ -199,7 +199,7 @@ export async function processSellerCategories(sellerDescription: string): Promis
   try {
     // Step 1: Generate categories using Gemini
     const generationResult = await generateProductCategories(sellerDescription);
-
+    
     if (!generationResult.success) {
       return {
         categories: [],
@@ -210,19 +210,19 @@ export async function processSellerCategories(sellerDescription: string): Promis
 
     // Step 2: Fetch existing categories from Supabase
     const existingCategories = await fetchExistingCategories();
-    // const existingCategoriesNormalized = existingCategories.map(normalizeCategory);
+    const existingCategoriesNormalized = existingCategories.map(normalizeCategory);
 
     // Step 3: Process each generated category
     const finalCategories: string[] = [];
-
+    
     for (const generatedCategory of generationResult.categories) {
       const normalizedGenerated = normalizeCategory(generatedCategory);
-
+      
       // Check if category already exists (case-insensitive)
       const existingMatch = existingCategories.find(
         existing => normalizeCategory(existing) === normalizedGenerated
       );
-
+      
       if (existingMatch) {
         // Use the existing category name (preserves original casing)
         finalCategories.push(existingMatch);
@@ -266,12 +266,12 @@ export async function getMerchantCategories(merchantId: string, sellerDescriptio
     }
 
     // If no stored categories, generate and store them
-    const result = await processSellerCategories(sellerDescription);
-
+    const result = await processSellerCategories(sellerDescription, merchantId);
+    
     if (result.success) {
       return result.categories;
     }
-
+    
     return [];
   } catch (error) {
     console.error('Error getting merchant categories:', error);

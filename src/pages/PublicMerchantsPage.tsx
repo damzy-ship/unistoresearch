@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Eye, Share2, Clipboard } from 'lucide-react';
+import { Search, Eye, Link, Share2, Clipboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, UniqueVisitor } from '../lib/supabase';
 import MerchantProductModal from '../components/MerchantProductModal';

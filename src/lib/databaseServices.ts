@@ -153,7 +153,7 @@ export async function updateSchoolForNullAuthVisitors() {
   console.log('Starting bulk update of unique_visitors where auth_user_id is NULL...');
 
   try {
-    const { error, count } = await supabase
+    const { data, error, count } = await supabase
       .from('unique_visitors')
       .update({ school_id: null }) // Set school_id to NULL
       .is('auth_user_id', null)    // Filter where auth_user_id is NULL
@@ -191,7 +191,7 @@ export async function updateUserTypeForNullAuthVisitors() {
   console.log('Starting bulk update of unique_visitors where auth_user_id is NULL...');
 
   try {
-    const { error, count } = await supabase
+    const { data, error, count } = await supabase
       .from('unique_visitors')
       .update({ user_type: 'visitor' })
       .is('auth_user_id', null)

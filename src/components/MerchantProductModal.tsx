@@ -20,8 +20,8 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
     const [error, setError] = useState<string | null>(null);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
-    const [_, setMerchantDetails] = useState<UniqueVisitor | null>(null);
+  
+    const [merchantDetails, setMerchantDetails] = useState<UniqueVisitor | null>(null);
     // Form states for adding/editing a product
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
@@ -374,7 +374,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                 <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">Available for sale</label>
                             </div>
 
-
+                 
                             {/* Image Upload Section */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
