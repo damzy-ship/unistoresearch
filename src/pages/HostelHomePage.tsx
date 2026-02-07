@@ -484,7 +484,7 @@ export default function HostelHomePage() {
                 setDeleteModalOpen={setDeleteModalOpen}
                 handleDeleteConfirm={handleDeleteConfirm}
                 deleting={deleting}
-                couponModalOpen={couponModalOpen}
+                couponModalOpen={false}
                 setCouponModalOpen={setCouponModalOpen}
                 handleGameCouponClaimed={handleGameCouponClaimed}
                 selectedSchoolId={selectedSchoolId}
