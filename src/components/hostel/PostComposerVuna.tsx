@@ -13,6 +13,8 @@ interface PostComposerProps {
     onImageSearchPrompt: () => void;
     userIsAuthenticated: boolean;
     setShowAuthModal: (showAuthModal: boolean) => void;
+    isExpanded: boolean;
+    setIsExpanded: (expanded: boolean) => void;
 }
 
 export default function PostComposerVuna({
@@ -23,12 +25,14 @@ export default function PostComposerVuna({
     onPost,
     posting,
     userIsAuthenticated,
-    setShowAuthModal
+    setShowAuthModal,
+    isExpanded,
+    setIsExpanded
 }: PostComposerProps) {
     const [composerText, setComposerText] = useState<string>('');
     const [composerImages, setComposerImages] = useState<File[]>([]);
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
+    // Removed local isExpanded state
 
     // Admin Merchant Selection State
     const [merchants, setMerchants] = useState<UniqueVisitor[]>([]);

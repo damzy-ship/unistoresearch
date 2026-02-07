@@ -61,6 +61,8 @@ export default function HostelHomePage() {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
+    const [isComposerExpanded, setIsComposerExpanded] = useState(false);
+
 
 
     // --- Custom Hooks ---
@@ -326,7 +328,8 @@ export default function HostelHomePage() {
                         />
 
                         {/* Promotional Slider */}
-                        {selectedSchoolId && (
+                        {selectedSchoolId && !isComposerExpanded && (
+
                             <div className="px-4 mb-2">
                                 {/* Vuna Students (Food + Discounts) */}
                                 {selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' && (
@@ -385,6 +388,8 @@ export default function HostelHomePage() {
                             onImageSearchPrompt={() => setShowImageSearchPrompt(true)}
                             userIsAuthenticated={userIsAuthenticated}
                             setShowAuthModal={setShowAuthModal}
+                            isExpanded={isComposerExpanded}
+                            setIsExpanded={setIsComposerExpanded}
                         />
 
                         {/* Filtering */}
