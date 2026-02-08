@@ -71,7 +71,7 @@ export default function Header({
                         onClick={() => navigate('/pay-merchant')}
                         aria-label="Pay a merchant"
                         title="Pay Merchant"
-                        className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
+                        className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium transition-transform transform active:scale-95`}
                     >
                         <CreditCard className="w-4 h-4" />
                         <span className="hidden sm:inline">Make Payment</span>
@@ -93,7 +93,7 @@ export default function Header({
 
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('toggle-user-sidebar'))}
-                            className={`lg:hidden p-2 rounded-lg mr-2 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold shadow-sm hover:shadow-md transition-transform transform active:scale-95`}
+                            className={`lg:hidden p-2 rounded-lg mr-2 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold transition-transform transform active:scale-95`}
                             aria-label="Open menu"
                             title="Menu"
                         >

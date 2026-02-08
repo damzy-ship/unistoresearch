@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { setUserId, setPhoneAuthenticated, getUserId } from '../hooks/useTracking';
-import AuthHeader from './auth/AuthHeader';
-import AuthInput from './auth/AuthInput';
-import AuthButton from './auth/AuthButton';
 import PhoneInput from './auth/PhoneInput';
 import UniversitySelector from './UniversitySelector';
+import { AppDrawer } from './ui/Drawer';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -235,8 +235,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(true);
     setError('');
 
-
-
     try {
 
       const { data: userDataFromUniqueVisitors } = await supabase.from('unique_visitors').select('email, id').eq('phone_number', phoneNumber).single();
@@ -264,7 +262,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       const loggedInAuthUserId = authData.user.id;
 
       // **NEW: Consolidate data from Auth Metadata**
-      const authMetadata = authData.user.identities[0].identity_data || {};
+      const identities = authData.user.identities;
+      const authMetadata = (identities && identities[0] ? identities[0].identity_data : {}) || {};
       const existingPhoneNumber = authMetadata.phone_number || '';
       const existingFullName = authMetadata.full_name || '';
 
@@ -405,38 +404,30 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     }
   };
 
-  const handleClose = () => {
-    if (!loading) {
-      onClose();
-    }
-  };
-
-  if (!isOpen) return null;
-
   const getViewConfig = () => {
     switch (view) {
       case 'login':
         return {
           title: 'Sign In',
-          subtitle: 'Sign in to contact sellers and track your requests.',
+          subtitle: 'Sign in to contact sellers.',
           showBack: false
         };
       case 'signup':
         return {
           title: 'Create Account',
-          subtitle: 'Create an account to contact sellers and track your requests.',
+          subtitle: 'Create an account to get started.',
           showBack: false
         };
       case 'forgot-password':
         return {
           title: 'Reset Password',
-          subtitle: 'Enter your email address to receive a password reset link.',
+          subtitle: 'Enter your email address.',
           showBack: true
         };
       case 'check-email':
         return {
           title: 'Check your email',
-          subtitle: checkEmailMessage || 'We sent a password reset link to your email.',
+          subtitle: checkEmailMessage || 'We sent a password reset link.',
           showBack: true
         };
 
@@ -452,247 +443,226 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const viewConfig = getViewConfig();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-6 sm:p-8 w-full max-w-md">
-        <AuthHeader
-          title={viewConfig.title}
-          subtitle={viewConfig.subtitle}
-          onClose={handleClose}
-          onBack={() => {
-            if (view === 'check-email') {
-              setView('forgot-password');
-            } else {
-              setView('login');
-            }
-          }}
-          showBack={viewConfig.showBack}
-          disabled={loading}
-        />
+    <AppDrawer
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      title={viewConfig.title}
+      description={viewConfig.subtitle}
+    >
+      <form onSubmit={handleSubmit} className="space-y-4 pb-6 overflow-y-auto px-1">
 
-        {/* Display OTP on screen if SMS service is not configured */}
+        {/* School Dropdown */}
+        {view === 'signup' && (
+          <UniversitySelector
+            selectedUniversity={selectedSchoolId ?? ''}
+            onUniversityChange={(id: string) => setSelectedSchoolId(id)}
+          />
+        )}
 
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          {/* School Dropdown */}
-          {view === 'signup' && (
-
-            <UniversitySelector
-              selectedUniversity={selectedSchoolId ?? ''}
-              onUniversityChange={(id: string) => setSelectedSchoolId(id)}
-            />
-          )}
-          {/* User Type Tabs (Sign Up only) */}
-          {view === 'signup' && (
-            <div className="flex bg-gray-100 rounded-xl p-1 mb-4">
-              <button
-                type="button"
-                onClick={() => setUserType('user')}
-                disabled={loading}
-                className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${userType === 'user' ? 'bg-white shadow text-orange-600' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                <User className="w-4 h-4 mr-2" />
-                User
-              </button>
-              <button
-                type="button"
-                onClick={() => setUserType('merchant')}
-                disabled={loading}
-                className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${userType === 'merchant' ? 'bg-white shadow text-orange-600' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                <Briefcase className="w-4 h-4 mr-2" />
-                Merchant
-              </button>
-            </div>
-          )}
-
-          {/* Full Name (Sign Up only) */}
-          {view === 'signup' && (
-            <AuthInput
-              type="text"
-              value={fullName}
-              onChange={setFullName}
-              placeholder="Full Name"
-              required
+        {/* User Type Tabs (Sign Up only) */}
+        {view === 'signup' && (
+          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4">
+            <button
+              type="button"
+              onClick={() => setUserType('user')}
               disabled={loading}
-              icon={<User className="w-4 h-4" />}
-            />
-          )}
-
-
-          {view === 'signup' && userType === 'merchant' && (
-            <AuthInput
-              type="text"
-              value={brandName}
-              onChange={setBrandName}
-              placeholder="Brand Name"
-              required
+              className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors text-sm font-medium ${userType === 'user' ? 'bg-white dark:bg-gray-700 shadow text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+            >
+              <User className="w-4 h-4 mr-2" />
+              User
+            </button>
+            <button
+              type="button"
+              onClick={() => setUserType('merchant')}
               disabled={loading}
-              icon={<Tag className="w-4 h-4" />}
-            />
-          )}
+              className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors text-sm font-medium ${userType === 'merchant' ? 'bg-white dark:bg-gray-700 shadow text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+            >
+              <Briefcase className="w-4 h-4 mr-2" />
+              Merchant
+            </button>
+          </div>
+        )}
 
+        {/* Full Name (Sign Up only) */}
+        {view === 'signup' && (
+          <Input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Full Name"
+            required
+            disabled={loading}
+            icon={<User className="w-4 h-4" />}
+          />
+        )}
 
+        {view === 'signup' && userType === 'merchant' && (
+          <Input
+            type="text"
+            value={brandName}
+            onChange={(e) => setBrandName(e.target.value)}
+            placeholder="Brand Name"
+            required
+            disabled={loading}
+            icon={<Tag className="w-4 h-4" />}
+          />
+        )}
 
-
-          {(view === 'login' || view === 'signup') && (
-            <>
-              {view === 'login' && (
-                <div className="flex gap-2 mb-3">
-                  <button
-                    type="button"
-                    onClick={() => setAuthMethod('phone')}
-                    disabled={loading}
-                    className={`px-3 py-1 rounded-md text-sm ${authMethod === 'phone' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
-                  >
-                    Use phone
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMethod('email')}
-                    disabled={loading}
-                    className={`px-3 py-1 rounded-md text-sm ${authMethod === 'email' ? 'bg-orange-100 text-orange-700' : 'bg-white border'}`}
-                  >
-                    Use email
-                  </button>
-                </div>
-              )}
-
-              {/* Email input - always visible on signup; visible on login when authMethod === 'email' */}
-              {(view === 'signup' || authMethod === 'email') && (
-                <AuthInput
-                  type="text"
-                  value={email}
-                  onChange={setEmail}
-                  placeholder="Email"
-                  required={view === 'signup'}
+        {(view === 'login' || view === 'signup') && (
+          <>
+            {view === 'login' && (
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setAuthMethod('phone')}
                   disabled={loading}
-                  icon={<Mail className="w-4 h-4" />}
-                />
-              )}
-
-              {/* Phone input - always visible on signup; visible on login when authMethod === 'phone' */}
-              {(view === 'signup' || authMethod === 'phone') && (
-                <PhoneInput
-                  value={phoneNumber}
-                  onChange={setPhoneNumber}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${authMethod === 'phone' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : 'bg-white dark:bg-gray-800 border dark:border-gray-700 text-gray-600 dark:text-gray-300'}`}
+                >
+                  Use phone
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMethod('email')}
                   disabled={loading}
-                  required={view === 'signup' || authMethod === 'phone'}
-                />
-              )}
-            </>
-          )}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${authMethod === 'email' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : 'bg-white dark:bg-gray-800 border dark:border-gray-700 text-gray-600 dark:text-gray-300'}`}
+                >
+                  Use email
+                </button>
+              </div>
+            )}
 
+            {/* Email input */}
+            {(view === 'signup' || authMethod === 'email') && (
+              <Input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                required={view === 'signup'}
+                disabled={loading}
+                icon={<Mail className="w-4 h-4" />}
+              />
+            )}
 
-          {/* Forgot Password Phone */}
-          {view === 'forgot-password' && (
-            <AuthInput
-              type="text"
-              value={forgotPasswordEmail}
-              onChange={setForgotPasswordEmail}
-              placeholder="Your Email"
-              required
-              disabled={loading}
-              icon={<Mail className="w-4 h-4" />}
-            />
+            {/* Phone input */}
+            {(view === 'signup' || authMethod === 'phone') && (
+              <PhoneInput
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+                disabled={loading}
+                required={view === 'signup' || authMethod === 'phone'}
+              />
+            )}
+          </>
+        )}
 
-          )}
+        {/* Forgot Password Phone */}
+        {view === 'forgot-password' && (
+          <Input
+            type="text"
+            value={forgotPasswordEmail}
+            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+            placeholder="Your Email"
+            required
+            disabled={loading}
+            icon={<Mail className="w-4 h-4" />}
+          />
+        )}
 
-          {view === 'check-email' && (
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-              <p className="text-sm text-blue-800">{checkEmailMessage || 'A password reset link was sent. Check your email.'}</p>
-            </div>
-          )}
+        {view === 'check-email' && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-4">
+            <p className="text-sm text-blue-800 dark:text-blue-200">{checkEmailMessage || 'A password reset link was sent. Check your email.'}</p>
+          </div>
+        )}
 
-          {/* Password */}
-          {(view === 'login' || view === 'signup') && (
-            <AuthInput
+        {/* Password */}
+        {(view === 'login' || view === 'signup') && (
+          <div className="space-y-1">
+            <Input
               type="password"
               value={password}
-              onChange={setPassword}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder={'Enter password'}
               required
               disabled={loading}
               icon={<Lock className="w-4 h-4" />}
-              showPasswordToggle
-              helpText={
-                'Password must be at least 6 characters'
-
-              }
             />
-          )}
-
-          {/* Confirm Password (Reset Password only) */}
-          {/** reset handled via email link; no in-modal reset UI **/}
-
-          {/* Forgot Password Link (Login view only) */}
-          {view === 'login' && (
-            <div className="mt-2">
-              <button
-                type="button"
-                onClick={() => setView('forgot-password')}
-                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
-                disabled={loading}
-              >
-                Forgot password?
-              </button>
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-2">
-            <AuthButton
-              variant="secondary"
-              onClick={handleClose}
-              disabled={loading}
-              fullWidth
-            >
-              Cancel
-            </AuthButton>
-            <AuthButton
-              type="submit"
-              variant="primary"
-              disabled={loading || (view === 'signup' && userType === 'merchant' && !selectedSchoolId)}
-              loading={loading}
-              fullWidth
-            >
-              {view === 'login' && (
-                <>
-                  {loading ? 'Signing In...' : 'Sign In'}
-                  {!loading && <LogIn className="w-4 h-4 ml-2" />}
-                </>
-              )}
-              {view === 'signup' && (
-                <>
-                  {loading ? 'Creating Account...' : 'Create'}
-                  {!loading && <UserPlus className="w-4 h-4 ml-2" />}
-                </>
-              )}
-              {view === 'forgot-password' && (
-                <>
-                  {loading ? 'Sending link...' : 'Confirm'}
-                  {!loading && <Send className="w-4 h-4 ml-2" />}
-                </>
-              )}
-              {view === 'check-email' && (loading ? 'Processing...' : 'Ok')}
-            </AuthButton>
+            <p className="text-xs text-gray-500 ml-1">At least 6 characters</p>
           </div>
-        </form>
+        )}
 
-        {/* Toggle between Login and Sign Up */}
-        <div className="mt-6 text-center space-y-2">
+        {/* Forgot Password Link (Login view only) */}
+        {view === 'login' && (
+          <div className="mt-2 text-right">
+            <button
+              type="button"
+              onClick={() => setView('forgot-password')}
+              className="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 font-medium"
+              disabled={loading}
+            >
+              Forgot password?
+            </button>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+            <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-2">
+          {viewConfig.showBack && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (view === 'check-email') setView('forgot-password');
+                else setView('login');
+              }}
+              disabled={loading}
+              className="w-full"
+            >
+              Back
+            </Button>
+          )}
+
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading || (view === 'signup' && userType === 'merchant' && !selectedSchoolId)}
+            loading={loading}
+            className="w-full"
+          >
+            {view === 'login' && (
+              <>
+                Sign In <LogIn className="w-4 h-4 ml-2" />
+              </>
+            )}
+            {view === 'signup' && (
+              <>
+                Create Account <UserPlus className="w-4 h-4 ml-2" />
+              </>
+            )}
+            {view === 'forgot-password' && (
+              <>
+                Send Link <Send className="w-4 h-4 ml-2" />
+              </>
+            )}
+            {view === 'check-email' && 'Close'}
+          </Button>
+        </div>
+      </form>
+
+      {/* Toggle between Login and Sign Up */}
+      {(view === 'login' || view === 'signup') && (
+        <div className="mt-4 text-center space-y-2 pb-4">
           {view === 'login' && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
               <button
                 type="button"
                 onClick={() => setView('signup')}
-                className="text-orange-600 hover:text-orange-700 font-medium"
+                className="text-orange-600 dark:text-orange-400 hover:text-orange-700 font-medium"
                 disabled={loading}
               >
                 Sign Up
@@ -701,12 +671,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
 
           {view === 'signup' && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => setView('login')}
-                className="text-orange-600 hover:text-orange-700 font-medium"
+                className="text-orange-600 dark:text-orange-400 hover:text-orange-700 font-medium"
                 disabled={loading}
               >
                 Sign In
@@ -714,7 +684,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             </p>
           )}
         </div>
-      </div>
-    </div>
+      )}
+    </AppDrawer>
   );
 }

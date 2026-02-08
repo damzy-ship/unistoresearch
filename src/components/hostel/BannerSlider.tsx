@@ -29,7 +29,7 @@ export default function BannerSlider({ slides, interval = 5000 }: BannerSliderPr
     if (!slides.length) return null;
 
     return (
-        <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden shadow-lg my-4 group">
+        <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 my-4 group">
             <AnimatePresence mode='wait'>
                 <motion.div
                     key={currentIndex}
@@ -81,8 +81,8 @@ export default function BannerSlider({ slides, interval = 5000 }: BannerSliderPr
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                    ? 'bg-white w-6'
-                                    : 'bg-white/40 hover:bg-white/60'
+                                ? 'bg-white w-6'
+                                : 'bg-white/40 hover:bg-white/60'
                                 }`}
                             aria-label={`Go to slide ${index + 1}`}
                         />

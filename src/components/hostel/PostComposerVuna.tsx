@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Camera, Search, Upload, X, ChevronDown, Check } from 'lucide-react';
+import { Upload, X, ChevronDown, Check, Image as ImageIcon } from 'lucide-react';
 import { UniqueVisitor, supabase } from '../../lib/supabase';
+import { PostDrawer } from '../ui/PostDrawer';
+import { Button } from '../ui/Button';
+import BecomeMerchantDrawer from './BecomeMerchantDrawer';
 
 interface PostComposerProps {
     currentVisitor: UniqueVisitor | null;
     userIsHostelMerchant: boolean;
-    isSearchView: boolean;
+    isSearchView: boolean; // Kept for prop compatibility, but likely internal state now
     onToggleView: (isSearch: boolean) => void;
     onPost: (text: string, images: File[], request: boolean, merchantId?: string) => Promise<void>;
-    onSearch: (text: string) => Promise<void>;
+    onSearch: (text: string) => Promise<void>; // Legacy?
     posting: boolean;
     onImageSearchPrompt: () => void;
     userIsAuthenticated: boolean;
@@ -18,7 +21,7 @@ interface PostComposerProps {
 export default function PostComposerVuna({
     currentVisitor,
     userIsHostelMerchant,
-    isSearchView,
+    // isSearchView: propIsSearchView, // We might manage this internally now or respect prop
     onToggleView,
     onPost,
     posting,
@@ -28,7 +31,10 @@ export default function PostComposerVuna({
     const [composerText, setComposerText] = useState<string>('');
     const [composerImages, setComposerImages] = useState<File[]>([]);
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
+
+    // Drawer State
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'request' | 'product'>('request'); // 'request' or 'product'
 
     // Admin Merchant Selection State
     const [merchants, setMerchants] = useState<UniqueVisitor[]>([]);
@@ -66,10 +72,10 @@ export default function PostComposerVuna({
             }
         };
 
-        if (isAdmin && isExpanded && !isSearchView) { // Only fetch when expanding post view
+        if (isAdmin && isDrawerOpen) {
             fetchMerchants();
         }
-    }, [isAdmin, isExpanded, isSearchView, currentVisitor?.schools?.id]);
+    }, [isAdmin, isDrawerOpen, currentVisitor?.schools?.id]);
 
     // Filter merchants based on search
     useEffect(() => {
@@ -93,7 +99,7 @@ export default function PostComposerVuna({
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
         setComposerImages((prev) => [...prev, ...files].slice(0, 4));
-        e.target.value = '';
+        e.target.value = ''; // Reset
     };
 
     const removeComposerImage = (index: number) => {
@@ -102,273 +108,220 @@ export default function PostComposerVuna({
 
     const handleSubmit = async () => {
         if (userIsAuthenticated) {
-            await onPost(composerText, composerImages, isSearchView, selectedMerchant?.id);
+            const isRequest = activeTab === 'request';
+            await onPost(composerText, composerImages, isRequest, selectedMerchant?.id);
             setComposerText('');
             setComposerImages([]);
-            setIsExpanded(false);
+            setIsDrawerOpen(false);
             setSelectedMerchant(null);
             setMerchantSearchTerm('');
         } else {
-            setShowAuthModal(true)
+            setShowAuthModal(true);
+            setIsDrawerOpen(false);
         }
     };
 
-    const resetComposer = () => {
-        setComposerText('');
-        setComposerImages([]);
-        setSelectedMerchant(null);
-        setMerchantSearchTerm('');
+    const handleOpenDrawer = (tab: 'request' | 'product') => {
+        if (tab === 'product' && !userIsHostelMerchant && !isAdmin) {
+            setShowBecomeMerchantModal(true);
+            return;
+        }
+        setActiveTab(tab);
+        setIsDrawerOpen(true);
+        // Sync parent state if needed, though we are capturing logic here
+        onToggleView(tab === 'request');
     };
 
-    if (!isExpanded) {
-        return (
-            <>
-                <div className="p-4 border-b border-gray-800 flex gap-4">
-                    <button
-                        onClick={() => {
-                            onToggleView(true);
-                            setIsExpanded(true);
-                        }}
-                        className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                    >
-                        <Search className="w-5 h-5 text-gray-400" />
-                        <span>Make Request</span>
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (userIsHostelMerchant || isAdmin) {
-                                onToggleView(false);
-                                setIsExpanded(true);
-                            } else {
-                                setShowBecomeMerchantModal(true);
-                            }
-                        }}
-                        className="flex-1 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                    >
-                        <Upload className="w-5 h-5" />
-                        <span>Post Product</span>
-                    </button>
-                </div>
-
-                {showBecomeMerchantModal && (
-                    <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
-                        onClick={() => setShowBecomeMerchantModal(false)}
-                    >
-                        <div
-                            className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <h3 className="text-xl font-bold text-white mb-2">
-                                {userIsAuthenticated ? 'Become a hostel merchant' : 'Sign in required'}
-                            </h3>
-                            <p className="text-gray-400 mb-6 text-sm">
-                                {userIsAuthenticated
-                                    ? `Hi ${currentVisitor?.full_name || 'User'}, you need to become a hostel merchant to be able to post products.`
-                                    : 'Sign in to be able to post product'}
-                            </p>
-
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    onClick={() => setShowBecomeMerchantModal(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (userIsAuthenticated) {
-                                            const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
-                                            window.open(whatsappUrl, '_blank');
-                                        } else {
-                                            setShowBecomeMerchantModal(false);
-                                            setShowAuthModal(true);
-                                        }
-                                    }}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
-                                >
-                                    {userIsAuthenticated ? 'Continue' : 'Sign In'}
-                                </button>
-                            </div>
+    return (
+        <>
+            {/* TRIGGER AREA - Clean Bar */}
+            <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-30">
+                <div className="flex gap-3">
+                    <div className="flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
+                            {currentVisitor?.profile_picture ? (
+                                <img src={currentVisitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-xs font-bold text-gray-400">
+                                    {String(currentVisitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2)}
+                                </span>
+                            )}
                         </div>
                     </div>
-                )}
-            </>
-        )
-    }
 
-    return (
-        <div className="p-4 border-b border-gray-800 flex gap-3">
-            <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-full bg-[#253341] flex items-center justify-center overflow-hidden">
-                    {currentVisitor?.profile_picture ? (
-                        <img src={currentVisitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
-                    ) : (
-                        <span className="text-sm font-semibold text-[#8b98a5]">
-                            {String(currentVisitor?.full_name || 'U').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2)}
-                        </span>
-                    )}
+                    <button
+                        onClick={() => handleOpenDrawer('request')}
+                        className="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-left px-4 rounded-full flex items-center text-gray-500 dark:text-gray-400 text-sm transition-colors border border-transparent dark:border-gray-700"
+                    >
+                        What are you looking for?
+                    </button>
+
+                    <Button
+                        variant="secondary"
+                        size="icon"
+                        className="rounded-full flex-shrink-0"
+                        onClick={() => handleOpenDrawer('product')}
+                    >
+                        <Upload size={18} />
+                    </Button>
                 </div>
             </div>
-            <div className="flex-1">
-                {/* Admin Merchant Selector */}
-                {isAdmin && !isSearchView && (
-                    <div className="mb-3 relative">
+
+            {/* DRAWER COMPOSER */}
+            <PostDrawer
+                open={isDrawerOpen}
+                onOpenChange={setIsDrawerOpen}
+            >
+                <div className="flex flex-col h-full">
+                    {/* Header with Tabs */}
+                    <div className="flex items-center justify-center gap-1 mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl self-center">
                         <button
-                            onClick={() => setShowMerchantDropdown(!showMerchantDropdown)}
-                            className="flex items-center gap-2 text-sm font-medium text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-lg hover:bg-emerald-400/20 transition-colors"
+                            onClick={() => setActiveTab('request')}
+                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'request' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
-                            <span>Posting as: <span className="text-white">{selectedMerchant ? (selectedMerchant.brand_name || selectedMerchant.full_name) : 'Myself'}</span></span>
-                            <ChevronDown className={`w-4 h-4 transition-transform ${showMerchantDropdown ? 'rotate-180' : ''}`} />
+                            Request Item
                         </button>
+                        <button
+                            onClick={() => setActiveTab('product')}
+                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'product' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        >
+                            Post Product
+                        </button>
+                    </div>
 
-                        {showMerchantDropdown && (
-                            <>
-                                <div className="fixed inset-0 z-10" onClick={() => setShowMerchantDropdown(false)} />
-                                <div className="absolute top-full left-0 mt-2 w-72 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-20 flex flex-col max-h-80">
-                                    <div className="p-2 border-b border-gray-700 sticky top-0 bg-gray-800 rounded-t-xl z-30">
-                                        <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                                            <input
-                                                type="text"
-                                                value={merchantSearchTerm}
-                                                onChange={(e) => setMerchantSearchTerm(e.target.value)}
-                                                placeholder="Search merchants..."
-                                                className="w-full bg-gray-900 text-white text-sm py-2 pl-9 pr-3 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none"
-                                                autoFocus
-                                            />
-                                        </div>
+                    {/* Admin Merchant Selector */}
+                    {isAdmin && activeTab === 'product' && (
+                        <div className="mb-4 relative z-50">
+                            <button
+                                onClick={() => setShowMerchantDropdown(!showMerchantDropdown)}
+                                className="w-full flex items-center justify-between gap-2 text-sm font-medium text-emerald-400 bg-emerald-900/10 dark:bg-emerald-400/10 px-4 py-3 rounded-xl hover:bg-emerald-900/20 dark:hover:bg-emerald-400/20 transition-colors border border-emerald-500/20"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <span className="text-gray-500">Posting as:</span>
+                                    <span className="text-gray-900 dark:text-white font-bold">{selectedMerchant ? (selectedMerchant.brand_name || selectedMerchant.full_name) : 'Myself'}</span>
+                                </span>
+                                <ChevronDown className={`w-4 h-4 transition-transform ${showMerchantDropdown ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {showMerchantDropdown && (
+                                <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 flex flex-col max-h-60 overflow-hidden">
+                                    <div className="p-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                                        <input
+                                            type="text"
+                                            value={merchantSearchTerm}
+                                            onChange={(e) => setMerchantSearchTerm(e.target.value)}
+                                            placeholder="Search merchants..."
+                                            className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm py-2 px-3 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-emerald-500 outline-none"
+                                            autoFocus
+                                        />
                                     </div>
-
-                                    <div className="overflow-y-auto flex-1 p-1 custom-scrollbar">
+                                    <div className="overflow-y-auto flex-1">
                                         <button
                                             onClick={() => {
                                                 setSelectedMerchant(null);
                                                 setShowMerchantDropdown(false);
                                             }}
-                                            className={`w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700/50 transition-colors ${!selectedMerchant ? 'bg-emerald-500/10' : ''}`}
+                                            className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 flex items-center justify-between group"
                                         >
-                                            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                                {currentVisitor?.profile_picture ? (
-                                                    <img src={currentVisitor.profile_picture} alt="me" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-xs font-bold text-gray-400">ME</span>
-                                                )}
-                                            </div>
-                                            <div className="text-left flex-1 min-w-0">
-                                                <div className="text-white text-sm font-medium truncate">Myself</div>
-                                                <div className="text-gray-500 text-xs truncate">Post as Admin</div>
-                                            </div>
-                                            {!selectedMerchant && <Check className="w-4 h-4 text-emerald-500" />}
+                                            <span className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-500">Myself</span>
+                                            {!selectedMerchant && <Check size={16} className="text-emerald-500" />}
                                         </button>
-
                                         {loadingMerchants && (
-                                            <div className="p-4 text-center text-gray-500 text-sm">Loading merchants...</div>
+                                            <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
                                         )}
-
-                                        {!loadingMerchants && filteredMerchants.length === 0 && (
-                                            <div className="p-4 text-center text-gray-500 text-sm">No merchants found</div>
-                                        )}
-
-                                        {filteredMerchants.map((merchant) => (
+                                        {filteredMerchants.map(merchant => (
                                             <button
                                                 key={merchant.id}
                                                 onClick={() => {
                                                     setSelectedMerchant(merchant);
                                                     setShowMerchantDropdown(false);
                                                 }}
-                                                className={`w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700/50 transition-colors ${selectedMerchant?.id === merchant.id ? 'bg-emerald-500/10' : ''}`}
+                                                className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 flex items-center justify-between group"
                                             >
-                                                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                                    {merchant.profile_picture ? (
-                                                        <img src={merchant.profile_picture} alt={merchant.brand_name || 'merchant'} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <span className="text-xs font-bold text-gray-400">
-                                                            {(merchant.brand_name || merchant.full_name || 'M')[0].toUpperCase()}
-                                                        </span>
-                                                    )}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
+                                                        {merchant.profile_picture && <img src={merchant.profile_picture} className="w-full h-full object-cover" />}
+                                                    </div>
+                                                    <span className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-500">{merchant.brand_name || merchant.full_name}</span>
                                                 </div>
-                                                <div className="text-left flex-1 min-w-0">
-                                                    <div className="text-white text-sm font-medium truncate">{merchant.brand_name || merchant.full_name}</div>
-                                                    <div className="text-gray-500 text-xs truncate">{merchant.phone_number || merchant.email || 'No contact info'}</div>
-                                                </div>
-                                                {selectedMerchant?.id === merchant.id && <Check className="w-4 h-4 text-emerald-500" />}
+                                                {selectedMerchant?.id === merchant.id && <Check size={16} className="text-emerald-500" />}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
-                            </>
-                        )}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    )}
 
-                <div className="flex items-start justify-between">
+                    {/* Text Input */}
                     <textarea
                         value={composerText}
                         onChange={(e) => setComposerText(e.target.value)}
-                        placeholder={isSearchView ? 'Who sells tote bags in hostel?' : 'What are you selling?'}
-                        className="w-full bg-transparent text-white text-xl placeholder-gray-500 outline-none resize-none"
-                        rows={2}
+                        placeholder={activeTab === 'request' ? "I'm looking for..." : "What are you selling today?"}
+                        className="w-full bg-transparent text-gray-900 dark:text-white text-2xl placeholder-gray-400 outline-none resize-none flex-1 min-h-[150px]"
+                        autoFocus
                     />
-                    <div className="ml-3">
-                        <button
-                            onClick={() => {
-                                resetComposer();
-                                setIsExpanded(false);
-                            }}
-                            className="text-gray-400 hover:text-white p-2 rounded-full"
-                            aria-label="Cancel"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
-                </div>
 
-                {composerImages.length > 0 && (
-                    <div className="mt-3 grid grid-cols-2 gap-2">
-                        {composerImages.map((file, idx) => (
-                            <div key={idx} className="relative rounded-2xl overflow-hidden">
-                                <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-48 object-cover" />
-                                <button
-                                    onClick={() => removeComposerImage(idx)}
-                                    className="absolute top-2 right-2 bg-gray-900/80 hover:bg-gray-800 text-white rounded-full p-2 transition-colors"
+                    {/* Image Preview Grid */}
+                    {composerImages.length > 0 && (
+                        <div className="mb-4 grid grid-cols-2 gap-3">
+                            {composerImages.map((file, idx) => (
+                                <div key={idx} className="relative rounded-xl overflow-hidden aspect-video group">
+                                    <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
+                                    <button
+                                        onClick={() => removeComposerImage(idx)}
+                                        className="absolute top-2 right-2 bg-black/50 hover:bg-red-500 text-white rounded-full p-1.5 transition-colors opacity-0 group-hover:opacity-100"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Bottom Actions */}
+                    <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex gap-2">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={onSelectImages}
+                                    className="hidden"
+                                    id="drawer-image-upload"
+                                />
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => document.getElementById('drawer-image-upload')?.click()}
+                                    className="h-12 w-12 rounded-xl p-0"
                                 >
-                                    ×
-                                </button>
+                                    <ImageIcon className="text-emerald-600 dark:text-emerald-400" />
+                                </Button>
+                                {/* <Button variant="ghost" className="h-12 w-12 rounded-xl p-0">
+                                    <Camera />
+                                </Button> */}
                             </div>
-                        ))}
-                    </div>
-                )}
 
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
-                    <div className="flex gap-2">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={onSelectImages}
-                            className="hidden"
-                            id="image-upload"
-                        />
-                        <button
-                            onClick={() => {
-                                document.getElementById('image-upload')?.click();
-                            }}
-                            className="text-emerald-300 bg-emerald-600/10 hover:bg-emerald-500/10 p-3 rounded-full transition-colors cursor-pointer"
-                            aria-label="Add images"
-                        >
-                            <Camera className="w-5 h-5" />
-                        </button>
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={posting || (!composerText.trim() && composerImages.length === 0)}
+                                className={`flex-1 h-12 text-lg rounded-xl font-bold ${activeTab === 'product' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
+                                variant={activeTab === 'product' ? 'primary' : 'primary'} // Visual preference
+                            >
+                                {posting ? 'Posting...' : (activeTab === 'request' ? 'Post Request' : 'Post Product')}
+                            </Button>
+                        </div>
                     </div>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={posting || (!composerText.trim() && composerImages.length === 0 && !isSearchView)}
-                        className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold px-6 py-2 rounded-full transition-colors"
-                    >
-                        {isSearchView ? (posting ? 'Posting request...' : 'Request') : (posting ? 'Posting...' : 'Post')}
-                    </button>
                 </div>
-            </div>
-        </div>
+            </PostDrawer >
+
+            {/* Become Merchant Drawer */}
+            < BecomeMerchantDrawer
+                isOpen={showBecomeMerchantModal}
+                onClose={() => setShowBecomeMerchantModal(false)
+                }
+            />
+        </>
     );
 }

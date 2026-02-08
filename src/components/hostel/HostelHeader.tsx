@@ -17,12 +17,12 @@ export const HostelHeader: React.FC<HostelHeaderProps> = ({ currentVisitor, user
                 {(currentVisitor?.is_admin || userIsHostelMerchant) && (
                     <div className="flex items-center gap-1.5 align-middle">
                         {currentVisitor?.is_admin && (
-                            <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 text-xs border border-rose-200 flex items-center shadow-sm">
+                            <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 text-xs border border-rose-200 flex items-center">
                                 Admin
                             </span>
                         )}
                         {userIsHostelMerchant && (
-                            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 text-xs border border-blue-200 flex items-center shadow-sm">
+                            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 text-xs border border-blue-200 flex items-center">
                                 Seller
                             </span>
                         )}

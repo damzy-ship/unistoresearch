@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Edit, Trash2, Image, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Plus, Edit, Trash2, Image, Loader } from 'lucide-react';
 import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
+import { AppDrawer } from './ui/Drawer';
+import { Button } from './ui/Button';
 
 interface MerchantProductModalProps {
     actual_merchant_id?: string;
@@ -309,205 +311,219 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
         }
     };
 
-    // 💡 MODIFIED RENDER LOGIC FOR INPUT FIELD
     const isImageUploadDisabled = editingProduct
         ? (editingProduct.image_urls.length + newFiles.length) >= MAX_IMAGES
         : newFiles.length >= MAX_IMAGES;
 
     const currentImageCount = editingProduct ? (editingProduct.image_urls.length + newFiles.length) : newFiles.length;
-    const remainingUploads = MAX_IMAGES - currentImageCount;
+
+
 
     return (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                {/* Modal Header */}
-                <div className="flex justify-between items-center p-4 border-b">
-                    <h2 className="text-md sm:text-xl font-semibold text-gray-800">Manage Products for {merchantName}</h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X className="w-6 h-6" />
-                    </button>
-                </div>
+        <AppDrawer
+            open={true} // Controlled by parent rendering this component conditionally, or we can add open prop if changed
+            onOpenChange={(open) => !open && onClose()}
+            title={showAddProductForm ? (editingProduct ? 'Edit Product' : 'New Product') : `Manage ${merchantName}`}
+        >
+            <div className="flex flex-col h-full bg-white dark:bg-gray-900 pb-safe">
 
                 {/* Error Display */}
                 {error && (
-                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-                        <p className="font-bold">Error</p>
+                    <div className="mx-4 mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm" role="alert">
+                        <p className="font-bold mb-1">Error</p>
                         <p>{error}</p>
                     </div>
                 )}
 
                 {/* Add/Edit Product Form */}
-                {(showAddProductForm) && (
-                    <div className="p-4 border-b bg-gray-50">
-                        <h3 className="text-lg font-semibold mb-4">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
+                {showAddProductForm ? (
+                    <div className="flex-1 overflow-y-auto p-4">
                         <form onSubmit={editingProduct ? handleEditProduct : handleAddProduct} className="space-y-4">
                             <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700">Product Description</label>
+                                <label htmlFor="description" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Description</label>
                                 <textarea
                                     id="description"
                                     value={productDescription}
                                     onChange={(e) => setProductDescription(e.target.value)}
                                     rows={3}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                                    className="w-full bg-gray-50 dark:bg-gray-800 border-none rounded-xl p-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 resize-none"
+                                    placeholder="Describe your product..."
                                     required
                                 ></textarea>
                             </div>
                             <div>
-                                <label htmlFor="price" className="block text-sm font-medium text-gray-700">Product Price</label>
+                                <label htmlFor="price" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Price (₦)</label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="price"
                                     value={productPrice}
                                     onChange={(e) => setProductPrice(e.target.value)}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                                    className="w-full bg-gray-50 dark:bg-gray-800 border-none rounded-xl p-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 font-mono"
+                                    placeholder="0.00"
                                     required
                                 />
                             </div>
-                            <div className="flex items-center">
+
+                            <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
                                 <input
                                     id="isAvailable"
                                     type="checkbox"
                                     checked={isAvailable}
                                     onChange={(e) => setIsAvailable(e.target.checked)}
-                                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                    className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 border-gray-300 bg-white dark:bg-gray-700"
                                 />
-                                <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">Available for sale</label>
+                                <label htmlFor="isAvailable" className="text-sm font-medium text-gray-900 dark:text-white">Available for sale</label>
                             </div>
-
 
                             {/* Image Upload Section */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Product Images 📸
-                                    {editingProduct && <span className="text-xs text-gray-500 ml-2">(Current images shown below. Add more, or remove existing ones.)</span>}
-                                </label>
-                                {/* 💡 ADDED HINT MESSAGE */}
-                                <p className={`text-xs ${isImageUploadDisabled ? 'text-red-500' : 'text-gray-500'} mb-1`}>
-                                    Maximum of {MAX_IMAGES} images per product. (Can upload {remainingUploads} more)
-                                </p>
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
-                                    // 💡 MODIFIED DISABLED STATE
-                                    disabled={uploadingImages || loading || isImageUploadDisabled}
-                                    key={editingProduct?.id} // Add key to force re-render/reset the file input on product change
-                                />
-                            </div>
-                            {/* Image previews and management */}
-                            {(newFiles.length > 0 || (editingProduct && editingProduct.image_urls.length > 0)) && (
-                                <div className="mt-2 flex flex-wrap gap-2">
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        Images
+                                    </label>
+                                    <span className={`text-xs ${isImageUploadDisabled ? 'text-red-500' : 'text-gray-400'}`}>
+                                        {currentImageCount}/{MAX_IMAGES}
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2">
+                                    {/* Current/New Images */}
                                     {editingProduct?.image_urls.map((url, index) => (
-                                        <div key={url} className="relative w-24 h-24 rounded-md overflow-hidden border border-gray-300">
-                                            <img src={url} alt={`Product image ${index + 1}`} className="w-full h-full object-cover" />
+                                        <div key={url} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 group">
+                                            <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveImageFromEdit(url)}
-                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
-                                                title="Remove image"
+                                                className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
-                                                <X className="w-3 h-3" />
+                                                <X size={12} />
                                             </button>
                                         </div>
                                     ))}
                                     {newFiles.map((file, index) => (
-                                        <div key={file.name + index} className="relative w-24 h-24 rounded-md overflow-hidden border border-gray-300">
-                                            <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover" />
-                                            <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">{file.name}</span>
+                                        <div key={file.name + index} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+                                            <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover opacity-80" />
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <span className="bg-black/50 text-white text-[10px] px-1 rounded truncate max-w-[90%]">New</span>
+                                            </div>
                                         </div>
                                     ))}
-                                </div>
-                            )}
 
-                            <div className="flex justify-end gap-3">
-                                <button
+                                    {/* Upload Button */}
+                                    {!isImageUploadDisabled && (
+                                        <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 flex flex-col items-center justify-center cursor-pointer transition-colors bg-gray-50 dark:bg-gray-800/50">
+                                            <Plus className="text-gray-400" size={24} />
+                                            <span className="text-xs text-gray-400 mt-1">Add</span>
+                                            <input
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                                className="hidden"
+                                                disabled={uploadingImages || loading}
+                                            />
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="pt-4 flex flex-col gap-3">
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-orange-600 hover:bg-orange-700 text-white h-12 text-lg rounded-xl"
+                                    disabled={loading || uploadingImages}
+                                >
+                                    {(loading || uploadingImages) && <Loader className="w-5 h-5 animate-spin mr-2" />}
+                                    {editingProduct ? 'Save Changes' : 'Add Product'}
+                                </Button>
+                                <Button
                                     type="button"
+                                    variant="ghost"
                                     onClick={resetForm}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                                    className="w-full text-gray-500"
                                     disabled={loading || uploadingImages}
                                 >
                                     Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center gap-2"
-                                    disabled={loading || uploadingImages}
-                                >
-                                    {(loading || uploadingImages) && <Loader className="w-4 h-4 animate-spin" />}
-                                    {editingProduct ? 'Save Changes' : 'Add Product'}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>
-                )}
-
-                {/* Product List */}
-                {(!showAddProductForm) && (<div className="p-4">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Products ({products.length})</h3>
-                        {!showAddProductForm && (
-                            <button
+                ) : (
+                    /* Product List */
+                    <div className="flex-col h-full overflow-hidden flex">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10 flex justify-between items-center">
+                            <div className="text-sm text-gray-500">{products.length} Products</div>
+                            <Button
                                 onClick={() => { setShowAddProductForm(true); resetAndShowForm(); }}
-                                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center gap-2"
+                                size="sm"
+                                className="bg-orange-600 hover:bg-orange-700 text-white rounded-lg"
                             >
-                                <Plus className="w-4 h-4" /> Add New Product
-                            </button>
-                        )}
-                    </div>
-
-                    {loading && !showAddProductForm ? (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                                <Plus size={16} className="mr-1" /> Add New
+                            </Button>
                         </div>
-                    ) : products.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">No products added yet.</div>
-                    ) : (
-                        <div className="space-y-4">
-                            {products.map((product) => (
-                                <div key={product.id} className="border border-gray-200 rounded-lg p-4 flex items-start gap-4">
-                                    <div className="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex items-center justify-center">
-                                        {product.image_urls && product.image_urls.length > 0 ? (
-                                            <img src={product.image_urls[0]} alt={product.product_description} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <Image className="w-8 h-8 text-gray-400" />
-                                        )}
-                                    </div>
-                                    <div className="flex-grow">
-                                        <h4 className="font-semibold text-gray-900">{product.product_description}</h4>
-                                        <p className="text-gray-700">₦{product.product_price}</p>
-                                        <p className="text-sm text-gray-600 flex items-center gap-1">
-                                            {product.is_available ? (
-                                                <><CheckCircle className="w-4 h-4 text-green-500" /> Available</>
-                                            ) : (
-                                                <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
-                                            )}
-                                        </p>
 
-                                        <div className="flex gap-2 mt-2">
-                                            <button
-                                                onClick={() => startEditProduct(product)}
-                                                className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="Edit Product"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteProduct(product.id, product.image_urls)}
-                                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Delete Product"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                            {loading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                                </div>
+                            ) : products.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <div className="w-16 h-16 bg-orange-50 dark:bg-orange-900/20 rounded-full flex items-center justify-center mb-4">
+                                        <Image className="w-8 h-8 text-orange-500" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">No products yet</h3>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 max-w-xs">
+                                        Start building your store by adding your first product.
+                                    </p>
+                                </div>
+                            ) : (
+                                products.map((product) => (
+                                    <div key={product.id} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 flex gap-3 shadow-sm hover:shadow-md transition-shadow">
+                                        <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                                            {product.image_urls && product.image_urls.length > 0 ? (
+                                                <img src={product.image_urls[0]} alt={product.product_description} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                    <Image size={20} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 dark:text-white text-sm line-clamp-1">{product.product_description}</h4>
+                                                <p className="text-orange-500 font-mono font-bold text-sm">₦{product.product_price}</p>
+                                            </div>
+
+                                            <div className="flex items-center justify-between mt-2">
+                                                <div className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${product.is_available ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                                                    {product.is_available ? 'In Stock' : 'Sold Out'}
+                                                </div>
+
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => startEditProduct(product)}
+                                                        className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                                    >
+                                                        <Edit size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteProduct(product.id, product.image_urls)}
+                                                        className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
-                    )}
-                </div>)}
+                    </div>
+                )}
             </div>
-        </div>
+        </AppDrawer>
     );
 }

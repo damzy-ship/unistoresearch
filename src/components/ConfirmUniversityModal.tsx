@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import UniversitySelector from './UniversitySelector';
-import { useTheme } from '../hooks/useTheme';
+import { AppDrawer } from './ui/Drawer';
+import { Button } from './ui/Button';
 
 interface ConfirmUniversityModalProps {
   isOpen: boolean;
@@ -9,52 +10,42 @@ interface ConfirmUniversityModalProps {
   onConfirm: (schoolId: string) => void;
 }
 
-export default function ConfirmUniversityModal({ isOpen, initialSchoolId, onConfirm }: ConfirmUniversityModalProps) {
-  const { currentTheme } = useTheme();
+export default function ConfirmUniversityModal({ isOpen, onClose, initialSchoolId, onConfirm }: ConfirmUniversityModalProps) {
   const [selectedUniversity, setSelectedUniversity] = useState<string>(initialSchoolId || '');
 
   useEffect(() => {
     setSelectedUniversity(initialSchoolId || '');
   }, [initialSchoolId]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/40" />
-
-      <div className="relative w-full max-w-lg mx-4 p-6 rounded-2xl" style={{ background: currentTheme.surface }}>
-        <h3 className="text-lg font-semibold mb-4" style={{ color: currentTheme.text }}>
-          Confirm your university
-        </h3>
-
-        <div className="mb-6">
+    <AppDrawer
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      title="Confirm your university"
+      description="Select your university to continue finding products and services near you."
+    >
+      <div className="flex flex-col h-full">
+        <div className="flex-1 py-4">
           <UniversitySelector
             selectedUniversity={selectedUniversity}
             onUniversityChange={(id) => setSelectedUniversity(id)}
           />
         </div>
 
-        <div className="flex gap-3 justify-end">
-          {/* <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl font-medium border"
-            style={{ background: currentTheme.background, color: currentTheme.text }}
-          >
-            Cancel
-          </button> */}
-
-          <button
+        <div className="mt-auto pt-4">
+          <Button
             onClick={() => {
               if (selectedUniversity) onConfirm(selectedUniversity);
             }}
-            className={`px-4 py-2 rounded-xl font-medium text-white`}
-            style={{ background: currentTheme.primary }}
+            disabled={!selectedUniversity}
+            className="w-full"
+            variant="primary"
           >
             Confirm University
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </AppDrawer>
   );
 }
+

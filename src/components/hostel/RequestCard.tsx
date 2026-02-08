@@ -58,9 +58,11 @@ export default function RequestCard({ item, onClick, currentVisitor, onContact, 
 
     // Design: Glassmorphism + Gradients
     // Active (Amber) vs Fulfilled (Emerald)
+    // Design: Flat + Subtle Borders
+    // Active (Amber) vs Fulfilled (Emerald)
     const cardBg = isFulfilled
-        ? 'bg-gradient-to-br from-emerald-900/40 to-gray-900/80 border-emerald-500/30 shadow-emerald-900/20'
-        : 'bg-gradient-to-br from-amber-900/30 to-gray-900/80 border-amber-500/30 shadow-amber-900/20';
+        ? 'bg-emerald-900/40 border-emerald-500/30'
+        : 'bg-gray-800/80 border-gray-700';
 
     const buttonGradient = isFulfilled
         ? 'from-emerald-600 to-teal-600'
@@ -87,7 +89,6 @@ export default function RequestCard({ item, onClick, currentVisitor, onContact, 
                 min-w-[280px] max-w-[280px] h-[180px]
                 p-5 rounded-2xl
                 backdrop-blur-md border 
-                shadow-xl
                 snap-center cursor-pointer
                 transition-all duration-300
                 overflow-hidden

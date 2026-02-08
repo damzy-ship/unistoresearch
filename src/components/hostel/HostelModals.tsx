@@ -6,6 +6,7 @@ import ImageModal from './ImageModal';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { CouponGameModal } from './CouponGameModal';
 import MerchantProfileModal from './MerchantProfileModal';
+import BecomeMerchantDrawer from './BecomeMerchantDrawer';
 import { HostelsProductUpdates, UniqueVisitor, Coupon } from '../../lib/supabase';
 
 interface HostelModalsProps {
@@ -139,33 +140,11 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
                 onProductClick={onProductClick}
             />
 
-            {/* Become Merchant Modal - Simple inline or separate component if complex */}
-            {showBecomeMerchantModal && (
-                <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-                    <div className="bg-gray-900 border border-gray-700 p-6 rounded-2xl max-w-sm w-full text-center">
-                        <div className="text-4xl mb-4">🏪</div>
-                        <h3 className="text-xl font-bold text-white mb-2">Become a Seller!</h3>
-                        <p className="text-gray-400 mb-6">
-                            Start selling your products to students in your hostel and campus.
-                            It's free to start!
-                        </p>
-                        <div className="flex gap-3 justify-center">
-                            <button
-                                onClick={() => setShowBecomeMerchantModal(false)}
-                                className="px-4 py-2 text-gray-400 hover:text-white"
-                            >
-                                Maybe Later
-                            </button>
-                            <a
-                                href="/hostel-merchant-onboarding" // Assuming this route exists or logic
-                                className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold"
-                            >
-                                Get Started
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <BecomeMerchantDrawer
+                isOpen={showBecomeMerchantModal}
+                onClose={() => setShowBecomeMerchantModal(false)}
+            />
         </>
     );
 };
+
