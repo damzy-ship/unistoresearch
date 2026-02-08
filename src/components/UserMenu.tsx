@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User, LogOut, History, FileText, Box, X, LogIn } from 'lucide-react';
+import { Icon } from '@iconify/react';
+
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
@@ -77,8 +78,8 @@ export default function UserMenu() {
 
   const menuContent = (
     <div className="flex flex-col h-full">
-      <div className="hidden lg:flex p-4 border-b border-gray-100">
-        <p className="font-medium text-gray-900 truncate">
+      <div className="hidden lg:flex p-4 border-b border-gray-100 dark:border-gray-800">
+        <p className="font-medium text-gray-900 dark:text-white truncate">
           {isAuthenticated ? (userName ? getFirstName(userName) : 'User') : 'Guest'}
         </p>
       </div>
@@ -90,9 +91,9 @@ export default function UserMenu() {
               window.dispatchEvent(new CustomEvent('open-auth-modal'));
               setMobileOpen(false);
             }}
-            className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
           >
-            <LogIn className="w-4 h-4" />
+            <Icon icon="vuesax:linear:login" className="w-4 h-4" />
             Sign In
           </button>
         ) : (
@@ -101,52 +102,52 @@ export default function UserMenu() {
 
             <button
               onClick={() => { navigate('/profile'); setMobileOpen(false); }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <User className="w-4 h-4" />
+              <Icon icon="vuesax:linear:user" className="w-4 h-4" />
               Profile & Themes
             </button>
 
             <button
               onClick={() => { navigate('/invoices'); setMobileOpen(false); }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <FileText className="w-4 h-4" />
+              <Icon icon="vuesax:linear:document-text" className="w-4 h-4" />
               Transactions
             </button>
 
             {userType === 'merchant' && (
               <button
                 onClick={handleViewProducts}
-                className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               >
-                <Box className="w-4 h-4" />
+                <Icon icon="vuesax:linear:box" className="w-4 h-4" />
                 Manage Products
               </button>
             )}
 
             <button
               onClick={() => { navigate('/past-requests'); setMobileOpen(false); }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <History className="w-4 h-4" />
+              <Icon icon="vuesax:linear:clock" className="w-4 h-4" />
               Past Requests
             </button>
 
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             >
-              <LogOut className="w-4 h-4" />
+              <Icon icon="vuesax:linear:logout" className="w-4 h-4" />
               Sign Out
             </button>
 
             {isAdmin && (
               <button
                 onClick={() => { navigate('/admin-coupons'); setMobileOpen(false); }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors mt-2 border-t border-gray-100"
+                className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors mt-2 border-t border-gray-100 dark:border-gray-800"
               >
-                <Box className="w-4 h-4" />
+                <Icon icon="vuesax:linear:gift" className="w-4 h-4" />
                 Manage Coupons
               </button>
             )}
@@ -155,10 +156,10 @@ export default function UserMenu() {
       </div>
 
       {isAuthenticated && (
-        <div className="p-3 border-t border-gray-100">
+        <div className="p-3 border-t border-gray-100 dark:border-gray-800">
           <button
             onClick={() => setShowPaymentModal(true)}
-            className={`w-full px-3 py-2 rounded-md bg-gradient-to-r ${currentTheme.buttonGradient} text-white text-sm`}
+            className={`w-full px-3 py-2 rounded-md bg-gradient-to-r ${currentTheme.buttonGradient} text-white text-sm shadow-lg shadow-orange-500/20`}
           >
             Make Payment
           </button>
@@ -183,13 +184,18 @@ export default function UserMenu() {
       )}
 
       <div
-        className={`fixed inset-y-0 right-0 w-72 bg-white/95 backdrop-blur-2xl border-l border-gray-200 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden z-30 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed inset-y-0 right-0 w-72 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-l border-white/20 dark:border-gray-800 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden z-50 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}
         aria-hidden={!mobileOpen}
       >
-        <div className={`flex items-center justify-between p-5 border-b border-gray-100 bg-gradient-to-r ${currentTheme.buttonGradient} text-white`}>
-          <div className="font-bold text-lg tracking-wide">{userName ? getFirstName(userName) : 'Hello, Guest'}</div>
-          <button onClick={() => setMobileOpen(false)} className="p-2 rounded-full hover:bg-white/20 transition-colors">
-            <X className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between p-5 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md">
+          <div className="font-bold text-lg tracking-wide text-gray-900 dark:text-white">
+            {userName ? getFirstName(userName) : 'Hello, Guest'}
+          </div>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+          >
+            <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
           </button>
         </div>
 

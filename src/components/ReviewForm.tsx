@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Send } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { supabase } from '../lib/supabase';
 import { getUserId } from '../hooks/useTracking';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ export default function ReviewForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (rating === 0) {
       toast.error('Please select a rating');
       return;
@@ -29,16 +29,16 @@ export default function ReviewForm() {
 
     try {
       const userId = await getUserId();
-      
+
       // Get user's name from unique_visitors
       const { data: userData } = await supabase
         .from('unique_visitors')
         .select('full_name')
         .eq('user_id', userId)
         .single();
-      
+
       const userName = userData?.full_name || 'Anonymous User';
-      
+
       // Insert the review
       const { error } = await supabase
         .from('site_reviews')
@@ -57,7 +57,7 @@ export default function ReviewForm() {
       toast.success('Thank you for your review! It will be reviewed by our team.');
       setRating(0);
       setReviewText('');
-      
+
     } catch (error) {
       console.error('Error submitting review:', error);
       toast.error('Failed to submit review. Please try again.');
@@ -70,7 +70,7 @@ export default function ReviewForm() {
     <div className="w-full max-w-2xl mx-auto relative">
       {/* Animated Border Effect */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 rounded-2xl"
           style={{
             background: `linear-gradient(45deg, ${currentTheme.primary}, ${currentTheme.secondary}, ${currentTheme.accent}, ${currentTheme.primary})`,
@@ -79,7 +79,7 @@ export default function ReviewForm() {
             padding: '2px'
           }}
         >
-          <div 
+          <div
             className="w-full h-full rounded-2xl"
             style={{ backgroundColor: currentTheme.surface }}
           />
@@ -87,7 +87,7 @@ export default function ReviewForm() {
       </div>
 
       {/* Neon Glow Effect */}
-      <div 
+      <div
         className="absolute inset-0 rounded-2xl blur-xl opacity-30"
         style={{
           background: `linear-gradient(45deg, ${currentTheme.primary}, ${currentTheme.secondary}, ${currentTheme.accent})`,
@@ -100,22 +100,22 @@ export default function ReviewForm() {
       <div className="relative z-10 p-8 rounded-2xl">
         <div className="text-center mb-6">
           <div className="flex items-center justify-center mb-4">
-            <div 
+            <div
               className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg animate-bounce"
-              style={{ 
+              style={{
                 background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`
               }}
             >
-              <Star className="w-8 h-8 text-white fill-current" />
+              <Icon icon="vuesax:bold:star" className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h3 
+          <h3
             className="text-2xl font-bold mb-2 animate-fade-in"
             style={{ color: currentTheme.text }}
           >
             Share Your Experience
           </h3>
-          <p 
+          <p
             className="animate-fade-in"
             style={{ color: currentTheme.textSecondary }}
           >
@@ -124,7 +124,7 @@ export default function ReviewForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
+
 
           <div className="relative">
             <textarea
@@ -144,14 +144,14 @@ export default function ReviewForm() {
               required
             />
             <div className="flex justify-between items-center mt-2">
-              <div 
+              <div
                 className="text-xs animate-pulse"
                 style={{ color: currentTheme.textSecondary }}
               >
                 {reviewText.length}/500 characters
               </div>
               {reviewText.length > 0 && (
-                <div 
+                <div
                   className="text-xs font-medium animate-bounce"
                   style={{ color: currentTheme.primary }}
                 >
@@ -173,22 +173,22 @@ export default function ReviewForm() {
                   className="p-2 transition-all duration-200 hover:scale-125 transform"
                   disabled={submitting}
                 >
-                  <Star
-                    className={`w-10 h-10 transition-all duration-200 ${
-                      star <= (hoveredRating || rating)
-                        ? 'text-yellow-400 fill-current drop-shadow-lg'
+                  <Icon
+                    icon="vuesax:bold:star"
+                    className={`w-10 h-10 transition-all duration-200 ${star <= (hoveredRating || rating)
+                        ? 'text-yellow-400 drop-shadow-lg'
                         : 'text-gray-300 hover:text-yellow-200'
-                    }`}
+                      }`}
                     style={{
-                      filter: star <= (hoveredRating || rating) 
-                        ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.6))' 
+                      filter: star <= (hoveredRating || rating)
+                        ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.6))'
                         : undefined
                     }}
                   />
                 </button>
               ))}
             </div>
-            <div 
+            <div
               className="text-sm font-medium animate-bounce"
               style={{ color: currentTheme.textSecondary }}
             >
@@ -212,7 +212,7 @@ export default function ReviewForm() {
               }}
             >
               {/* Button Background Animation */}
-              <div 
+              <div
                 className="absolute inset-0 bg-gradient-to-r opacity-0 hover:opacity-100 transition-opacity duration-300"
                 style={{
                   background: `linear-gradient(45deg, ${currentTheme.primary}, ${currentTheme.secondary}, ${currentTheme.accent})`,
@@ -220,7 +220,7 @@ export default function ReviewForm() {
                   animation: 'gradient-shift 3s ease infinite'
                 }}
               />
-              
+
               <div className="relative z-10 flex items-center justify-center gap-3">
                 {submitting ? (
                   <>
@@ -229,7 +229,7 @@ export default function ReviewForm() {
                   </>
                 ) : (
                   <>
-                    <Send className="w-6 h-6 animate-bounce" />
+                    <Icon icon="vuesax:linear:send-2" className="w-6 h-6 animate-bounce" />
                     <span>Submit Review</span>
                     <div className="ml-2 animate-ping w-2 h-2 bg-white rounded-full" />
                   </>

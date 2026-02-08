@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface ProductImageModalProps {
   images: string[];
@@ -68,7 +68,7 @@ export default function ProductImageModal({
           onClick={onClose}
           className="ml-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
         >
-          <X className="w-6 h-6" />
+          <Icon icon="vuesax:linear:close-circle" className="w-6 h-6" />
         </button>
       </div>
 
@@ -80,7 +80,7 @@ export default function ProductImageModal({
             onClick={goToPrevious}
             className="absolute left-4 z-10 p-3 bg-gray-800/80 hover:bg-gray-700 text-white rounded-full transition-colors"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <Icon icon="vuesax:linear:arrow-left" className="w-6 h-6" />
           </button>
         )}
 
@@ -104,7 +104,7 @@ export default function ProductImageModal({
             onClick={goToNext}
             className="absolute right-4 z-10 p-3 bg-gray-800/80 hover:bg-gray-700 text-white rounded-full transition-colors"
           >
-            <ChevronRight className="w-6 h-6" />
+            <Icon icon="vuesax:linear:arrow-right" className="w-6 h-6" />
           </button>
         )}
       </div>
@@ -117,11 +117,10 @@ export default function ProductImageModal({
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                  index === currentIndex
+                className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${index === currentIndex
                     ? 'border-orange-500 ring-2 ring-orange-500/50 scale-105'
                     : 'border-gray-600 hover:border-gray-400'
-                }`}
+                  }`}
               >
                 <img
                   src={image}

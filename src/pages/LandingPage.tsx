@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Star, ArrowRight, MessageSquare, CheckCircle } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import ReviewSlider from '../components/ReviewSlider';
 
 export default function LandingPage() {
@@ -7,22 +7,22 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: Search,
+      icon: 'vuesax:linear:search-normal',
       title: 'AI-Powered Search',
       description: 'Find exactly what you need with our intelligent product matching system'
     },
     {
-      icon: Users,
+      icon: 'vuesax:linear:profile-2user',
       title: 'University Network',
       description: 'Connect with verified sellers from your university community'
     },
     {
-      icon: Star,
+      icon: 'vuesax:linear:star',
       title: 'Trusted Reviews',
       description: 'Make informed decisions with authentic ratings and reviews'
     },
     {
-      icon: MessageSquare,
+      icon: 'vuesax:linear:message',
       title: 'Direct Communication',
       description: 'Chat directly with sellers via WhatsApp for instant responses'
     }
@@ -96,7 +96,7 @@ export default function LandingPage() {
                 </button>
               </div>
             </div>
-            
+
             {/* Hero Illustration */}
             <div className="relative">
               <div className="relative z-10 bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
@@ -111,7 +111,7 @@ export default function LandingPage() {
                     </div>
                     <div className="ml-auto">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <CheckCircle className="w-3 h-3 mr-1" />
+                        <Icon icon="vuesax:linear:tick-circle" className="w-3 h-3 mr-1" />
                         Active
                       </span>
                     </div>
@@ -124,7 +124,7 @@ export default function LandingPage() {
                   <div className="flex items-center gap-2">
                     <div className="flex text-yellow-400">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" />
+                        <Icon key={i} icon="vuesax:linear:star" className="w-4 h-4 text-yellow-400" />
                       ))}
                     </div>
                     <span className="text-sm text-gray-600">(24 reviews)</span>
@@ -164,12 +164,12 @@ export default function LandingPage() {
               We've built the perfect platform to connect university students with trusted local sellers
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="bg-white rounded-2xl p-8 shadow-sm border hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center text-white mb-6">
-                  <feature.icon className="w-6 h-6" />
+                  <Icon icon={feature.icon} className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{feature.description}</p>
@@ -190,7 +190,7 @@ export default function LandingPage() {
               Get what you need in just a few simple steps
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-6">
@@ -201,7 +201,7 @@ export default function LandingPage() {
                 Tell us what you're looking for and our AI will find the best matches from your university
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-6">
                 2
@@ -211,7 +211,7 @@ export default function LandingPage() {
                 Browse verified sellers and contact them directly via WhatsApp for instant communication
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-6">
                 3
@@ -247,7 +247,7 @@ export default function LandingPage() {
               className="bg-white text-orange-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               Start Shopping
-              <ArrowRight className="w-5 h-5" />
+              <Icon icon="vuesax:linear:arrow-right" className="w-5 h-5" />
             </button>
             <button
               onClick={() => navigate('/sellers')}
@@ -272,7 +272,7 @@ export default function LandingPage() {
                 Connecting university students with trusted local sellers through AI-powered search and direct communication.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
@@ -281,7 +281,7 @@ export default function LandingPage() {
                 <li><button onClick={() => navigate('/past-requests')} className="hover:text-white transition-colors">Past Requests</button></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Universities</h4>
               <ul className="space-y-2 text-gray-400">
@@ -290,7 +290,7 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; 2024 UniStore. All rights reserved.</p>
           </div>

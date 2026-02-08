@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface SearchPromptProps {
@@ -84,7 +84,7 @@ Example outputs:
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <Sparkles className="w-4 h-4 text-orange-500" />
+      <Icon icon="vuesax:linear:magic-star" className="w-4 h-4 text-orange-500" />
       <p className="text-gray-600 text-sm">{prompt}</p>
     </div>
   );

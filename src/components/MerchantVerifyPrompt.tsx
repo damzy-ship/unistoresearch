@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
-import { ShieldCheck } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 export default function MerchantVerifyPrompt() {
   const { currentTheme } = useTheme();
@@ -82,7 +82,7 @@ export default function MerchantVerifyPrompt() {
     <div className="fixed opacity-95 bottom-6 left-6 z-50 max-w-md w-full">
       <div className="rounded-2xl shadow-xl border bg-white p-4 flex items-start gap-3" style={{ borderColor: currentTheme.primary + '20' }}>
         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-white">
-          <ShieldCheck className="w-5 h-5" />
+          <Icon icon="vuesax:linear:shield-tick" className="w-5 h-5" />
         </div>
         <div className="flex-1">
           <div className="py-1 pr-3">

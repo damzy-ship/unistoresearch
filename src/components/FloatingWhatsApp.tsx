@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, X } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface FloatingWhatsAppProps {
   isVisible?: boolean;
@@ -27,8 +27,8 @@ export default function FloatingWhatsApp({ isVisible = true }: FloatingWhatsAppP
         className="fixed bottom-6 right-3 w-10 h-10 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white  rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 z-50 group"
         title="Got a question?"
       >
-        <MessageCircle className="w-5 h-5" />
-        
+        <Icon icon="vuesax:linear:message" className="w-5 h-5" />
+
         {/* Tooltip */}
         <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
           Got a question?
@@ -46,14 +46,14 @@ export default function FloatingWhatsApp({ isVisible = true }: FloatingWhatsAppP
                 onClick={() => setShowPrompt(false)}
                 className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
               </button>
             </div>
-            
+
             <p className="text-gray-600 mb-6">
               Have a question or need assistance? We're here to help!
             </p>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPrompt(false)}

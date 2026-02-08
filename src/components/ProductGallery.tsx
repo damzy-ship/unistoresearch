@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Image, X, Plus, Loader } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface ProductGalleryProps {
   merchantId: string;
@@ -222,7 +222,7 @@ export default function ProductGallery({ merchantId, editable = false, className
                   className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   title="Delete image"
                 >
-                  <X className="w-4 h-4" />
+                  <Icon icon="vuesax:linear:close-circle" className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -230,7 +230,7 @@ export default function ProductGallery({ merchantId, editable = false, className
         </div>
       ) : (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <Icon icon="vuesax:linear:gallery" className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500">No product images available</p>
         </div>
       )}
@@ -241,7 +241,7 @@ export default function ProductGallery({ merchantId, editable = false, className
           {!showLabelInput ? (
             <div className="flex justify-center">
               <label className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-                <Plus className="w-4 h-4" />
+                <Icon icon="vuesax:linear:add" className="w-4 h-4" />
                 Add Product Image
                 <input
                   type="file"
@@ -283,12 +283,12 @@ export default function ProductGallery({ merchantId, editable = false, className
                 >
                   {uploading ? (
                     <>
-                      <Loader className="w-4 h-4 animate-spin" />
+                      <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4 animate-spin" />
                       Uploading...
                     </>
                   ) : (
                     <>
-                      <Plus className="w-4 h-4" />
+                      <Icon icon="vuesax:linear:add" className="w-4 h-4" />
                       Upload Image
                     </>
                   )}

@@ -1,6 +1,5 @@
 import React from 'react';
-import { LogIn, Menu, Repeat } from 'lucide-react';
-import { CreditCard } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { isAuthenticated } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
@@ -58,7 +57,7 @@ export default function Header({
                     aria-label="Toggle hostel mode"
                     title="Switch modes"
                 >
-                    <Repeat className="w-4 h-4" />
+                    <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4" />
 
                 </button>
             )}
@@ -73,7 +72,7 @@ export default function Header({
                         title="Pay Merchant"
                         className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r ${currentTheme.buttonGradient} text-white font-medium transition-transform transform active:scale-95`}
                     >
-                        <CreditCard className="w-4 h-4" />
+                        <Icon icon="vuesax:linear:card" className="w-4 h-4" />
                         <span className="hidden sm:inline">Make Payment</span>
                         <span className="inline sm:hidden">Make Payment</span>
                     </button>
@@ -87,17 +86,17 @@ export default function Header({
                             onClick={onAuthClick}
                             className={`hidden ${!userIsAuthenticated ? 'lg:flex' : 'lg:hidden'} mx-4 items-center gap-2 px-4 py-2 bg-gradient-to-r ${currentTheme.buttonGradient} hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200`}
                         >
-                            <LogIn className="w-4 h-4" />
+                            <Icon icon="vuesax:linear:login" className="w-5 h-5" />
                             Sign In
                         </button>
 
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('toggle-user-sidebar'))}
-                            className={`lg:hidden p-2 rounded-lg mr-2 bg-gradient-to-l ${currentTheme.buttonGradient} text-white font-bold transition-transform transform active:scale-95`}
+                            className="lg:hidden p-2 rounded-xl mr-2 bg-white/10 backdrop-blur-md border border-gray-700/50 text-white hover:bg-white/20 transition-all active:scale-95"
                             aria-label="Open menu"
                             title="Menu"
                         >
-                            <Menu className="w-6 h-6" />
+                            <Icon icon="vuesax:linear:menu" className="w-6 h-6" />
                         </button>
                     </>
                 )}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Icon } from '@iconify/react';
 import { Toaster, toast } from 'sonner';
 import Header from '../components/Header';
 import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
@@ -532,7 +533,7 @@ export default function HostelHomePage() {
                             }}
                             className="p-1.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <Icon icon="vuesax:linear:close-circle" width="16" height="16" />
                         </button>
                     </div>
                 </div>

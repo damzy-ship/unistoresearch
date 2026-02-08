@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface StarRatingProps {
   rating: number;
@@ -9,12 +9,12 @@ interface StarRatingProps {
   className?: string;
 }
 
-export default function StarRating({ 
-  rating, 
-  totalRatings, 
-  size = 'md', 
+export default function StarRating({
+  rating,
+  totalRatings,
+  size = 'md',
   showCount = true,
-  className = '' 
+  className = ''
 }: StarRatingProps) {
   const sizeClasses = {
     sm: 'w-3 h-3',
@@ -39,9 +39,10 @@ export default function StarRating({
     // Full stars
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <Star
+        <Icon
           key={`full-${i}`}
-          className={`${starSize} text-yellow-400 fill-current`}
+          icon="vuesax:bold:star"
+          className={`${starSize} text-yellow-400`}
         />
       );
     }
@@ -50,9 +51,9 @@ export default function StarRating({
     if (hasHalfStar) {
       stars.push(
         <div key="half" className={`${starSize} relative`}>
-          <Star className={`${starSize} text-gray-300 absolute`} />
+          <Icon icon="vuesax:linear:star" className={`${starSize} text-gray-300 absolute`} />
           <div className="overflow-hidden w-1/2">
-            <Star className={`${starSize} text-yellow-400 fill-current`} />
+            <Icon icon="vuesax:bold:star" className={`${starSize} text-yellow-400`} />
           </div>
         </div>
       );
@@ -62,8 +63,9 @@ export default function StarRating({
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(
-        <Star
+        <Icon
           key={`empty-${i}`}
+          icon="vuesax:linear:star"
           className={`${starSize} text-gray-300`}
         />
       );
@@ -77,7 +79,7 @@ export default function StarRating({
       <div className="flex items-center">
         {renderStars()}
       </div>
-      
+
       {showCount && (
         <div className={`${textSize} text-gray-600 ml-1`}>
           <span className="font-medium">{rating.toFixed(1)}</span>

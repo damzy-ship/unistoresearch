@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, RefreshCw } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Theme } from '../hooks/useTheme';
 
 interface AIThemeGeneratorProps {
@@ -139,7 +139,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4" />
+              <Icon icon="vuesax:linear:magic-star" className="w-4 h-4" />
               Generate AI Theme
             </>
           )}
@@ -185,7 +185,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
                   color: generatedTheme.textSecondary
                 }}
               >
-                <RefreshCw className="w-4 h-4" />
+                <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4" />
                 Try Again
               </button>
             </div>

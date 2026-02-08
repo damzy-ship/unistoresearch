@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useTheme } from '../../hooks/useTheme';
 
 interface FilterBarProps {
@@ -41,7 +41,7 @@ export default function FilterBar({
                             className="hover:bg-white/20 rounded-full p-1 transition-colors"
                             aria-label="Clear search"
                         >
-                            <X className="w-4 h-4" />
+                            <Icon icon="vuesax:linear:close-circle" className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -54,9 +54,9 @@ export default function FilterBar({
             <div className="flex gap-2 sm:gap-3 mb-3 overflow-x-auto pb-2 scrollbar-hide">
                 <button
                     onClick={() => onSelectHostel('all')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedHostel === 'all'
-                        ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white rounded-full transition-all duration-200`
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedHostel === 'all'
+                        ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                        : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                         }`}
                 >
                     All Hostels
@@ -65,9 +65,9 @@ export default function FilterBar({
                     <button
                         key={hostel.id}
                         onClick={() => onSelectHostel(hostel.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedHostel === hostel.id
-                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white rounded-full transition-all duration-200`
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedHostel === hostel.id
+                            ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                            : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                             }`}
                     >
                         {hostel.name}
@@ -78,9 +78,9 @@ export default function FilterBar({
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 <button
                     onClick={() => onSelectCategory('all')}
-                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === 'all'
-                        ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white rounded-full transition-all duration-200`
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedCategory === 'all'
+                        ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                        : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                         }`}
                 >
                     All
@@ -88,9 +88,9 @@ export default function FilterBar({
                 {showMyProducts && (
                     <button
                         onClick={onToggleMyProducts}
-                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${myProductsActive
-                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white rounded-full transition-all duration-200`
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${myProductsActive
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 backdrop-blur-md'
+                            : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                             }`}
                     >
                         My Products
@@ -100,9 +100,9 @@ export default function FilterBar({
                     <button
                         key={category}
                         onClick={() => onSelectCategory(category)}
-                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === category
-                            ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white rounded-full transition-all duration-200`
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedCategory === category
+                            ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                            : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                             }`}
                     >
                         {category}

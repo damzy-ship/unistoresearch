@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Icon as IconifyIcon } from '@iconify/react';
 
 interface AuthInputProps {
   type: 'text' | 'email' | 'tel' | 'password';
@@ -29,8 +29,8 @@ export default function AuthInput({
   helpText
 }: AuthInputProps) {
   const [showPassword, setShowPassword] = React.useState(false);
-  
-  const inputType = showPasswordToggle && type === 'password' 
+
+  const inputType = showPasswordToggle && type === 'password'
     ? (showPassword ? 'text' : 'password')
     : type;
 
@@ -46,9 +46,8 @@ export default function AuthInput({
           type={inputType}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${
-            icon ? 'pl-10' : ''
-          } ${showPasswordToggle ? 'pr-12' : ''}`}
+          className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors ${icon ? 'pl-10' : ''
+            } ${showPasswordToggle ? 'pr-12' : ''}`}
           placeholder={placeholder}
           required={required}
           disabled={disabled}
@@ -60,7 +59,7 @@ export default function AuthInput({
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showPassword ? <IconifyIcon icon="vuesax:linear:eye-slash" className="w-5 h-5" /> : <IconifyIcon icon="vuesax:linear:eye" className="w-5 h-5" />}
           </button>
         )}
       </div>

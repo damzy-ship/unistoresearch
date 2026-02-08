@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Palette, RefreshCw } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Theme, useTheme } from '../hooks/useTheme';
 
 interface CustomThemeBuilderProps {
@@ -167,7 +167,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
               </>
             ) : (
               <>
-                <Palette className="w-4 h-4" />
+                <Icon icon="vuesax:linear:brush-2" className="w-4 h-4" />
                 Generate Complete Theme
               </>
             )}
@@ -182,7 +182,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
               color: currentTheme.text
             }}
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4 mr-2" />
             Reset
           </button>
         </div>

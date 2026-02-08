@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ArrowLeft } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 interface AuthHeaderProps {
   title: string;
@@ -28,7 +28,7 @@ export default function AuthHeader({
             disabled={disabled}
             className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <Icon icon="vuesax:linear:arrow-left" className="w-5 h-5" />
           </button>
         )}
         <div>
@@ -43,7 +43,7 @@ export default function AuthHeader({
         disabled={disabled}
         className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
       >
-        <X className="w-5 h-5" />
+        <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
       </button>
     </div>
   );

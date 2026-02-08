@@ -8,7 +8,7 @@ import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { useHostelMode } from '../hooks/useHostelMode';
-import { Loader } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import ContactSellerButton from './ContactSellerButton';
 import ContactSellerLink from './ContactSellerLink';
 import ProductImageModal from './ProductImageModal';
@@ -99,7 +99,7 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
     if (loading) {
         return (
             <div className="flex justify-center items-center h-44 bg-gray-50 w-full">
-                <Loader className="animate-spin h-8 w-8 text-indigo-600" />
+                <Icon icon="vuesax:linear:refresh-2" className="animate-spin h-8 w-8 text-indigo-600" />
             </div>
         );
     }
@@ -202,11 +202,11 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
                                             by <span className="font-medium">{product?.brand_name ? product.brand_name : product.full_name}</span>
                                         </p>
                                     )}
-                                    {hostelMode && (product.is_hostel_product && product.is_hostel_merchant)  && (
+                                    {hostelMode && (product.is_hostel_product && product.is_hostel_merchant) && (
                                         <p className="text-xs mb-3"
                                             style={{ color: currentTheme.text }}
                                         >
-                                            by <span className="font-medium">{product.brand_name ? product.brand_name :product.full_name}</span>
+                                            by <span className="font-medium">{product.brand_name ? product.brand_name : product.full_name}</span>
                                         </p>
                                     )}
                                     {product.phone_number && (

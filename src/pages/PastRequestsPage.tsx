@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, MessageSquare, Calendar, MapPin, Store, Eye, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, RequestLog } from '../lib/supabase';
 import { getUserId } from '../hooks/useTracking';
@@ -28,7 +28,7 @@ export default function PastRequestsPage() {
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
 
-          // console.log(data)
+        // console.log(data)
 
         if (error) {
           console.error('Error fetching user requests:', error);
@@ -54,7 +54,7 @@ export default function PastRequestsPage() {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       return 'Just now';
     } else if (diffInHours < 24) {
@@ -75,13 +75,13 @@ export default function PastRequestsPage() {
   }
 
   return (
-    <div 
+    <div
       className="min-h-screen transition-colors duration-300"
       style={{ backgroundColor: currentTheme.surface }}
     >
-   
+
       {/* Header */}
-      <div 
+      <div
         className="relative z-10 shadow-sm border-b transition-colors duration-300"
         style={{ backgroundColor: currentTheme.background }}
       >
@@ -95,16 +95,16 @@ export default function PastRequestsPage() {
                 onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
                 onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
               >
-                <ArrowLeft className="w-6 h-6" />
+                <Icon icon="vuesax:linear:arrow-left" className="w-6 h-6" />
               </button>
               <div>
-                <h1 
+                <h1
                   className="text-xl sm:text-2xl font-bold"
                   style={{ color: currentTheme.text }}
                 >
                   Past Requests
                 </h1>
-                <p 
+                <p
                   className="text-sm"
                   style={{ color: currentTheme.textSecondary }}
                 >
@@ -124,21 +124,22 @@ export default function PastRequestsPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search */}
-            {/* Background texture overlay */}
-       {backgroundTexture.id !== 'none' && (
-        <div 
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            backgroundImage: backgroundTexture.pattern,
-            backgroundSize: backgroundTexture.id === 'grid' ? '20px 20px' : '30px 30px',
-            opacity: backgroundTexture.opacity,
-            color: currentTheme.textSecondary
-          }}
-        />
-      )}
+        {/* Background texture overlay */}
+        {backgroundTexture.id !== 'none' && (
+          <div
+            className="fixed inset-0 pointer-events-none z-0"
+            style={{
+              backgroundImage: backgroundTexture.pattern,
+              backgroundSize: backgroundTexture.id === 'grid' ? '20px 20px' : '30px 30px',
+              opacity: backgroundTexture.opacity,
+              color: currentTheme.textSecondary
+            }}
+          />
+        )}
         <div className="mb-6">
           <div className="relative">
-            <Search 
+            <Icon
+              icon="vuesax:linear:search-normal"
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: currentTheme.textSecondary }}
             />
@@ -150,8 +151,7 @@ export default function PastRequestsPage() {
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl transition-colors"
               style={{
                 backgroundColor: currentTheme.background,
-                color: currentTheme.text,
-                focusBorderColor: currentTheme.primary
+                color: currentTheme.text
               }}
             />
           </div>
@@ -160,22 +160,23 @@ export default function PastRequestsPage() {
         {/* Requests List */}
         {filteredRequests.length === 0 ? (
           <div className="relative text-center py-12 z-10">
-            <MessageSquare 
+            <Icon
+              icon="vuesax:linear:message"
               className="w-12 h-12 mx-auto mb-4"
               style={{ color: currentTheme.textSecondary }}
             />
-            <h3 
+            <h3
               className="text-lg font-semibold mb-2"
               style={{ color: currentTheme.text }}
             >
               {searchTerm ? 'No matching requests found' : 'No requests yet'}
             </h3>
-            <p 
+            <p
               className="mb-4"
               style={{ color: currentTheme.textSecondary }}
             >
-              {searchTerm 
-                ? 'Try adjusting your search terms' 
+              {searchTerm
+                ? 'Try adjusting your search terms'
                 : 'Start by making your first product request'
               }
             </p>
@@ -200,29 +201,29 @@ export default function PastRequestsPage() {
                   <div className="flex-1">
                     {/* Request Header */}
                     <div className="flex items-center gap-3 mb-3">
-                      <MessageSquare 
+                      <Icon
+                        icon="vuesax:linear:message"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        request.university === 'Bingham' 
-                          ? 'bg-orange-100 text-orange-800' 
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        <MapPin className="w-3 h-3 mr-1" />
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${request.university === 'Bingham'
+                        ? 'bg-orange-100 text-orange-800'
+                        : 'bg-blue-100 text-blue-800'
+                        }`}>
+                        <Icon icon="vuesax:linear:location" className="w-3 h-3 mr-1" />
                         {request.university} University
                       </span>
-                      <div 
+                      <div
                         className="flex items-center gap-1 text-sm"
                         style={{ color: currentTheme.textSecondary }}
                       >
-                        <Calendar className="w-4 h-4" />
+                        <Icon icon="vuesax:linear:calendar" className="w-4 h-4" />
                         {formatDate(request.created_at)}
                       </div>
                     </div>
 
                     {/* Request Text */}
-                    <p 
+                    <p
                       className="leading-relaxed mb-3"
                       style={{ color: currentTheme.text }}
                     >
@@ -232,15 +233,15 @@ export default function PastRequestsPage() {
                     {/* Matched Sellers Info */}
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <Store 
+                        <Icon
+                          icon="vuesax:linear:shop"
                           className="w-4 h-4"
                           style={{ color: currentTheme.textSecondary }}
                         />
-                        <span className={`text-sm font-medium ${
-                          (request.matched_seller_ids?.length || 0) > 0
-                            ? 'text-green-600'
-                            : 'text-gray-500'
-                        }`}>
+                        <span className={`text-sm font-medium ${(request.matched_seller_ids?.length || 0) > 0
+                          ? 'text-green-600'
+                          : 'text-gray-500'
+                          }`}>
                           {request.matched_seller_ids?.length || 0} seller{(request.matched_seller_ids?.length || 0) !== 1 ? 's' : ''} matched
                         </span>
                       </div>
@@ -252,14 +253,14 @@ export default function PastRequestsPage() {
                     <button
                       onClick={() => setViewingRequest(request)}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-                      style={{ 
+                      style={{
                         backgroundColor: currentTheme.primary + '10',
                         color: currentTheme.primary
                       }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = currentTheme.primary + '20'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentTheme.primary + '10'}
                     >
-                      <Eye className="w-4 h-4" />
+                      <Icon icon="vuesax:linear:eye" className="w-4 h-4" />
                       View Details
                     </button>
                   </div>
@@ -272,7 +273,7 @@ export default function PastRequestsPage() {
         {/* Summary Stats */}
         {requests.length > 0 && (
           <div className="relative mt-8 bg-white rounded-xl p-6 shadow-sm border">
-            <h3 
+            <h3
               className="text-lg font-semibold mb-4"
               style={{ color: currentTheme.text }}
             >
@@ -280,13 +281,13 @@ export default function PastRequestsPage() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <p 
+                <p
                   className="text-2xl font-bold"
                   style={{ color: currentTheme.primary }}
                 >
                   {requests.length}
                 </p>
-                <p 
+                <p
                   className="text-sm"
                   style={{ color: currentTheme.textSecondary }}
                 >
@@ -294,13 +295,13 @@ export default function PastRequestsPage() {
                 </p>
               </div>
               <div className="text-center">
-                <p 
+                <p
                   className="text-2xl font-bold"
                   style={{ color: currentTheme.secondary }}
                 >
                   {requests.filter(r => r.university === 'Bingham').length}
                 </p>
-                <p 
+                <p
                   className="text-sm"
                   style={{ color: currentTheme.textSecondary }}
                 >
@@ -308,13 +309,13 @@ export default function PastRequestsPage() {
                 </p>
               </div>
               <div className="text-center">
-                <p 
+                <p
                   className="text-2xl font-bold"
                   style={{ color: currentTheme.secondary }}
                 >
                   {requests.filter(r => r.university === 'Veritas').length}
                 </p>
-                <p 
+                <p
                   className="text-sm"
                   style={{ color: currentTheme.textSecondary }}
                 >
@@ -322,13 +323,13 @@ export default function PastRequestsPage() {
                 </p>
               </div>
               <div className="text-center">
-                <p 
+                <p
                   className="text-2xl font-bold"
                   style={{ color: currentTheme.accent }}
                 >
                   {requests.filter(r => (r.matched_seller_ids?.length || 0) > 0).length}
                 </p>
-                <p 
+                <p
                   className="text-sm"
                   style={{ color: currentTheme.textSecondary }}
                 >
@@ -347,10 +348,10 @@ export default function PastRequestsPage() {
           onClose={() => setViewingRequest(null)}
         />
       )}
-      
+
       {/* Floating WhatsApp Button */}
       <FloatingWhatsApp isVisible={!viewingRequest} />
-      
+
       {/* Rating Prompt */}
       <RatingPrompt />
     </div>

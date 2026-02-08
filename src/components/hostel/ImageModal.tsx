@@ -1,5 +1,5 @@
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { Icon } from '@iconify/react';
+
 
 interface ImageModalProps {
     isOpen: boolean;
@@ -39,7 +39,7 @@ export default function ImageModal({ isOpen, images, activeIndex, onClose, onInd
                 className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
                 aria-label="Close"
             >
-                <X className="w-8 h-8" />
+                <Icon icon="vuesax:linear:close-circle" width={32} height={32} />
             </button>
 
             <div className="relative w-full h-full flex items-center justify-center p-4" onClick={stopPropagation}>
@@ -50,7 +50,7 @@ export default function ImageModal({ isOpen, images, activeIndex, onClose, onInd
                             className="absolute left-4 text-white hover:text-gray-300 transition-colors bg-black/50 hover:bg-black/70 rounded-full p-3"
                             aria-label="Previous image"
                         >
-                            <ChevronLeft className="w-8 h-8" />
+                            <Icon icon="vuesax:linear:arrow-left" width={32} height={32} />
                         </button>
 
                         <button
@@ -58,7 +58,7 @@ export default function ImageModal({ isOpen, images, activeIndex, onClose, onInd
                             className="absolute right-4 text-white hover:text-gray-300 transition-colors bg-black/50 hover:bg-black/70 rounded-full p-3"
                             aria-label="Next image"
                         >
-                            <ChevronRight className="w-8 h-8" />
+                            <Icon icon="vuesax:linear:arrow-right" width={32} height={32} />
                         </button>
                     </>
                 )}

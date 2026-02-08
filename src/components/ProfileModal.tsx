@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, User, Phone, Calendar, Edit2, Save, Palette } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { supabase } from '../lib/supabase';
 import ThemeSelector from './ThemeSelector';
 import AuthInput from './auth/AuthInput';
@@ -25,7 +25,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const {currentTheme} = useTheme();
+  const { currentTheme } = useTheme();
   const [editForm, setEditForm] = useState({
     full_name: '',
     phone_number: ''
@@ -41,10 +41,10 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      
+
       // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session?.user) {
         // Get user details from unique_visitors
         const { data: visitorData, error } = await supabase
@@ -63,7 +63,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             created_at: visitorData.created_at,
             visit_count: visitorData.visit_count || 0
           };
-          
+
           setProfile(profileData);
           setEditForm({
             full_name: profileData.full_name,
@@ -89,7 +89,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session?.user) {
         // Update visitor record
         const { error: updateError } = await supabase
@@ -151,7 +151,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
           </button>
         </div>
 
@@ -181,20 +181,20 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   <AuthInput
                     type="text"
                     value={editForm.full_name}
-                    onChange={(value) => setEditForm({...editForm, full_name: value})}
+                    onChange={(value) => setEditForm({ ...editForm, full_name: value })}
                     placeholder="Full Name"
                     required
                     disabled={saving}
-                    icon={<User className="w-4 h-4" />}
+                    icon={<Icon icon="vuesax:linear:user" className="w-4 h-4" />}
                   />
-                  
+
                   <AuthInput
                     type="tel"
                     value={editForm.phone_number}
-                    onChange={(value) => setEditForm({...editForm, phone_number: value})}
+                    onChange={(value) => setEditForm({ ...editForm, phone_number: value })}
                     placeholder="Phone Number"
                     disabled={saving}
-                    icon={<Phone className="w-4 h-4" />}
+                    icon={<Icon icon="vuesax:linear:call" className="w-4 h-4" />}
                   />
 
                   {error && (
@@ -206,7 +206,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               ) : (
                 <>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <User className="w-5 h-5 text-gray-400" />
+                    <Icon icon="vuesax:linear:user" className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Full Name</p>
                       <p className="text-gray-900">{profile.full_name}</p>
@@ -214,7 +214,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Phone className="w-5 h-5 text-gray-400" />
+                    <Icon icon="vuesax:linear:call" className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Phone Number</p>
                       <p className="text-gray-900">{profile.phone_number || 'Not provided'}</p>
@@ -232,7 +232,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   )} */}
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Calendar className="w-5 h-5 text-gray-400" />
+                    <Icon icon="vuesax:linear:calendar" className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Activity</p>
                       <p className="text-gray-900">{profile.visit_count} visits</p>
@@ -245,7 +245,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             {/* Theme Customization */}
             <div className="border-t pt-6">
               <div className="flex items-center gap-2 mb-4">
-                <Palette className="w-5 h-5 text-gray-600" />
+                <Icon icon="vuesax:linear:brush-2" className="w-5 h-5 text-gray-600" />
                 <h5 className="font-semibold text-gray-900">Theme Customization</h5>
               </div>
               <ThemeSelector />
@@ -277,7 +277,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     loading={saving}
                     fullWidth
                   >
-                    <Save className="w-4 h-4" />
+                    <Icon icon="vuesax:linear:tick-circle" className="w-4 h-4" />
                     Save Changes
                   </AuthButton>
                 </>
@@ -295,7 +295,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     onClick={() => setEditing(true)}
                     fullWidth
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Icon icon="vuesax:linear:edit" className="w-4 h-4" />
                     Edit Profile
                   </AuthButton>
                 </>

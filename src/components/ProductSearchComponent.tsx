@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for routin
 import 'swiper/css'; // Keep Swiper styles if needed elsewhere, but they are not used in this component anymore
 // import universityIdSelector from './universityIdSelector';
 import { useTheme } from '../hooks/useTheme';
-import { History } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
 import { sendMassVendorNotification } from '../lib/brevoService';
 
@@ -162,7 +162,7 @@ function ProductSearchComponent() {
             onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
             onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
           >
-            <History className="w-4 h-4" />
+            <Icon icon="vuesax:linear:clock" className="w-4 h-4" />
             View past requests
           </button>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Search, Store } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useTheme } from '../hooks/useTheme';
 
 interface Merchant {
@@ -62,20 +62,19 @@ export default function MerchantSelector({
                 type="button"
                 id="merchant_id"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={`w-full flex items-center justify-between px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                    isDropdownOpen ? `border-orange-500 ring-4 ring-orange-100` : `border-gray-200 hover:border-gray-300`
-                }`}
+                className={`w-full flex items-center justify-between px-4 py-3 border-2 rounded-xl transition-all duration-200 ${isDropdownOpen ? `border-orange-500 ring-4 ring-orange-100` : `border-gray-200 hover:border-gray-300`
+                    }`}
                 style={{
                     backgroundColor: currentTheme.background,
                 }}
             >
                 <div className="flex items-center gap-2" style={{ color: currentTheme.text }}>
-                    <Store className="w-4 h-4 text-gray-500" />
+                    <Icon icon="vuesax:linear:shop" className="w-4 h-4 text-gray-500" />
                     <span className="font-medium">
                         {loading ? 'Loading...' : selectedMerchant ? selectedMerchant.full_name : 'Select Merchant'}
                     </span>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                <Icon icon="vuesax:linear:arrow-down" className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isDropdownOpen && (
@@ -86,7 +85,7 @@ export default function MerchantSelector({
                     {/* Search */}
                     <div className="p-3 border-b" style={{ borderColor: currentTheme.primary + '10' }}>
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: currentTheme.textSecondary }} />
+                            <Icon icon="vuesax:linear:search-normal" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: currentTheme.textSecondary }} />
                             <input
                                 type="text"
                                 value={search}
@@ -111,7 +110,7 @@ export default function MerchantSelector({
                             </div>
                         ) : filteredMerchants.length === 0 ? (
                             <div className="px-4 py-6 text-center" style={{ color: currentTheme.textSecondary }}>
-                                <Store className="w-8 h-8 mx-auto mb-2" style={{ color: currentTheme.textSecondary + '40' }} />
+                                <Icon icon="vuesax:linear:shop" className="w-8 h-8 mx-auto mb-2" style={{ color: currentTheme.textSecondary + '40' }} />
                                 <p className="text-sm">No merchants found</p>
                             </div>
                         ) : (
@@ -120,9 +119,8 @@ export default function MerchantSelector({
                                     key={m.auth_user_id}
                                     type="button"
                                     onClick={() => handleSelectMerchant(m)}
-                                    className={`w-full text-left px-4 py-3 transition-colors border-b last:border-b-0 ${
-                                        selectedMerchant?.auth_user_id === m.auth_user_id ? 'bg-orange-50 text-orange-700' : 'hover:bg-gray-50'
-                                    }`}
+                                    className={`w-full text-left px-4 py-3 transition-colors border-b last:border-b-0 ${selectedMerchant?.auth_user_id === m.auth_user_id ? 'bg-orange-50 text-orange-700' : 'hover:bg-gray-50'
+                                        }`}
                                     style={{
                                         color: currentTheme.text,
                                         borderBottomColor: currentTheme.primary + '10'

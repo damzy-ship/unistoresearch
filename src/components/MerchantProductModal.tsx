@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Edit, Trash2, Image, Loader } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
 import { categorizePost, extractProductKeywordsFromDescription } from '../lib/gemini';
@@ -396,7 +396,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                                 onClick={() => handleRemoveImageFromEdit(url)}
                                                 className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
-                                                <X size={12} />
+                                                <Icon icon="vuesax:linear:close-circle" width={12} />
                                             </button>
                                         </div>
                                     ))}
@@ -412,7 +412,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                     {/* Upload Button */}
                                     {!isImageUploadDisabled && (
                                         <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 flex flex-col items-center justify-center cursor-pointer transition-colors bg-gray-50 dark:bg-gray-800/50">
-                                            <Plus className="text-gray-400" size={24} />
+                                            <Icon icon="vuesax:linear:add" className="text-gray-400" width={24} />
                                             <span className="text-xs text-gray-400 mt-1">Add</span>
                                             <input
                                                 type="file"
@@ -433,7 +433,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                     className="w-full bg-orange-600 hover:bg-orange-700 text-white h-12 text-lg rounded-xl"
                                     disabled={loading || uploadingImages}
                                 >
-                                    {(loading || uploadingImages) && <Loader className="w-5 h-5 animate-spin mr-2" />}
+                                    {(loading || uploadingImages) && <Icon icon="vuesax:linear:refresh-2" className="w-5 h-5 animate-spin mr-2" />}
                                     {editingProduct ? 'Save Changes' : 'Add Product'}
                                 </Button>
                                 <Button
@@ -458,7 +458,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                 size="sm"
                                 className="bg-orange-600 hover:bg-orange-700 text-white rounded-lg"
                             >
-                                <Plus size={16} className="mr-1" /> Add New
+                                <Icon icon="vuesax:linear:add" width={16} className="mr-1" /> Add New
                             </Button>
                         </div>
 
@@ -470,7 +470,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                             ) : products.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center">
                                     <div className="w-16 h-16 bg-orange-50 dark:bg-orange-900/20 rounded-full flex items-center justify-center mb-4">
-                                        <Image className="w-8 h-8 text-orange-500" />
+                                        <Icon icon="vuesax:linear:gallery" className="w-8 h-8 text-orange-500" />
                                     </div>
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">No products yet</h3>
                                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 max-w-xs">
@@ -485,7 +485,7 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                                 <img src={product.image_urls[0]} alt={product.product_description} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                    <Image size={20} />
+                                                    <Icon icon="vuesax:linear:gallery" width={20} />
                                                 </div>
                                             )}
                                         </div>
@@ -506,13 +506,13 @@ export default function MerchantProductModal({ actual_merchant_id, merchantId, m
                                                         onClick={() => startEditProduct(product)}
                                                         className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                                                     >
-                                                        <Edit size={16} />
+                                                        <Icon icon="vuesax:linear:edit" width={16} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteProduct(product.id, product.image_urls)}
                                                         className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                                     >
-                                                        <Trash2 size={16} />
+                                                        <Icon icon="vuesax:linear:trash" width={16} />
                                                     </button>
                                                 </div>
                                             </div>

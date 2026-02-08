@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Plus, Loader, CheckCircle, AlertCircle, Image, X } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Product, supabase, UniqueVisitor } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { deleteImageFromSupabase, uploadImageToSupabase } from '../lib/databaseServices';
@@ -389,7 +389,7 @@ export default function MerchantProductPage() {
                                             title="Remove image"
                                             disabled={loading || uploadingImages}
                                         >
-                                            <X className="w-3 h-3" />
+                                            <Icon icon="vuesax:linear:close-circle" className="w-3 h-3" />
                                         </button>
                                     </div>
                                 ))}
@@ -416,7 +416,7 @@ export default function MerchantProductPage() {
                                 className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-md shadow-md transition-all duration-200 font-medium`}
                                 disabled={loading || uploadingImages}
                             >
-                                {(loading || uploadingImages) && <Loader className="w-4 h-4 animate-spin" />}
+                                {(loading || uploadingImages) && <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4 animate-spin" />}
                                 {editingProduct ? 'Save Changes' : 'Add Product'}
                             </button>
                         </div>
@@ -430,7 +430,7 @@ export default function MerchantProductPage() {
                             onClick={() => resetAndShowForm()}
                             className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-md shadow-md transition-all duration-200 font-medium`}
                         >
-                            <Plus className="w-4 h-4" /> Add New Product
+                            <Icon icon="vuesax:linear:add" className="w-4 h-4" /> Add New Product
                         </button>
                     </div>
 
@@ -448,7 +448,7 @@ export default function MerchantProductPage() {
                                         {product.image_urls && product.image_urls.length > 0 ? (
                                             <img src={product.image_urls[0]} alt={product.product_description} className="w-full h-full object-cover" />
                                         ) : (
-                                            <Image className="w-16 h-16 text-gray-400" />
+                                            <Icon icon="vuesax:linear:gallery" className="w-16 h-16 text-gray-400" />
                                         )}
                                     </div>
                                     <div className="w-full">
@@ -456,9 +456,9 @@ export default function MerchantProductPage() {
                                         <p className="text-gray-700">₦{product.product_price}</p>
                                         <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
                                             {product.is_available ? (
-                                                <><CheckCircle className="w-4 h-4 text-green-500" /> Available</>
+                                                <><Icon icon="vuesax:linear:tick-circle" className="w-4 h-4 text-green-500" /> Available</>
                                             ) : (
-                                                <><AlertCircle className="w-4 h-4 text-red-500" /> Not Available</>
+                                                <><Icon icon="vuesax:linear:danger" className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
 

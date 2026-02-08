@@ -44,8 +44,8 @@ export default function LiveActivityHub({ onUserClick }: LiveActivityHubProps) {
         <div className="py-2 px-4 border-b border-gray-800/50">
             <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2">
                 <div className="flex flex-col items-center flex-shrink-0 mr-2">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-300 flex items-center justify-center mb-1 ring-2 ring-gray-900 border-2 border-transparent">
-                        <span className="text-gray-900 font-bold text-xs text-center leading-tight">WHAT'S<br />NEW</span>
+                    <div className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mb-1">
+                        <span className="text-gray-400 font-medium text-[9px] text-center leading-tight">WHAT'S<br />NEW</span>
                     </div>
                 </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Phone, Calendar, Palette, Sparkles, Wand2, Store, BadgeCheck, Clock, XCircle, Edit2, Mail } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, UniqueVisitor } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
@@ -67,8 +67,8 @@ export default function ProfilePage() {
     }
   };
 
-  const handleUpdateBrandName = async (newBrandName: string) => {
-    if (!profile) return;
+  const handleUpdateBrandName = async (newBrandName: string | null) => {
+    if (!profile || !newBrandName) return;
 
     const { data: { session } } = await supabase.auth.getSession();
 
@@ -173,12 +173,12 @@ export default function ProfilePage() {
   const getVerificationStatus = (status: 'pending' | 'verified' | 'unverified' | null) => {
     switch (status) {
       case 'verified':
-        return { icon: <BadgeCheck className="w-5 h-5 text-green-500" />, text: 'Verified', color: 'text-green-500' };
+        return { icon: <Icon icon="vuesax:linear:verify" className="w-5 h-5 text-green-500" />, text: 'Verified', color: 'text-green-500' };
       case 'pending':
-        return { icon: <Clock className="w-5 h-5 text-yellow-500" />, text: 'Pending', color: 'text-yellow-500' };
+        return { icon: <Icon icon="vuesax:linear:clock" className="w-5 h-5 text-yellow-500" />, text: 'Pending', color: 'text-yellow-500' };
       case 'unverified':
       default:
-        return { icon: <XCircle className="w-5 h-5 text-red-500" />, text: 'Unverified', color: 'text-red-500' };
+        return { icon: <Icon icon="vuesax:linear:close-circle" className="w-5 h-5 text-red-500" />, text: 'Unverified', color: 'text-red-500' };
     }
   };
 
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                   e.currentTarget.style.color = currentTheme.textSecondary;
                 }}
               >
-                <ArrowLeft className="w-6 h-6" />
+                <Icon icon="vuesax:linear:arrow-left" className="w-6 h-6" />
               </button>
               <div>
                 <h1
@@ -288,7 +288,8 @@ export default function ProfilePage() {
                       className="flex items-center gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: currentTheme.background }}
                     >
-                      <Mail
+                      <Icon
+                        icon="vuesax:linear:sms"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -321,7 +322,8 @@ export default function ProfilePage() {
                         className="flex items-center gap-3 p-4 rounded-xl"
                         style={{ backgroundColor: currentTheme.background }}
                       >
-                        <Store
+                        <Icon
+                          icon="vuesax:linear:shop"
                           className="w-5 h-5"
                           style={{ color: currentTheme.primary }}
                         />
@@ -376,7 +378,7 @@ export default function ProfilePage() {
                               style={{ color: currentTheme.primary, backgroundColor: currentTheme.primary + '10' }}
                               title="Change ID"
                             >
-                              <Edit2 className="w-5 h-5" />
+                              <Icon icon="vuesax:linear:edit" className="w-5 h-5" />
                             </button>
                           </div>
                         )}
@@ -400,7 +402,8 @@ export default function ProfilePage() {
                       className="flex items-center gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: currentTheme.background }}
                     >
-                      <User
+                      <Icon
+                        icon="vuesax:linear:user"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -419,7 +422,8 @@ export default function ProfilePage() {
                       className="flex items-center gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: currentTheme.background }}
                     >
-                      <Phone
+                      <Icon
+                        icon="vuesax:linear:call"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -440,7 +444,8 @@ export default function ProfilePage() {
                       className="flex items-center gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: currentTheme.background }}
                     >
-                      <Calendar
+                      <Icon
+                        icon="vuesax:linear:calendar"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -452,7 +457,7 @@ export default function ProfilePage() {
                           Member Since
                         </p>
                         <p style={{ color: currentTheme.text }}>
-                          {formatDate(profile.created_at)}
+                          {formatDate(profile.created_at || new Date().toISOString())}
                         </p>
                       </div>
                     </div>
@@ -461,7 +466,8 @@ export default function ProfilePage() {
                       className="flex items-center gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: currentTheme.background }}
                     >
-                      <Sparkles
+                      <Icon
+                        icon="vuesax:linear:magic-star"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -492,7 +498,8 @@ export default function ProfilePage() {
               style={{ backgroundColor: currentTheme.surface }}
             >
               <div className="flex items-center gap-3 mb-8">
-                <Palette
+                <Icon
+                  icon="vuesax:linear:brush-2"
                   className="w-6 h-6"
                   style={{ color: currentTheme.primary }}
                 />
@@ -507,10 +514,10 @@ export default function ProfilePage() {
               {/* Tab Navigation */}
               <div className="flex flex-wrap gap-2 mb-8">
                 {[
-                  { id: 'themes', label: 'Preset Themes', icon: Palette },
-                  { id: 'textures', label: 'Background Textures', icon: Sparkles },
-                  { id: 'ai', label: 'AI Generated', icon: Wand2 }
-                ].map(({ id, label, icon: Icon }) => (
+                  { id: 'themes', label: 'Preset Themes', icon: 'vuesax:linear:brush-2' },
+                  { id: 'textures', label: 'Background Textures', icon: 'vuesax:linear:magic-star' },
+                  { id: 'ai', label: 'AI Generated', icon: 'vuesax:linear:magic-pen' }
+                ].map(({ id, label, icon: MenuIcon }) => (
                   <button
                     key={id}
                     onClick={() => setActiveTab(id as any)}
@@ -523,7 +530,7 @@ export default function ProfilePage() {
                       color: currentTheme.text
                     } : {}}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon icon={typeof MenuIcon === 'string' ? MenuIcon : 'vuesax:linear:element-3'} className="w-4 h-4" />
                     {label}
                   </button>
                 ))}
