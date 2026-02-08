@@ -61,7 +61,7 @@ export default function LiveActivityHub({ onUserClick }: LiveActivityHubProps) {
                         onClick={() => onUserClick && onUserClick(user)}
                     >
                         <div className="relative">
-                            <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-purple-500 to-pink-500">
+                            <div className="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-orange-500 to-amber-500">
                                 <div className="w-full h-full rounded-full bg-gray-900 p-[2px] overflow-hidden">
                                     {user.profile_picture ? (
                                         <img src={user.profile_picture} alt="u" className="w-full h-full rounded-full object-cover" />
@@ -72,7 +72,7 @@ export default function LiveActivityHub({ onUserClick }: LiveActivityHubProps) {
                                     )}
                                 </div>
                             </div>
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full"></div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-orange-500 border-2 border-gray-900 rounded-full"></div>
                         </div>
                         <span className="text-[10px] text-gray-400 mt-1 max-w-[60px] truncate">{user.full_name?.split(' ')[0]}</span>
                     </motion.div>

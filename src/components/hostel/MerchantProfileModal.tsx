@@ -49,7 +49,7 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
             <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 overflow-hidden">
                 {/* Header / Profile Info */}
                 <div className="bg-white dark:bg-gray-800 p-6 flex flex-col items-center text-center border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-br from-purple-500 to-pink-500 mb-3 shadow-lg">
+                    <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-br from-orange-500 to-amber-500 mb-3 shadow-lg">
                         <div className="w-full h-full rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                             {merchant.profile_picture ? (
                                 <img src={merchant.profile_picture} alt={merchant.full_name} className="w-full h-full object-cover" />
@@ -67,12 +67,12 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                     <div className="flex flex-wrap items-center justify-center gap-2 mt-2 w-full">
                         {merchant.hostels?.name && (
                             <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full">
-                                <Icon icon="mdi:map-marker" width={14} className="text-emerald-500" />
+                                <Icon icon="mdi:map-marker" width={14} className="text-orange-500" />
                                 <span>{merchant.hostels.name}</span>
                             </div>
                         )}
                         <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full">
-                            <Icon icon="mdi:tag" width={14} className="text-amber-500" />
+                            <Icon icon="mdi:tag" width={14} className="text-orange-500" />
                             <span>{products.length} Products</span>
                         </div>
                     </div>
@@ -80,10 +80,10 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                     <div className="grid grid-cols-2 gap-3 w-full mt-4">
                         <Button
                             onClick={() => window.open(`https://wa.me/${merchant.phone_number?.replace(/[^0-9]/g, '')}`, '_blank')}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
+                            className="bg-[#25D366] hover:bg-[#128C7E] text-white border-transparent"
                             size="sm"
                         >
-                            <Icon icon="mdi:message-text" width={16} className="mr-2" />
+                            <Icon icon="mdi:whatsapp" width={18} className="mr-2" />
                             WhatsApp
                         </Button>
                         <Button
@@ -100,7 +100,7 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                 {/* Products Grid */}
                 <div className="flex-1 overflow-y-auto p-4">
                     <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 uppercase tracking-wider flex items-center gap-2">
-                        <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
+                        <span className="w-1 h-4 bg-orange-500 rounded-full"></span>
                         Store Catalog
                     </h3>
 
@@ -133,7 +133,7 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
 
                                     <div className="absolute bottom-0 left-0 right-0 p-3">
                                         <p className="text-white font-bold text-xs line-clamp-2">{product.post_description}</p>
-                                        <p className="text-emerald-400 font-mono text-xs font-bold mt-1">
+                                        <p className="text-orange-400 font-mono text-xs font-bold mt-1">
                                             ₦{product.price?.toLocaleString() || '0'}
                                         </p>
                                     </div>

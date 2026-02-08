@@ -55,7 +55,7 @@ export default function FilterBar({
                 <button
                     onClick={() => onSelectHostel('all')}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedHostel === 'all'
-                        ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                        ? 'bg-orange-500/90 border-orange-400 text-white shadow-lg shadow-orange-500/20 backdrop-blur-sm'
                         : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                         }`}
                 >
@@ -66,7 +66,7 @@ export default function FilterBar({
                         key={hostel.id}
                         onClick={() => onSelectHostel(hostel.id)}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedHostel === hostel.id
-                            ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                            ? 'bg-orange-500/90 border-orange-400 text-white shadow-lg shadow-orange-500/20 backdrop-blur-sm'
                             : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                             }`}
                     >
@@ -79,7 +79,7 @@ export default function FilterBar({
                 <button
                     onClick={() => onSelectCategory('all')}
                     className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedCategory === 'all'
-                        ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                        ? 'bg-orange-500/90 border-orange-400 text-white shadow-lg shadow-orange-500/20 backdrop-blur-sm'
                         : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                         }`}
                 >
@@ -89,7 +89,7 @@ export default function FilterBar({
                     <button
                         onClick={onToggleMyProducts}
                         className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${myProductsActive
-                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 backdrop-blur-md'
+                            ? 'bg-orange-500/20 border-orange-500/40 text-orange-300 backdrop-blur-md'
                             : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                             }`}
                     >
@@ -101,7 +101,7 @@ export default function FilterBar({
                         key={category}
                         onClick={() => onSelectCategory(category)}
                         className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 border ${selectedCategory === category
-                            ? 'bg-white/10 border-white/20 text-white backdrop-blur-md shadow-lg shadow-purple-500/10'
+                            ? 'bg-orange-500/90 border-orange-400 text-white shadow-lg shadow-orange-500/20 backdrop-blur-sm'
                             : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/10'
                             }`}
                     >

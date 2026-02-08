@@ -183,7 +183,7 @@ export default function PostComposerVuna({
                         </button>
                         <button
                             onClick={() => setActiveTab('product')}
-                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'product' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'product' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Post Product
                         </button>
@@ -194,7 +194,7 @@ export default function PostComposerVuna({
                         <div className="mb-4 relative z-50">
                             <button
                                 onClick={() => setShowMerchantDropdown(!showMerchantDropdown)}
-                                className="w-full flex items-center justify-between gap-2 text-sm font-medium text-emerald-400 bg-emerald-900/10 dark:bg-emerald-400/10 px-4 py-3 rounded-xl hover:bg-emerald-900/20 dark:hover:bg-emerald-400/20 transition-colors border border-emerald-500/20"
+                                className="w-full flex items-center justify-between gap-2 text-sm font-medium text-orange-400 bg-orange-900/10 dark:bg-orange-400/10 px-4 py-3 rounded-xl hover:bg-orange-900/20 dark:hover:bg-orange-400/20 transition-colors border border-orange-500/20"
                             >
                                 <span className="flex items-center gap-2">
                                     <span className="text-gray-500">Posting as:</span>
@@ -211,7 +211,7 @@ export default function PostComposerVuna({
                                             value={merchantSearchTerm}
                                             onChange={(e) => setMerchantSearchTerm(e.target.value)}
                                             placeholder="Search merchants..."
-                                            className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm py-2 px-3 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-emerald-500 outline-none"
+                                            className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm py-2 px-3 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-orange-500 outline-none"
                                             autoFocus
                                         />
                                     </div>
@@ -223,8 +223,8 @@ export default function PostComposerVuna({
                                             }}
                                             className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 flex items-center justify-between group"
                                         >
-                                            <span className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-500">Myself</span>
-                                            {!selectedMerchant && <Icon icon="mdi:check-circle" width={16} className="text-emerald-500" />}
+                                            <span className="font-medium text-gray-900 dark:text-white group-hover:text-orange-500">Myself</span>
+                                            {!selectedMerchant && <Icon icon="mdi:check-circle" width={16} className="text-orange-500" />}
                                         </button>
                                         {loadingMerchants && (
                                             <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
@@ -242,9 +242,9 @@ export default function PostComposerVuna({
                                                     <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
                                                         {merchant.profile_picture && <img src={merchant.profile_picture} className="w-full h-full object-cover" />}
                                                     </div>
-                                                    <span className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-500">{merchant.brand_name || merchant.full_name}</span>
+                                                    <span className="font-medium text-gray-900 dark:text-white group-hover:text-orange-500">{merchant.brand_name || merchant.full_name}</span>
                                                 </div>
-                                                {selectedMerchant?.id === merchant.id && <Icon icon="mdi:check-circle" width={16} className="text-emerald-500" />}
+                                                {selectedMerchant?.id === merchant.id && <Icon icon="mdi:check-circle" width={16} className="text-orange-500" />}
                                             </button>
                                         ))}
                                     </div>
@@ -280,7 +280,7 @@ export default function PostComposerVuna({
                     )}
 
                     {/* Bottom Actions */}
-                    <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div className="mt-auto pt-4 pb-8 border-t border-gray-100 dark:border-gray-800">
                         <div className="flex items-center justify-between gap-4">
                             <div className="flex gap-2">
                                 <input
@@ -296,7 +296,7 @@ export default function PostComposerVuna({
                                     onClick={() => document.getElementById('drawer-image-upload')?.click()}
                                     className="h-12 w-12 rounded-xl p-0"
                                 >
-                                    <Icon icon="mdi:image-outline" className="text-emerald-600 dark:text-emerald-400" />
+                                    <Icon icon="mdi:image-outline" width={24} height={24} className="text-orange-600 dark:text-orange-400" />
                                 </Button>
                                 {/* <Button variant="ghost" className="h-12 w-12 rounded-xl p-0">
                                     <Camera />
@@ -306,7 +306,7 @@ export default function PostComposerVuna({
                             <Button
                                 onClick={handleSubmit}
                                 disabled={posting || (!composerText.trim() && composerImages.length === 0)}
-                                className={`flex-1 h-12 text-lg rounded-xl font-bold ${activeTab === 'product' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
+                                className={`flex-1 h-12 text-lg rounded-xl font-bold ${activeTab === 'product' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-orange-600 hover:bg-orange-700'}`}
                                 variant={activeTab === 'product' ? 'primary' : 'primary'} // Visual preference
                             >
                                 {posting ? 'Posting...' : (activeTab === 'request' ? 'Post Request' : 'Post Product')}

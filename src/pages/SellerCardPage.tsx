@@ -130,7 +130,7 @@ export default function SellerCardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-blue-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -151,9 +151,9 @@ export default function SellerCardPage() {
 
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-5">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-orange-500 to-blue-500"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-orange-500 to-amber-500"></div>
                 <div className="absolute top-4 left-4 w-32 h-32 border-2 border-orange-300 rounded-full opacity-20"></div>
-                <div className="absolute bottom-4 right-4 w-24 h-24 border-2 border-blue-300 rounded-full opacity-20"></div>
+                <div className="absolute bottom-4 right-4 w-24 h-24 border-2 border-orange-300 rounded-full opacity-20"></div>
               </div>
 
               {/* Top Badges */}
@@ -168,9 +168,9 @@ export default function SellerCardPage() {
                 <div className="flex gap-1">
                   {/* Status Badge */}
                   {isSellerActive(seller) ? (
-                    <div className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-full">
-                      <Icon icon="mdi:check-circle" className="w-3 h-3 text-green-600" />
-                      <span className="text-xs font-bold text-green-700">ACTIVE</span>
+                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                      <Icon icon="mdi:check-circle" className="w-3 h-3 text-gray-600" />
+                      <span className="text-xs font-bold text-gray-700">ACTIVE</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 bg-red-100 px-2 py-1 rounded-full">
@@ -234,7 +234,7 @@ export default function SellerCardPage() {
                     {seller.categories.slice(0, 4).map((category, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-full text-xs font-bold border border-blue-300 shadow-sm transform transition-all duration-200 hover:scale-105"
+                        className="px-3 py-1 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 rounded-full text-xs font-bold border border-orange-300 shadow-sm transform transition-all duration-200 hover:scale-105"
                       >
                         {category}
                       </span>
@@ -256,11 +256,11 @@ export default function SellerCardPage() {
                   </div>
                   <div className="text-xs text-orange-700 font-medium">Categories</div>
                 </div>
-                <div className="text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 border border-blue-200">
-                  <div className="text-lg font-bold text-blue-600">
+                <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3 border border-gray-200">
+                  <div className="text-lg font-bold text-gray-600">
                     {seller.total_ratings || 0}
                   </div>
-                  <div className="text-xs text-blue-700 font-medium">Reviews</div>
+                  <div className="text-xs text-gray-700 font-medium">Reviews</div>
                 </div>
               </div>
 
