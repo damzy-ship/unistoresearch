@@ -112,6 +112,19 @@ export interface HostelsProductUpdates {
   status?: 'open' | 'fulfilled' | 'cancelled' | 'hide';
   post_type: 'update' | 'request';
   fulfilled: boolean | null;
+  price?: string | number;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  value: number;
+  type: string;
+  claimed: boolean;
+  school_id: string;
+  created_at?: string;
+  claimed_at?: string;
+  claimed_by?: string;
 }
 
 export interface RequestLog {

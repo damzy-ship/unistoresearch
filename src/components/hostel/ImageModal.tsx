@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 
 
@@ -88,9 +89,8 @@ export default function ImageModal({ isOpen, images, initialIndex = 0, onClose }
                                     e.stopPropagation();
                                     setActiveIndex(index);
                                 }}
-                                className={`w-2 h-2 rounded-full transition-all ${
-                                    index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
-                                }`}
+                                className={`w-2 h-2 rounded-full transition-all ${index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                                    }`}
                                 aria-label={`Go to image ${index + 1}`}
                             />
                         ))}

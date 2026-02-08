@@ -111,9 +111,7 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
                 isOpen={imageModalOpen}
                 onClose={() => setImageModalOpen(false)}
                 images={imageModalImages}
-                activeIndex={imageModalActive}
-                description={imageModalDescription}
-                onIndexChange={setImageModalActive}
+                initialIndex={imageModalActive}
             />
 
             <ConfirmDeleteModal
