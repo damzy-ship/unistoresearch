@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { getUserId } from '../hooks/useTracking';
+import { getUserId, isAuthenticated } from '../hooks/useTracking';
 import { trackMerchantContact } from './merchantAnalytics';
 
 export interface RatingData {
@@ -21,7 +21,7 @@ export async function trackContactInteraction(
 ): Promise<RatingResult> {
   try {
     const userId = await getUserId();
-
+    
     // Check if this user has already contacted this merchant for this specific request
     const { data: existingContact } = await supabase
       .from('contact_interactions')
@@ -57,9 +57,9 @@ export async function trackContactInteraction(
     return { success: true };
   } catch (error) {
     console.error('Error tracking contact interaction:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
 }
@@ -73,7 +73,7 @@ export async function hasUserContactedMerchant(
 ): Promise<boolean> {
   try {
     const userId = await getUserId();
-
+    
     const { data, error } = await supabase
       .from('contact_interactions')
       .select('id')
@@ -104,16 +104,16 @@ export async function submitRating(
 ): Promise<RatingResult> {
   try {
     const userId = await getUserId();
-
+    
     // Check if user has contacted this merchant for this request
     const hasContacted = await hasUserContactedMerchant(merchantId, requestId);
     if (!hasContacted) {
-      return {
-        success: false,
-        error: 'You can only rate merchants you have contacted'
+      return { 
+        success: false, 
+        error: 'You can only rate merchants you have contacted' 
       };
     }
-
+    
     // Check if user has already rated this merchant for this request
     const { data: existingRating } = await supabase
       .from('seller_ratings')
@@ -125,12 +125,12 @@ export async function submitRating(
 
     if (existingRating) {
       if (existingRating.is_cancelled) {
-        return {
-          success: false,
-          error: 'This rating has been cancelled and cannot be modified'
+        return { 
+          success: false, 
+          error: 'This rating has been cancelled and cannot be modified' 
         };
       }
-
+      
       // Update existing rating
       const { error } = await supabase
         .from('seller_ratings')
@@ -187,9 +187,9 @@ export async function submitRating(
     return { success: true };
   } catch (error) {
     console.error('Error submitting rating:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
 }
@@ -203,7 +203,7 @@ export async function cancelRating(
 ): Promise<RatingResult> {
   try {
     const userId = await getUserId();
-
+    
     const { data: rating, error: fetchError } = await supabase
       .from('seller_ratings')
       .select('id, can_be_cancelled, is_cancelled')
@@ -232,9 +232,9 @@ export async function cancelRating(
     // Mark rating as cancelled
     const { error } = await supabase
       .from('seller_ratings')
-      .update({
+      .update({ 
         is_cancelled: true,
-        can_be_cancelled: false
+        can_be_cancelled: false 
       })
       .eq('id', rating.id);
 
@@ -266,9 +266,9 @@ export async function cancelRating(
     return { success: true };
   } catch (error) {
     console.error('Error cancelling rating:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
 }
@@ -282,7 +282,7 @@ export async function hasUserRatedMerchant(
 ): Promise<boolean> {
   try {
     const userId = getUserId();
-
+    
     const { data, error } = await supabase
       .from('seller_ratings')
       .select('id, is_cancelled')
@@ -317,10 +317,10 @@ export async function getUserRating(
 }> {
   try {
     const userId = await getUserId();
-
+    
     // Check if user has contacted this merchant
     const hasContacted = await hasUserContactedMerchant(merchantId, requestId);
-
+    
     // Get existing rating
     const { data: rating, error } = await supabase
       .from('seller_ratings')
@@ -433,9 +433,9 @@ export async function markContactAsRatingPrompted(contactId: string): Promise<Ra
     return { success: true };
   } catch (error) {
     console.error('Error marking contact as rating prompted:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
 }

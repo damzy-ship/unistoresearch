@@ -4,23 +4,23 @@ import { Icon } from '@iconify/react';
 interface ImageModalProps {
     isOpen: boolean;
     images: string[];
-    activeIndex: number;
+    initialIndex?: number;
     onClose: () => void;
-    onIndexChange: (index: number) => void;
-    description?: string;
 }
 
-export default function ImageModal({ isOpen, images, activeIndex, onClose, onIndexChange, description }: ImageModalProps) {
+export default function ImageModal({ isOpen, images, initialIndex = 0, onClose }: ImageModalProps) {
+    const [activeIndex, setActiveIndex] = useState(initialIndex);
+
     if (!isOpen) return null;
 
     const handlePrevious = (e: React.MouseEvent) => {
         e.stopPropagation();
-        onIndexChange(activeIndex === 0 ? images.length - 1 : activeIndex - 1);
+        setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     };
 
     const handleNext = (e: React.MouseEvent) => {
         e.stopPropagation();
-        onIndexChange(activeIndex === images.length - 1 ? 0 : activeIndex + 1);
+        setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     };
 
     const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation();
@@ -86,22 +86,14 @@ export default function ImageModal({ isOpen, images, activeIndex, onClose, onInd
                                 key={index}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    onIndexChange(index);
+                                    setActiveIndex(index);
                                 }}
-                                className={`w-2 h-2 rounded-full transition-all ${index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
-                                    }`}
+                                className={`w-2 h-2 rounded-full transition-all ${
+                                    index === activeIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                                }`}
                                 aria-label={`Go to image ${index + 1}`}
                             />
                         ))}
-                    </div>
-                )}
-                {description && (
-                    <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
-                        <div className="inline-block bg-black/70 backdrop-blur-sm px-6 py-3 rounded-xl max-w-2xl mx-4 pointer-events-auto">
-                            <p className="text-white text-sm md:text-base font-medium leading-relaxed">
-                                {description}
-                            </p>
-                        </div>
                     </div>
                 )}
             </div>
