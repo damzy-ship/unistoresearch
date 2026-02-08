@@ -93,7 +93,7 @@ export default function UserMenu() {
             }}
             className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
           >
-            <Icon icon="vuesax:linear:login" className="w-4 h-4" />
+            <Icon icon="mdi:store-plus" className="w-4 h-4 mr-2" />
             Sign In
           </button>
         ) : (
@@ -104,7 +104,7 @@ export default function UserMenu() {
               onClick={() => { navigate('/profile'); setMobileOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <Icon icon="vuesax:linear:user" className="w-4 h-4" />
+              <Icon icon="mdi:magnify" className="w-4 h-4 mr-2" />
               Profile & Themes
             </button>
 
@@ -112,7 +112,7 @@ export default function UserMenu() {
               onClick={() => { navigate('/invoices'); setMobileOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <Icon icon="vuesax:linear:document-text" className="w-4 h-4" />
+              <Icon icon="mdi:file-document-outline" className="w-4 h-4 mr-2" />
               Transactions
             </button>
 
@@ -121,7 +121,7 @@ export default function UserMenu() {
                 onClick={handleViewProducts}
                 className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               >
-                <Icon icon="vuesax:linear:box" className="w-4 h-4" />
+                <Icon icon="mdi:store" className="w-4 h-4 mr-2" />
                 Manage Products
               </button>
             )}
@@ -130,7 +130,7 @@ export default function UserMenu() {
               onClick={() => { navigate('/past-requests'); setMobileOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <Icon icon="vuesax:linear:clock" className="w-4 h-4" />
+              <Icon icon="mdi:history" className="w-4 h-4 mr-2" />
               Past Requests
             </button>
 
@@ -138,7 +138,7 @@ export default function UserMenu() {
               onClick={handleSignOut}
               className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             >
-              <Icon icon="vuesax:linear:logout" className="w-4 h-4" />
+              <Icon icon="mdi:logout" className="w-4 h-4 mr-2" />
               Sign Out
             </button>
 
@@ -147,7 +147,7 @@ export default function UserMenu() {
                 onClick={() => { navigate('/admin-coupons'); setMobileOpen(false); }}
                 className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors mt-2 border-t border-gray-100 dark:border-gray-800"
               >
-                <Icon icon="vuesax:linear:gift" className="w-4 h-4" />
+                <Icon icon="mdi:gift-outline" className="w-4 h-4" />
                 Manage Coupons
               </button>
             )}
@@ -195,7 +195,7 @@ export default function UserMenu() {
             onClick={() => setMobileOpen(false)}
             className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
           >
-            <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
+            <Icon icon="mdi:close-circle" className="w-5 h-5" />
           </button>
         </div>
 

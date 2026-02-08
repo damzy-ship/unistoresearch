@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../hooks/useTheme';
-import { FileUp, FileCheck } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { uploadImageToSupabase } from '../lib/databaseServices';
 
 interface VerifyIDModalProps {
@@ -15,7 +15,7 @@ export default function VerifyIDModal({ onClose, onSave, currentTheme, uniqueId,
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentVerificationId);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentVerificationId || null);
 
   useEffect(() => {
     if (file) {
@@ -52,11 +52,11 @@ export default function VerifyIDModal({ onClose, onSave, currentTheme, uniqueId,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300">
-      <div 
+      <div
         className="rounded-2xl p-8 shadow-lg max-w-lg w-full m-4 transition-all duration-300"
         style={{ backgroundColor: currentTheme.surface, color: currentTheme.text }}
       >
-        <h3 
+        <h3
           className="text-2xl font-bold mb-4"
           style={{ color: currentTheme.primary }}
         >
@@ -73,34 +73,34 @@ export default function VerifyIDModal({ onClose, onSave, currentTheme, uniqueId,
           </div>
         )}
 
-        <div 
+        <div
           className="p-6 rounded-lg border-2 border-dashed flex items-center justify-center text-center cursor-pointer transition-colors duration-200"
           style={{ borderColor: currentTheme.textSecondary + '30' }}
         >
           <label htmlFor="id-upload" className="w-full h-full cursor-pointer flex flex-col items-center justify-center">
             {file ? (
               <div className="flex flex-col items-center">
-                <FileCheck className="w-8 h-8 text-green-500 mb-2" />
+                <Icon icon="mdi:file-check" className="w-8 h-8 text-green-500 mb-2" />
                 <p className="text-green-500 font-medium">{file.name} is ready for upload.</p>
               </div>
             ) : (
               <div className="flex flex-col items-center">
-                <FileUp className="w-8 h-8 text-gray-400 mb-2" />
+                <Icon icon="mdi:file-upload" className="w-8 h-8 text-gray-400 mb-2" />
                 <p className="text-gray-400">Drag & drop your ID here, or click to browse</p>
               </div>
             )}
-            <input 
-              id="id-upload" 
-              type="file" 
-              className="hidden" 
-              onChange={handleFileChange} 
-              accept="image/*,.pdf" 
+            <input
+              id="id-upload"
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+              accept="image/*,.pdf"
             />
           </label>
         </div>
 
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-        
+
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}

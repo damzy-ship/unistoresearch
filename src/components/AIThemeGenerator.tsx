@@ -75,8 +75,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
             style={{
               backgroundColor: currentTheme.background,
               borderColor: currentTheme.textSecondary + '30',
-              color: currentTheme.text,
-              focusRingColor: currentTheme.primary
+              color: currentTheme.text
             }}
             rows={3}
             placeholder="e.g., A vibrant theme inspired by tropical sunsets with warm oranges and deep purples..."
@@ -139,7 +138,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
             </>
           ) : (
             <>
-              <Icon icon="vuesax:linear:magic-star" className="w-4 h-4" />
+              <Icon icon="mdi:creation" className="w-4 h-4" />
               Generate AI Theme
             </>
           )}
@@ -185,7 +184,7 @@ export default function AIThemeGenerator({ onThemeGenerated, currentTheme }: AIT
                   color: generatedTheme.textSecondary
                 }}
               >
-                <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4" />
+                <Icon icon="mdi:refresh" className="w-4 h-4" />
                 Try Again
               </button>
             </div>

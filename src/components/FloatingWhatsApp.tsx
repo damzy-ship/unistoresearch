@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
 
 interface FloatingWhatsAppProps {
@@ -27,7 +27,7 @@ export default function FloatingWhatsApp({ isVisible = true }: FloatingWhatsAppP
         className="fixed bottom-6 right-3 w-10 h-10 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white  rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 z-50 group"
         title="Got a question?"
       >
-        <Icon icon="vuesax:linear:message" className="w-5 h-5" />
+        <Icon icon="mdi:message-outline" className="w-5 h-5" />
 
         {/* Tooltip */}
         <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
@@ -46,7 +46,7 @@ export default function FloatingWhatsApp({ isVisible = true }: FloatingWhatsAppP
                 onClick={() => setShowPrompt(false)}
                 className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
+                <Icon icon="mdi:close" className="w-5 h-5 text-green-500" />
               </button>
             </div>
 

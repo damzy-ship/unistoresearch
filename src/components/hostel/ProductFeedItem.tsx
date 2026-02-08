@@ -172,7 +172,7 @@ export default function ProductFeedItem({
                             className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
                             onClick={() => onDelete(item.id)}
                         >
-                            <Icon icon="vuesax:linear:trash" width={16} />
+                            <Icon icon="mdi:delete" width={16} />
                         </Button>
                     )}
                 </div>
@@ -227,7 +227,7 @@ export default function ProductFeedItem({
                                 }}
                             >
                                 <Button className="w-full" variant="primary">
-                                    <Icon icon="vuesax:linear:message" width={18} className="mr-2" />
+                                    <Icon icon="mdi:message-text" width={18} className="mr-2" />
                                     Message Seller
                                 </Button>
                             </ContactSellerButton>

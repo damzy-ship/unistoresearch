@@ -102,7 +102,7 @@ export default function PublicMerchantsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <div className="relative max-w-lg">
-            <Icon icon="vuesax:linear:search-normal" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Icon icon="mdi:magnify" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search merchants by name, phone number, or ID..."
@@ -146,21 +146,21 @@ export default function PublicMerchantsPage() {
                             className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
                             title="View Products"
                           >
-                            <Icon icon="vuesax:linear:eye" className="w-4 h-4" /> View
+                            <Icon icon="mdi:eye" className="w-4 h-4" /> View
                           </button>
                           <button
                             onClick={() => handleCopyLink(m)}
                             className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-1"
                             title="Copy Link"
                           >
-                            <Icon icon="vuesax:linear:copy" className="w-4 h-4" /> Copy
+                            <Icon icon="mdi:content-copy" className="w-4 h-4" /> Copy
                           </button>
                           <button
                             onClick={() => handleShareOnWhatsApp(m)}
                             className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
                             title="Share on WhatsApp"
                           >
-                            <Icon icon="vuesax:linear:export" className="w-4 h-4" /> Share
+                            <Icon icon="mdi:share-variant" className="w-4 h-4" /> Share
                           </button>
                         </div>
                       </td>
@@ -182,7 +182,7 @@ export default function PublicMerchantsPage() {
       {isModalOpen && selectedMerchant && (
         <MerchantProductModal
           actual_merchant_id={selectedMerchant.id}
-          merchantId={selectedMerchant.user_id}
+          merchantId={selectedMerchant.user_id || ''}
           merchantName={selectedMerchant.full_name || 'Merchant'}
           onClose={handleCloseModal}
         />

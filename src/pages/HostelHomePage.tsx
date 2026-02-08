@@ -533,7 +533,7 @@ export default function HostelHomePage() {
                             }}
                             className="p-1.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                         >
-                            <Icon icon="vuesax:linear:close-circle" width="16" height="16" />
+                            <Icon icon="mdi:close-circle" width="16" height="16" />
                         </button>
                     </div>
                 </div>

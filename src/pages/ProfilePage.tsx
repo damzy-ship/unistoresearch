@@ -173,12 +173,12 @@ export default function ProfilePage() {
   const getVerificationStatus = (status: 'pending' | 'verified' | 'unverified' | null) => {
     switch (status) {
       case 'verified':
-        return { icon: <Icon icon="vuesax:linear:verify" className="w-5 h-5 text-green-500" />, text: 'Verified', color: 'text-green-500' };
+        return { icon: <Icon icon="mdi:check-decagram" className="w-5 h-5 text-green-500" />, text: 'Verified', color: 'text-green-500' };
       case 'pending':
-        return { icon: <Icon icon="vuesax:linear:clock" className="w-5 h-5 text-yellow-500" />, text: 'Pending', color: 'text-yellow-500' };
+        return { icon: <Icon icon="mdi:clock-outline" className="w-5 h-5 text-yellow-500" />, text: 'Pending', color: 'text-yellow-500' };
       case 'unverified':
       default:
-        return { icon: <Icon icon="vuesax:linear:close-circle" className="w-5 h-5 text-red-500" />, text: 'Unverified', color: 'text-red-500' };
+        return { icon: <Icon icon="mdi:close-circle-outline" className="w-5 h-5 text-red-500" />, text: 'Unverified', color: 'text-red-500' };
     }
   };
 
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                   e.currentTarget.style.color = currentTheme.textSecondary;
                 }}
               >
-                <Icon icon="vuesax:linear:arrow-left" className="w-6 h-6" />
+                <Icon icon="mdi:arrow-left" className="w-6 h-6" />
               </button>
               <div>
                 <h1
@@ -289,7 +289,7 @@ export default function ProfilePage() {
                       style={{ backgroundColor: currentTheme.background }}
                     >
                       <Icon
-                        icon="vuesax:linear:sms"
+                        icon="mdi:email-outline"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -323,7 +323,7 @@ export default function ProfilePage() {
                         style={{ backgroundColor: currentTheme.background }}
                       >
                         <Icon
-                          icon="vuesax:linear:shop"
+                          icon="mdi:store"
                           className="w-5 h-5"
                           style={{ color: currentTheme.primary }}
                         />
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                               style={{ color: currentTheme.primary, backgroundColor: currentTheme.primary + '10' }}
                               title="Change ID"
                             >
-                              <Icon icon="vuesax:linear:edit" className="w-5 h-5" />
+                              <Icon icon="mdi:pencil" className="w-5 h-5" />
                             </button>
                           </div>
                         )}
@@ -403,7 +403,7 @@ export default function ProfilePage() {
                       style={{ backgroundColor: currentTheme.background }}
                     >
                       <Icon
-                        icon="vuesax:linear:user"
+                        icon="mdi:account-outline"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -423,7 +423,7 @@ export default function ProfilePage() {
                       style={{ backgroundColor: currentTheme.background }}
                     >
                       <Icon
-                        icon="vuesax:linear:call"
+                        icon="mdi:phone-outline"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -445,7 +445,7 @@ export default function ProfilePage() {
                       style={{ backgroundColor: currentTheme.background }}
                     >
                       <Icon
-                        icon="vuesax:linear:calendar"
+                        icon="mdi:calendar"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -467,7 +467,7 @@ export default function ProfilePage() {
                       style={{ backgroundColor: currentTheme.background }}
                     >
                       <Icon
-                        icon="vuesax:linear:magic-star"
+                        icon="mdi:creation"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -499,7 +499,7 @@ export default function ProfilePage() {
             >
               <div className="flex items-center gap-3 mb-8">
                 <Icon
-                  icon="vuesax:linear:brush-2"
+                  icon="mdi:brush"
                   className="w-6 h-6"
                   style={{ color: currentTheme.primary }}
                 />
@@ -514,9 +514,9 @@ export default function ProfilePage() {
               {/* Tab Navigation */}
               <div className="flex flex-wrap gap-2 mb-8">
                 {[
-                  { id: 'themes', label: 'Preset Themes', icon: 'vuesax:linear:brush-2' },
-                  { id: 'textures', label: 'Background Textures', icon: 'vuesax:linear:magic-star' },
-                  { id: 'ai', label: 'AI Generated', icon: 'vuesax:linear:magic-pen' }
+                  { id: 'themes', label: 'Preset Themes', icon: 'mdi:brush' },
+                  { id: 'textures', label: 'Background Textures', icon: 'mdi:creation' },
+                  { id: 'ai', label: 'AI Generated', icon: 'mdi:magic-staff' }
                 ].map(({ id, label, icon: MenuIcon }) => (
                   <button
                     key={id}
@@ -530,7 +530,7 @@ export default function ProfilePage() {
                       color: currentTheme.text
                     } : {}}
                   >
-                    <Icon icon={typeof MenuIcon === 'string' ? MenuIcon : 'vuesax:linear:element-3'} className="w-4 h-4" />
+                    <Icon icon={typeof MenuIcon === 'string' ? MenuIcon : 'mdi:view-grid'} className="w-4 h-4" />
                     {label}
                   </button>
                 ))}

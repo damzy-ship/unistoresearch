@@ -498,7 +498,7 @@ export default function AllProductsPage() {
                                             className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
                                             title="Remove image"
                                         >
-                                            <Icon icon="vuesax:linear:close-circle" className="w-3 h-3" />
+                                            <Icon icon="mdi:close-circle" className="w-3 h-3" />
                                         </button>
                                     </div>
                                 ))}
@@ -524,7 +524,7 @@ export default function AllProductsPage() {
                                 className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-md shadow-md transition-all duration-200 font-medium`}
                                 disabled={loading || uploadingImages}
                             >
-                                {(loading || uploadingImages) && <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4 animate-spin" />}
+                                {(loading || uploadingImages) && <Icon icon="mdi:refresh" className="w-4 h-4 animate-spin" />}
                                 Save Changes
                             </button>
                         </div>
@@ -536,7 +536,7 @@ export default function AllProductsPage() {
                         <h3 className="text-lg font-semibold text-gray-800">Products ({allProducts.length})</h3>
                         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                             <div className="relative">
-                                <Icon icon="vuesax:linear:search-normal" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <Icon icon="mdi:magnify" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
                                     type="text"
                                     placeholder="Search products..."
@@ -616,7 +616,7 @@ export default function AllProductsPage() {
                                         {product.image_urls && product.image_urls.length > 0 ? (
                                             <img src={product.image_urls[0]} alt={product.product_description} className="w-full h-full object-cover" />
                                         ) : (
-                                            <Icon icon="vuesax:linear:gallery" className="w-16 h-16 text-gray-400" />
+                                            <Icon icon="mdi:image-outline" className="w-16 h-16 text-gray-400" />
                                         )}
                                     </div>
                                     <div className="w-full">
@@ -649,16 +649,16 @@ export default function AllProductsPage() {
                                         </p>
                                         <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
                                             {product.is_available ? (
-                                                <><Icon icon="vuesax:linear:tick-circle" className="w-4 h-4 text-green-500" /> Available</>
+                                                <><Icon icon="mdi:check-circle" className="w-4 h-4 text-green-500" /> Available</>
                                             ) : (
-                                                <><Icon icon="vuesax:linear:danger" className="w-4 h-4 text-red-500" /> Not Available</>
+                                                <><Icon icon="mdi:close-circle" className="w-4 h-4 text-red-500" /> Not Available</>
                                             )}
                                         </p>
                                         <p className="text-sm text-gray-600 flex items-center justify-center gap-1 mt-1">
                                             {product.is_featured ? (
-                                                <><Icon icon="vuesax:linear:tick-circle" className="w-4 h-4 text-green-500" /> Featured</>
+                                                <><Icon icon="mdi:check-circle" className="w-4 h-4 text-green-500" /> Featured</>
                                             ) : (
-                                                <><Icon icon="vuesax:linear:danger" className="w-4 h-4 text-red-500" /> Not Featured</>
+                                                <><Icon icon="mdi:close-circle" className="w-4 h-4 text-red-500" /> Not Featured</>
                                             )}
                                         </p>
                                         <div className="flex flex-col gap-2 mt-4 w-full">
@@ -692,7 +692,7 @@ export default function AllProductsPage() {
                                                     }`}
                                                 disabled={embeddingLoadingId === product.id}
                                             >
-                                                {embeddingLoadingId === product.id && <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4 animate-spin" />}
+                                                {embeddingLoadingId === product.id && <Icon icon="mdi:refresh" className="w-4 h-4 animate-spin" />}
                                                 Update Embedding
                                             </button>
                                         </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, Search, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Icon } from '@iconify/react';
 import { School } from '../lib/supabase';
 import { getActiveSchools } from '../lib/schoolService';
 import { useTheme } from '../hooks/useTheme';
@@ -23,7 +23,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
         setError(null);
         const activeSchools = await getActiveSchools();
         setSchools(activeSchools);
-        
+
         // If no university is selected and we have schools, select the first one
         if (!selectedUniversity && activeSchools.length > 0) {
           onUniversityChange(activeSchools[0].id);
@@ -59,7 +59,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
         <div className="flex items-center gap-2 text-red-700">
-          <MapPin className="w-4 h-4" />
+          <Icon icon="mdi:map-marker" className="w-4 h-4" />
           <span className="font-medium">Connection Error</span>
         </div>
         <p className="text-sm text-red-600 mt-1">{error}</p>
@@ -85,11 +85,10 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
           <button
             key={school.id}
             type="button"
-            className={`flex-1 py-2 px-6 rounded-xl font-semibold text-sm uppercase tracking-wide transition-all duration-200 ${
-              selectedUniversity === school.id
-                ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white shadow-lg transform hover:scale-105`
-                : "border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
-            }`}
+            className={`flex-1 py-2 px-6 rounded-xl font-semibold text-sm uppercase tracking-wide transition-all duration-200 ${selectedUniversity === school.id
+              ? `bg-gradient-to-r ${currentTheme.buttonGradient} text-white shadow-lg transform hover:scale-105`
+              : "border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+              }`}
             onClick={() => onUniversityChange(school.id)}
           >
             {school.short_name}
@@ -109,12 +108,12 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
         disabled={loading}
       >
         <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-gray-500" />
+          <Icon icon="mdi:map-marker" className="w-4 h-4 text-gray-500" />
           <span className="text-gray-900 font-medium">
             {loading ? 'Loading...' : selectedSchool ? selectedSchool.short_name : 'Select University'}
           </span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <Icon icon="mdi:chevron-down" className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -122,7 +121,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
           {/* Search */}
           <div className="p-3 border-b border-gray-100">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Icon icon="mdi:magnify" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 value={searchTerm}
@@ -142,9 +141,8 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
                   key={school.id}
                   type="button"
                   onClick={() => handleSelectSchool(school)}
-                  className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0 ${
-                    selectedUniversity === school.id ? 'bg-orange-50 text-orange-700' : 'text-gray-900'
-                  }`}
+                  className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0 ${selectedUniversity === school.id ? 'bg-orange-50 text-orange-700' : 'text-gray-900'
+                    }`}
                 >
                   <div className="font-medium">{school.name}</div>
                   <div className="text-sm text-gray-500">{school.short_name}</div>
@@ -152,7 +150,7 @@ export default function UniversitySelector({ selectedUniversity, onUniversityCha
               ))
             ) : (
               <div className="px-4 py-6 text-center text-gray-500">
-                <MapPin className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                <Icon icon="mdi:map-marker" className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                 <p className="text-sm">No universities found</p>
               </div>
             )}

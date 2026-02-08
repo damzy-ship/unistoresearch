@@ -106,7 +106,7 @@ export default function ReviewForm() {
                 background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`
               }}
             >
-              <Icon icon="vuesax:bold:star" className="w-8 h-8 text-white" />
+              <Icon icon="mdi:star" className="w-8 h-8 text-white" />
             </div>
           </div>
           <h3
@@ -174,10 +174,10 @@ export default function ReviewForm() {
                   disabled={submitting}
                 >
                   <Icon
-                    icon="vuesax:bold:star"
+                    icon="mdi:star"
                     className={`w-10 h-10 transition-all duration-200 ${star <= (hoveredRating || rating)
-                        ? 'text-yellow-400 drop-shadow-lg'
-                        : 'text-gray-300 hover:text-yellow-200'
+                      ? 'text-yellow-400 drop-shadow-lg'
+                      : 'text-gray-300 hover:text-yellow-200'
                       }`}
                     style={{
                       filter: star <= (hoveredRating || rating)
@@ -229,7 +229,7 @@ export default function ReviewForm() {
                   </>
                 ) : (
                   <>
-                    <Icon icon="vuesax:linear:send-2" className="w-6 h-6 animate-bounce" />
+                    <Icon icon="mdi:send" className="w-6 h-6 animate-bounce" />
                     <span>Submit Review</span>
                     <div className="ml-2 animate-ping w-2 h-2 bg-white rounded-full" />
                   </>

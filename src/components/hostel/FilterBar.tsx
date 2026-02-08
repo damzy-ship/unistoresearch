@@ -41,7 +41,7 @@ export default function FilterBar({
                             className="hover:bg-white/20 rounded-full p-1 transition-colors"
                             aria-label="Clear search"
                         >
-                            <Icon icon="vuesax:linear:close-circle" className="w-4 h-4" />
+                            <Icon icon="mdi:close-circle" className="w-4 h-4" />
                         </button>
                     </div>
                 </div>

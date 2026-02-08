@@ -7,22 +7,22 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: 'vuesax:linear:search-normal',
+      icon: 'mdi:magnify',
       title: 'AI-Powered Search',
       description: 'Find exactly what you need with our intelligent product matching system'
     },
     {
-      icon: 'vuesax:linear:profile-2user',
+      icon: 'mdi:account-group',
       title: 'University Network',
       description: 'Connect with verified sellers from your university community'
     },
     {
-      icon: 'vuesax:linear:star',
+      icon: 'mdi:star-outline',
       title: 'Trusted Reviews',
       description: 'Make informed decisions with authentic ratings and reviews'
     },
     {
-      icon: 'vuesax:linear:message',
+      icon: 'mdi:message-outline',
       title: 'Direct Communication',
       description: 'Chat directly with sellers via WhatsApp for instant responses'
     }
@@ -111,7 +111,7 @@ export default function LandingPage() {
                     </div>
                     <div className="ml-auto">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <Icon icon="vuesax:linear:tick-circle" className="w-3 h-3 mr-1" />
+                        <Icon icon="mdi:check-circle" className="w-3 h-3 mr-1" />
                         Active
                       </span>
                     </div>
@@ -124,7 +124,7 @@ export default function LandingPage() {
                   <div className="flex items-center gap-2">
                     <div className="flex text-yellow-400">
                       {[...Array(5)].map((_, i) => (
-                        <Icon key={i} icon="vuesax:linear:star" className="w-4 h-4 text-yellow-400" />
+                        <Icon key={i} icon="mdi:star" className="w-4 h-4 text-yellow-400" />
                       ))}
                     </div>
                     <span className="text-sm text-gray-600">(24 reviews)</span>
@@ -247,7 +247,7 @@ export default function LandingPage() {
               className="bg-white text-orange-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               Start Shopping
-              <Icon icon="vuesax:linear:arrow-right" className="w-5 h-5" />
+              <Icon icon="mdi:arrow-right" className="w-5 h-5" />
             </button>
             <button
               onClick={() => navigate('/sellers')}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { useTheme } from '../hooks/useTheme';
 
@@ -43,8 +43,8 @@ export default function MerchantSelector({
     }, []);
 
     const filteredMerchants = merchants.filter(merchant =>
-        merchant.full_name.toLowerCase().includes(search.toLowerCase()) ||
-        merchant.auth_user_id.toLowerCase().includes(search.toLowerCase())
+        (merchant.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (merchant.auth_user_id || '').toLowerCase().includes(search.toLowerCase())
     );
 
     const handleSelectMerchant = (merchant: Merchant) => {
@@ -69,12 +69,12 @@ export default function MerchantSelector({
                 }}
             >
                 <div className="flex items-center gap-2" style={{ color: currentTheme.text }}>
-                    <Icon icon="vuesax:linear:shop" className="w-4 h-4 text-gray-500" />
+                    <Icon icon="mdi:store" className="w-4 h-4 text-gray-500" />
                     <span className="font-medium">
                         {loading ? 'Loading...' : selectedMerchant ? selectedMerchant.full_name : 'Select Merchant'}
                     </span>
                 </div>
-                <Icon icon="vuesax:linear:arrow-down" className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                <Icon icon="mdi:chevron-down" className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isDropdownOpen && (
@@ -85,7 +85,7 @@ export default function MerchantSelector({
                     {/* Search */}
                     <div className="p-3 border-b" style={{ borderColor: currentTheme.primary + '10' }}>
                         <div className="relative">
-                            <Icon icon="vuesax:linear:search-normal" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: currentTheme.textSecondary }} />
+                            <Icon icon="mdi:magnify" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: currentTheme.textSecondary }} />
                             <input
                                 type="text"
                                 value={search}
@@ -110,7 +110,7 @@ export default function MerchantSelector({
                             </div>
                         ) : filteredMerchants.length === 0 ? (
                             <div className="px-4 py-6 text-center" style={{ color: currentTheme.textSecondary }}>
-                                <Icon icon="vuesax:linear:shop" className="w-8 h-8 mx-auto mb-2" style={{ color: currentTheme.textSecondary + '40' }} />
+                                <Icon icon="mdi:store" className="w-8 h-8 mx-auto mb-2" style={{ color: currentTheme.textSecondary + '40' }} />
                                 <p className="text-sm">No merchants found</p>
                             </div>
                         ) : (
@@ -131,7 +131,7 @@ export default function MerchantSelector({
                                             <div className="font-medium" style={{ color: selectedMerchant?.auth_user_id === m.auth_user_id ? 'inherit' : currentTheme.text }}>{m.full_name}</div>
                                             <div className="text-xs" style={{ color: selectedMerchant?.auth_user_id === m.auth_user_id ? 'inherit' : currentTheme.textSecondary }}>{m.phone_number || 'No phone'}</div>
                                         </div>
-                                        <div className="text-xs" style={{ color: selectedMerchant?.auth_user_id === m.auth_user_id ? 'inherit' : currentTheme.textSecondary }}>{m.auth_user_id.slice(0, 6)}</div>
+                                        <div className="text-xs" style={{ color: selectedMerchant?.auth_user_id === m.auth_user_id ? 'inherit' : currentTheme.textSecondary }}>{m.auth_user_id?.slice(0, 6)}</div>
                                     </div>
                                 </button>
                             ))

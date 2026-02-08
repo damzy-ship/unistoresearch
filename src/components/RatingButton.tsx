@@ -67,7 +67,7 @@ export default function RatingButton({
             onClick={() => setShowRatingModal(true)}
             className="flex items-center gap-2 px-3 py-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-lg font-medium transition-colors"
           >
-            <Icon icon="vuesax:linear:star" className="w-4 h-4" />
+            <Icon icon="mdi:star-outline" className="w-4 h-4" />
             <span className="text-sm">
               {userRating ? 'Update Rating' : 'Rate Seller'}
             </span>
@@ -76,7 +76,7 @@ export default function RatingButton({
 
         {userRating && !canRate && (
           <div className="flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg">
-            <Icon icon="vuesax:bold:star" className="w-4 h-4 text-green-700" />
+            <Icon icon="mdi:star" className="w-4 h-4 text-green-700" />
             <span className="text-sm">Rated {userRating.rating}★</span>
           </div>
         )}

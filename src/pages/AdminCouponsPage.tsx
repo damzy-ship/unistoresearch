@@ -175,7 +175,7 @@ export default function AdminCouponsPage() {
                             onClick={() => { resetForm(); setShowModal(true); }}
                             className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-700"
                         >
-                            <Icon icon="vuesax:linear:add" width="20" height="20" /> New Coupon
+                            <Icon icon="mdi:plus" width="20" height="20" /> New Coupon
                         </button>
                     </div>
                 </div>
@@ -218,10 +218,10 @@ export default function AdminCouponsPage() {
                                             </td>
                                             <td className="p-4 text-right space-x-2">
                                                 <button onClick={() => openEdit(coupon)} className="text-blue-600 hover:bg-blue-50 p-2 rounded">
-                                                    <Icon icon="vuesax:linear:edit" width="16" height="16" />
+                                                    <Icon icon="mdi:pencil" width="16" height="16" />
                                                 </button>
                                                 <button onClick={() => handleDelete(coupon.id)} className="text-red-600 hover:bg-red-50 p-2 rounded">
-                                                    <Icon icon="vuesax:linear:trash" width="16" height="16" />
+                                                    <Icon icon="mdi:delete" width="16" height="16" />
                                                 </button>
                                             </td>
                                         </tr>
@@ -240,7 +240,7 @@ export default function AdminCouponsPage() {
                         <div className="p-4 border-b flex justify-between items-center">
                             <h3 className="font-bold text-lg">Select Product</h3>
                             <button onClick={() => setShowProductSelector(false)} className="p-1 hover:bg-gray-100 rounded-full">
-                                <Icon icon="vuesax:linear:close-circle" width="20" height="20" className="text-gray-500" />
+                                <Icon icon="mdi:close-circle" width="20" height="20" className="text-gray-500" />
                             </button>
                         </div>
 
@@ -283,13 +283,13 @@ export default function AdminCouponsPage() {
                                                         />
                                                     ) : (
                                                         <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                                            <Icon icon="vuesax:linear:gallery" width="24" height="24" />
+                                                            <Icon icon="mdi:image-outline" width="24" height="24" />
                                                         </div>
                                                     )}
                                                     {formData.product_id === product.id && (
                                                         <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
                                                             <div className="bg-white rounded-full p-1 shadow-sm">
-                                                                <Icon icon="vuesax:linear:tick-circle" width="16" height="16" className="text-emerald-600" />
+                                                                <Icon icon="mdi:check-circle" width="16" height="16" className="text-emerald-600" />
                                                             </div>
                                                         </div>
                                                     )}
@@ -326,7 +326,7 @@ export default function AdminCouponsPage() {
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold">{editingCoupon ? 'Edit Coupon' : 'New Coupon'}</h2>
                             <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
-                                <Icon icon="vuesax:linear:close-circle" width="24" height="24" />
+                                <Icon icon="mdi:close-circle" width="24" height="24" />
                             </button>
                         </div>
 
@@ -403,7 +403,7 @@ export default function AdminCouponsPage() {
                                                     fetchProducts(formData.school_id);
                                                 }}
                                             />
-                                            <Icon icon="vuesax:linear:gift" className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                                            <Icon icon="mdi:gift-outline" className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
                                         </div>
                                         <button
                                             type="button"
@@ -415,7 +415,7 @@ export default function AdminCouponsPage() {
                                             className="bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             disabled={!formData.school_id}
                                         >
-                                            <Icon icon="vuesax:linear:search-normal" width="18" height="18" />
+                                            <Icon icon="mdi:magnify" width="18" height="18" />
                                         </button>
                                     </div>
                                     {formData.product_id && (

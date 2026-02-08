@@ -8,7 +8,7 @@ import 'swiper/css/navigation';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 // import { useHostelMode } from '../hooks/useHostelMode';
-import { Loader } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import ContactSellerButton from './ContactSellerButton';
 import ContactSellerLink from './ContactSellerLink';
 import ProductImageModal from './ProductImageModal';
@@ -104,7 +104,7 @@ const HorizontalProductList: React.FC<HorizontalProductListProps> = ({ categoryI
         return (
 
             <div className="flex justify-center items-center h-44 bg-gray-50 w-full">
-                <Loader />
+                <Icon icon="mdi:loading" className="w-8 h-8 animate-spin text-gray-400" />
                 {/* <div className="text-xl font-semibold text-gray-700">Loading products...</div> */}
             </div>
         );

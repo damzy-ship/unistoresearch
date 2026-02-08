@@ -43,7 +43,7 @@ export default function PhoneInput({
   return (
     <div>
       <div className="relative">
-        <Icon icon="vuesax:linear:call" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Icon icon="mdi:phone" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
           type="tel"
           value={value}

@@ -54,12 +54,12 @@ export default function RatingPrompt() {
       <div className="fixed bottom-4 right-4 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 max-w-sm z-40">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
-            <Icon icon="vuesax:bold:star" className="w-5 h-5 text-white" />
+            <Icon icon="mdi:star" className="w-5 h-5 text-white" />
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Icon icon="vuesax:linear:clock" className="w-4 h-4 text-gray-400" />
+              <Icon icon="mdi:clock-outline" className="w-4 h-4 text-gray-400" />
               <span className="text-xs text-gray-500">Rate your experience</span>
             </div>
 
@@ -93,7 +93,7 @@ export default function RatingPrompt() {
             onClick={() => handleDismiss(contactToShow.id)}
             className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
           >
-            <Icon icon="vuesax:linear:close-circle" className="w-4 h-4" />
+            <Icon icon="mdi:close" className="w-4 h-4" />
           </button>
         </div>
       </div>

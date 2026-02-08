@@ -125,14 +125,14 @@ export default function RequestCard({ item, onClick, currentVisitor, onContact, 
                                 className="p-1.5 rounded-full bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors"
                                 title="Mark as Fulfilled"
                             >
-                                <Icon icon="vuesax:linear:tick-circle" width={14} />
+                                <Icon icon="mdi:check-circle" width={14} />
                             </button>
                             <button
                                 onClick={(e) => handleAdminAction(e, 'delete')}
                                 className="p-1.5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-colors"
                                 title="Delete Request"
                             >
-                                <Icon icon="vuesax:linear:trash" width={14} />
+                                <Icon icon="mdi:delete" width={14} />
                             </button>
                         </div>
                     )}
@@ -176,7 +176,7 @@ export default function RequestCard({ item, onClick, currentVisitor, onContact, 
                                 onClick={(e) => handleAdminAction(e, 'delete')}
                                 className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
                             >
-                                <Icon icon="vuesax:linear:trash" width={12} /> Delete
+                                <Icon icon="mdi:delete" width={12} /> Delete
                             </button>
                         )}
                     </div>

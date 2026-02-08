@@ -136,7 +136,7 @@ export default function SellerCardPage() {
         onClick={() => navigate(-1)}
         className="fixed top-6 left-6 z-10 flex items-center gap-2 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 px-4 py-2 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
       >
-        <Icon icon="vuesax:linear:arrow-left" className="w-4 h-4" />
+        <Icon icon="mdi:arrow-left" className="w-4 h-4" />
         Back
       </button>
 
@@ -159,7 +159,7 @@ export default function SellerCardPage() {
               {/* Top Badges */}
               <div className="relative z-10 flex justify-between items-start mb-4">
                 <div className="flex items-center gap-1 bg-orange-100 px-2 py-1 rounded-full">
-                  <Icon icon="vuesax:linear:location" className="w-3 h-3 text-orange-600" />
+                  <Icon icon="mdi:map-marker" className="w-3 h-3 text-orange-600" />
                   <span className="text-xs font-bold text-orange-700">
                     {seller.school_name.replace(' University', '')}
                   </span>
@@ -169,19 +169,19 @@ export default function SellerCardPage() {
                   {/* Status Badge */}
                   {isSellerActive(seller) ? (
                     <div className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-full">
-                      <Icon icon="vuesax:linear:tick-circle" className="w-3 h-3 text-green-600" />
+                      <Icon icon="mdi:check-circle" className="w-3 h-3 text-green-600" />
                       <span className="text-xs font-bold text-green-700">ACTIVE</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 bg-red-100 px-2 py-1 rounded-full">
-                      <Icon icon="vuesax:linear:danger" className="w-3 h-3 text-red-600" />
+                      <Icon icon="mdi:alert-circle" className="w-3 h-3 text-red-600" />
                       <span className="text-xs font-bold text-red-700">INACTIVE</span>
                     </div>
                   )}
 
                   {isTopRated(seller) && (
                     <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-yellow-500 px-2 py-1 rounded-full shadow-lg animate-pulse">
-                      <Icon icon="vuesax:linear:award" className="w-3 h-3 text-white" />
+                      <Icon icon="mdi:medal" className="w-3 h-3 text-white" />
                       <span className="text-xs font-bold text-white">TOP</span>
                     </div>
                   )}
@@ -221,7 +221,7 @@ export default function SellerCardPage() {
 
                 {/* Member Since */}
                 <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
-                  <Icon icon="vuesax:linear:calendar" className="w-4 h-4" />
+                  <Icon icon="mdi:calendar" className="w-4 h-4" />
                   <span>Member since {formatDate(seller.created_at)}</span>
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function SellerCardPage() {
                   onClick={() => navigate(`/seller/${seller.seller_id}`)}
                   className="w-full bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 hover:from-orange-600 hover:via-orange-700 hover:to-orange-800 text-white py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                 >
-                  <Icon icon="vuesax:linear:eye" className="w-4 h-4" />
+                  <Icon icon="mdi:eye" className="w-4 h-4" />
                   VIEW FULL PROFILE
                 </button>
               </div>

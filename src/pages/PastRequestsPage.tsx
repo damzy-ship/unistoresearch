@@ -95,7 +95,7 @@ export default function PastRequestsPage() {
                 onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
                 onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
               >
-                <Icon icon="vuesax:linear:arrow-left" className="w-6 h-6" />
+                <Icon icon="mdi:arrow-left" className="w-6 h-6" />
               </button>
               <div>
                 <h1
@@ -139,7 +139,7 @@ export default function PastRequestsPage() {
         <div className="mb-6">
           <div className="relative">
             <Icon
-              icon="vuesax:linear:search-normal"
+              icon="mdi:magnify"
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: currentTheme.textSecondary }}
             />
@@ -161,7 +161,7 @@ export default function PastRequestsPage() {
         {filteredRequests.length === 0 ? (
           <div className="relative text-center py-12 z-10">
             <Icon
-              icon="vuesax:linear:message"
+              icon="mdi:message-text"
               className="w-12 h-12 mx-auto mb-4"
               style={{ color: currentTheme.textSecondary }}
             />
@@ -202,7 +202,7 @@ export default function PastRequestsPage() {
                     {/* Request Header */}
                     <div className="flex items-center gap-3 mb-3">
                       <Icon
-                        icon="vuesax:linear:message"
+                        icon="mdi:message-text"
                         className="w-5 h-5"
                         style={{ color: currentTheme.primary }}
                       />
@@ -210,14 +210,14 @@ export default function PastRequestsPage() {
                         ? 'bg-orange-100 text-orange-800'
                         : 'bg-blue-100 text-blue-800'
                         }`}>
-                        <Icon icon="vuesax:linear:location" className="w-3 h-3 mr-1" />
+                        <Icon icon="mdi:map-marker" className="w-3 h-3 mr-1" />
                         {request.university} University
                       </span>
                       <div
                         className="flex items-center gap-1 text-sm"
                         style={{ color: currentTheme.textSecondary }}
                       >
-                        <Icon icon="vuesax:linear:calendar" className="w-4 h-4" />
+                        <Icon icon="mdi:calendar" className="w-4 h-4" />
                         {formatDate(request.created_at)}
                       </div>
                     </div>
@@ -234,7 +234,7 @@ export default function PastRequestsPage() {
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Icon
-                          icon="vuesax:linear:shop"
+                          icon="mdi:store"
                           className="w-4 h-4"
                           style={{ color: currentTheme.textSecondary }}
                         />
@@ -260,7 +260,7 @@ export default function PastRequestsPage() {
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = currentTheme.primary + '20'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentTheme.primary + '10'}
                     >
-                      <Icon icon="vuesax:linear:eye" className="w-4 h-4" />
+                      <Icon icon="mdi:eye" className="w-4 h-4" />
                       View Details
                     </button>
                   </div>

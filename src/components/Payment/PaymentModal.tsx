@@ -1,4 +1,4 @@
-import { X, Copy, Check } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -32,7 +32,7 @@ export default function PaymentModal({ isOpen, onClose, userId }: PaymentModalPr
         <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: currentTheme.primary + '20' }}>
           <h3 className="text-lg font-bold" style={{ color: currentTheme.text }}>Your Payment Link</h3>
           <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-100" style={{ color: currentTheme.textSecondary }}>
-            <X className="w-5 h-5" />
+            <Icon icon="mdi:close" className="w-5 h-5" />
           </button>
         </div>
 
@@ -52,9 +52,9 @@ export default function PaymentModal({ isOpen, onClose, userId }: PaymentModalPr
               style={{ color: currentTheme.textSecondary }}
             >
               {copied ? (
-                <Check className="w-5 h-5 text-green-500" />
+                <Icon icon="mdi:check" className="w-5 h-5 text-green-500" />
               ) : (
-                <Copy className="w-5 h-5" />
+                <Icon icon="mdi:content-copy" className="w-5 h-5" />
               )}
             </button>
           </div>

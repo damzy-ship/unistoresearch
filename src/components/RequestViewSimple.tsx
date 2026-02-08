@@ -177,7 +177,7 @@ export default function RequestViewSimple({
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
+              <Icon icon="mdi:close" className="w-5 h-5" />
             </button>
           </div>
 
@@ -186,7 +186,7 @@ export default function RequestViewSimple({
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                  <Icon icon="vuesax:linear:message" className="w-5 h-5 text-white" />
+                  <Icon icon="mdi:message-text" className="w-5 h-5 text-white" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-800">
                   Your Request
@@ -196,15 +196,15 @@ export default function RequestViewSimple({
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <Icon icon="vuesax:linear:location" className="w-4 h-4 text-blue-500" />
+                    <Icon icon="mdi:map-marker" className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-medium text-gray-600">
                       University
                     </span>
                   </div>
                   <span
                     className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${request.university === 'Bingham'
-                        ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                        : 'bg-blue-100 text-blue-800 border border-blue-200'
+                      ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                      : 'bg-blue-100 text-blue-800 border border-blue-200'
                       }`}
                   >
                     {request.university} University
@@ -213,7 +213,7 @@ export default function RequestViewSimple({
 
                 <div className="bg-white rounded-xl p-4 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
-                    <Icon icon="vuesax:linear:message" className="w-4 h-4 text-blue-500" />
+                    <Icon icon="mdi:message-text" className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-medium text-gray-600">
                       Request Details
                     </span>
@@ -229,7 +229,7 @@ export default function RequestViewSimple({
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                  <Icon icon="vuesax:linear:shop" className="w-4 h-4 text-white" />
+                  <Icon icon="mdi:store" className="w-4 h-4 text-white" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-800">
                   Matched Sellers ({request.matched_seller_ids?.length || 0})
@@ -245,7 +245,7 @@ export default function RequestViewSimple({
                 </div>
               ) : matchedSellers.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-xl">
-                  <Icon icon="vuesax:linear:shop" className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <Icon icon="mdi:store" className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                   <p className="text-gray-600 font-medium">
                     No sellers were matched to this request
                   </p>

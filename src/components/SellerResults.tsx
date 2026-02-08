@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Store, ExternalLink, Award } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { MerchantWithCategories } from '../lib/gemini';
 import { isAuthenticated } from '../hooks/useTracking';
 import AuthModal from './AuthModal';
@@ -102,7 +102,7 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
       <div className="w-full max-w-2xl mt-8">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
           <div className="text-center py-8">
-            <Store className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <Icon icon="mdi:store" className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No sellers found</h3>
             <p className="text-gray-600 mb-4">
               We couldn't find any sellers matching your request at the moment.
@@ -129,7 +129,7 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
                 onClick={() => window.open("https://unistore.ng", "_blank")}
                 className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
               >
-                <ExternalLink className="w-4 h-4" />
+                <Icon icon="mdi:open-in-new" className="w-4 h-4" />
                 Browse all university vendors
               </button>
             </div>
@@ -169,7 +169,7 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
                           <h4 className="font-semibold text-gray-900 text-lg">{seller.full_name}</h4>
                           {isTopRated(seller) && (
                             <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                              <Award className="w-3 h-3" />
+                              <Icon icon="mdi:medal" className="w-3 h-3" />
                               Top Rated
                             </div>
                           )}
@@ -220,7 +220,7 @@ export default function SellerResults({ sellers, isLoading, requestText, univers
               onClick={() => window.open("https://unistore.ng", "_blank")}
               className="inline-flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium"
             >
-              <ExternalLink className="w-4 h-4" />
+              <Icon icon="mdi:open-in-new" className="w-4 h-4" />
               View more products from university vendors
             </button>
           </div>

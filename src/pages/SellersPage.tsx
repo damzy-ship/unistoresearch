@@ -216,7 +216,7 @@ export default function SellersPage() {
         <div className="mb-8 space-y-4">
           {/* Search Bar */}
           <div className="relative">
-            <Icon icon="vuesax:linear:search-normal" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Icon icon="mdi:magnify" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search sellers by name, categories, or description..."
@@ -235,7 +235,7 @@ export default function SellersPage() {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
-              <Icon icon="vuesax:linear:filter" className="w-4 h-4" />
+              <Icon icon="mdi:filter-variant" className="w-4 h-4" />
               Filters
               {activeFiltersCount > 0 && (
                 <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">
@@ -249,7 +249,7 @@ export default function SellersPage() {
                 onClick={clearFilters}
                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
               >
-                <Icon icon="vuesax:linear:close-circle" className="w-4 h-4" />
+                <Icon icon="mdi:close-circle" className="w-4 h-4" />
                 Clear Filters
               </button>
             )}
@@ -265,7 +265,7 @@ export default function SellersPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Icon icon="vuesax:linear:location" className="w-4 h-4 inline mr-1" />
+                    <Icon icon="mdi:map-marker" className="w-4 h-4 inline mr-1" />
                     University
                   </label>
                   <select
@@ -290,7 +290,7 @@ export default function SellersPage() {
         {filteredSellers.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <Icon icon="vuesax:linear:search-normal" className="w-8 h-8 text-gray-400" />
+              <Icon icon="mdi:store-search" className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No sellers found</h3>
             <p className="text-gray-600">
@@ -318,7 +318,7 @@ export default function SellersPage() {
 
                   <h3 className="font-bold text-gray-900 text-lg mb-1">{seller.full_name}</h3>
                   <div className="flex items-center justify-center gap-1 text-sm text-gray-600 mb-2">
-                    <Icon icon="vuesax:linear:location" className="w-3 h-3" />
+                    <Icon icon="mdi:map-marker" className="w-3 h-3" />
                     {seller.school_name}
                   </div>
 
@@ -326,12 +326,12 @@ export default function SellersPage() {
                   <div className="mb-2">
                     {isSellerActive(seller) ? (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <Icon icon="vuesax:linear:tick-circle" className="w-3 h-3 mr-1" />
+                        <Icon icon="mdi:check-circle" className="w-3 h-3 mr-1" />
                         Active
                       </span>
                     ) : (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        <Icon icon="vuesax:linear:danger" className="w-3 h-3 mr-1" />
+                        <Icon icon="mdi:alert-circle" className="w-3 h-3 mr-1" />
                         Inactive
                       </span>
                     )}
@@ -351,7 +351,7 @@ export default function SellersPage() {
                 {seller.categories.length > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center gap-1 mb-2">
-                      <Icon icon="vuesax:linear:tag" className="w-3 h-3 text-gray-500" />
+                      <Icon icon="mdi:tag-outline" className="w-3 h-3 text-gray-500" />
                       <span className="text-xs font-medium text-gray-600">Categories</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
@@ -374,7 +374,7 @@ export default function SellersPage() {
 
                 {/* Registration Date */}
                 <div className="flex items-center gap-1 text-xs text-gray-500 mb-4">
-                  <Icon icon="vuesax:linear:calendar" className="w-3 h-3" />
+                  <Icon icon="mdi:calendar" className="w-3 h-3" />
                   Joined {formatDate(seller.created_at)}
                 </div>
 
@@ -384,14 +384,14 @@ export default function SellersPage() {
                     onClick={() => handleShareProfile(seller)}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                   >
-                    <Icon icon="vuesax:linear:export" className="w-4 h-4" />
+                    <Icon icon="mdi:share-variant" className="w-4 h-4" />
                     Share
                   </button>
                   <button
                     onClick={() => handleViewAccount(seller)}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200"
                   >
-                    <Icon icon="vuesax:linear:eye" className="w-4 h-4" />
+                    <Icon icon="mdi:eye" className="w-4 h-4" />
                     View
                   </button>
                 </div>

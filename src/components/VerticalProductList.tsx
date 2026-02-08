@@ -99,7 +99,7 @@ const VerticalProductList: React.FC<VerticalProductListProps> = ({ categoryId, s
     if (loading) {
         return (
             <div className="flex justify-center items-center h-44 bg-gray-50 w-full">
-                <Icon icon="vuesax:linear:refresh-2" className="animate-spin h-8 w-8 text-indigo-600" />
+                <Icon icon="mdi:package-variant" className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             </div>
         );
     }

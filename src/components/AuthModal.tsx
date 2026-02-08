@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, LogIn, UserPlus, Send, Briefcase, Mail, Tag } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { supabase } from '../lib/supabase';
 import { setUserId, setPhoneAuthenticated, getUserId } from '../hooks/useTracking';
 import PhoneInput from './auth/PhoneInput';
@@ -468,7 +468,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               disabled={loading}
               className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors text-sm font-medium ${userType === 'user' ? 'bg-white dark:bg-gray-700 shadow text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
             >
-              <User className="w-4 h-4 mr-2" />
+              <Icon icon="mdi:account" className="w-4 h-4 mr-2" />
               User
             </button>
             <button
@@ -477,7 +477,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               disabled={loading}
               className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors text-sm font-medium ${userType === 'merchant' ? 'bg-white dark:bg-gray-700 shadow text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
             >
-              <Briefcase className="w-4 h-4 mr-2" />
+              <Icon icon="mdi:briefcase" className="w-4 h-4 mr-2" />
               Merchant
             </button>
           </div>
@@ -492,7 +492,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             placeholder="Full Name"
             required
             disabled={loading}
-            icon={<User className="w-4 h-4" />}
+            icon={<Icon icon="mdi:account" className="w-4 h-4" />}
           />
         )}
 
@@ -504,7 +504,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             placeholder="Brand Name"
             required
             disabled={loading}
-            icon={<Tag className="w-4 h-4" />}
+            icon={<Icon icon="mdi:tag" className="w-4 h-4" />}
           />
         )}
 
@@ -540,7 +540,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 placeholder="Email"
                 required={view === 'signup'}
                 disabled={loading}
-                icon={<Mail className="w-4 h-4" />}
+                icon={<Icon icon="mdi:email" className="w-4 h-4" />}
               />
             )}
 
@@ -565,7 +565,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             placeholder="Your Email"
             required
             disabled={loading}
-            icon={<Mail className="w-4 h-4" />}
+            icon={<Icon icon="mdi:email" className="w-4 h-4" />}
           />
         )}
 
@@ -585,7 +585,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               placeholder={'Enter password'}
               required
               disabled={loading}
-              icon={<Lock className="w-4 h-4" />}
+              icon={<Icon icon="mdi:lock" className="w-4 h-4" />}
             />
             <p className="text-xs text-gray-500 ml-1">At least 6 characters</p>
           </div>
@@ -635,17 +635,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           >
             {view === 'login' && (
               <>
-                Sign In <LogIn className="w-4 h-4 ml-2" />
+                Sign In <Icon icon="mdi:login" className="w-4 h-4 ml-2" />
               </>
             )}
             {view === 'signup' && (
               <>
-                Create Account <UserPlus className="w-4 h-4 ml-2" />
+                Create Account <Icon icon="mdi:account-plus" className="w-4 h-4 ml-2" />
               </>
             )}
             {view === 'forgot-password' && (
               <>
-                Send Link <Send className="w-4 h-4 ml-2" />
+                Send Link <Icon icon="mdi:send" className="w-4 h-4 ml-2" />
               </>
             )}
             {view === 'check-email' && 'Close'}

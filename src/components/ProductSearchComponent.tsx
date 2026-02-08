@@ -162,7 +162,7 @@ function ProductSearchComponent() {
             onMouseEnter={(e) => e.currentTarget.style.color = currentTheme.text}
             onMouseLeave={(e) => e.currentTarget.style.color = currentTheme.textSecondary}
           >
-            <Icon icon="vuesax:linear:clock" className="w-4 h-4" />
+            <Icon icon="mdi:history" className="w-4 h-4" />
             View past requests
           </button>
         </div>

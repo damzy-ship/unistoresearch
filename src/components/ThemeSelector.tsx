@@ -17,7 +17,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
         title="Change Theme"
       >
-        <Icon icon="vuesax:linear:brush-2" className="w-4 h-4 text-orange-600" />  <span className='font-medium text-orange-600'>Select Theme</span>
+        <Icon icon="mdi:palette" className="w-5 h-5 text-gray-500" />  <span className='font-medium text-orange-600'>Select Theme</span>
         <span className="text-sm font-medium text-gray-700 hidden sm:inline">
           {currentTheme.name}
         </span>
@@ -58,7 +58,7 @@ export default function ThemeSelector({ className = '' }: ThemeSelectorProps) {
                     </div>
                   </div>
                   {currentTheme.id === theme.id && (
-                    <Icon icon="vuesax:linear:tick-circle" className="w-4 h-4 text-green-600" />
+                    <Icon icon="mdi:check-circle" className="w-4 h-4 text-white" />
                   )}
                 </button>
               ))}

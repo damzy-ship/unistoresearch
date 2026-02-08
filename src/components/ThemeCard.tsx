@@ -76,7 +76,7 @@ export default function ThemeCard({ theme, isSelected, onSelect }: ThemeCardProp
           className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-lg"
           style={{ backgroundColor: theme.primary }}
         >
-          <Icon icon="vuesax:linear:tick-circle" className="w-4 h-4 text-white" />
+          <Icon icon="mdi:check-circle" className="w-4 h-4 text-white" />
         </div>
       )}
 

@@ -162,7 +162,7 @@ export default function PostComposerVuna({
                         className="rounded-full flex-shrink-0"
                         onClick={() => handleOpenDrawer('product')}
                     >
-                        <Icon icon="vuesax:linear:add" width={18} height={18} />
+                        <Icon icon="mdi:plus" width={18} height={18} />
                     </Button>
                 </div>
             </div>
@@ -200,7 +200,7 @@ export default function PostComposerVuna({
                                     <span className="text-gray-500">Posting as:</span>
                                     <span className="text-gray-900 dark:text-white font-bold">{selectedMerchant ? (selectedMerchant.brand_name || selectedMerchant.full_name) : 'Myself'}</span>
                                 </span>
-                                <Icon icon="vuesax:linear:arrow-down" className={`w-4 h-4 transition-transform ${showMerchantDropdown ? 'rotate-180' : ''}`} />
+                                <Icon icon="mdi:chevron-down" className={`w-4 h-4 transition-transform ${showMerchantDropdown ? 'rotate-180' : ''}`} />
                             </button>
 
                             {showMerchantDropdown && (
@@ -224,7 +224,7 @@ export default function PostComposerVuna({
                                             className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 flex items-center justify-between group"
                                         >
                                             <span className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-500">Myself</span>
-                                            {!selectedMerchant && <Icon icon="vuesax:linear:tick-circle" width={16} className="text-emerald-500" />}
+                                            {!selectedMerchant && <Icon icon="mdi:check-circle" width={16} className="text-emerald-500" />}
                                         </button>
                                         {loadingMerchants && (
                                             <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
@@ -244,7 +244,7 @@ export default function PostComposerVuna({
                                                     </div>
                                                     <span className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-500">{merchant.brand_name || merchant.full_name}</span>
                                                 </div>
-                                                {selectedMerchant?.id === merchant.id && <Icon icon="vuesax:linear:tick-circle" width={16} className="text-emerald-500" />}
+                                                {selectedMerchant?.id === merchant.id && <Icon icon="mdi:check-circle" width={16} className="text-emerald-500" />}
                                             </button>
                                         ))}
                                     </div>
@@ -272,7 +272,7 @@ export default function PostComposerVuna({
                                         onClick={() => removeComposerImage(idx)}
                                         className="absolute top-2 right-2 bg-black/50 hover:bg-red-500 text-white rounded-full p-1.5 transition-colors opacity-0 group-hover:opacity-100"
                                     >
-                                        <Icon icon="vuesax:linear:close-circle" width={14} />
+                                        <Icon icon="mdi:close-circle" width={14} />
                                     </button>
                                 </div>
                             ))}
@@ -296,7 +296,7 @@ export default function PostComposerVuna({
                                     onClick={() => document.getElementById('drawer-image-upload')?.click()}
                                     className="h-12 w-12 rounded-xl p-0"
                                 >
-                                    <Icon icon="vuesax:linear:gallery" className="text-emerald-600 dark:text-emerald-400" />
+                                    <Icon icon="mdi:image-outline" className="text-emerald-600 dark:text-emerald-400" />
                                 </Button>
                                 {/* <Button variant="ghost" className="h-12 w-12 rounded-xl p-0">
                                     <Camera />

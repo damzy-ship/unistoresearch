@@ -59,7 +59,7 @@ export default function AuthInput({
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
-            {showPassword ? <IconifyIcon icon="vuesax:linear:eye-slash" className="w-5 h-5" /> : <IconifyIcon icon="vuesax:linear:eye" className="w-5 h-5" />}
+            {showPassword ? <IconifyIcon icon="mdi:eye-off" className="w-5 h-5" /> : <IconifyIcon icon="mdi:eye" className="w-5 h-5" />}
           </button>
         )}
       </div>

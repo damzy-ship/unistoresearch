@@ -134,14 +134,14 @@ export default function ReviewSlider() {
               className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white bg-opacity-80 p-2 rounded-full shadow-md hover:bg-opacity-100 transition-all"
               aria-label="Previous review"
             >
-              <Icon icon="vuesax:linear:arrow-left" className="w-5 h-5 text-gray-700" />
+              <Icon icon="mdi:chevron-left" className="w-5 h-5 text-gray-700" />
             </button>
             <button
               onClick={goToNextSlide}
               className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white bg-opacity-80 p-2 rounded-full shadow-md hover:bg-opacity-100 transition-all"
               aria-label="Next review"
             >
-              <Icon icon="vuesax:linear:arrow-right" className="w-5 h-5 text-gray-700" />
+              <Icon icon="mdi:chevron-right" className="w-5 h-5 text-gray-700" />
             </button>
           </>
         )}
@@ -168,7 +168,7 @@ export default function ReviewSlider() {
                         {[...Array(5)].map((_, i) => (
                           <Icon
                             key={i}
-                            icon={i < review.rating ? "vuesax:bold:star" : "vuesax:linear:star"}
+                            icon={i < review.rating ? "mdi:star" : "mdi:star-outline"}
                             className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                           />
                         ))}
@@ -204,8 +204,8 @@ export default function ReviewSlider() {
                   }
                 }}
                 className={`w-2 h-2 rounded-full transition-all ${index === currentIndex
-                    ? `bg-${currentTheme.primaryTsFormat} w-4`
-                    : 'bg-gray-300 hover:bg-gray-400'
+                  ? `bg-${currentTheme.primaryTsFormat} w-4`
+                  : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                 aria-label={`Go to review ${index + 1}`}
               />

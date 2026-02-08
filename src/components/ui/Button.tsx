@@ -37,7 +37,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 )}
                 {...props}
             >
-                {loading && <Icon icon="vuesax:linear:refresh-2" className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <Icon icon="mdi:loading" className="mr-2 h-4 w-4 animate-spin" />}
                 {children}
             </button>
         );

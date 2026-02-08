@@ -41,7 +41,7 @@ export default function StarRating({
       stars.push(
         <Icon
           key={`full-${i}`}
-          icon="vuesax:bold:star"
+          icon="mdi:star"
           className={`${starSize} text-yellow-400`}
         />
       );
@@ -51,9 +51,9 @@ export default function StarRating({
     if (hasHalfStar) {
       stars.push(
         <div key="half" className={`${starSize} relative`}>
-          <Icon icon="vuesax:linear:star" className={`${starSize} text-gray-300 absolute`} />
+          <Icon icon="mdi:star-outline" className={`${starSize} text-gray-300 absolute`} />
           <div className="overflow-hidden w-1/2">
-            <Icon icon="vuesax:bold:star" className={`${starSize} text-yellow-400`} />
+            <Icon icon="mdi:star-half" className={`${starSize} text-yellow-400 absolute top-0 left-0`} />
           </div>
         </div>
       );
@@ -65,7 +65,7 @@ export default function StarRating({
       stars.push(
         <Icon
           key={`empty-${i}`}
-          icon="vuesax:linear:star"
+          icon="mdi:star-outline"
           className={`${starSize} text-gray-300`}
         />
       );

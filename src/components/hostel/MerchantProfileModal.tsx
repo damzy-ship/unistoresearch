@@ -67,12 +67,12 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                     <div className="flex flex-wrap items-center justify-center gap-2 mt-2 w-full">
                         {merchant.hostels?.name && (
                             <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full">
-                                <Icon icon="vuesax:linear:location" width={14} className="text-emerald-500" />
+                                <Icon icon="mdi:map-marker" width={14} className="text-emerald-500" />
                                 <span>{merchant.hostels.name}</span>
                             </div>
                         )}
                         <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full">
-                            <Icon icon="vuesax:linear:tag" width={14} className="text-amber-500" />
+                            <Icon icon="mdi:tag" width={14} className="text-amber-500" />
                             <span>{products.length} Products</span>
                         </div>
                     </div>
@@ -83,7 +83,7 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                             className="bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
                             size="sm"
                         >
-                            <Icon icon="vuesax:linear:message" width={16} className="mr-2" />
+                            <Icon icon="mdi:message-text" width={16} className="mr-2" />
                             WhatsApp
                         </Button>
                         <Button
@@ -91,7 +91,7 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                             variant="secondary"
                             size="sm"
                         >
-                            <Icon icon="vuesax:linear:mobile" width={16} className="mr-2" />
+                            <Icon icon="mdi:cellphone" width={16} className="mr-2" />
                             Call
                         </Button>
                     </div>
@@ -142,7 +142,7 @@ export default function MerchantProfileModal({ isOpen, onClose, merchant, onProd
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-                            <Icon icon="vuesax:linear:tag" width={32} className="mb-2 opacity-50" />
+                            <Icon icon="mdi:tag-outline" width={32} className="mb-2 opacity-50" />
                             <p className="text-sm">No products found</p>
                         </div>
                     )}

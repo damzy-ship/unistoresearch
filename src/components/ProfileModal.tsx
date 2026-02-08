@@ -151,7 +151,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <Icon icon="vuesax:linear:close-circle" className="w-5 h-5" />
+            <Icon icon="mdi:close" className="w-5 h-5" />
           </button>
         </div>
 
@@ -185,7 +185,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     placeholder="Full Name"
                     required
                     disabled={saving}
-                    icon={<Icon icon="vuesax:linear:user" className="w-4 h-4" />}
+                    icon={<Icon icon="mdi:account" className="w-4 h-4" />}
                   />
 
                   <AuthInput
@@ -194,7 +194,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     onChange={(value) => setEditForm({ ...editForm, phone_number: value })}
                     placeholder="Phone Number"
                     disabled={saving}
-                    icon={<Icon icon="vuesax:linear:call" className="w-4 h-4" />}
+                    icon={<Icon icon="mdi:phone" className="w-4 h-4" />}
                   />
 
                   {error && (
@@ -206,7 +206,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               ) : (
                 <>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Icon icon="vuesax:linear:user" className="w-5 h-5 text-gray-400" />
+                    <Icon icon="mdi:account" className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Full Name</p>
                       <p className="text-gray-900">{profile.full_name}</p>
@@ -214,7 +214,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Icon icon="vuesax:linear:call" className="w-5 h-5 text-gray-400" />
+                    <Icon icon="mdi:phone" className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Phone Number</p>
                       <p className="text-gray-900">{profile.phone_number || 'Not provided'}</p>
@@ -232,7 +232,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   )} */}
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Icon icon="vuesax:linear:calendar" className="w-5 h-5 text-gray-400" />
+                    <Icon icon="mdi:calendar" className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-600">Activity</p>
                       <p className="text-gray-900">{profile.visit_count} visits</p>
@@ -245,7 +245,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             {/* Theme Customization */}
             <div className="border-t pt-6">
               <div className="flex items-center gap-2 mb-4">
-                <Icon icon="vuesax:linear:brush-2" className="w-5 h-5 text-gray-600" />
+                <Icon icon="mdi:palette-outline" className="w-5 h-5 text-gray-600" />
                 <h5 className="font-semibold text-gray-900">Theme Customization</h5>
               </div>
               <ThemeSelector />
@@ -277,7 +277,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     loading={saving}
                     fullWidth
                   >
-                    <Icon icon="vuesax:linear:tick-circle" className="w-4 h-4" />
+                    <Icon icon="mdi:content-save" className="w-4 h-4" />
                     Save Changes
                   </AuthButton>
                 </>
@@ -295,7 +295,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     onClick={() => setEditing(true)}
                     fullWidth
                   >
-                    <Icon icon="vuesax:linear:edit" className="w-4 h-4" />
+                    <Icon icon="mdi:pencil" className="w-4 h-4" />
                     Edit Profile
                   </AuthButton>
                 </>

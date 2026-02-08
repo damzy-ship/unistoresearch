@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Star, Send, Trash2 } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { submitRating, cancelRating, RatingData } from '../lib/ratingService';
 
 interface RatingModalProps {
@@ -46,7 +46,7 @@ export default function RatingModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (rating === 0) {
       setError('Please select a rating');
       return;
@@ -116,7 +116,7 @@ export default function RatingModal({
             disabled={submitting || cancelling}
             className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
           >
-            <X className="w-5 h-5" />
+            <Icon icon="mdi:close" className="w-5 h-5" />
           </button>
         </div>
 
@@ -148,12 +148,12 @@ export default function RatingModal({
                   className="p-1 transition-transform hover:scale-110"
                   disabled={submitting || cancelling}
                 >
-                  <Star
-                    className={`w-8 h-8 ${
-                      star <= (hoveredRating || rating)
-                        ? 'text-yellow-400 fill-current'
+                  <Icon
+                    icon="mdi:star"
+                    className={`w-8 h-8 ${star <= (hoveredRating || rating)
+                        ? 'text-yellow-400 fill-current' // Note: fill-current might not be needed for iconify but keeping for safety if color prop assumes it
                         : 'text-gray-300'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}
@@ -202,7 +202,7 @@ export default function RatingModal({
             >
               Cancel
             </button>
-            
+
             {canCancel && existingRating && (
               <button
                 type="button"
@@ -217,13 +217,13 @@ export default function RatingModal({
                   </>
                 ) : (
                   <>
-                    <Trash2 className="w-4 h-4" />
+                    <Icon icon="mdi:delete" className="w-4 h-4" />
                     Cancel Rating
                   </>
                 )}
               </button>
             )}
-            
+
             <button
               type="submit"
               disabled={submitting || cancelling || rating === 0}
@@ -236,7 +236,7 @@ export default function RatingModal({
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <Icon icon="mdi:send" className="w-4 h-4" />
                   {existingRating ? 'Update Rating' : 'Submit Rating'}
                 </>
               )}

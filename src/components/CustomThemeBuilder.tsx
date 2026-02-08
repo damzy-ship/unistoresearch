@@ -167,7 +167,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
               </>
             ) : (
               <>
-                <Icon icon="vuesax:linear:brush-2" className="w-4 h-4" />
+                <Icon icon="mdi:palette-outline" className="w-4 h-4 mr-2" />
                 Generate Complete Theme
               </>
             )}
@@ -182,7 +182,7 @@ export default function CustomThemeBuilder({ currentTheme, onThemeChange }: Cust
               color: currentTheme.text
             }}
           >
-            <Icon icon="vuesax:linear:refresh-2" className="w-4 h-4 mr-2" />
+            <Icon icon="mdi:refresh" className="w-4 h-4 mr-2" />
             Reset
           </button>
         </div>
