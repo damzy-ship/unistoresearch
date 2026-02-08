@@ -13,7 +13,7 @@ interface ContactSellerButtonProps {
     children?: React.ReactNode;
 }
 
-const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, children }) => {
+const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, className, children }) => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [pendingProduct, setPendingProduct] = useState<Partial<Product> | null>(null);
     const { currentTheme } = useTheme();
@@ -95,7 +95,10 @@ const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, chil
 
     return (
         <>
-            <button onClick={handleClick} className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full`}>
+            <button
+                onClick={handleClick}
+                className={`flex gap-1 items-center justify-center bg-gradient-to-r ${currentTheme.buttonGradient} hover:shadow-lg text-white px-8 py-2.5 rounded-full shadow-md transition-all duration-200 font-medium w-full ${className || ''}`}
+            >
                 {children || 'Get Now'}
             </button>
 

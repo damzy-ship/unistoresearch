@@ -226,10 +226,8 @@ export default function ProductFeedItem({
                                     merchant_id: visitor?.id,
                                 }}
                             >
-                                <Button className="w-full" variant="primary">
-                                    <Icon icon="mdi:message-text" width={18} className="mr-2" />
-                                    Message Seller
-                                </Button>
+                                <Icon icon="mdi:message-text" width={18} className="mr-2" />
+                                Message Seller
                             </ContactSellerButton>
                         </div>
                         {/* <Button variant="secondary" size="icon" className="shrink-0">

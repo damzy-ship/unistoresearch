@@ -5,7 +5,9 @@ import { useTheme } from '../hooks/useTheme';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 
 // Reusable functions from your original component
-const uploadImageToSupabase = async (file, merchantId) => {
+// Reusable functions from your original component
+const uploadImageToSupabase = async (file: File, merchantId: string | undefined) => {
+    if (!merchantId) throw new Error("Merchant ID is missing");
     const fileExt = file.name.split('.').pop();
     const fileName = `${merchantId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `product-images/${fileName}`;
@@ -25,7 +27,7 @@ const uploadImageToSupabase = async (file, merchantId) => {
     return publicUrl;
 };
 
-const deleteImageFromSupabase = async (imageUrl) => {
+const deleteImageFromSupabase = async (imageUrl: string) => {
     const urlParts = imageUrl.split('/');
     const fileName = urlParts.slice(urlParts.indexOf('product-images') + 1).join('/');
 
@@ -87,7 +89,7 @@ export default function AllProductsPage() {
         try {
             const { data, error } = await supabase
                 .from('schools')
-                .select('id, short_name')
+                .select('id, name, short_name')
                 .order('short_name');
 
             if (error) {
@@ -123,9 +125,10 @@ export default function AllProductsPage() {
             setAllProducts(results || []);
             // console.log('Fetched products:', results);
             setTotalPages(pagination.total_pages);
-        } catch (err) {
+        } catch (err: unknown) {
             console.error('Error fetching paginated products:', err);
-            setError('Failed to load products. ' + err.message);
+            const msg = err instanceof Error ? err.message : String(err);
+            setError('Failed to load products. ' + msg);
         } finally {
             setLoading(false);
         }
@@ -144,8 +147,8 @@ export default function AllProductsPage() {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
         return allProducts.filter(product =>
             product.product_description.toLowerCase().includes(lowerCaseSearchTerm) ||
-            product.search_description.toLowerCase().includes(lowerCaseSearchTerm) ||
-            product.merchant_id.toLowerCase().includes(lowerCaseSearchTerm)
+            (product.search_description && product.search_description.toLowerCase().includes(lowerCaseSearchTerm)) ||
+            (product.merchant_id && product.merchant_id.toLowerCase().includes(lowerCaseSearchTerm))
         );
     }, [allProducts, searchTerm]);
 
@@ -153,7 +156,7 @@ export default function AllProductsPage() {
         setEditingProduct(product);
         setProductDescription(product.product_description);
         setProductPrice(product.product_price);
-        setSearchDescription(product.search_description);
+        setSearchDescription(product.search_description || '');
         setIsAvailable(product.is_available);
         setNewFiles([]);
         setShowForm(true);

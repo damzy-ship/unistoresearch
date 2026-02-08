@@ -171,7 +171,7 @@ export default function UserMenu() {
   return (
     <>
       {/* Large screen fixed sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:flex lg:flex-col lg:bg-white lg:border-r lg:shadow z-30">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:flex lg:flex-col lg:bg-white dark:lg:bg-gray-900 lg:border-r lg:shadow dark:lg:border-gray-800 z-30">
         {menuContent}
       </aside>
 

@@ -24,7 +24,7 @@ export function PostDrawer({
                 <Drawer.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999]" />
                 <Drawer.Content
                     className={cn(
-                        "bg-gray-900 flex flex-col rounded-t-[20px] h-[85vh] mt-24 fixed bottom-0 left-0 right-0 z-[9999] focus:outline-none border-t border-gray-800",
+                        "bg-gray-900 flex flex-col rounded-t-[20px] h-[85vh] mt-24 fixed bottom-0 left-0 right-0 z-[9999] focus:outline-none border-t border-gray-800 md:max-w-md md:mx-auto",
                         className
                     )}
                 >
