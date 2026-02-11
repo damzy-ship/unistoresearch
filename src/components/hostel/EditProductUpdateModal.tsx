@@ -51,7 +51,7 @@ export default function EditProductUpdateModal({ isOpen, onClose, update, onUpda
                     discount_price: numericDiscount,
                 })
                 .eq('id', update.id)
-                .select()
+                .select('*, unique_visitors(*, schools(*), hostels(*))')
                 .single();
 
             if (updateError) throw updateError;
