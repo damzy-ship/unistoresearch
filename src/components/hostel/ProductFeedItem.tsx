@@ -64,6 +64,7 @@ interface ProductFeedItemProps {
     onContactMerchant?: (item: HostelsProductUpdates) => void;
     onRecommend?: (item: HostelsProductUpdates) => void;
     onUserClick?: (user: UniqueVisitor) => void;
+    onEdit?: (item: HostelsProductUpdates) => void;
 }
 
 export default function ProductFeedItem({
@@ -76,7 +77,8 @@ export default function ProductFeedItem({
     discountValue,
     onContactMerchant,
     onRecommend,
-    onUserClick
+    onUserClick,
+    onEdit
 }: ProductFeedItemProps) {
     const [isFulfillModalOpen, setIsFulfillModalOpen] = useState(false);
     const { currentTheme } = useTheme();
@@ -147,6 +149,10 @@ export default function ProductFeedItem({
         }
     };
 
+    const handleEdit = () => {
+        onEdit?.(item);
+    };
+
     return (
         <motion.article
             initial={{ opacity: 0, y: 20 }}
@@ -210,7 +216,16 @@ export default function ProductFeedItem({
                     {item.price != null && (
                         <div className="mt-2 text-sm font-medium">
                             <div className="flex items-center gap-2">
-                                {discountValue && discountValue > 0 ? (
+                                {item.discount_price && item.discount_price > 0 ? (
+                                    <>
+                                        <span className="text-gray-400 line-through text-xs">
+                                            ₦{Number(item.price).toLocaleString()}
+                                        </span>
+                                        <span className="text-emerald-400 font-bold text-base">
+                                            ₦{Math.max(0, Number(item.discount_price) - (discountValue || 0)).toLocaleString()}
+                                        </span>
+                                    </>
+                                ) : discountValue && discountValue > 0 ? (
                                     <>
                                         <span className="text-gray-400 line-through text-xs">
                                             ₦{Number(item.price).toLocaleString()}
@@ -269,6 +284,17 @@ export default function ProductFeedItem({
                                     aria-label="Mark as fulfilled"
                                 >
                                     ✓ Fulfilled
+                                </button>
+                            )}
+
+                            {/* Edit Button for Updates */}
+                            {(isAdmin || isOwnPost) && !isRequest && onEdit && (
+                                <button
+                                    onClick={handleEdit}
+                                    className="flex items-center gap-1.5 px-3 py-1 text-sm font-semibold rounded-lg text-blue-400 border border-blue-400/30 hover:bg-blue-400/10 transition-colors"
+                                    aria-label="Edit post"
+                                >
+                                    Edit
                                 </button>
                             )}
 

@@ -7,11 +7,12 @@ import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { CouponGameModal } from './CouponGameModal';
 import MerchantProfileModal from './MerchantProfileModal';
 import RequestDetailsModal from './RequestDetailsModal';
-import { HostelsProductUpdates, UniqueVisitor, Coupon } from '../../lib/supabase';
+import EditProductUpdateModal from './EditProductUpdateModal';
+import { HostelsProductUpdates, UniqueVisitor, Coupon, Product } from '../../lib/supabase';
 
 interface HostelModalsProps {
-    showConfirmUniversityModal: boolean;
-    setShowConfirmUniversityModal: (show: boolean) => void;
+    confirmUniversityModalOpen: boolean;
+    setConfirmUniversityModalOpen: (open: boolean) => void;
     onConfirmUniversity: (schoolId: string) => void;
 
     showAuthModal: boolean;
@@ -58,11 +59,17 @@ interface HostelModalsProps {
     onFulfillRequest?: (item: HostelsProductUpdates) => void;
     onDeleteRequest?: (item: HostelsProductUpdates) => void;
     onRequestContact?: (type: 'merchant' | 'recommend', item: HostelsProductUpdates) => void;
+
+    // New props for Edit Modal
+    editUpdateModalOpen: boolean;
+    setEditUpdateModalOpen: (open: boolean) => void;
+    selectedUpdateForEdit: HostelsProductUpdates | null;
+    onUpdateSuccess: (updatedItem: HostelsProductUpdates) => void;
 }
 
 export const HostelModals: React.FC<HostelModalsProps> = ({
-    showConfirmUniversityModal,
-    setShowConfirmUniversityModal,
+    confirmUniversityModalOpen,
+    setConfirmUniversityModalOpen,
     onConfirmUniversity,
     showAuthModal,
     setShowAuthModal,
@@ -98,13 +105,17 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
     selectedRequest,
     onFulfillRequest,
     onDeleteRequest,
-    onRequestContact
+    onRequestContact,
+    editUpdateModalOpen,
+    setEditUpdateModalOpen,
+    selectedUpdateForEdit,
+    onUpdateSuccess
 }) => {
     return (
         <>
             <ConfirmUniversityModal
-                isOpen={showConfirmUniversityModal}
-                onClose={() => setShowConfirmUniversityModal(false)}
+                isOpen={confirmUniversityModalOpen}
+                onClose={() => setConfirmUniversityModalOpen(false)}
                 onConfirm={onConfirmUniversity}
             />
 
@@ -117,8 +128,18 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
             <ConfirmContactModal
                 isOpen={showConfirmContactModal}
                 onClose={() => setShowConfirmContactModal(false)}
-                onConfirm={(product) => onContactSeller(product as HostelsProductUpdates)}
-                product={pendingContactProduct}
+                onConfirm={() => pendingContactProduct && onContactSeller(pendingContactProduct)}
+                product={pendingContactProduct ? {
+                    id: pendingContactProduct.id,
+                    product_description: pendingContactProduct.post_description,
+                    product_price: pendingContactProduct.price?.toString() || '0',
+                    discount_price: pendingContactProduct.discount_price?.toString(),
+                    image_urls: pendingContactProduct.post_images,
+                    full_name: pendingContactProduct.unique_visitors?.full_name || 'Seller',
+                    phone_number: pendingContactProduct.unique_visitors?.phone_number || '',
+                    school_short_name: pendingContactProduct.unique_visitors?.schools?.short_name,
+                    merchant_id: pendingContactProduct.actual_user_id
+                } : null}
             />
 
             <ImageModal
@@ -162,6 +183,13 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
                 onContact={(type, item) => onRequestContact ? onRequestContact(type, item) : onContactSeller(item)}
                 onFulfill={onFulfillRequest}
                 onDelete={onDeleteRequest}
+            />
+
+            <EditProductUpdateModal
+                isOpen={editUpdateModalOpen}
+                onClose={() => setEditUpdateModalOpen(false)}
+                update={selectedUpdateForEdit}
+                onUpdateSuccess={onUpdateSuccess}
             />
 
             {/* Become Merchant Modal - Simple inline or separate component if complex */}

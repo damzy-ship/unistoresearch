@@ -68,9 +68,21 @@ export default function HostelHomePage() {
     const [requestModalOpen, setRequestModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<HostelsProductUpdates | null>(null);
 
+    // Edit Update Modal
+    const [editUpdateModalOpen, setEditUpdateModalOpen] = useState(false);
+    const [selectedUpdate, setSelectedUpdate] = useState<HostelsProductUpdates | null>(null);
+
+    // ... existing hooks ...
 
 
-    // --- Custom Hooks ---
+
+    // ... existing render ...
+
+
+
+    // ... existing code ...
+
+
 
     // 1. Feed Logic
     const {
@@ -318,6 +330,23 @@ export default function HostelHomePage() {
         setImageModalOpen(true);
     };
 
+    const handleEditUpdate = (item: HostelsProductUpdates) => {
+        setSelectedUpdate(item);
+        setEditUpdateModalOpen(true);
+    };
+
+    const handleUpdateSuccess = (updatedItem: HostelsProductUpdates) => {
+        // Update local feed state
+        setFeed(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+
+        // Update search results if active
+        if (searchResults) {
+            setSearchResults(prev => prev ? prev.map(item => item.id === updatedItem.id ? updatedItem : item) : null);
+        }
+
+        toast.success('Post updated successfully');
+    };
+
     // --- Render ---
 
     return (
@@ -463,6 +492,7 @@ export default function HostelHomePage() {
                                             onContactMerchant={(item) => handleRequestContact('merchant', item)}
                                             onRecommend={(item) => handleRequestContact('recommend', item)}
                                             onUserClick={handleUserClick}
+                                            onEdit={handleEditUpdate}
                                         />
                                     ))}
 
@@ -480,35 +510,43 @@ export default function HostelHomePage() {
 
             {/* All Modals */}
             <HostelModals
-                showConfirmUniversityModal={showConfirmUniversityModal}
-                setShowConfirmUniversityModal={setShowConfirmUniversityModal}
+                confirmUniversityModalOpen={showConfirmUniversityModal}
+                setConfirmUniversityModalOpen={setShowConfirmUniversityModal}
                 onConfirmUniversity={handleConfirmUniversity}
+
                 showAuthModal={showAuthModal}
                 setShowAuthModal={setShowAuthModal}
+
                 showConfirmContactModal={showConfirmContactModal}
                 setShowConfirmContactModal={setShowConfirmContactModal}
                 pendingContactProduct={pendingContactProduct}
+
                 imageModalOpen={imageModalOpen}
                 setImageModalOpen={setImageModalOpen}
                 imageModalImages={imageModalImages}
                 imageModalActive={imageModalActive}
                 setImageModalActive={setImageModalActive}
                 imageModalDescription={imageModalDescription}
+
                 deleteModalOpen={deleteModalOpen}
                 setDeleteModalOpen={setDeleteModalOpen}
                 handleDeleteConfirm={handleDeleteConfirm}
                 deleting={deleting}
+
                 couponModalOpen={false}
                 setCouponModalOpen={setCouponModalOpen}
                 handleGameCouponClaimed={handleGameCouponClaimed}
                 selectedSchoolId={selectedSchoolId}
                 currentVisitorId={currentVisitor?.id}
                 activeCoupon={activeCoupon}
+
                 merchantModalOpen={merchantModalOpen}
                 setMerchantModalOpen={setMerchantModalOpen}
                 selectedMerchant={selectedMerchant}
                 currentVisitor={currentVisitor}
+
                 onProductClick={handleProductClick}
+
                 showBecomeMerchantModal={showBecomeMerchantModal}
                 setShowBecomeMerchantModal={setShowBecomeMerchantModal}
                 userIsHostelMerchant={userIsHostelMerchant}
@@ -523,6 +561,11 @@ export default function HostelHomePage() {
                     handleDeleteClick(item.id);
                 }}
                 onRequestContact={handleRequestContact}
+
+                editUpdateModalOpen={editUpdateModalOpen}
+                setEditUpdateModalOpen={setEditUpdateModalOpen}
+                selectedUpdateForEdit={selectedUpdate}
+                onUpdateSuccess={handleUpdateSuccess}
             />
 
             {/* Active Coupon Floating Timer */}

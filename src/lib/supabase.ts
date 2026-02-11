@@ -112,7 +112,8 @@ export interface HostelsProductUpdates {
   status?: 'open' | 'fulfilled' | 'cancelled' | 'hide';
   post_type: 'update' | 'request';
   fulfilled: boolean | null;
-  price?: number | null
+  price?: number | null;
+  discount_price?: number | null;
 }
 
 export interface RequestLog {
