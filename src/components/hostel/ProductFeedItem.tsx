@@ -252,6 +252,8 @@ export default function ProductFeedItem({
                                 phone_number: visitor?.phone_number || '',
                                 school_short_name: visitor?.schools?.short_name,
                                 merchant_id: visitor?.id,
+                                discount_price: item.discount_price?.toString(),
+                                full_name: visitor?.brand_name || visitor?.full_name || 'Seller',
                             }}
                         >
                             Contact Seller
