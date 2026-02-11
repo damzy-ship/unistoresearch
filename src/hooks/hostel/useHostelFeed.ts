@@ -49,7 +49,8 @@ export function useHostelFeed(
                     status,
                     post_type,
                     fulfilled,
-                    price
+                    price,
+                    discount_price
                 `)
                 .order('created_at', { ascending: false });
 
@@ -68,6 +69,7 @@ export function useHostelFeed(
                 fulfilled?: boolean | null;
                 status?: string | null;
                 price?: number | null;
+                discount_price?: number | null;
             };
 
             const rawList: RawUpdate[] = (data || []) as RawUpdate[];
@@ -92,7 +94,8 @@ export function useHostelFeed(
                 search_words: Array.isArray(d.search_words) ? d.search_words : [],
                 fulfilled: d.fulfilled ?? null,
                 status: d.status as 'open' | 'fulfilled' | 'cancelled' | 'hide' | undefined,
-                price: d.price
+                price: d.price,
+                discount_price: d.discount_price
             }));
 
             setFeed(mapped);
