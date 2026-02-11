@@ -6,6 +6,7 @@ import ImageModal from './ImageModal';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { CouponGameModal } from './CouponGameModal';
 import MerchantProfileModal from './MerchantProfileModal';
+import RequestDetailsModal from './RequestDetailsModal';
 import { HostelsProductUpdates, UniqueVisitor, Coupon } from '../../lib/supabase';
 
 interface HostelModalsProps {
@@ -49,6 +50,14 @@ interface HostelModalsProps {
     setShowBecomeMerchantModal: (show: boolean) => void;
     userIsHostelMerchant: boolean;
     onContactSeller: (product: HostelsProductUpdates) => void;
+
+    // Request Details Modal Props
+    requestModalOpen: boolean;
+    setRequestModalOpen: (open: boolean) => void;
+    selectedRequest: HostelsProductUpdates | null;
+    onFulfillRequest?: (item: HostelsProductUpdates) => void;
+    onDeleteRequest?: (item: HostelsProductUpdates) => void;
+    onRequestContact?: (type: 'merchant' | 'recommend', item: HostelsProductUpdates) => void;
 }
 
 export const HostelModals: React.FC<HostelModalsProps> = ({
@@ -84,6 +93,12 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
     showBecomeMerchantModal,
     setShowBecomeMerchantModal,
     onContactSeller,
+    requestModalOpen,
+    setRequestModalOpen,
+    selectedRequest,
+    onFulfillRequest,
+    onDeleteRequest,
+    onRequestContact
 }) => {
     return (
         <>
@@ -102,8 +117,8 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
             <ConfirmContactModal
                 isOpen={showConfirmContactModal}
                 onClose={() => setShowConfirmContactModal(false)}
-                product={pendingContactProduct}
                 onConfirm={(product) => onContactSeller(product as HostelsProductUpdates)}
+                product={pendingContactProduct}
             />
 
             <ImageModal
@@ -137,6 +152,16 @@ export const HostelModals: React.FC<HostelModalsProps> = ({
                 merchant={selectedMerchant}
                 currentVisitor={currentVisitor}
                 onProductClick={onProductClick}
+            />
+
+            <RequestDetailsModal
+                isOpen={requestModalOpen}
+                onClose={() => setRequestModalOpen(false)}
+                request={selectedRequest}
+                currentVisitor={currentVisitor}
+                onContact={(type, item) => onRequestContact ? onRequestContact(type, item) : onContactSeller(item)}
+                onFulfill={onFulfillRequest}
+                onDelete={onDeleteRequest}
             />
 
             {/* Become Merchant Modal - Simple inline or separate component if complex */}

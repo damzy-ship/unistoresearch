@@ -61,7 +61,12 @@ export default function HostelHomePage() {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
+
     const [isComposerExpanded, setIsComposerExpanded] = useState(false);
+
+    // Request Modal
+    const [requestModalOpen, setRequestModalOpen] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState<HostelsProductUpdates | null>(null);
 
 
 
@@ -292,10 +297,19 @@ export default function HostelHomePage() {
             if (error) throw error;
             toast.success('Request marked as fulfilled!');
             setFeed(prev => prev.map(p => p.id === item.id ? { ...p, fulfilled: true } : p));
+            // Also update selectedRequest if it's the one being fulfilled
+            if (selectedRequest?.id === item.id) {
+                setSelectedRequest(prev => prev ? { ...prev, fulfilled: true } : null);
+            }
         } catch (error) {
             console.error('Error fulfilling request:', error);
             toast.error('Failed to update request');
         }
+    };
+
+    const handleRequestClick = (request: HostelsProductUpdates) => {
+        setSelectedRequest(request);
+        setRequestModalOpen(true);
     };
 
     const openImageModal = (images: string[], startIndex: number) => {
@@ -421,7 +435,7 @@ export default function HostelHomePage() {
                                 <LiveActivityHub onUserClick={handleUserClick} />
                                 <RequestsCarousel
                                     requests={requestItems}
-                                    onItemClick={(item) => console.log("Clicked request", item.id)}
+                                    onItemClick={handleRequestClick}
                                     currentVisitor={currentVisitor}
                                     onContact={handleRequestContact}
                                     onDelete={(item) => handleDeleteClick(item.id)}
@@ -498,7 +512,17 @@ export default function HostelHomePage() {
                 showBecomeMerchantModal={showBecomeMerchantModal}
                 setShowBecomeMerchantModal={setShowBecomeMerchantModal}
                 userIsHostelMerchant={userIsHostelMerchant}
+
                 onContactSeller={(item) => handleRequestContact('merchant', item)}
+                requestModalOpen={requestModalOpen}
+                setRequestModalOpen={setRequestModalOpen}
+                selectedRequest={selectedRequest}
+                onFulfillRequest={handleFulfillRequest}
+                onDeleteRequest={(item) => {
+                    setRequestModalOpen(false); // Close details modal before showing delete confirmation
+                    handleDeleteClick(item.id);
+                }}
+                onRequestContact={handleRequestContact}
             />
 
             {/* Active Coupon Floating Timer */}
