@@ -12,6 +12,19 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
     onClose,
     request
 }) => {
+    const handleContactRequester = () => {
+        const phone = request?.unique_visitors?.phone_number;
+        if (!phone) {
+            alert('Contact not available for this requester');
+            return;
+        }
+
+        const message = `Hi! I saw your request: "${request?.post_description || request?.text || ''}". I have this item available!`;
+        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        onClose();
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -67,7 +80,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                         <div className="space-y-4">
                             {/* Option 1: Sell */}
                             <button
-                                onClick={onClose}
+                                onClick={handleContactRequester}
                                 className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
                             >
                                 <div className="flex items-center gap-4">

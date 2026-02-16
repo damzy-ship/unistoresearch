@@ -31,10 +31,11 @@ export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ onUserClic
         fetchActiveUsers();
     }, []);
 
-    if (activeUsers.length === 0) return null;
+    // Stabilize rendering: Always return the container to prevent React hydration/removeChild crashes
+    const hasUsers = activeUsers.length > 0;
 
     return (
-        <div className="py-4 border-b border-black/5 dark:border-white/5 bg-transparent">
+        <div className={`py-4 border-b border-black/5 dark:border-white/5 bg-transparent transition-opacity duration-500 ${hasUsers ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
             <div className="flex items-center gap-5 overflow-x-auto no-scrollbar py-2 px-6">
                 {/* What's New Circle */}
                 <div className="flex flex-col items-center flex-shrink-0 cursor-pointer group">
@@ -49,7 +50,7 @@ export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ onUserClic
                 {/* Merchant Story Avatars */}
                 {activeUsers.map((user, idx) => (
                     <motion.div
-                        key={user.id}
+                        key={`story-${user.id}-${idx}`}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.05 }}

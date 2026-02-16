@@ -350,7 +350,18 @@
 }
 
 .swiper-pagination-bullet {
-  margin: 0 4px !important;
+  margin: 0 5px !important;
+  background: #d1d5db !important;
+  opacity: 0.4 !important;
+  width: 8px !important;
+  height: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #ed5b0c !important;
+  opacity: 1 !important;
+  transform: scale(1.2);
 }
 
 .line-clamp-2 {

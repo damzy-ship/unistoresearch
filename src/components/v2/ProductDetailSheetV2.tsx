@@ -11,12 +11,14 @@ interface ProductDetailSheetV2Props {
     isOpen: boolean;
     onClose: () => void;
     product?: any;
+    isAdmin?: boolean;
 }
 
 export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     isOpen,
     onClose,
-    product
+    product,
+    isAdmin
 }) => {
     const controls = useAnimation();
 
@@ -28,22 +30,22 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
 
     if (!isOpen) return null;
 
-    const displayProduct = product || {
-        name: 'Fresh Homemade Sourdough',
-        price: '2,500',
-        oldPrice: '3,000',
-        category: 'Bakery & Snacks',
-        seller: 'Tunde Oladapo',
-        loc: 'Hall 4, Room 302',
-        rating: '4.9',
-        description: 'Experience the authentic taste of slow-fermented artisanal sourdough. Baked fresh every morning in my dorm kitchen using organic flour and a 3-year-old starter. Perfect for sandwiches or just with some butter.',
-        img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB9FoQAzLiZu-WiNdyOdE6qLxAQrxj3k_H6vpgo1evE9wD70PSMmkduAK7E54ROK3WJu3_Bs9627RigBOvuLPqxZhGGj0p6gOFSL4PgjHzGzuCIu_AOV1rnM9lE80JMQ0IFXEHJgqRF1y7OlG3nRL5jIRfzVzNJCwblq7TR1lslI-IMblYTCw3HaqLMuh-uizNgxTSLadA-iPOEHATsLimQAfIX95fG-GlkEixnmtpVPL_bPXkup8kiH0sVhmhKiPMY2tZJuifehSQ'
-    };
+    const FALLBACK_IMAGE = '/v2/assets/portable_speaker_product_1771272581168.png';
 
-    // Use product images if available, otherwise mock a few
-    const images = product?.images?.length > 0
-        ? product.images
-        : [displayProduct.img, displayProduct.img, displayProduct.img];
+    // Map real data from hostel_product_updates schema
+    const productTitle = product?.post_description || 'Product Details';
+    const productPrice = product?.price?.toLocaleString() || '0';
+    const productDiscount = product?.discount_price?.toLocaleString();
+    const productCategory = product?.post_category || 'General';
+    const sellerName = product?.unique_visitors?.brand_name || product?.unique_visitors?.full_name || 'Verified Merchant';
+    const sellerLocation = product?.unique_visitors?.hostels?.name || product?.unique_visitors?.schools?.short_name || 'Campus';
+    const sellerPhoto = product?.unique_visitors?.profile_picture;
+    const productRating = '4.8'; // Placeholder for now
+
+    // Handle multiple images correctly
+    const productImages = product?.post_images && product.post_images.length > 0
+        ? product.post_images
+        : [FALLBACK_IMAGE];
 
     const handleDragEnd = (_: any, info: any) => {
         if (info.offset.y > 100 || info.velocity.y > 500) {
@@ -90,12 +92,12 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 <Swiper
                                     modules={[Autoplay, Pagination]}
                                     autoplay={{ delay: 3000, disableOnInteraction: false }}
-                                    pagination={{ dynamicBullets: true, clickable: true }}
+                                    pagination={{ clickable: true }}
                                     spaceBetween={12}
-                                    loop={true}
+                                    loop={productImages.length > 1}
                                     className="w-full aspect-[4/5] rounded-[2.5rem] !pb-10"
                                 >
-                                    {images.map((img: string, i: number) => (
+                                    {productImages.map((img: string, i: number) => (
                                         <SwiperSlide key={i}>
                                             <div
                                                 className="w-full h-full bg-cover bg-center rounded-[2.5rem] shadow-inner border border-black/5 dark:border-white/10"
@@ -110,46 +112,67 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             <div className="px-6 pt-4">
                                 <div className="flex justify-between items-start gap-4">
                                     <div className="flex-1">
-                                        <h1 className="text-2xl font-bold text-[#1a2a40] dark:text-white leading-tight">{displayProduct.name}</h1>
-                                        <p className="text-sm text-zinc-500 font-medium mt-1 tracking-wide">{displayProduct.category || 'Bakery & Snacks'}</p>
+                                        <h1 className="text-2xl font-bold text-[#1a2a40] dark:text-white leading-tight">{productTitle}</h1>
+                                        <p className="text-sm text-zinc-500 font-bold mt-1 tracking-wider uppercase">{productCategory}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-2xl font-bold text-primary">₦{displayProduct.price}</p>
-                                        {displayProduct.oldPrice && <p className="text-sm text-zinc-400 line-through">₦{displayProduct.oldPrice}</p>}
+                                        <p className="text-2xl font-black text-primary">₦{productPrice}</p>
+                                        {productDiscount && <p className="text-sm text-zinc-400 line-through font-bold">₦{productDiscount}</p>}
                                     </div>
                                 </div>
 
                                 {/* Seller Card */}
                                 <div className="mt-8 flex items-center justify-between p-4 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 shadow-sm">
                                     <div className="flex items-center gap-3">
-                                        <div
-                                            className="h-12 w-12 rounded-full border-2 border-[#f8f6f5] dark:border-zinc-800 shadow-sm bg-cover bg-center bg-zinc-100"
-                                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAOkQXxLVWEgdGx319Xuk5fzA2_nEMJ_3OBr70yTUgxpib1V2L6gOg-1nn1O6-nOyqwLsWGF0VYtRCx-CQ2YbNTXwtu6KTfNNU3b_2_ujhDNS6QtwcF79HW9kqV7ecAyKnvk1jQzTw_TBz8_137kfwTa0BU0EPm7c_nIiHOFXxTy8AdJtxpFnrUwjwXJYReYBFjSFyygNd8I-BmtYPirk0xRAfySocJ-pSvuVJ-r4kWvgzPZoh43l9Tc8qnl5Tc1O8f3U83mAkRUYE')" }}
-                                        ></div>
+                                        {sellerPhoto ? (
+                                            <img src={sellerPhoto} alt="Seller" className="h-12 w-12 rounded-full border-2 border-primary/20 object-cover" />
+                                        ) : (
+                                            <div className="h-12 w-12 rounded-full border-2 border-[#f8f6f5] dark:border-zinc-800 shadow-sm bg-zinc-100 flex items-center justify-center text-zinc-400 font-bold uppercase">
+                                                {sellerName.charAt(0)}
+                                            </div>
+                                        )}
                                         <div>
-                                            <p className="text-sm font-bold text-[#1a2a40] dark:text-zinc-100">{displayProduct.seller}</p>
-                                            <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                                                <span className="material-symbols-outlined text-xs">location_on</span>
-                                                <span>{displayProduct.loc}</span>
+                                            <p className="text-sm font-bold text-[#1a2a40] dark:text-zinc-100">{sellerName}</p>
+                                            <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                                                <span className="material-symbols-outlined text-[14px]">location_on</span>
+                                                <span>{sellerLocation}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full">
                                         <span className="material-symbols-outlined text-primary text-sm fill-1">star</span>
-                                        <span className="text-xs font-bold text-primary">{displayProduct.rating || '4.9'}</span>
+                                        <span className="text-xs font-bold text-primary">{productRating}</span>
                                     </div>
                                 </div>
 
                                 {/* Description */}
                                 <div className="mt-8">
-                                    <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-3">Description</h3>
-                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-sm">
-                                        {displayProduct.description}
+                                    <h3 className="text-sm font-black text-[#1a2a40] dark:text-white uppercase tracking-widest mb-3">About this product</h3>
+                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-sm font-medium">
+                                        {productTitle}
                                     </p>
-                                    <div className="mt-5 flex flex-wrap gap-2">
-                                        <span className="px-4 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-black/5 dark:border-white/10">Artisanal</span>
-                                        <span className="px-4 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-black/5 dark:border-white/10">Dorm-baked</span>
-                                        <span className="px-4 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-black/5 dark:border-white/10">Organic</span>
+                                    <div className="mt-6 flex flex-wrap gap-2">
+                                        <span className="px-5 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-wider border border-black/5 dark:border-white/10 shadow-sm">Verified</span>
+                                        <span className="px-5 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-wider border border-black/5 dark:border-white/10 shadow-sm">Campus Delivery</span>
+                                        {isAdmin && (
+                                            <button
+                                                onClick={async () => {
+                                                    if (!confirm('Hide this post as Admin?')) return;
+                                                    const { error } = await supabase
+                                                        .from('hostel_product_updates')
+                                                        .update({ status: 'hide' })
+                                                        .eq('id', product.id);
+                                                    if (!error) {
+                                                        alert('Post hidden');
+                                                        onClose();
+                                                        window.location.reload(); // Refresh to hide
+                                                    }
+                                                }}
+                                                className="px-5 py-2 rounded-full bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest border border-red-500/20 shadow-sm hover:bg-red-500 hover:text-white transition-all"
+                                            >
+                                                Hide (Admin)
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -187,14 +210,22 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                     // Log Analytics (V1 Parity)
                                     try {
                                         const userId = await getUserId();
-                                        await supabase
-                                            .from('merchant_analytics')
-                                            .insert([{
-                                                merchant_id: product.actual_user_id || null,
-                                                product_id: product.id || null,
-                                                event_type: 'profile_contacted',
-                                                user_id: userId
-                                            }]);
+                                        // Log research/contact action
+                                        try {
+                                            await supabase
+                                                .from('merchant_analytics')
+                                                .insert([{
+                                                    merchant_id: product.actual_user_id || null,
+                                                    product_id: product.id || null,
+                                                    event_type: 'profile_contacted',
+                                                    user_id: userId
+                                                }]);
+                                        } catch (e: any) {
+                                            // Ignore 409 Conflict errors (duplicate entry)
+                                            if (e.code !== '23505') { // '23505' is the PostgreSQL error code for unique_violation
+                                                console.warn('Analytics log failed (likely conflict):', e);
+                                            }
+                                        }
                                     } catch (err) {
                                         console.warn('Failed to log contact analytics:', err);
                                     }

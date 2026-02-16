@@ -8,13 +8,15 @@ interface RequestDetailsSheetV2Props {
     onClose: () => void;
     request: any;
     currentVisitorId?: string;
+    isAdmin?: boolean;
 }
 
 export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
     isOpen,
     onClose,
     request,
-    currentVisitorId
+    currentVisitorId,
+    isAdmin
 }) => {
     const [matchedSellers, setMatchedSellers] = React.useState<any[]>([]);
     const [loadingSellers, setLoadingSellers] = React.useState(false);
@@ -199,7 +201,7 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
 
                         {/* Bottom Actions */}
                         <div className="pt-8 flex gap-4">
-                            {request?.user_id === currentVisitorId ? (
+                            {request?.actual_user_id === currentVisitorId ? (
                                 <>
                                     <button className="flex-1 h-16 rounded-[2rem] bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white font-black text-sm active:scale-95 transition-all border border-zinc-200 dark:border-white/10">
                                         Cancel Request
@@ -209,6 +211,25 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
                                         BUMP REQUEST
                                     </button>
                                 </>
+                            ) : isAdmin ? (
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm('Cancel this request as Admin?')) return;
+                                        const { error } = await supabase
+                                            .from('hostel_product_updates')
+                                            .update({ fulfilled: true }) // Treating fulfilled as cancelled for now in V2 requests
+                                            .eq('id', request.id);
+                                        if (!error) {
+                                            alert('Request cancelled');
+                                            onClose();
+                                            window.location.reload();
+                                        }
+                                    }}
+                                    className="w-full h-16 rounded-[2rem] bg-red-500 text-white font-black text-sm shadow-xl shadow-red-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
+                                >
+                                    <span className="material-symbols-outlined">delete_sweep</span>
+                                    ADMIN: CANCEL REQUEST
+                                </button>
                             ) : (
                                 <button
                                     onClick={() => {

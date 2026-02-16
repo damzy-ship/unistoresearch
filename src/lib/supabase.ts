@@ -35,6 +35,28 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
+let sessionPromise: Promise<{ data: { session: any }, error: any }> | null = null;
+
+/**
+ * Centered, lock-safe method to get the current session.
+ * Prevents multiple background calls from hitting the auth lock at once (the cause of AbortError).
+ */
+export async function getSafeSession() {
+  if (sessionPromise) return sessionPromise;
+
+  sessionPromise = (async () => {
+    try {
+      return await supabase.auth.getSession();
+    } finally {
+      // Small timeout to allow other simultaneous callers to use the same promise
+      // but still allow fresh checks later if needed.
+      setTimeout(() => { sessionPromise = null; }, 500);
+    }
+  })();
+
+  return sessionPromise;
+}
+
 export interface UniqueVisitor {
   id?: string;
   user_id?: string;

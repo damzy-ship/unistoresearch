@@ -409,6 +409,30 @@ export const ProfilePageV2: React.FC = () => {
                     </div>
                 </div>
 
+                {user?.is_admin && (
+                    <div className="pt-4">
+                        <h3 className="text-xs font-bold text-purple-500 dark:text-purple-400 mb-4 px-4 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm">shield_person</span>
+                            Admin Controls
+                        </h3>
+                        <div className="bg-purple-500/5 dark:bg-purple-500/10 rounded-[2.5rem] border border-purple-500/20 shadow-sm overflow-hidden">
+                            <button
+                                onClick={() => navigate('/admin-coupons')}
+                                className="w-full flex items-center gap-4 p-5 hover:bg-purple-500/10 transition-colors group"
+                            >
+                                <div className="bg-purple-500/20 p-2.5 rounded-xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-all duration-300">
+                                    <span className="material-symbols-outlined text-2xl">confirmation_number</span>
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <p className="font-bold dark:text-white text-base leading-none mb-1">Coupon Management</p>
+                                    <p className="text-[11px] text-purple-400/70 font-medium">Create and manage viral coupons</p>
+                                </div>
+                                <span className="material-symbols-outlined text-purple-300 dark:text-purple-800 group-hover:translate-x-1 transition-transform">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="pt-8">
                     <button
                         onClick={handleSignOut}

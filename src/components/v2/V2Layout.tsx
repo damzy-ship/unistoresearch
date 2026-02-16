@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthModalV2 } from './AuthModalV2';
 import { CreateActionSheetV2 } from './CreateActionSheetV2';
 import { useTheme } from '../../hooks/useTheme.tsx';
-import { supabase, UniqueVisitor } from '../../lib/supabase';
+import { supabase, UniqueVisitor, getSafeSession } from '../../lib/supabase';
 
 interface V2LayoutProps {
     children: React.ReactNode;
@@ -29,22 +29,29 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
     useEffect(() => {
         const initUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUserIsAuthenticated(!!session);
+            try {
+                const { data: { session } } = await getSafeSession();
+                setUserIsAuthenticated(!!session);
 
-            if (session?.user?.id) {
-                const { data: visitor } = await supabase
-                    .from('unique_visitors')
-                    .select('*, hostels(*), schools(*)')
-                    .eq('auth_user_id', session.user.id)
-                    .single();
-                setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                if (session?.user?.id) {
+                    const { data: visitor } = await supabase
+                        .from('unique_visitors')
+                        .select('*, hostels(*), schools(*)')
+                        .eq('auth_user_id', session.user.id)
+                        .single();
+                    setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                    return { session, visitor };
+                }
+            } catch (err) {
+                console.warn('Supabase session init failed/aborted:', err);
             }
+            return { session: null, visitor: null };
         };
 
         initUser();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('Auth state change event:', event);
             setUserIsAuthenticated(!!session);
             if (session?.user?.id) {
                 const { data: visitor } = await supabase
@@ -53,8 +60,10 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     .eq('auth_user_id', session.user.id)
                     .single();
                 setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor } }));
             } else {
                 setCurrentVisitor(null);
+                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session: null, visitor: null } }));
             }
         });
 

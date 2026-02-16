@@ -19,6 +19,11 @@ export async function recordUserAction({
     const actual_user_id = typeof window !== 'undefined' ? window.localStorage.getItem('unistore_actual_user_id') : null;
     const current_page_url = typeof window !== 'undefined' ? window.location.href : '';
 
+    // Sanitize actual_user_id: must be a UUID or null. 
+    // Generic guest IDs like 'user_123...' will fail on UUID columns.
+    const isUUID = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const sanitized_user_id = (actual_user_id && isUUID(actual_user_id)) ? actual_user_id : null;
+
     const payload: {
       actual_user_id: string | null;
       event_type: string;
@@ -27,7 +32,7 @@ export async function recordUserAction({
       current_page_url: string;
       client_event_id?: string;
     } = {
-      actual_user_id,
+      actual_user_id: sanitized_user_id,
       event_type: eventType,
       event_details: eventDetails ?? {},
       event_description: eventDescription || '',

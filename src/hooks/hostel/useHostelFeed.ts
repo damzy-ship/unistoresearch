@@ -10,7 +10,7 @@ export function useHostelFeed(
     selectedSchoolId: string | null,
     selectedHostel: string,
     selectedCategory: string,
-    myProductsActive: boolean,
+    showMyProducts: boolean,
     currentVisitor: UniqueVisitor | null
 ) {
     const [feed, setFeed] = useState<HostelsProductUpdates[]>([]);
@@ -22,7 +22,7 @@ export function useHostelFeed(
     const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
         console.log('Loading feed for school ID:', schoolId);
         try {
-            getUserId(); // Ensure user tracking
+            await getUserId(); // Ensure user tracking
             setLoadingFeed(true);
 
             const { data, error } = await supabase
@@ -78,7 +78,18 @@ export function useHostelFeed(
             const filteredBySchool = (schoolId
                 ? rawList.filter((d) => {
                     const uv = d.unique_visitors as UniqueVisitor | undefined;
-                    return (uv?.schools?.id === schoolId && d.post_type === 'request') || (uv?.hostels?.school_id === schoolId);
+
+                    // Robust check: match school ID on request directly, or via hostels join, or via schools join
+                    // If we are authenticated and the merchant profile is restricted (RLS), uv might be null.
+                    // In that case, we can't be sure of the school, so we might hide it if a filter is active.
+                    const schoolMatch = (uv?.schools?.id === schoolId) || (uv?.hostels?.school_id === schoolId) || (uv?.school_id === schoolId);
+
+                    // Log if we have a mismatch that looks suspicious (e.g. data exists but uv is null)
+                    if (schoolId && !uv && d.actual_user_id) {
+                        console.warn(`Feed item ${d.id} has no visitor data (RLS?). Filtering out from school ${schoolId}.`);
+                    }
+
+                    return schoolMatch;
                 })
                 : rawList);
 
@@ -133,12 +144,12 @@ export function useHostelFeed(
             return matchesHostel && matchesCategory;
         });
 
-        if (myProductsActive && currentVisitor?.id) {
+        if (showMyProducts && currentVisitor?.id) {
             filtered = filtered.filter((item) => item.actual_user_id === currentVisitor.id);
         }
 
         return filtered;
-    }, [feed, selectedHostel, selectedCategory, myProductsActive, currentVisitor?.id]);
+    }, [feed, selectedHostel, selectedCategory, showMyProducts, currentVisitor?.id, currentVisitor?.is_admin]);
 
     /**
      * Sorts the feed into time buckets and shuffles them for freshness.

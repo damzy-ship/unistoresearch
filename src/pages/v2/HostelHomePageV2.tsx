@@ -2,18 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { V2Layout } from '../../components/v2/V2Layout';
 import { ProductDetailSheetV2 } from '../../components/v2/ProductDetailSheetV2';
 import { RequestDetailsSheetV2 } from '../../components/v2/RequestDetailsSheetV2';
-import { supabase, UniqueVisitor, Hostel } from '../../lib/supabase';
+import { supabase, UniqueVisitor, Hostel, getSafeSession } from '../../lib/supabase';
 import { useHostelFeed } from '../../hooks/hostel/useHostelFeed';
 import { motion } from 'framer-motion';
 import { LiveActivityHubV2 } from '../../components/v2/LiveActivityHubV2';
 import { MerchantCatalogSheetV2 } from '../../components/v2/MerchantCatalogSheetV2';
+import { LiveRequestResponseSheetV2 } from '../../components/v2/LiveRequestResponseSheetV2';
+import { SchoolSelectionModalV2 } from '../../components/v2/SchoolSelectionModalV2';
+import { toast } from 'sonner';
 
 export const HostelHomePageV2: React.FC = () => {
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [isRequestOpen, setIsRequestOpen] = useState(false);
+    const [isResponseOpen, setIsResponseOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<any>(null);
-    const [selectedSchoolId] = useState<string | null>(localStorage.getItem('selectedSchoolId'));
+    const [isSchoolModalOpen, setIsSchoolModalOpen] = useState(false);
+    const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(localStorage.getItem('selectedSchoolId'));
+    const [selectedSchoolName, setSelectedSchoolName] = useState<string>('Select University');
     const [selectedHostel, setSelectedHostel] = useState<string>('all');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -25,31 +31,52 @@ export const HostelHomePageV2: React.FC = () => {
     const { feed, loadingFeed, loadFeed } = useHostelFeed(selectedSchoolId, selectedHostel, selectedCategory, false, currentVisitor);
 
     useEffect(() => {
-        const init = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user?.id) {
+        const handleAuthChange = (e: any) => {
+            console.log('HostelHomePageV2 reacting to auth change:', e.detail);
+            if (e.detail?.visitor) {
+                setCurrentVisitor(e.detail.visitor);
+            }
+        };
+        window.addEventListener('auth-state-changed', handleAuthChange);
+
+        // Initial check if V2Layout already has it
+        const checkInitial = async () => {
+            const { data: { session } } = await getSafeSession();
+            if (session?.user?.id && !currentVisitor) {
                 const { data: visitor } = await supabase
                     .from('unique_visitors')
                     .select('*, hostels(*), schools(*)')
                     .eq('auth_user_id', session.user.id)
-                    .single();
-                setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                    .maybeSingle();
+                if (visitor) setCurrentVisitor(visitor as unknown as UniqueVisitor);
             }
         };
-        init();
+        checkInitial();
+
+        return () => window.removeEventListener('auth-state-changed', handleAuthChange);
     }, []);
 
     useEffect(() => {
-        const fetchHostels = async () => {
-            if (!selectedSchoolId) return;
-            const { data } = await supabase
+        const fetchHostelsAndSchool = async () => {
+            if (!selectedSchoolId) {
+                // Auto-open modal if no school selected
+                setIsSchoolModalOpen(true);
+                return;
+            };
+
+            // Fetch school name for display
+            const { data: schoolData } = await supabase.from('schools').select('short_name').eq('id', selectedSchoolId).maybeSingle();
+            if (schoolData) setSelectedSchoolName(schoolData.short_name);
+
+            // Fetch hostels
+            const { data: hostelData } = await supabase
                 .from('hostels')
                 .select('*')
                 .eq('school_id', selectedSchoolId)
                 .order('name', { ascending: true });
-            setHostels(data || []);
+            setHostels(hostelData || []);
         };
-        fetchHostels();
+        fetchHostelsAndSchool();
     }, [selectedSchoolId]);
 
     // Added useEffect to trigger feed load
@@ -134,7 +161,11 @@ export const HostelHomePageV2: React.FC = () => {
 
     const openRequestResponse = (request: any) => {
         setSelectedRequest(request);
-        setIsRequestOpen(true);
+        if (request.actual_user_id === currentVisitor?.id) {
+            setIsRequestOpen(true);
+        } else {
+            setIsResponseOpen(true);
+        }
     };
 
     // Updated asset paths to use public directory
@@ -147,6 +178,20 @@ export const HostelHomePageV2: React.FC = () => {
                 setSelectedMerchant(user);
                 setIsCatalogOpen(true);
             }} />
+
+            {/* University Selection Tag */}
+            <div className="px-5 pt-2 flex items-center justify-between">
+                <button
+                    onClick={() => setIsSchoolModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 shadow-sm active:scale-95 transition-all group"
+                >
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#1a2a40] dark:text-white/70 group-hover:text-primary transition-colors">
+                        {selectedSchoolName}
+                    </span>
+                    <span className="material-symbols-outlined text-sm text-zinc-400">expand_more</span>
+                </button>
+            </div>
             {/* Safety Banner */}
             <section className="p-4 pt-6">
                 <div className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 border border-primary/10 dark:border-primary/20 rounded-[2rem] p-5 flex gap-5 items-center shadow-sm backdrop-blur-3xl group">
@@ -178,42 +223,58 @@ export const HostelHomePageV2: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex gap-4 overflow-x-auto px-6 no-scrollbar pb-4">
+                <div className="flex gap-4 overflow-x-auto px-6 no-scrollbar pb-4 min-h-[140px] items-center">
                     {realLiveRequests.length > 0 ? (
-                        realLiveRequests.map((item) => (
+                        realLiveRequests.map((item, idx) => (
                             <motion.div
-                                key={item.id}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                key={`request-${item.id}`}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.05 }}
                                 onClick={() => openRequestResponse(item)}
-                                className="min-w-[170px] w-[170px] bg-white dark:bg-white/5 p-3 rounded-[2.5rem] shadow-sm border border-zinc-100 dark:border-white/10 flex flex-col gap-3 cursor-pointer active:scale-95 transition-all group relative overflow-hidden h-[240px]"
+                                className="flex-shrink-0 w-[280px] bg-white dark:bg-white/5 rounded-[2.5rem] p-5 shadow-sm border border-black/5 dark:border-white/10 relative overflow-hidden group active:scale-95 transition-all cursor-pointer"
                             >
-                                <div className="absolute top-0 right-0 p-2 z-10">
-                                    <div className="bg-primary/10 text-primary px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-tighter backdrop-blur-md">New</div>
-                                </div>
-                                <div className="w-full aspect-square rounded-[1.8rem] bg-zinc-100 dark:bg-zinc-800 overflow-hidden ring-4 ring-zinc-50 dark:ring-white/5 shrink-0">
-                                    <img
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                        src={item.post_images?.[0] || FALLBACK_SPEAKER}
-                                        onError={(e: any) => e.target.src = FALLBACK_SPEAKER}
-                                        alt="Request"
-                                    />
-                                </div>
-                                <div className="px-1 py-1 flex flex-col gap-1.5 flex-1">
-                                    <p className="text-[12px] font-bold leading-snug text-[#1a2a40] dark:text-zinc-100 line-clamp-2">"{item.post_description}"</p>
-                                    <div className="flex items-center gap-2 mt-auto">
-                                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                            <span className="material-symbols-outlined text-[10px] text-primary">schedule</span>
+                                {/* Background Decorative Element */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/10 transition-colors"></div>
+
+                                <div className="relative z-10">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center p-0.5 border border-black/5">
+                                                {item.unique_visitors?.profile_picture ? (
+                                                    <img src={item.unique_visitors.profile_picture} alt="" className="w-full h-full rounded-full object-cover" />
+                                                ) : (
+                                                    <span className="material-symbols-outlined text-zinc-400 dark:text-zinc-500 text-lg">person</span>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-black dark:text-white uppercase tracking-tight">{item.unique_visitors?.full_name?.split(' ')[0] || 'Anonymous'}</h4>
+                                                <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest leading-none mt-0.5">{item.unique_visitors?.hostels?.name || 'UniStore User'}</p>
+                                            </div>
                                         </div>
-                                        <span className="text-[9px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">
-                                            {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
+                                        <div className="bg-primary/10 text-primary text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest">
+                                            Live
+                                        </div>
+                                    </div>
+
+                                    <p className="text-sm font-bold text-[#1a2a40] dark:text-white/90 line-clamp-2 leading-tight mb-4 min-h-[40px]">
+                                        {item.post_description || "I'm looking for something..."}
+                                    </p>
+
+                                    <div className="flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/5">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="material-symbols-outlined text-primary text-base font-bold">chat_bubble</span>
+                                            <span className="text-[11px] font-black text-primary uppercase tracking-widest">
+                                                {item.actual_user_id === currentVisitor?.id ? 'My Request' : 'I have this'}
+                                            </span>
+                                        </div>
+                                        <span className="material-symbols-outlined text-zinc-300 dark:text-zinc-600">arrow_forward_ios</span>
                                     </div>
                                 </div>
                             </motion.div>
                         ))
                     ) : (
-                        <div className="flex-1 text-center py-10 text-zinc-400 text-xs font-bold uppercase tracking-widest bg-white dark:bg-white/5 rounded-[2rem] border border-dashed border-zinc-200 dark:border-white/10 mx-6">No live requests</div>
+                        <div className="flex-1 text-center py-10 text-zinc-400 text-xs font-bold uppercase tracking-widest bg-white dark:bg-white/5 rounded-[2rem] border border-dashed border-zinc-200 dark:border-white/10 w-full">No live requests</div>
                     )}
                 </div>
             </section>
@@ -287,7 +348,7 @@ export const HostelHomePageV2: React.FC = () => {
             </section>
 
             {/* Product Feed */}
-            <main className="p-4 grid grid-cols-1 gap-8 mb-20">
+            <div className="p-4 grid grid-cols-1 gap-8 mb-20 relative">
                 {loadingFeed ? (
                     Array(3).fill(0).map((_, k) => (
                         <div key={k} className="bg-zinc-100 dark:bg-white/5 rounded-[2.5rem] aspect-[4/5] animate-pulse" />
@@ -297,8 +358,8 @@ export const HostelHomePageV2: React.FC = () => {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                            key={product.id}
+                            transition={{ delay: i * 0.01 }}
+                            key={`product-${product.id}`}
                             onClick={() => openProductDetail(product)}
                             className="bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden shadow-sm border border-black/5 dark:border-white/10 flex flex-col group transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] cursor-pointer relative"
                         >
@@ -344,21 +405,30 @@ export const HostelHomePageV2: React.FC = () => {
                 ) : (
                     <div className="col-span-2 text-center py-20 text-zinc-400 font-bold uppercase tracking-widest text-xs">No products in this category</div>
                 )}
-            </main>
+            </div>
 
             {/* Product Detail Sheet */}
             <ProductDetailSheetV2
                 isOpen={isDetailOpen}
                 onClose={() => setIsDetailOpen(false)}
                 product={selectedProduct}
+                isAdmin={currentVisitor?.is_admin}
             />
 
-            {/* Live Request Details Sheet */}
+            {/* Live Request Details Sheet (Management) */}
             <RequestDetailsSheetV2
                 isOpen={isRequestOpen}
                 onClose={() => setIsRequestOpen(false)}
                 request={selectedRequest}
                 currentVisitorId={currentVisitor?.id}
+                isAdmin={currentVisitor?.is_admin}
+            />
+
+            {/* Live Request Response Sheet (Other users) */}
+            <LiveRequestResponseSheetV2
+                isOpen={isResponseOpen}
+                onClose={() => setIsResponseOpen(false)}
+                request={selectedRequest}
             />
 
             {/* Merchant Catalog Sheet */}
@@ -370,6 +440,19 @@ export const HostelHomePageV2: React.FC = () => {
                     setIsCatalogOpen(false);
                     setSelectedProduct(product);
                     setIsDetailOpen(true);
+                }}
+            />
+
+            {/* School Selection Modal */}
+            <SchoolSelectionModalV2
+                isOpen={isSchoolModalOpen}
+                onClose={() => setIsSchoolModalOpen(false)}
+                currentSchoolId={selectedSchoolId}
+                onSelect={(schoolId) => {
+                    localStorage.setItem('selectedSchoolId', schoolId);
+                    setSelectedSchoolId(schoolId);
+                    setIsSchoolModalOpen(false);
+                    // toast.success('University updated');
                 }}
             />
         </V2Layout>
