@@ -23,6 +23,10 @@ import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import UserMenu from './components/UserMenu';
 import HostelHomePage from './pages/HostelHomePage';
 import AdminCouponsPage from './pages/AdminCouponsPage';
+import { HostelHomePageV2 } from './pages/v2/HostelHomePageV2';
+import { ProfilePageV2 } from './pages/v2/ProfilePageV2';
+import { OrdersPageV2 } from './pages/v2/OrdersPageV2';
+import { PaymentsPageV2 } from './pages/v2/PaymentsPageV2';
 // import { useHostelMode } from './hooks/useHostelMode';
 
 // function HomeEntry() {
@@ -45,7 +49,7 @@ function App() {
           <AnalyticsLoader />
           <UserMenu />
           <Toaster position="top-center" richColors />
-          <AnnouncementBar />
+          {!window.location.pathname.startsWith('/v2') && <AnnouncementBar />}
           <Routes>
             <Route path="/" element={<HostelHomePage />} />
             <Route path="/hostel" element={<HostelHomePage />} />
@@ -67,6 +71,10 @@ function App() {
             <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
             <Route path="/update-password" element={<UpdatePasswordPage />} />
             <Route path="/admin-coupons" element={<AdminCouponsPage />} />
+            <Route path="/v2/hostel" element={<HostelHomePageV2 />} />
+            <Route path="/v2/profile" element={<ProfilePageV2 />} />
+            <Route path="/v2/orders" element={<OrdersPageV2 />} />
+            <Route path="/v2/payments" element={<PaymentsPageV2 />} />
           </Routes>
         </div>
       </Router>
