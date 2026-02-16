@@ -8,10 +8,10 @@ interface MerchantCatalogSheetV2Props {
     isOpen: boolean;
     onClose: () => void;
     merchant: UniqueVisitor | null;
+    onProductClick?: (product: any) => void;
 }
 
-export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ isOpen, onClose, merchant }) => {
-    const { currentTheme } = useTheme();
+export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ isOpen, onClose, merchant, onProductClick }) => {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -55,25 +55,29 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={onClose}
-                    className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                    className="absolute inset-0 bg-black/90 backdrop-blur-md"
                 />
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="relative w-full max-w-4xl bg-[#111827] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 flex flex-col md:flex-row h-[85vh] md:h-auto md:max-h-[650px]"
+                    initial={{ opacity: 0, y: "100%" }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="relative w-full max-w-4xl bg-[#0a0f1a] rounded-t-[3rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-t md:border border-white/10 flex flex-col md:flex-row h-[94vh] md:h-auto md:max-h-[650px]"
                 >
-                    {/* Close Button */}
+                    {/* Drawer Handle (Mobile Only) */}
+                    <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 mb-2 md:hidden" />
+
+                    {/* Close Button (Desktop Only) */}
                     <button
                         onClick={onClose}
-                        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90"
+                        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/10 hidden md:flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90"
                     >
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -140,7 +144,7 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
                             <h3 className="text-lg font-black text-white uppercase tracking-widest">Store Catalog</h3>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar">
+                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar pb-10">
                             {loading ? (
                                 <div className="grid grid-cols-2 gap-4">
                                     {[1, 2, 3, 4].map(i => (
@@ -153,6 +157,7 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
                                         <motion.div
                                             key={p.id}
                                             whileHover={{ y: -5 }}
+                                            onClick={() => onProductClick && onProductClick(p)}
                                             className="group relative aspect-square rounded-[1.5rem] overflow-hidden bg-white/5 border border-white/5 cursor-pointer shadow-sm hover:shadow-2xl transition-all"
                                         >
                                             <img

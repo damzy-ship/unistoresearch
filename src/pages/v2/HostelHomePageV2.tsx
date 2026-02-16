@@ -18,6 +18,7 @@ export const HostelHomePageV2: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
+    const [realLiveRequests, setRealLiveRequests] = useState<any[]>([]);
     const [hostels, setHostels] = useState<Hostel[]>([]);
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
 
@@ -65,7 +66,65 @@ export const HostelHomePageV2: React.FC = () => {
         return () => window.removeEventListener('hostel-feed-refresh', handleRefresh);
     }, [loadFeed]);
 
-    const requestItems = feed.filter(item => item.post_type === 'request');
+    useEffect(() => {
+        const fetchRealLiveRequests = async () => {
+            const { data } = await supabase
+                .from('hostel_product_updates')
+                .select(`
+                    id,
+                    post_description,
+                    post_images,
+                    created_at,
+                    post_category,
+                    actual_user_id,
+                    unique_visitors:actual_user_id (
+                        id,
+                        full_name,
+                        profile_picture,
+                        phone_number,
+                        room,
+                        is_hostel_merchant,
+                        hostel_id,
+                        hostels (id, name, school_id),
+                        schools (id, short_name),
+                        brand_name
+                    ),
+                    status,
+                    post_type,
+                    fulfilled,
+                    price,
+                    discount_price
+                `)
+                .eq('post_type', 'request')
+                .or('fulfilled.is.null,fulfilled.eq.false')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (data) {
+                console.log('Fetched realLiveRequests:', data.length, data);
+                setRealLiveRequests(data);
+            }
+        };
+        fetchRealLiveRequests();
+
+        // Realtime subscription for requests
+        const channel = supabase
+            .channel('realtime_requests')
+            .on('postgres_changes' as any, {
+                event: '*',
+                table: 'hostel_product_updates',
+                filter: "post_type=eq.request"
+            }, (payload: any) => {
+                console.log('Realtime request change:', payload);
+                fetchRealLiveRequests();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
+
     const productItems = feed.filter(item => item.post_type !== 'request');
 
     const openProductDetail = (product: any) => {
@@ -80,7 +139,6 @@ export const HostelHomePageV2: React.FC = () => {
 
     // Updated asset paths to use public directory
     const HERO_IMAGE = '/v2/assets/hostel_deals_hero_1771272553009.png';
-    const FALLBACK_NIACINAMIDE = '/v2/assets/niacinamide_serum_product_1771272568186.png';
     const FALLBACK_SPEAKER = '/v2/assets/portable_speaker_product_1771272581168.png';
 
     return (
@@ -112,54 +170,50 @@ export const HostelHomePageV2: React.FC = () => {
                 <div className="px-6 flex items-center justify-between mb-5">
                     <div className="flex items-center gap-3">
                         <h3 className="text-xl font-bold text-[#1a2a40] dark:text-white tracking-tight leading-none">Live Requests</h3>
-                        <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">{requestItems.length} Active</p>
+                        <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">{realLiveRequests.length} Active</p>
                         <div className="relative flex items-center justify-center">
                             <div className="w-2.5 h-2.5 rounded-full bg-primary animate-ping absolute opacity-50"></div>
                             <div className="w-2.5 h-2.5 rounded-full bg-primary relative border-2 border-[#f8f6f5] dark:border-[#221610]"></div>
                         </div>
                     </div>
-                    <button className="text-primary text-xs font-bold tracking-wide hover:translate-x-1 transition-transform">See All</button>
                 </div>
-                <div className="flex gap-4 overflow-x-auto px-6 pb-6 no-scrollbar">
-                    {loadingFeed ? (
-                        Array(3).fill(0).map((_, i) => (
-                            <div key={i} className="min-w-[170px] aspect-[4/5] bg-zinc-100 dark:bg-white/5 rounded-[2rem] animate-pulse" />
-                        ))
-                    ) : requestItems.length > 0 ? (
-                        requestItems.map((req) => (
+
+                <div className="flex gap-4 overflow-x-auto px-6 no-scrollbar pb-4">
+                    {realLiveRequests.length > 0 ? (
+                        realLiveRequests.map((item) => (
                             <motion.div
+                                key={item.id}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                key={req.id}
-                                onClick={() => openRequestResponse(req)}
-                                className="min-w-[170px] bg-white dark:bg-white/5 p-3 rounded-[2rem] shadow-sm border border-zinc-100 dark:border-white/10 flex flex-col gap-3 cursor-pointer active:scale-95 transition-all group relative overflow-hidden"
+                                onClick={() => openRequestResponse(item)}
+                                className="min-w-[170px] w-[170px] bg-white dark:bg-white/5 p-3 rounded-[2.5rem] shadow-sm border border-zinc-100 dark:border-white/10 flex flex-col gap-3 cursor-pointer active:scale-95 transition-all group relative overflow-hidden h-[240px]"
                             >
-                                <div className="absolute top-0 right-0 p-2">
-                                    <div className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter">New</div>
+                                <div className="absolute top-0 right-0 p-2 z-10">
+                                    <div className="bg-primary/10 text-primary px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-tighter backdrop-blur-md">New</div>
                                 </div>
-                                <div className="w-full aspect-square rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 overflow-hidden ring-4 ring-zinc-50 dark:ring-white/5">
+                                <div className="w-full aspect-square rounded-[1.8rem] bg-zinc-100 dark:bg-zinc-800 overflow-hidden ring-4 ring-zinc-50 dark:ring-white/5 shrink-0">
                                     <img
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                        src={req.post_images?.[0] || FALLBACK_NIACINAMIDE}
-                                        onError={(e: any) => e.target.src = FALLBACK_NIACINAMIDE}
+                                        src={item.post_images?.[0] || FALLBACK_SPEAKER}
+                                        onError={(e: any) => e.target.src = FALLBACK_SPEAKER}
                                         alt="Request"
                                     />
                                 </div>
                                 <div className="px-1 py-1 flex flex-col gap-1.5 flex-1">
-                                    <p className="text-[13px] font-bold leading-snug text-[#1a2a40] dark:text-zinc-100 line-clamp-2">"{req.post_description}"</p>
+                                    <p className="text-[12px] font-bold leading-snug text-[#1a2a40] dark:text-zinc-100 line-clamp-2">"{item.post_description}"</p>
                                     <div className="flex items-center gap-2 mt-auto">
-                                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <span className="material-symbols-outlined text-[10px] text-primary">schedule</span>
                                         </div>
-                                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium uppercase tracking-wider">
-                                            {new Date(req.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        <span className="text-[9px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">
+                                            {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
                                 </div>
                             </motion.div>
                         ))
                     ) : (
-                        <div className="flex-1 text-center py-10 text-zinc-400 text-xs font-bold uppercase tracking-widest">No live requests</div>
+                        <div className="flex-1 text-center py-10 text-zinc-400 text-xs font-bold uppercase tracking-widest bg-white dark:bg-white/5 rounded-[2rem] border border-dashed border-zinc-200 dark:border-white/10 mx-6">No live requests</div>
                     )}
                 </div>
             </section>
@@ -188,11 +242,14 @@ export const HostelHomePageV2: React.FC = () => {
             <section className="py-4">
                 <div className="flex gap-8 overflow-x-auto px-8 no-scrollbar">
                     {[
+                        { icon: 'grid_view', label: 'All', id: 'all' },
                         { icon: 'restaurant', label: 'Food', id: 'food & snacks' },
                         { icon: 'apparel', label: 'Clothing', id: 'clothing' },
+                        { icon: 'ice_skating', label: 'Shoes', id: 'shoes' },
+                        { icon: 'hat_off', label: 'Caps', id: 'caps' },
                         { icon: 'devices', label: 'Gadgets', id: 'gadgets' },
-                        { icon: 'face_6', label: 'Beauty', id: 'beauty & skincare' },
-                        { icon: 'book', label: 'Academic', id: 'others' }
+                        { icon: 'smartphone', label: 'Phones', id: 'phones' },
+                        { icon: 'diamond', label: 'Jewelry', id: 'jeweleries' }
                     ].map((cat) => (
                         <div
                             key={cat.id}
@@ -309,6 +366,11 @@ export const HostelHomePageV2: React.FC = () => {
                 isOpen={isCatalogOpen}
                 onClose={() => setIsCatalogOpen(false)}
                 merchant={selectedMerchant}
+                onProductClick={(product) => {
+                    setIsCatalogOpen(false);
+                    setSelectedProduct(product);
+                    setIsDetailOpen(true);
+                }}
             />
         </V2Layout>
     );

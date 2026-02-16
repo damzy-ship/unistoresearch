@@ -34,41 +34,44 @@ export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ onUserClic
     if (activeUsers.length === 0) return null;
 
     return (
-        <div className="py-4 px-4 bg-white dark:bg-[#1a110c] border-b border-primary/5">
-            <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-1">
-                <div className="flex flex-col items-center flex-shrink-0 mr-1">
-                    <div className="w-14 h-14 rounded-full bg-emerald-400 p-[2px] shadow-lg shadow-emerald-500/20 group cursor-pointer hover:scale-105 transition-all">
-                        <div className="w-full h-full rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center border-2 border-transparent">
-                            <p className="text-[7px] font-black text-emerald-600 dark:text-emerald-400 uppercase leading-[8px] text-center">What's<br />New</p>
+        <div className="py-4 border-b border-black/5 dark:border-white/5 bg-transparent">
+            <div className="flex items-center gap-5 overflow-x-auto no-scrollbar py-2 px-6">
+                {/* What's New Circle */}
+                <div className="flex flex-col items-center flex-shrink-0 cursor-pointer group">
+                    <div className="relative">
+                        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20 mb-2 group-hover:scale-110 transition-all duration-500 ring-2 ring-primary/20 ring-offset-2 ring-offset-white dark:ring-offset-[#221610]">
+                            <p className="text-[7.5px] font-black text-white uppercase leading-[8px] text-center tracking-tighter">WHAT'S<br />NEW</p>
                         </div>
                     </div>
+                    <span className="text-[9px] font-bold text-primary uppercase tracking-widest mt-1">Live</span>
                 </div>
 
+                {/* Merchant Story Avatars */}
                 {activeUsers.map((user, idx) => (
                     <motion.div
                         key={user.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.05 }}
                         className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
                         onClick={() => onUserClick && onUserClick(user)}
                     >
                         <div className="relative">
-                            <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 group-hover:scale-105 transition-all duration-300">
-                                <div className="w-full h-full rounded-full bg-white dark:bg-[#111827] p-[1.5px] overflow-hidden shadow-2xl">
+                            <div className="w-14 h-14 rounded-full p-[2px] border-2 border-primary/30 group-hover:border-primary transition-all duration-500 shadow-sm">
+                                <div className="w-full h-full rounded-full bg-white dark:bg-[#1a110c] p-[1.5px] overflow-hidden">
                                     {user.profile_picture ? (
-                                        <img src={user.profile_picture} alt="u" className="w-full h-full rounded-full object-cover" />
+                                        <img src={user.profile_picture} alt="story" className="w-full h-full rounded-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase">
-                                            {user.full_name?.substring(0, 1) || 'U'}
+                                        <div className="w-full h-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center text-sm font-black text-zinc-400 dark:text-zinc-500 uppercase">
+                                            {user.full_name?.charAt(0)}
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-[#111827] rounded-full shadow-lg"></div>
+                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-primary border-2 border-white dark:border-[#221610] rounded-full shadow-md z-10"></div>
                         </div>
-                        <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-1.5 max-w-[64px] truncate transition-colors group-hover:text-primary">
-                            {user.full_name?.split(' ')[0]}
+                        <span className="text-[9px] font-bold text-[#1a2a40]/60 dark:text-zinc-400 uppercase tracking-tighter mt-2 max-w-[56px] truncate transition-colors group-hover:text-primary">
+                            {user.brand_name || user.full_name?.split(' ')[0]}
                         </span>
                     </motion.div>
                 ))}
