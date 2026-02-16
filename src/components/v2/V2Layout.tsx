@@ -75,10 +75,18 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     };
 
     const handleTabChange = (tab: 'home' | 'orders' | 'messages' | 'profile') => {
-        if (tab === 'home') navigate('/v2/hostel');
+        if (tab === 'home') {
+            navigate('/v2/hostel');
+            return;
+        }
+
+        if (!userIsAuthenticated) {
+            setIsAuthOpen(true);
+            return;
+        }
+
         if (tab === 'profile') navigate('/v2/profile');
         if (tab === 'orders') navigate('/v2/orders');
-        if (tab === 'messages') setIsAuthOpen(true);
     };
 
     return (

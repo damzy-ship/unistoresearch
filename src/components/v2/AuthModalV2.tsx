@@ -1,15 +1,169 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { setUserId, setPhoneAuthenticated, getUserId } from '../../hooks/useTracking';
+import { toast } from 'sonner';
 
 interface AuthModalV2Props {
     isOpen: boolean;
     onClose: () => void;
 }
 
-type AuthView = 'signin' | 'signup' | 'otp';
+type AuthView = 'signin' | 'signup' | 'otp' | 'forgot' | 'check-email';
 
 export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => {
     const [view, setView] = useState<AuthView>('signin');
     const [method, setMethod] = useState<'email' | 'phone'>('email');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Form states
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('+234');
+    const [password, setPassword] = useState('');
+    const [userType, setUserType] = useState<'user' | 'merchant'>('user');
+    const [brandName, setBrandName] = useState('');
+    const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>("684c03a5-a18d-4df9-b064-0aaeee2a5f01"); // Default Bingham
+    const [checkEmailMessage, setCheckEmailMessage] = useState('');
+
+    useEffect(() => {
+        if (isOpen) {
+            setView('signin');
+            setError('');
+            setLoading(false);
+        }
+    }, [isOpen]);
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            // Support phone-based alias login like V1
+            let loginEmail = method === 'email' ? email.trim() : `${phone.replace(/\+/g, '')}@phone.unistore.local`;
+
+            // Check if phone has a custom email in unique_visitors first (V1 logic)
+            if (method === 'phone') {
+                const { data: vData } = await supabase.from('unique_visitors').select('email, id').eq('phone_number', phone).single();
+                if (vData?.email) loginEmail = vData.email;
+            }
+
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email: loginEmail,
+                password: password
+            });
+
+            if (authError) throw authError;
+            if (!authData.user) throw new Error('Login failed');
+
+            // Set IDs and tracking
+            const { data: visitorData } = await supabase.from('unique_visitors').select('id').eq('auth_user_id', authData.user.id).single();
+            setUserId(authData.user.id, visitorData?.id || '');
+            setPhoneAuthenticated(true);
+
+            toast.success('Successfully signed in');
+            onClose();
+            window.location.reload();
+        } catch (err: any) {
+            setError(err.message || 'Failed to sign in');
+            toast.error(err.message || 'Login failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSignUp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email.includes('@')) {
+            setError('Valid email required');
+            return;
+        }
+        setLoading(true);
+        setError('');
+
+        try {
+            const currentLocalUserId = await getUserId();
+            console.log('Current local user ID for merge:', currentLocalUserId);
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: email.trim(),
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        phone_number: phone,
+                        user_type: userType,
+                        school_id: selectedSchoolId,
+                        ...(userType === 'merchant' && { brand_name: brandName })
+                    }
+                }
+            });
+
+            if (authError) throw authError;
+            if (!authData.user) throw new Error('Signup failed');
+
+            const newAuthUserId = authData.user.id;
+
+            // Merge/Upsert visitor record like V1
+            const finalRecordPayload = {
+                user_id: newAuthUserId,
+                auth_user_id: newAuthUserId,
+                phone_number: phone,
+                email: email.trim(),
+                full_name: fullName,
+                last_visit: new Date().toISOString(),
+                visit_count: 1,
+                user_type: userType,
+                school_id: selectedSchoolId,
+                ...(userType === 'merchant' && { brand_name: brandName })
+            };
+
+            const { data: upsertData } = await supabase
+                .from('unique_visitors')
+                .upsert(finalRecordPayload, { onConflict: 'auth_user_id' })
+                .select('id')
+                .single();
+
+            setUserId(newAuthUserId, upsertData?.id || '');
+            setPhoneAuthenticated(true);
+
+            toast.success('Account created! Welcome.');
+            onClose();
+            window.location.reload();
+        } catch (err: any) {
+            setError(err.message || 'Signup failed');
+            toast.error(err.message || 'Signup failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email.includes('@')) {
+            setError('Please enter a valid email address');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                redirectTo: `${window.location.origin}/update-password`
+            });
+
+            if (resetError) throw resetError;
+
+            setCheckEmailMessage(`A password reset link was sent to ${email}. Check your email and follow the instructions.`);
+            setView('check-email');
+        } catch (err: any) {
+            setError(err.message || 'Failed to send reset email');
+            toast.error(err.message || 'Reset failed');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -32,6 +186,12 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                 </p>
             </div>
 
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+                </div>
+            )}
+
             {/* Toggle Segmented Control */}
             <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 mb-8 rounded-lg">
                 <button
@@ -49,7 +209,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
             </div>
 
             {/* Sign In Form */}
-            <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); if (method === 'phone') setView('otp'); }}>
+            <form className="space-y-5" onSubmit={handleLogin}>
                 {method === 'email' ? (
                     <div className="space-y-1.5">
                         <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Email</label>
@@ -59,6 +219,9 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                                 className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
                                 placeholder="Enter your email"
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
                         </div>
                     </div>
@@ -71,6 +234,9 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                                 className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
                                 placeholder="+234 812 345 6789"
                                 type="tel"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                required
                             />
                         </div>
                     </div>
@@ -79,7 +245,13 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                 <div className="space-y-1.5">
                     <div className="flex justify-between items-center ml-1">
                         <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Password</label>
-                        <button type="button" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">Forgot password?</button>
+                        <button
+                            type="button"
+                            onClick={() => setView('forgot')}
+                            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                        >
+                            Forgot password?
+                        </button>
                     </div>
                     <div className="relative group">
                         <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors">lock</span>
@@ -87,13 +259,19 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                             className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
                             placeholder="Enter your password"
                             type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </div>
                 </div>
 
                 <div className="pt-4 flex flex-col gap-3">
-                    <button className="w-full h-14 bg-primary text-white font-bold hover:bg-primary/90 hover:scale-[0.99] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 rounded-lg">
-                        Sign In
+                    <button
+                        disabled={loading}
+                        className="w-full h-14 bg-primary text-white font-bold hover:bg-primary/90 hover:scale-[0.99] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? 'Signing In...' : 'Sign In'}
                     </button>
                     <button onClick={onClose} type="button" className="w-full h-14 bg-transparent text-zinc-600 dark:text-zinc-400 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all rounded-lg">
                         Cancel
@@ -150,43 +328,119 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                 </p>
             </header>
 
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+                </div>
+            )}
+
             <div className="space-y-6 mb-8">
                 <div>
                     <label className="text-zinc-900 dark:text-white text-sm font-bold tracking-wide mb-3 block px-1">University</label>
                     <div className="flex gap-2">
-                        <button className="flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all bg-primary text-white shadow-sm border border-primary">Bingham</button>
-                        <button className="flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10">Veritas</button>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedSchoolId("684c03a5-a18d-4df9-b064-0aaeee2a5f01")}
+                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${selectedSchoolId === "684c03a5-a18d-4df9-b064-0aaeee2a5f01" ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                        >
+                            Bingham
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedSchoolId("a7741870-1798-466f-87d2-748446b404f2")}
+                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${selectedSchoolId === "a7741870-1798-466f-87d2-748446b404f2" ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                        >
+                            Veritas
+                        </button>
                     </div>
                 </div>
                 <div>
                     <label className="text-zinc-900 dark:text-white text-sm font-bold tracking-wide mb-3 block px-1">Account Type</label>
                     <div className="flex gap-2">
-                        <button className="flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all bg-primary text-white shadow-sm border border-primary">User</button>
-                        <button className="flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10">Merchant</button>
+                        <button
+                            type="button"
+                            onClick={() => setUserType('user')}
+                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${userType === 'user' ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                        >
+                            User
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setUserType('merchant')}
+                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${userType === 'merchant' ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                        >
+                            Merchant
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setView('otp'); }}>
+            <form className="space-y-4" onSubmit={handleSignUp}>
                 <div className="relative group">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary group-focus-within:text-primary">person</span>
-                    <input className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium" placeholder="Full Name" type="text" />
+                    <input
+                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
+                        placeholder="Full Name"
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                    />
                 </div>
                 <div className="relative group">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">mail</span>
-                    <input className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium" placeholder="Email Address" type="email" />
+                    <input
+                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
+                        placeholder="Email Address"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
                 </div>
                 <div className="relative group">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">phone_iphone</span>
-                    <input className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium" placeholder="Phone Number" type="tel" />
+                    <input
+                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
+                        placeholder="Phone Number"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                    />
                 </div>
+                {userType === 'merchant' && (
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">store</span>
+                        <input
+                            className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
+                            placeholder="Brand Name"
+                            type="text"
+                            value={brandName}
+                            onChange={(e) => setBrandName(e.target.value)}
+                            required
+                        />
+                    </div>
+                )}
                 <div className="relative group">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">lock</span>
-                    <input className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-12 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium" placeholder="Password" type="password" />
+                    <input
+                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-12 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
+                        placeholder="Password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
                 </div>
 
                 <div className="pt-6 space-y-3">
-                    <button className="w-full bg-primary text-white font-bold py-4 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-lg rounded-lg">Create Account</button>
+                    <button
+                        disabled={loading}
+                        className="w-full bg-primary text-white font-bold py-4 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-lg rounded-lg disabled:opacity-50"
+                    >
+                        {loading ? 'Creating Account...' : 'Create Account'}
+                    </button>
                     <button onClick={onClose} type="button" className="w-full bg-transparent text-[#221610] dark:text-white font-semibold py-4 hover:bg-primary/5 transition-all text-base border border-primary/20 rounded-lg">Cancel</button>
                 </div>
             </form>
@@ -260,6 +514,76 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
         </div>
     );
 
+    const renderForgotPassword = () => (
+        <div className="w-full max-w-[480px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-6 md:p-10 border border-primary/10 animate-in fade-in zoom-in duration-300 overflow-y-auto max-h-[90vh] no-scrollbar">
+            <div className="mb-8">
+                <button onClick={() => setView('signin')} className="mb-6 text-zinc-400 hover:text-primary transition-colors flex items-center gap-2 group">
+                    <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+                    <span className="text-sm font-bold uppercase tracking-widest">Back to Sign In</span>
+                </button>
+                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">Reset Password</h1>
+                <p className="text-zinc-500 dark:text-zinc-400 text-base leading-relaxed">
+                    Enter your email address to receive a password reset link.
+                </p>
+            </div>
+
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+                </div>
+            )}
+
+            <form className="space-y-6" onSubmit={handleResetPassword}>
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Email Address</label>
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors">mail</span>
+                        <input
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                            placeholder="Enter your email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-3">
+                    <button
+                        disabled={loading}
+                        className="w-full h-14 bg-primary text-white font-bold hover:bg-primary/90 hover:scale-[0.99] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? 'Sending Link...' : 'Send Reset Link'}
+                    </button>
+                    <button onClick={() => setView('signin')} type="button" className="w-full h-14 bg-transparent text-zinc-600 dark:text-zinc-400 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all rounded-lg">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+
+    const renderCheckEmail = () => (
+        <div className="w-full max-w-[480px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-6 md:p-10 border border-primary/10 animate-in fade-in zoom-in duration-300 text-center">
+            <div className="mb-8 flex justify-center">
+                <div className="bg-primary/10 p-6 rounded-full text-primary scale-125">
+                    <span className="material-symbols-outlined text-5xl">mark_email_read</span>
+                </div>
+            </div>
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">Check your email</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 text-base leading-relaxed mb-8">
+                {checkEmailMessage || 'We sent a password reset link to your email.'}
+            </p>
+            <button
+                onClick={() => setView('signin')}
+                className="w-full h-14 bg-primary text-white font-bold hover:bg-primary/90 hover:scale-[0.99] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 rounded-lg"
+            >
+                Return to Sign In
+            </button>
+        </div>
+    );
+
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-[4px] transition-all animate-in fade-in duration-300">
             <div className="absolute inset-0" onClick={onClose} />
@@ -267,6 +591,8 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                 {view === 'signin' && renderSignIn()}
                 {view === 'signup' && renderSignUp()}
                 {view === 'otp' && renderOTP()}
+                {view === 'forgot' && renderForgotPassword()}
+                {view === 'check-email' && renderCheckEmail()}
             </div>
         </div>
     );

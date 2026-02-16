@@ -4,6 +4,10 @@ import { V2Layout } from '../../components/v2/V2Layout';
 import { useTheme } from '../../hooks/useTheme';
 import { supabase, UniqueVisitor } from '../../lib/supabase';
 import { toast } from 'sonner';
+import { useHostelFeed } from '../../hooks/hostel/useHostelFeed';
+import EditBrandNameModal from '../../components/EditBrandNameModal';
+import VerifyIDModal from '../../components/VerifyIdModal';
+import EditEmailModal from '../../components/EditEmailModal';
 
 export const ProfilePageV2: React.FC = () => {
     const navigate = useNavigate();
@@ -11,6 +15,12 @@ export const ProfilePageV2: React.FC = () => {
     const isDark = currentTheme.isDark;
     const [user, setUser] = useState<UniqueVisitor | null>(null);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
+    const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+
+    const { feed, loadFeed, setFeed } = useHostelFeed(null, 'all', 'all', true, user);
 
     useEffect(() => {
         let isMounted = true;
@@ -20,7 +30,6 @@ export const ProfilePageV2: React.FC = () => {
             if (!isMounted) return;
 
             if (!session) {
-                // Give it one more tiny chance or check if we are actually intentionally signed out
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 if (!authUser && isMounted) {
                     toast.error('Please sign in to view your profile');
@@ -29,12 +38,12 @@ export const ProfilePageV2: React.FC = () => {
                 }
             }
 
-            if (session?.user?.id || (await supabase.auth.getUser()).data.user?.id) {
-                const userId = session?.user?.id || (await supabase.auth.getUser()).data.user?.id;
+            const activeUser = session?.user || (await supabase.auth.getUser()).data.user;
+            if (activeUser && isMounted) {
                 const { data: visitor } = await supabase
                     .from('unique_visitors')
                     .select('*, hostels(*), schools(*)')
-                    .eq('auth_user_id', userId)
+                    .eq('auth_user_id', activeUser.id)
                     .single();
 
                 if (isMounted) {
@@ -60,6 +69,12 @@ export const ProfilePageV2: React.FC = () => {
         };
     }, [navigate]);
 
+    useEffect(() => {
+        if (user) {
+            loadFeed(user.schools?.id || user.hostels?.school_id);
+        }
+    }, [user, loadFeed]);
+
     const handleSignOut = async () => {
         try {
             await supabase.auth.signOut();
@@ -67,6 +82,79 @@ export const ProfilePageV2: React.FC = () => {
             navigate('/v2/hostel');
         } catch (error) {
             toast.error('Error signing out');
+        }
+    };
+
+    const handleDeletePost = async (postId: string) => {
+        try {
+            setDeletingId(postId);
+            const { error } = await supabase
+                .from('hostel_product_updates')
+                .delete()
+                .eq('id', postId);
+
+            if (error) throw error;
+
+            toast.success('Post deleted');
+            setFeed(prev => prev.filter(p => p.id !== postId));
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to delete post');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleUpdateBrandName = async (newBrandName: string | null) => {
+        if (!user) return;
+        try {
+            const { error } = await supabase
+                .from('unique_visitors')
+                .update({ brand_name: newBrandName })
+                .eq('auth_user_id', user.auth_user_id);
+
+            if (error) throw error;
+            setUser({ ...user, brand_name: newBrandName || undefined });
+            toast.success('Brand name updated');
+            setIsBrandModalOpen(false);
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to update brand name');
+        }
+    };
+
+    const handleVerifyID = async (uploadedUrl: string) => {
+        if (!user) return;
+        try {
+            const { error } = await supabase
+                .from('unique_visitors')
+                .update({
+                    verification_status: 'pending',
+                    verification_id: uploadedUrl
+                })
+                .eq('auth_user_id', user.auth_user_id);
+
+            if (error) throw error;
+            setUser({ ...user, verification_status: 'pending', verification_id: uploadedUrl });
+            toast.success('ID submitted for verification');
+            setIsVerifyModalOpen(false);
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to submit verification');
+        }
+    };
+
+    const handleUpdateEmail = async (newEmail: string) => {
+        if (!user) return;
+        try {
+            const { error } = await supabase
+                .from('unique_visitors')
+                .update({ email: newEmail })
+                .eq('auth_user_id', user.auth_user_id);
+
+            if (error) throw error;
+            setUser({ ...user, email: newEmail });
+            toast.success('Email updated internally');
+            setIsEmailModalOpen(false);
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to update email');
         }
     };
 
@@ -97,7 +185,7 @@ export const ProfilePageV2: React.FC = () => {
                                 user?.full_name?.charAt(0) || 'U'
                             )}
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full border-4 border-background-light dark:border-[#221610] flex items-center justify-center cursor-pointer shadow-xl z-20 hover:scale-110 transition-all active:scale-90">
+                        <div className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full border-4 border-[#f8f6f5] dark:border-[#221610] flex items-center justify-center cursor-pointer shadow-xl z-20 hover:scale-110 transition-all active:scale-90">
                             <span className="material-symbols-outlined text-sm">photo_camera</span>
                         </div>
                     </div>
@@ -109,14 +197,65 @@ export const ProfilePageV2: React.FC = () => {
 
                     <div className="flex gap-4 mt-8 w-full max-w-[280px]">
                         <div className="flex-1 bg-white dark:bg-white/5 border border-zinc-100 dark:border-white/10 rounded-[2rem] py-3 shadow-sm">
-                            <p className="text-lg font-black dark:text-white">12</p>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Orders</p>
+                            <p className="text-lg font-black dark:text-white">{feed.length}</p>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Posts</p>
                         </div>
                         <div className="flex-1 bg-white dark:bg-white/5 border border-zinc-100 dark:border-white/10 rounded-[2rem] py-3 shadow-sm">
-                            <p className="text-lg font-black dark:text-white">₦24k</p>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Spent</p>
+                            <p className="text-lg font-black dark:text-white">₦0</p>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Sales</p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* My Posts Section */}
+            <section className="px-6 mb-10">
+                <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 mb-4 px-4 uppercase tracking-widest">My Posts & Requests</h3>
+                <div className="space-y-4">
+                    {feed.length > 0 ? (
+                        feed.map((post) => (
+                            <div key={post.id} className="bg-white dark:bg-white/5 rounded-[2rem] border border-zinc-100 dark:border-white/10 shadow-sm p-4 flex gap-4 items-center transition-all hover:border-primary/20">
+                                <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
+                                    <img
+                                        src={post.post_images?.[0] || '/v2/assets/portable_speaker_product_1771272581168.png'}
+                                        alt="post"
+                                        className="w-full h-full object-cover"
+                                        onError={(e: any) => e.target.src = '/v2/assets/portable_speaker_product_1771272581168.png'}
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${post.post_type === 'request' ? 'bg-blue-500/10 text-blue-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                                            {post.post_type}
+                                        </span>
+                                        <span className="text-[10px] text-zinc-400 font-medium">
+                                            {new Date(post.created_at).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm font-bold dark:text-white truncate">{post.post_description}</p>
+                                    <p className="text-xs text-primary font-black mt-0.5">₦{post.price?.toLocaleString() || '0'}</p>
+                                </div>
+                                <button
+                                    disabled={deletingId === post.id}
+                                    onClick={() => handleDeletePost(post.id)}
+                                    className="w-11 h-11 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-95 disabled:opacity-50 shrink-0"
+                                >
+                                    {deletingId === post.id ? (
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <span className="material-symbols-outlined text-xl">delete</span>
+                                    )}
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="bg-white dark:bg-white/5 rounded-[2.5rem] p-10 text-center border-2 border-dashed border-zinc-100 dark:border-white/10">
+                            <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                <span className="material-symbols-outlined text-3xl text-zinc-300 dark:text-zinc-600">post_add</span>
+                            </div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">No posts or requests found</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -129,10 +268,52 @@ export const ProfilePageV2: React.FC = () => {
                             <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Email Address</p>
                             <p className="font-bold dark:text-white">{user?.email || 'N/A'}</p>
                         </div>
-                        <button className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-full uppercase tracking-widest active:scale-95 transition-all">Change</button>
+                        <button
+                            onClick={() => setIsEmailModalOpen(true)}
+                            className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-full uppercase tracking-widest active:scale-95 transition-all"
+                        >
+                            Change
+                        </button>
                     </div>
 
-                    <div className="space-y-1">
+                    {user?.user_type === 'merchant' && (
+                        <>
+                            <div className="flex items-center justify-between group pt-4 border-t border-zinc-50 dark:border-white/5">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Brand Name</p>
+                                    <p className="font-bold dark:text-white uppercase">{user.brand_name || 'Set your brand'}</p>
+                                </div>
+                                <button
+                                    onClick={() => setIsBrandModalOpen(true)}
+                                    className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-full uppercase tracking-widest active:scale-95 transition-all"
+                                >
+                                    Change
+                                </button>
+                            </div>
+
+                            <div className="flex items-center justify-between group pt-4 border-t border-zinc-50 dark:border-white/5">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Verification</p>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`w-2 h-2 rounded-full ${user.verification_status === 'verified' ? 'bg-emerald-500' :
+                                            user.verification_status === 'pending' ? 'bg-amber-500' : 'bg-red-500'
+                                            }`} />
+                                        <p className="font-bold dark:text-white uppercase text-xs">{user.verification_status || 'unverified'}</p>
+                                    </div>
+                                </div>
+                                {user.verification_status !== 'verified' && (
+                                    <button
+                                        onClick={() => setIsVerifyModalOpen(true)}
+                                        className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-full uppercase tracking-widest active:scale-95 transition-all"
+                                    >
+                                        {user.verification_status === 'pending' ? 'Update ID' : 'Verify Now'}
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    <div className="space-y-1 pt-4 border-t border-zinc-50 dark:border-white/5">
                         <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Full Name</p>
                         <p className="font-bold dark:text-white">{user?.full_name || 'N/A'}</p>
                     </div>
@@ -249,6 +430,33 @@ export const ProfilePageV2: React.FC = () => {
                     <p className="text-[10px] font-bold text-zinc-300 dark:text-zinc-700 uppercase tracking-widest">Bingham • Veritas</p>
                 </div>
             </section>
+            {isBrandModalOpen && (
+                <EditBrandNameModal
+                    currentBrandName={user?.brand_name || ''}
+                    onClose={() => setIsBrandModalOpen(false)}
+                    onSave={handleUpdateBrandName}
+                    currentTheme={currentTheme}
+                />
+            )}
+
+            {isVerifyModalOpen && (
+                <VerifyIDModal
+                    onClose={() => setIsVerifyModalOpen(false)}
+                    onSave={handleVerifyID}
+                    currentTheme={currentTheme}
+                    uniqueId={user?.full_name || 'user'}
+                    currentVerificationId={user?.verification_id}
+                />
+            )}
+
+            {isEmailModalOpen && (
+                <EditEmailModal
+                    currentEmail={user?.email || ''}
+                    onClose={() => setIsEmailModalOpen(false)}
+                    onSave={handleUpdateEmail}
+                    currentTheme={currentTheme}
+                />
+            )}
         </V2Layout>
     );
 };

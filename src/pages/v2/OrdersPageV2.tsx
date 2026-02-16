@@ -57,7 +57,7 @@ export const OrdersPageV2: React.FC = () => {
         total: requests.length,
         bingham: requests.filter(r => r.university === 'Bingham').length,
         veritas: requests.filter(r => r.university === 'Veritas').length,
-        matches: 0
+        matches: requests.filter(r => r.matched_seller_ids && r.matched_seller_ids.length > 0).length
     };
 
     return (
@@ -152,7 +152,7 @@ export const OrdersPageV2: React.FC = () => {
                                     <p className="text-2xl font-black dark:text-white leading-tight mb-4 group-hover:text-primary transition-colors duration-300">"{req.request_text}"</p>
                                     <div className="flex items-center gap-2 mt-4 text-zinc-400">
                                         <span className="material-symbols-outlined text-sm">group</span>
-                                        <span className="text-xs font-bold uppercase tracking-widest">0 sellers matched</span>
+                                        <span className="text-xs font-bold uppercase tracking-widest">{req.matched_seller_ids?.length || 0} sellers matched</span>
                                     </div>
                                 </div>
 
@@ -163,7 +163,10 @@ export const OrdersPageV2: React.FC = () => {
                                     >
                                         View Details
                                     </button>
-                                    <button className="flex-1 h-14 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <button
+                                        onClick={() => setSelectedRequest(req)}
+                                        className="flex-1 h-14 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    >
                                         <span className="material-symbols-outlined text-lg">chat</span>
                                         Contact Seller
                                     </button>

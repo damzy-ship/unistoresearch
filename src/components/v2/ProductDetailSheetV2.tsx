@@ -4,6 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import { supabase } from '../../lib/supabase';
+import { getUserId } from '../../hooks/useTracking';
 
 interface ProductDetailSheetV2Props {
     isOpen: boolean;
@@ -171,7 +173,34 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             <button className="h-14 w-14 rounded-full border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-primary transition-all active:scale-95">
                                 <span className="material-symbols-outlined text-[28px]">favorite</span>
                             </button>
-                            <button className="flex-1 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95">
+                            <button
+                                onClick={async () => {
+                                    const phone = product?.unique_visitors?.phone_number;
+                                    if (!phone) {
+                                        alert('Contact not available');
+                                        return;
+                                    }
+                                    const msg = `hi there, i'm interested in your ${product.post_description || ''} for ₦${product.price?.toLocaleString() || '0'}`;
+                                    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+                                    window.open(whatsappUrl, '_blank');
+
+                                    // Log Analytics (V1 Parity)
+                                    try {
+                                        const userId = await getUserId();
+                                        await supabase
+                                            .from('merchant_analytics')
+                                            .insert([{
+                                                merchant_id: product.actual_user_id || null,
+                                                product_id: product.id || null,
+                                                event_type: 'profile_contacted',
+                                                user_id: userId
+                                            }]);
+                                    } catch (err) {
+                                        console.warn('Failed to log contact analytics:', err);
+                                    }
+                                }}
+                                className="flex-1 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95"
+                            >
                                 <span className="material-symbols-outlined">chat</span>
                                 Contact Seller
                             </button>

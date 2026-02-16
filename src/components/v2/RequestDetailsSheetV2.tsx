@@ -1,17 +1,63 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
+import { trackContactInteraction } from '../../lib/ratingService';
 
 interface RequestDetailsSheetV2Props {
     isOpen: boolean;
     onClose: () => void;
     request: any;
+    currentVisitorId?: string;
 }
 
 export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
     isOpen,
     onClose,
-    request
+    request,
+    currentVisitorId
 }) => {
+    const [matchedSellers, setMatchedSellers] = React.useState<any[]>([]);
+    const [loadingSellers, setLoadingSellers] = React.useState(false);
+
+    React.useEffect(() => {
+        const fetchMatchedSellers = async () => {
+            if (!isOpen || !request?.matched_seller_ids || request.matched_seller_ids.length === 0) {
+                setMatchedSellers([]);
+                return;
+            }
+
+            setLoadingSellers(true);
+            try {
+                const { data: merchants, error } = await supabase
+                    .from('merchants')
+                    .select('*')
+                    .in('seller_id', request.matched_seller_ids);
+
+                if (error) throw error;
+                setMatchedSellers(merchants || []);
+            } catch (err) {
+                console.error('Error fetching matched sellers:', err);
+            } finally {
+                setLoadingSellers(false);
+            }
+        };
+
+        fetchMatchedSellers();
+    }, [isOpen, request?.matched_seller_ids]);
+
+    const handleContactSeller = async (seller: any) => {
+        try {
+            // Track contact for rating (V1 Parity)
+            await trackContactInteraction(seller.id, request.id);
+
+            const message = `Hi! I'm looking for the following from ${request.university || ''} University: ${request.request_text || ''}`;
+            const whatsappUrl = `https://wa.me/${seller.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        } catch (err) {
+            console.error('Failed to contact seller:', err);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -78,17 +124,49 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
                                         </div>
                                     </div>
 
-                                    <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-100 dark:border-white/10 rounded-3xl p-5 flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm border border-zinc-100 dark:border-zinc-700">
-                                                <span className="material-symbols-outlined text-zinc-500">group</span>
+                                    <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-100 dark:border-white/10 rounded-3xl p-5 flex flex-col gap-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm border border-zinc-100 dark:border-zinc-700">
+                                                    <span className="material-symbols-outlined text-zinc-500">group</span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Seller Matches</p>
+                                                    <p className="font-bold dark:text-white">{matchedSellers.length} Sellers matched</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Seller Matches</p>
-                                                <p className="font-bold dark:text-white">0 Sellers matched</p>
-                                            </div>
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${matchedSellers.length > 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-200 dark:bg-white/10 dark:text-zinc-400'}`}>
+                                                {matchedSellers.length > 0 ? 'MATCHED' : 'PENDING'}
+                                            </span>
                                         </div>
-                                        <span className="bg-zinc-200 dark:bg-white/10 px-3 py-1 rounded-full text-[10px] font-bold dark:text-zinc-400">PENDING</span>
+
+                                        {loadingSellers ? (
+                                            <div className="flex items-center justify-center py-4">
+                                                <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                                            </div>
+                                        ) : matchedSellers.length > 0 && (
+                                            <div className="space-y-3 mt-2">
+                                                {matchedSellers.map((seller) => (
+                                                    <div key={seller.id} className="bg-white dark:bg-white/5 border border-zinc-100 dark:border-white/10 rounded-2xl p-4 flex items-center justify-between group hover:border-primary/30 transition-all">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold">
+                                                                {seller.full_name?.charAt(0) || 'S'}
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold dark:text-white">{seller.full_name}</p>
+                                                                <p className="text-[10px] text-zinc-400 font-medium">Verified Seller</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleContactSeller(seller)}
+                                                            className="h-10 px-4 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all active:scale-95"
+                                                        >
+                                                            Chat
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -121,13 +199,34 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
 
                         {/* Bottom Actions */}
                         <div className="pt-8 flex gap-4">
-                            <button className="flex-1 h-16 rounded-[2rem] bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white font-black text-sm active:scale-95 transition-all border border-zinc-200 dark:border-white/10">
-                                Cancel Request
-                            </button>
-                            <button className="flex-2 h-16 px-10 rounded-[2rem] bg-primary text-white font-black text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2">
-                                <span className="material-symbols-outlined">refresh</span>
-                                BUMP REQUEST
-                            </button>
+                            {request?.user_id === currentVisitorId ? (
+                                <>
+                                    <button className="flex-1 h-16 rounded-[2rem] bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white font-black text-sm active:scale-95 transition-all border border-zinc-200 dark:border-white/10">
+                                        Cancel Request
+                                    </button>
+                                    <button className="flex-2 h-16 px-10 rounded-[2rem] bg-primary text-white font-black text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                        <span className="material-symbols-outlined">refresh</span>
+                                        BUMP REQUEST
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        const phone = request?.unique_visitors?.phone_number;
+                                        if (!phone) {
+                                            alert('Contact not available');
+                                            return;
+                                        }
+                                        const msg = `hi there, i have the ${request.post_description || ''} you're looking for`;
+                                        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+                                        window.open(whatsappUrl, '_blank');
+                                    }}
+                                    className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
+                                >
+                                    <span className="material-symbols-outlined text-xl">chat</span>
+                                    Contact Requester
+                                </button>
+                            )}
                         </div>
                     </motion.div>
                 </div>

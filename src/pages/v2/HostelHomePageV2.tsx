@@ -5,6 +5,8 @@ import { RequestDetailsSheetV2 } from '../../components/v2/RequestDetailsSheetV2
 import { supabase, UniqueVisitor, Hostel } from '../../lib/supabase';
 import { useHostelFeed } from '../../hooks/hostel/useHostelFeed';
 import { motion } from 'framer-motion';
+import { LiveActivityHubV2 } from '../../components/v2/LiveActivityHubV2';
+import { MerchantCatalogSheetV2 } from '../../components/v2/MerchantCatalogSheetV2';
 
 export const HostelHomePageV2: React.FC = () => {
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -14,6 +16,8 @@ export const HostelHomePageV2: React.FC = () => {
     const [selectedSchoolId] = useState<string | null>(localStorage.getItem('selectedSchoolId'));
     const [selectedHostel, setSelectedHostel] = useState<string>('all');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+    const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
     const [hostels, setHostels] = useState<Hostel[]>([]);
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
 
@@ -52,6 +56,15 @@ export const HostelHomePageV2: React.FC = () => {
         loadFeed();
     }, [loadFeed, selectedSchoolId, selectedHostel, selectedCategory]);
 
+    useEffect(() => {
+        const handleRefresh = () => {
+            console.log('Refreshing hostel feed from event...');
+            loadFeed();
+        };
+        window.addEventListener('hostel-feed-refresh', handleRefresh);
+        return () => window.removeEventListener('hostel-feed-refresh', handleRefresh);
+    }, [loadFeed]);
+
     const requestItems = feed.filter(item => item.post_type === 'request');
     const productItems = feed.filter(item => item.post_type !== 'request');
 
@@ -72,6 +85,10 @@ export const HostelHomePageV2: React.FC = () => {
 
     return (
         <V2Layout activeTab="home">
+            <LiveActivityHubV2 onUserClick={(user) => {
+                setSelectedMerchant(user);
+                setIsCatalogOpen(true);
+            }} />
             {/* Safety Banner */}
             <section className="p-4 pt-6">
                 <div className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 border border-primary/10 dark:border-primary/20 rounded-[2rem] p-5 flex gap-5 items-center shadow-sm backdrop-blur-3xl group">
@@ -95,6 +112,7 @@ export const HostelHomePageV2: React.FC = () => {
                 <div className="px-6 flex items-center justify-between mb-5">
                     <div className="flex items-center gap-3">
                         <h3 className="text-xl font-bold text-[#1a2a40] dark:text-white tracking-tight leading-none">Live Requests</h3>
+                        <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">{requestItems.length} Active</p>
                         <div className="relative flex items-center justify-center">
                             <div className="w-2.5 h-2.5 rounded-full bg-primary animate-ping absolute opacity-50"></div>
                             <div className="w-2.5 h-2.5 rounded-full bg-primary relative border-2 border-[#f8f6f5] dark:border-[#221610]"></div>
@@ -283,6 +301,14 @@ export const HostelHomePageV2: React.FC = () => {
                 isOpen={isRequestOpen}
                 onClose={() => setIsRequestOpen(false)}
                 request={selectedRequest}
+                currentVisitorId={currentVisitor?.id}
+            />
+
+            {/* Merchant Catalog Sheet */}
+            <MerchantCatalogSheetV2
+                isOpen={isCatalogOpen}
+                onClose={() => setIsCatalogOpen(false)}
+                merchant={selectedMerchant}
             />
         </V2Layout>
     );
