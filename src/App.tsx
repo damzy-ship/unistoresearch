@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useTheme } from './hooks/useTheme';
+import { useTheme } from './hooks/useTheme.tsx';
 // import HomePage from './pages/HomePage';
 import PastRequestsPage from './pages/PastRequestsPage';
 import SellersPage from './pages/SellersPage';
@@ -41,7 +41,7 @@ function App() {
   return (
     <div
       className="min-h-screen transition-colors duration-300"
-      style={{ backgroundColor: currentTheme.background }}
+      style={!window.location.pathname.startsWith('/v2') ? { backgroundColor: currentTheme.background } : {}}
     >
       <Router>
         <div className="lg:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}

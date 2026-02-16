@@ -74,7 +74,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                         animate={controls}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative flex h-[85vh] w-full flex-col rounded-t-[3rem] bg-white dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10"
+                        className="relative flex h-[85vh] w-full flex-col rounded-t-[3rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10"
                     >
                         {/* Handle Bar Area - Explicitly for dragging */}
                         <div className="flex h-12 w-full items-center justify-center pt-2 cursor-grab active:cursor-grabbing shrink-0">
@@ -91,12 +91,12 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                     pagination={{ dynamicBullets: true, clickable: true }}
                                     spaceBetween={12}
                                     loop={true}
-                                    className="w-full aspect-[4/5] rounded-3xl !pb-8"
+                                    className="w-full aspect-[4/5] rounded-[2.5rem] !pb-10"
                                 >
                                     {images.map((img: string, i: number) => (
                                         <SwiperSlide key={i}>
                                             <div
-                                                className="w-full h-full bg-cover bg-center rounded-3xl shadow-md border border-zinc-100 dark:border-zinc-800"
+                                                className="w-full h-full bg-cover bg-center rounded-[2.5rem] shadow-inner border border-black/5 dark:border-white/10"
                                                 style={{ backgroundImage: `url('${img}')` }}
                                             />
                                         </SwiperSlide>
@@ -105,11 +105,11 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             </div>
 
                             {/* Product Info */}
-                            <div className="px-6 pt-2">
-                                <div className="flex justify-between items-start">
+                            <div className="px-6 pt-4">
+                                <div className="flex justify-between items-start gap-4">
                                     <div className="flex-1">
-                                        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white leading-tight">{displayProduct.name}</h1>
-                                        <p className="text-sm text-zinc-400 dark:text-zinc-500 font-medium mt-1 tracking-wide">{displayProduct.category || 'Bakery & Snacks'}</p>
+                                        <h1 className="text-2xl font-bold text-[#1a2a40] dark:text-white leading-tight">{displayProduct.name}</h1>
+                                        <p className="text-sm text-zinc-500 font-medium mt-1 tracking-wide">{displayProduct.category || 'Bakery & Snacks'}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-2xl font-bold text-primary">₦{displayProduct.price}</p>
@@ -118,47 +118,47 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 </div>
 
                                 {/* Seller Card */}
-                                <div className="mt-6 flex items-center justify-between p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700">
+                                <div className="mt-8 flex items-center justify-between p-4 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 shadow-sm">
                                     <div className="flex items-center gap-3">
                                         <div
-                                            className="h-12 w-12 rounded-full border-2 border-white dark:border-zinc-600 shadow-sm bg-cover bg-center bg-zinc-200"
+                                            className="h-12 w-12 rounded-full border-2 border-[#f8f6f5] dark:border-zinc-800 shadow-sm bg-cover bg-center bg-zinc-100"
                                             style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAOkQXxLVWEgdGx319Xuk5fzA2_nEMJ_3OBr70yTUgxpib1V2L6gOg-1nn1O6-nOyqwLsWGF0VYtRCx-CQ2YbNTXwtu6KTfNNU3b_2_ujhDNS6QtwcF79HW9kqV7ecAyKnvk1jQzTw_TBz8_137kfwTa0BU0EPm7c_nIiHOFXxTy8AdJtxpFnrUwjwXJYReYBFjSFyygNd8I-BmtYPirk0xRAfySocJ-pSvuVJ-r4kWvgzPZoh43l9Tc8qnl5Tc1O8f3U83mAkRUYE')" }}
                                         ></div>
                                         <div>
-                                            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{displayProduct.seller}</p>
-                                            <div className="flex items-center gap-1 text-xs text-zinc-500">
+                                            <p className="text-sm font-bold text-[#1a2a40] dark:text-zinc-100">{displayProduct.seller}</p>
+                                            <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
                                                 <span className="material-symbols-outlined text-xs">location_on</span>
                                                 <span>{displayProduct.loc}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 bg-white dark:bg-zinc-700 px-2.5 py-1 rounded-full shadow-sm">
+                                    <div className="flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full">
                                         <span className="material-symbols-outlined text-primary text-sm fill-1">star</span>
-                                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{displayProduct.rating || '4.9'}</span>
+                                        <span className="text-xs font-bold text-primary">{displayProduct.rating || '4.9'}</span>
                                     </div>
                                 </div>
 
                                 {/* Description */}
                                 <div className="mt-8">
-                                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-3">Description</h3>
+                                    <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-3">Description</h3>
                                     <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-sm">
                                         {displayProduct.description}
                                     </p>
-                                    <div className="mt-4 flex flex-wrap gap-2">
-                                        <span className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium border border-zinc-200 dark:border-zinc-700">Artisanal</span>
-                                        <span className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium border border-zinc-200 dark:border-zinc-700">Dorm-baked</span>
-                                        <span className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium border border-zinc-200 dark:border-zinc-700">Organic</span>
+                                    <div className="mt-5 flex flex-wrap gap-2">
+                                        <span className="px-4 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-black/5 dark:border-white/10">Artisanal</span>
+                                        <span className="px-4 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-black/5 dark:border-white/10">Dorm-baked</span>
+                                        <span className="px-4 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-black/5 dark:border-white/10">Organic</span>
                                     </div>
                                 </div>
 
                                 {/* Campus Map Snippet */}
                                 <div className="mt-8">
-                                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-3">Pickup Location</h3>
-                                    <div className="h-40 w-full rounded-2xl bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-700">
+                                    <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-3">Pickup Location</h3>
+                                    <div className="h-44 w-full rounded-[2rem] bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
                                         <img className="w-full h-full object-cover opacity-60 dark:opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7-GaqwsyUCErSKiAV_I5Lukji5va4cNJ1JBu4D2Sa_6jXMtHElAPLX9eMQxKWDeN48PDZ8b3feacGUd7rxyHz1jl-Ioj9SAreYctYUrcGu90oQlU60AQqrs1NZaMBlaRe5Z48sxNJ-5sOHVSTX137QUg-QKzIuLJJOvIlROzsrHDS_FX2Wn477tNbgebn-ssisbIdGBZlAlT2FhGJxGjN00Z-AzVx36kWTS1dLyLVf8vY8V013_BanRlZGOSv1tlsIIuMTZW1C4I" alt="Map" />
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center border-4 border-white dark:border-zinc-900 shadow-xl">
-                                                <span className="material-symbols-outlined text-white text-base">location_on</span>
+                                            <div className="h-12 w-12 bg-primary rounded-full flex items-center justify-center border-4 border-white dark:border-[#221610] shadow-2xl">
+                                                <span className="material-symbols-outlined text-white text-xl">location_on</span>
                                             </div>
                                         </div>
                                     </div>
@@ -167,11 +167,11 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                         </div>
 
                         {/* Sticky Bottom Action Bar */}
-                        <div className="p-6 bg-white dark:bg-[#221610] border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-4 shrink-0">
-                            <button className="h-14 w-14 rounded-full border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-primary transition-colors hover:border-primary/20">
+                        <div className="px-6 py-8 bg-[#f8f6f5]/90 dark:bg-[#221610]/95 backdrop-blur-3xl border-t border-black/5 dark:border-white/5 flex items-center gap-4 shrink-0">
+                            <button className="h-14 w-14 rounded-full border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-primary transition-all active:scale-95">
                                 <span className="material-symbols-outlined text-[28px]">favorite</span>
                             </button>
-                            <button className="flex-1 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95">
+                            <button className="flex-1 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95">
                                 <span className="material-symbols-outlined">chat</span>
                                 Contact Seller
                             </button>

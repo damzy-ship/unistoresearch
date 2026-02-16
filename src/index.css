@@ -11,8 +11,15 @@
 
 @layer base {
   body {
-    @apply bg-background-light text-navy antialiased;
+    @apply antialiased;
+    background-color: var(--background-light);
+    color: var(--navy);
     font-family: 'Bricolage Grotesque', 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  .dark body {
+    background-color: var(--background-dark);
+    color: #ffffff;
   }
 }
 

@@ -39,7 +39,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative flex w-full flex-col rounded-t-[2.5rem] bg-white dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10 p-6 pb-10"
+                        className="relative flex w-full flex-col rounded-t-[3rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10 p-6 pb-12"
                     >
                         {/* Handle */}
                         <div className="flex justify-center mb-6">
@@ -47,26 +47,28 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                         </div>
 
                         {/* Request Preview */}
-                        <div className="flex gap-4 mb-8 p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-100 dark:border-white/5">
-                            <div className="w-20 h-20 rounded-xl bg-zinc-200 dark:bg-zinc-800 overflow-hidden shrink-0">
+                        <div className="flex gap-4 mb-8 p-4 bg-white dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm">
+                            <div className="w-20 h-20 rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0 ring-4 ring-black/5 dark:ring-white/5">
                                 <img className="w-full h-full object-cover" src={request?.img} alt="Request" />
                             </div>
                             <div className="flex-1">
-                                <h4 className="text-zinc-900 dark:text-white font-bold leading-tight mb-1">{request?.text}</h4>
-                                <div className="flex items-center gap-1.5 mt-2">
-                                    <div className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700"></div>
-                                    <span className="text-xs text-zinc-500">{request?.time || 'Just now'}</span>
+                                <h4 className="text-[#1a2a40] dark:text-white font-bold leading-tight mb-1 text-lg">{request?.text}</h4>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-[10px] text-primary">schedule</span>
+                                    </div>
+                                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{request?.time || 'Just now'}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-4 px-1">How would you like to respond?</h3>
+                        <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-5 px-1">How would you like to respond?</h3>
 
                         <div className="space-y-4">
                             {/* Option 1: Sell */}
                             <button
                                 onClick={onClose}
-                                className="w-full flex items-center justify-between p-5 rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
+                                className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -74,33 +76,33 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                                     </div>
                                     <div>
                                         <p className="font-bold text-lg leading-tight text-white">I have this item</p>
-                                        <p className="text-white/80 text-xs mt-0.5">Contact requester to sell yours</p>
+                                        <p className="text-white/80 text-xs mt-1">Contact requester to sell yours</p>
                                     </div>
                                 </div>
-                                <span className="material-symbols-outlined">arrow_forward_ios</span>
+                                <span className="material-symbols-outlined text-xl">arrow_forward_ios</span>
                             </button>
 
                             {/* Option 2: Recommend */}
                             <button
                                 onClick={onClose}
-                                className="w-full flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:scale-[1.02] active:scale-95 transition-all text-left"
+                                className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/10 hover:scale-[1.02] active:scale-95 transition-all text-left shadow-sm"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+                                    <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
                                         <span className="material-symbols-outlined text-2xl">recommend</span>
                                     </div>
                                     <div>
-                                        <p className="font-bold text-lg leading-tight text-zinc-900 dark:text-white">Recommend Product</p>
-                                        <p className="text-zinc-500 text-xs mt-0.5">Suggest an existing product</p>
+                                        <p className="font-bold text-lg leading-tight text-[#1a2a40] dark:text-white">Recommend Product</p>
+                                        <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">Suggest an existing product</p>
                                     </div>
                                 </div>
-                                <span className="material-symbols-outlined text-zinc-400">arrow_forward_ios</span>
+                                <span className="material-symbols-outlined text-zinc-400 text-xl">arrow_forward_ios</span>
                             </button>
                         </div>
 
                         <button
                             onClick={onClose}
-                            className="mt-8 w-full py-4 text-zinc-400 dark:text-zinc-500 font-bold hover:bg-zinc-100 dark:hover:bg-white/5 rounded-2xl transition-all"
+                            className="mt-8 w-full py-5 text-zinc-400 dark:text-zinc-500 font-bold hover:text-primary transition-colors text-sm uppercase tracking-widest"
                         >
                             Nevermind
                         </button>
