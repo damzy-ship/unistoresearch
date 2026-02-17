@@ -58,20 +58,20 @@ export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ onUserClic
                         onClick={() => onUserClick && onUserClick(user)}
                     >
                         <div className="relative">
-                            <div className="w-14 h-14 rounded-full p-[2px] border-2 border-primary/30 group-hover:border-primary transition-all duration-500 shadow-sm">
+                            <div className="w-14 h-14 rounded-full p-[1.5px] bg-primary group-hover:scale-105 transition-all duration-300 shadow-md">
                                 <div className="w-full h-full rounded-full bg-white dark:bg-[#1a110c] p-[1.5px] overflow-hidden">
                                     {user.profile_picture ? (
                                         <img src={user.profile_picture} alt="story" className="w-full h-full rounded-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center text-sm font-black text-zinc-400 dark:text-zinc-500 uppercase">
+                                        <div className="w-full h-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-xs font-black text-primary uppercase">
                                             {user.full_name?.charAt(0)}
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-primary border-2 border-white dark:border-[#221610] rounded-full shadow-md z-10"></div>
+                            <div className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-primary border-2 border-white dark:border-[#221610] rounded-full shadow-sm z-10 transition-transform group-hover:scale-110"></div>
                         </div>
-                        <span className="text-[9px] font-bold text-[#1a2a40]/60 dark:text-zinc-400 uppercase tracking-tighter mt-2 max-w-[56px] truncate transition-colors group-hover:text-primary">
+                        <span className="text-[9px] font-black text-[#1a2a40]/60 dark:text-zinc-400 uppercase tracking-tighter mt-1.5 max-w-[56px] truncate transition-colors group-hover:text-primary">
                             {user.brand_name || user.full_name?.split(' ')[0]}
                         </span>
                     </motion.div>

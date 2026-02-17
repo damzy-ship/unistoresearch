@@ -34,55 +34,77 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     const isDark = currentTheme.isDark;
 
     useEffect(() => {
-        const initUser = async () => {
-            try {
-                const { data: { session } } = await getSafeSession();
-                console.log('[V2Layout] initUser session:', !!session);
+        let isInitialCheckDone = false;
 
-                // Only update if not already set significantly (prevents overriding onAuthStateChange)
-                setUserIsAuthenticated(prev => {
-                    if (prev === true) return true;
-                    return !!session;
-                });
-
-                if (session?.user?.id) {
-                    const { data: visitor } = await supabase
-                        .from('unique_visitors')
-                        .select('*, hostels(*), schools(*)')
-                        .eq('auth_user_id', session.user.id)
-                        .maybeSingle();
-
-                    if (visitor) {
-                        setCurrentVisitor(visitor as unknown as UniqueVisitor);
-                        window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor } }));
-                    }
-                    return { session, visitor };
-                }
-            } catch (err) {
-                console.warn('Supabase session init failed/aborted:', err);
-                setUserIsAuthenticated(false);
-            }
-            return { session: null, visitor: null };
-        };
-
-        initUser();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            setUserIsAuthenticated(!!session);
-            if (session?.user?.id) {
-                const { data: visitor } = await supabase
-                    .from('unique_visitors')
-                    .select('*, hostels(*), schools(*)')
-                    .eq('auth_user_id', session.user.id)
-                    .single();
-                setCurrentVisitor(visitor as unknown as UniqueVisitor);
-                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor } }));
-            } else {
+        const syncUser = async (session: any) => {
+            const userId = session?.user?.id;
+            if (!userId) {
                 setCurrentVisitor(null);
+                setUserIsAuthenticated(false);
                 window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session: null, visitor: null } }));
                 if (activeTab === 'profile' || activeTab === 'orders' || activeTab === 'messages') {
                     navigate('/v2/hostel');
                 }
+                return;
+            }
+
+            try {
+                setUserIsAuthenticated(true);
+
+                // Fetch visitor with timeout to prevent hanging the app if DB is slow
+                const visitorPromise = supabase
+                    .from('unique_visitors')
+                    .select('*, hostels(*), schools(*)')
+                    .eq('auth_user_id', userId)
+                    .maybeSingle();
+
+                const timeoutPromise = new Promise<{ data: any, error: any }>((_, reject) =>
+                    setTimeout(() => reject(new Error('Visitor sync timeout')), 4000)
+                );
+
+                const { data: visitor, error } = await Promise.race([visitorPromise, timeoutPromise]) as any;
+
+                if (error) throw error;
+
+                if (visitor) {
+                    setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                } else {
+                    console.warn('[V2Layout] No visitor record found for auth user:', userId);
+                }
+
+                // ALWAYS DISPATCH to unblock children, even if visitor is null
+                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: visitor || null } }));
+            } catch (err) {
+                console.warn('[V2Layout] visitor sync failed or timed out:', err);
+                // Dispatch failure state to unblock children
+                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: null } }));
+            }
+        };
+
+        const initUser = async () => {
+            try {
+                const { data: { session } } = await getSafeSession();
+                if (session && !isInitialCheckDone) {
+                    await syncUser(session);
+                } else if (!session) {
+                    setUserIsAuthenticated(false);
+                }
+            } catch (err) {
+                console.warn('[V2Layout] initUser failed:', err);
+                setUserIsAuthenticated(false);
+            } finally {
+                isInitialCheckDone = true;
+            }
+        };
+
+        initUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('[V2Layout] onAuthStateChange:', event);
+            if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+                await syncUser(session);
+            } else if (event === 'SIGNED_OUT') {
+                await syncUser(null);
             }
         });
 

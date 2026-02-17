@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, UniqueVisitor } from '../../lib/supabase';
 import { useTheme } from '../../hooks/useTheme';
 import { toast } from 'sonner';
+import { MessageCircle, Phone, MapPin, Package, X, ArrowRight } from 'lucide-react';
 
 interface MerchantCatalogSheetV2Props {
     isOpen: boolean;
@@ -14,17 +15,19 @@ interface MerchantCatalogSheetV2Props {
 export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ isOpen, onClose, merchant, onProductClick }) => {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const { currentTheme } = useTheme();
 
     useEffect(() => {
-        if (isOpen && merchant) {
+        if (isOpen && merchant?.id) {
             const fetchProducts = async () => {
                 setLoading(true);
                 try {
+                    console.log('[MerchantCatalog] Fetching products for visitor (post_type=update):', merchant.id);
                     const { data, error } = await supabase
                         .from('hostel_product_updates')
                         .select('*')
-                        .eq('actual_user_id', merchant.auth_user_id)
-                        .eq('post_type', 'product')
+                        .eq('actual_user_id', merchant.id)
+                        .eq('post_type', 'update') // Corrected from 'product'
                         .order('created_at', { ascending: false });
 
                     if (error) throw error;
@@ -38,15 +41,17 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
             };
             fetchProducts();
         }
-    }, [isOpen, merchant]);
+    }, [isOpen, merchant?.id]);
 
-    const handleWhatsApp = () => {
+    const handleWhatsApp = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (!merchant?.phone_number) return;
         const msg = encodeURIComponent(`Hi ${merchant.brand_name || merchant.full_name}, I saw your items on UniStore!`);
         window.open(`https://wa.me/${merchant.phone_number.replace(/[^0-9]/g, '')}?text=${msg}`, '_blank');
     };
 
-    const handleCall = () => {
+    const handleCall = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (!merchant?.phone_number) return;
         window.location.href = `tel:${merchant.phone_number}`;
     };
@@ -55,129 +60,145 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center">
+            <div className="fixed inset-0 z-[120] flex items-end">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={onClose}
-                    className="absolute inset-0 bg-black/90 backdrop-blur-md"
+                    className="absolute inset-0 bg-black/60 backdrop-blur-[4px]"
                 />
 
                 <motion.div
-                    initial={{ opacity: 0, y: "100%" }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: "100%" }}
+                    drag="y"
+                    dragConstraints={{ top: 0, bottom: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(_, info) => {
+                        if (info.offset.y > 100) onClose();
+                    }}
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="relative w-full max-w-4xl bg-[#0a0f1a] rounded-t-[3rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-t md:border border-white/10 flex flex-col md:flex-row h-[94vh] md:h-auto md:max-h-[650px]"
+                    className="relative flex w-full flex-col rounded-t-[2.5rem] bg-white dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/10 z-10 h-[85vh]"
                 >
-                    {/* Drawer Handle (Mobile Only) */}
-                    <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 mb-2 md:hidden" />
-
-                    {/* Close Button (Desktop Only) */}
-                    <button
-                        onClick={onClose}
-                        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/10 hidden md:flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90"
-                    >
-                        <span className="material-symbols-outlined">close</span>
-                    </button>
-
-                    {/* Left Panel: Merchant Info */}
-                    <div className="w-full md:w-[320px] bg-[#1a2233] p-8 flex flex-col items-center text-center border-b md:border-b-0 md:border-r border-white/10">
-                        <div className="relative mb-6">
-                            <div className="w-28 h-28 rounded-full p-1 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 shadow-2xl">
-                                <div className="w-full h-full rounded-full bg-[#111827] p-1 overflow-hidden">
-                                    {merchant?.profile_picture ? (
-                                        <img src={merchant.profile_picture} alt="Avatar" className="w-full h-full rounded-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-3xl font-black text-white">
-                                            {merchant?.full_name?.charAt(0) || 'M'}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="absolute bottom-1 right-1 w-6 h-6 bg-emerald-500 border-4 border-[#1a2233] rounded-full"></div>
-                        </div>
-
-                        <h2 className="text-2xl font-black text-white mb-1 uppercase tracking-tight line-clamp-1">
-                            {merchant?.brand_name || merchant?.full_name?.split(' ')[0]}
-                        </h2>
-                        <p className="text-zinc-400 text-sm font-medium mb-8">
-                            {merchant?.full_name}
-                        </p>
-
-                        <div className="w-full space-y-3 mb-8">
-                            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl border border-white/5">
-                                <span className="material-symbols-outlined text-emerald-400 text-sm font-bold">location_on</span>
-                                <span className="text-[11px] font-black text-zinc-300 uppercase tracking-widest truncate">
-                                    {merchant?.hostels?.name || 'Main Campus'}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl border border-white/5">
-                                <span className="material-symbols-outlined text-orange-400 text-sm font-bold">sell</span>
-                                <span className="text-[11px] font-black text-zinc-300 uppercase tracking-widest">
-                                    {products.length} Products
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="w-full grid grid-cols-2 gap-3 mt-auto">
-                            <button
-                                onClick={handleWhatsApp}
-                                className="h-12 flex items-center justify-center gap-2 bg-emerald-500 text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
-                            >
-                                <span className="material-symbols-outlined text-lg">chat</span> WhatsApp
-                            </button>
-                            <button
-                                onClick={handleCall}
-                                className="h-12 flex items-center justify-center gap-2 bg-white/10 text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-white/20 transition-all active:scale-95"
-                            >
-                                <span className="material-symbols-outlined text-lg">smartphone</span> Call
-                            </button>
-                        </div>
+                    {/* Handle */}
+                    <div className="flex justify-center py-4 flex-shrink-0">
+                        <div className="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
                     </div>
 
-                    {/* Right Panel: Catalog Grid */}
-                    <div className="flex-1 p-8 flex flex-col min-h-0 bg-[#0f172a]">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="w-1.5 h-6 bg-purple-500 rounded-full shadow-lg shadow-purple-500/50"></div>
-                            <h3 className="text-lg font-black text-white uppercase tracking-widest">Store Catalog</h3>
-                        </div>
+                    {/* Scrollable Content Wrapper */}
+                    <div className="flex-1 overflow-y-auto no-scrollbar p-6 pt-2 pb-12">
+                        <div className="flex flex-col md:flex-row gap-8">
 
-                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar pb-10">
-                            {loading ? (
-                                <div className="grid grid-cols-2 gap-4">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className="aspect-square bg-white/5 rounded-3xl animate-pulse" />
-                                    ))}
+                            {/* Left: Merchant Profile (Now part of scroll) */}
+                            <div className="w-full md:w-[280px] flex flex-col items-center">
+                                <button
+                                    onClick={onClose}
+                                    className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-zinc-400 hover:bg-primary hover:text-white transition-all"
+                                >
+                                    <X size={18} />
+                                </button>
+
+                                <div className="w-24 h-24 rounded-full p-1 border-2 border-primary mb-6 shadow-xl shadow-primary/10">
+                                    <div className="w-full h-full rounded-full bg-white dark:bg-[#1a110c] overflow-hidden flex items-center justify-center">
+                                        {merchant?.profile_picture ? (
+                                            <img src={merchant.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-2xl font-black text-primary uppercase">
+                                                {merchant?.full_name?.charAt(0) || 'M'}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                            ) : products.length > 0 ? (
-                                <div className="grid grid-cols-2 gap-4">
-                                    {products.map((p) => (
-                                        <motion.div
-                                            key={p.id}
-                                            whileHover={{ y: -5 }}
-                                            onClick={() => onProductClick && onProductClick(p)}
-                                            className="group relative aspect-square rounded-[1.5rem] overflow-hidden bg-white/5 border border-white/5 cursor-pointer shadow-sm hover:shadow-2xl transition-all"
-                                        >
-                                            <img
-                                                src={p.post_images?.[0] || '/v2/assets/niacinamide_serum_product_1771272568186.png'}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                alt="p"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 p-4 flex flex-col justify-end">
-                                                <p className="text-[10px] font-black text-white uppercase tracking-widest line-clamp-1 mb-0.5">{p.post_description}</p>
-                                                <p className="text-emerald-400 font-black text-xs">₦{p.price?.toLocaleString()}</p>
-                                            </div>
-                                        </motion.div>
-                                    ))}
+
+                                <h2 className="text-xl font-black text-[#1a2a40] dark:text-white mb-1 uppercase tracking-tight">
+                                    {merchant?.brand_name || merchant?.full_name?.split(' ')[0]}
+                                </h2>
+                                <p className="text-xs font-bold text-[#1a2a40]/50 dark:text-white/40 uppercase tracking-widest mb-8">
+                                    {merchant?.full_name}
+                                </p>
+
+                                <div className="w-full space-y-2 mb-8">
+                                    <div className="flex items-center gap-3 px-4 py-3 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-100 dark:border-white/10 shadow-sm">
+                                        <MapPin size={14} className="text-primary" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-[#1a2a40]/70 dark:text-white/70 truncate">
+                                            {merchant?.hostels?.name || 'Main Campus'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-3 px-4 py-3 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-100 dark:border-white/10 shadow-sm">
+                                        <Package size={14} className="text-primary" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-[#1a2a40]/70 dark:text-white/70">
+                                            {products.length} Items Listed
+                                        </span>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-zinc-500 italic py-10">
-                                    <span className="material-symbols-outlined text-5xl mb-4 opacity-20">inventory_2</span>
-                                    <p className="text-sm font-bold uppercase tracking-widest opacity-40">No items available</p>
+
+                                <div className="w-full grid grid-cols-2 gap-3 mt-auto">
+                                    <button
+                                        onClick={handleWhatsApp}
+                                        className="h-11 flex items-center justify-center gap-2 bg-[#25D366]/10 dark:bg-[#25D366]/20 text-[#25D366] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#25D366] hover:text-white transition-all active:scale-95"
+                                    >
+                                        <MessageCircle size={14} /> WhatsApp
+                                    </button>
+                                    <button
+                                        onClick={handleCall}
+                                        className="h-11 flex items-center justify-center gap-2 bg-primary/10 dark:bg-primary/20 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all active:scale-95"
+                                    >
+                                        <Phone size={14} /> Call
+                                    </button>
                                 </div>
-                            )}
+                            </div>
+
+                            {/* Right: Product Catalog */}
+                            <div className="flex-1 flex flex-col min-h-0">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-1 h-5 bg-primary rounded-full shadow-lg shadow-primary/20" />
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-[#1a2a40]/40 dark:text-white/40">Store Catalog</h3>
+                                </div>
+
+                                {loading ? (
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {[1, 2, 3, 4, 5, 6].map(i => (
+                                            <div key={i} className="aspect-[4/5] bg-black/[0.03] dark:bg-white/[0.03] rounded-3xl animate-pulse" />
+                                        ))}
+                                    </div>
+                                ) : products.length > 0 ? (
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
+                                        {products.map((p, idx) => (
+                                            <motion.div
+                                                key={`p-${p.id}`}
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: idx * 0.03 }}
+                                                onClick={() => onProductClick && onProductClick(p)}
+                                                className="group relative aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-white dark:bg-white/5 border border-zinc-100 dark:border-white/10 cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
+                                            >
+                                                <img
+                                                    src={p.post_images?.[0]}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    onError={(e: any) => e.target.src = '/v2/assets/niacinamide_serum_product_1771272568186.png'}
+                                                    alt="product"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent flex flex-col justify-end p-4">
+                                                    <p className="text-[9px] font-black text-white/70 uppercase tracking-tighter line-clamp-1 mb-0.5">{p.post_description}</p>
+                                                    <div className="flex items-center justify-between">
+                                                        <p className="text-primary font-black text-sm">₦{p.price?.toLocaleString() || '0'}</p>
+                                                        <div className="w-6 h-6 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
+                                                            <ArrowRight size={12} className="text-primary group-hover:text-white" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="h-64 flex flex-col items-center justify-center p-12 text-center bg-black/[0.02] dark:bg-white/[0.02] rounded-[2rem] border border-dashed border-black/5 dark:border-white/5">
+                                        <Package size={40} className="text-primary/20 mb-4" />
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-[#1a2a40]/30 dark:text-white/20">No items available</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </motion.div>

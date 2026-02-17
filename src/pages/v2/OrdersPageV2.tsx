@@ -56,9 +56,11 @@ export const OrdersPageV2: React.FC = () => {
         fetchUserRequests();
         fetchVisitor();
 
-        const handleAuthChange = () => {
+        const handleAuthChange = (e: any) => {
+            console.log('[OrdersPageV2] auth-state-changed:', e.detail);
+            const visitor = e.detail?.visitor;
+            setCurrentVisitor(visitor || null);
             fetchUserRequests();
-            fetchVisitor();
         };
 
         window.addEventListener('auth-state-changed', handleAuthChange);

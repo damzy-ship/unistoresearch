@@ -45,8 +45,10 @@ export default function UserMenu() {
           const name = typedVisitor?.full_name || session.user.user_metadata?.full_name || '';
           setUserName(name);
         }
-      } catch (err) {
-        console.warn('UserMenu checkAuth failed/aborted:', err);
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          console.warn('UserMenu checkAuth failed:', err);
+        }
       }
     };
 

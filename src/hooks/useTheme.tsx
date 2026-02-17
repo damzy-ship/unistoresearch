@@ -133,19 +133,26 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     useEffect(() => {
         const loadUserTheme = async () => {
-            if (await isAuthenticated()) {
-                const userId = await getUserId();
-                const { data: rows } = await supabase
-                    .from('user_themes')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('updated_at', { ascending: false })
-                    .limit(1);
+            try {
+                if (await isAuthenticated()) {
+                    const userId = await getUserId();
+                    const { data: rows } = await supabase
+                        .from('user_themes')
+                        .select('*')
+                        .eq('user_id', userId)
+                        .order('updated_at', { ascending: false })
+                        .limit(1);
 
-                if (rows?.[0]?.theme_data) {
-                    const themeData = rows[0].theme_data as Theme;
-                    setCurrentTheme(themeData);
-                    if (themeData.backgroundTexture) setBackgroundTexture(themeData.backgroundTexture);
+                    if (rows?.[0]?.theme_data) {
+                        const themeData = rows[0].theme_data as Theme;
+                        setCurrentTheme(themeData);
+                        if (themeData.backgroundTexture) setBackgroundTexture(themeData.backgroundTexture);
+                    }
+                }
+            } catch (err: any) {
+                // Ignore AbortError as it's handled by retries in supabase.ts or is transient
+                if (err?.name !== 'AbortError') {
+                    console.warn('[ThemeProvider] Initial theme load failed:', err);
                 }
             }
         };

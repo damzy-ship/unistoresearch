@@ -1,6 +1,8 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { supabase, HostelsProductUpdates, UniqueVisitor } from '../../lib/supabase';
 import { getUserId } from '../useTracking';
+
+const ITEMS_PER_PAGE = 40;
 
 /**
  * Hook to manage the hostel product feed.
@@ -15,147 +17,33 @@ export function useHostelFeed(
 ) {
     const [feed, setFeed] = useState<HostelsProductUpdates[]>([]);
     const [loadingFeed, setLoadingFeed] = useState<boolean>(true);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    // Use ref for page to prevent loadFeed from being recreated every time page increments
+    const pageRef = useRef(0);
+    const hasMoreRef = useRef(true);
+    const loadingMoreRef = useRef(false);
 
     /**
-     * Fetches the feed data from Supabase.
+     * Internal shuffle helper
      */
-    const loadFeed = useCallback(async (schoolId: string | null = selectedSchoolId) => {
-        console.log('Loading feed for school ID:', schoolId);
-        try {
-            await getUserId(); // Ensure user tracking
-            setLoadingFeed(true);
-
-            const { data, error } = await supabase
-                .from('hostel_product_updates')
-                .select(`
-                    id,
-                    post_category,
-                    post_description,
-                    post_images,
-                    created_at,
-                    actual_user_id,
-                    unique_visitors:actual_user_id (
-                        id,
-                        full_name,
-                        profile_picture,
-                        phone_number,
-                        room,
-                        is_hostel_merchant,
-                        hostel_id,
-                        hostels (id, name, school_id),
-                        schools (id, short_name),
-                        brand_name
-                    ),
-                    status,
-                    post_type,
-                    fulfilled,
-                    price,
-                    discount_price
-                `)
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-
-            type RawUpdate = {
-                id: string;
-                post_description: string;
-                post_images: string[];
-                post_category?: string | null;
-                created_at: string;
-                actual_user_id: string;
-                unique_visitors?: UniqueVisitor;
-                post_type?: string | null;
-                search_words?: string[] | null;
-                fulfilled?: boolean | null;
-                status?: string | null;
-                price?: number | null;
-                discount_price?: number | null;
-            };
-
-            const rawList: RawUpdate[] = (data || []) as RawUpdate[];
-
-            // Filter by school if selected
-            const filteredBySchool = (schoolId
-                ? rawList.filter((d) => {
-                    const uv = d.unique_visitors as UniqueVisitor | undefined;
-
-                    // Robust check: match school ID on request directly, or via hostels join, or via schools join
-                    // If we are authenticated and the merchant profile is restricted (RLS), uv might be null.
-                    // In that case, we can't be sure of the school, so we might hide it if a filter is active.
-                    const schoolMatch = (uv?.schools?.id === schoolId) || (uv?.hostels?.school_id === schoolId) || (uv?.school_id === schoolId);
-
-                    // Log if we have a mismatch that looks suspicious (e.g. data exists but uv is null)
-                    if (schoolId && !uv && d.actual_user_id) {
-                        console.warn(`Feed item ${d.id} has no visitor data (RLS?). Filtering out from school ${schoolId}.`);
-                    }
-
-                    return schoolMatch;
-                })
-                : rawList);
-
-            const mapped: HostelsProductUpdates[] = filteredBySchool.map((d) => ({
-                id: d.id,
-                post_description: d.post_description,
-                post_images: Array.isArray(d.post_images) ? d.post_images : [],
-                post_category: d.post_category ?? '',
-                created_at: d.created_at,
-                actual_user_id: d.actual_user_id,
-                unique_visitors: d.unique_visitors,
-                post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
-                search_words: Array.isArray(d.search_words) ? d.search_words : [],
-                fulfilled: d.fulfilled ?? null,
-                status: d.status as 'open' | 'fulfilled' | 'cancelled' | 'hide' | undefined,
-                price: d.price,
-                discount_price: d.discount_price
-            }));
-
-            setFeed(mapped);
-        } catch (e) {
-            console.error('Failed to load feed', e);
-        } finally {
-            setLoadingFeed(false);
+    const shuffle = <T,>(arr: T[]) => {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = a[i];
+            a[i] = a[j];
+            a[j] = tmp;
         }
-    }, [selectedSchoolId]);
+        return a;
+    };
 
     /**
-     * Filters the feed based on UI selections (hostel, category, my products).
+     * Logic to order a batch of items
      */
-    const displayedFeed = useMemo(() => {
-        let filtered = feed.filter((item) => {
-            const visitor = item.unique_visitors as UniqueVisitor | undefined;
-            // Requests should be visible regardless of selected hostel
-            const matchesHostel = selectedHostel === 'all' || !selectedHostel
-                ? true
-                : item.post_type === 'request'
-                    ? true
-                    : visitor?.hostel_id === selectedHostel || visitor?.hostels?.id === selectedHostel;
-
-            const matchesCategory = selectedCategory === 'all' || !selectedCategory
-                ? true
-                : (item.post_category || '').toLowerCase() === selectedCategory.toLowerCase();
-
-            const isHidden = item.status === 'hide';
-            if (isHidden) {
-                const isAdmin = currentVisitor?.is_admin;
-                const isOwner = currentVisitor?.id === item.actual_user_id;
-                if (!isAdmin && !isOwner) return false;
-            }
-
-            return matchesHostel && matchesCategory;
-        });
-
-        if (showMyProducts && currentVisitor?.id) {
-            filtered = filtered.filter((item) => item.actual_user_id === currentVisitor.id);
-        }
-
-        return filtered;
-    }, [feed, selectedHostel, selectedCategory, showMyProducts, currentVisitor?.id, currentVisitor?.is_admin]);
-
-    /**
-     * Sorts the feed into time buckets and shuffles them for freshness.
-     */
-    const orderedDisplayedFeed = useMemo(() => {
-        if (!displayedFeed || displayedFeed.length === 0) return [] as HostelsProductUpdates[];
+    const orderBatch = (items: HostelsProductUpdates[]) => {
+        if (items.length === 0) return [];
 
         const now = Date.now();
         const H = 60 * 60 * 1000;
@@ -163,7 +51,7 @@ export function useHostelFeed(
         const bucketsB: HostelsProductUpdates[] = []; // 2-10 hours
         const bucketsC: HostelsProductUpdates[] = []; // 10-24 hours
         const bucketsD: HostelsProductUpdates[] = []; // 24h-72h
-        const bucketsEByDay: Record<string, HostelsProductUpdates[]> = {}; // >=72h grouped by day
+        const bucketsEByDay: Record<string, HostelsProductUpdates[]> = {};
 
         const safeDateMs = (d?: string | null) => {
             if (!d) return 0;
@@ -171,7 +59,7 @@ export function useHostelFeed(
             return Number.isNaN(t) ? 0 : t;
         };
 
-        for (const item of displayedFeed) {
+        for (const item of items) {
             const createdMs = safeDateMs(item.created_at as unknown as string);
             const age = now - createdMs;
 
@@ -190,46 +78,183 @@ export function useHostelFeed(
             }
         }
 
-        const shuffle = <T,>(arr: T[]) => {
-            const a = arr.slice();
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                const tmp = a[i];
-                a[i] = a[j];
-                a[j] = tmp;
-            }
-            return a;
-        };
-
         const partA = shuffle(bucketsA);
         const partB = shuffle(bucketsB);
         const partC = shuffle(bucketsC);
         const partD = shuffle(bucketsD);
 
-        const dayKeys = Object.keys(bucketsEByDay).filter(k => k !== 'unknown');
-        dayKeys.sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
-
+        const dayKeys = Object.keys(bucketsEByDay).filter(k => k !== 'unknown').sort().reverse();
         const partE: HostelsProductUpdates[] = [];
         for (const dayKey of dayKeys) {
-            const group = bucketsEByDay[dayKey] || [];
-            const shuffledGroup = shuffle(group);
-            partE.push(...shuffledGroup);
+            partE.push(...shuffle(bucketsEByDay[dayKey]));
         }
-
-        if (bucketsEByDay['unknown']) {
-            partE.push(...shuffle(bucketsEByDay['unknown']));
-        }
+        if (bucketsEByDay['unknown']) partE.push(...shuffle(bucketsEByDay['unknown']));
 
         return [...partA, ...partB, ...partC, ...partD, ...partE];
+    };
+
+    /**
+     * Fetches the feed data from Supabase.
+     */
+    const loadFeed = useCallback(async (
+        schoolId: string | null = selectedSchoolId,
+        isLoadMore: boolean = false
+    ) => {
+        console.log(`[useHostelFeed] Load attempt (schoolId: ${schoolId}, isLoadMore: ${isLoadMore}, page: ${pageRef.current})`);
+        try {
+            if (!isLoadMore) {
+                setLoadingFeed(true);
+                pageRef.current = 0;
+                hasMoreRef.current = true;
+                setHasMore(true);
+            } else {
+                if (!hasMoreRef.current || loadingMoreRef.current) return;
+                setLoadingMore(true);
+                loadingMoreRef.current = true;
+            }
+
+            await getUserId();
+
+            const currentPage = isLoadMore ? pageRef.current + 1 : 0;
+            const from = currentPage * ITEMS_PER_PAGE;
+            const to = from + ITEMS_PER_PAGE - 1;
+
+            let query = supabase
+                .from('hostel_product_updates')
+                .select(`
+                    id,
+                    post_category,
+                    post_description,
+                    post_images,
+                    created_at,
+                    actual_user_id,
+                    unique_visitors:actual_user_id !inner (
+                        id,
+                        full_name,
+                        profile_picture,
+                        phone_number,
+                        room,
+                        is_hostel_merchant,
+                        hostel_id,
+                        hostels (id, name, school_id),
+                        schools (id, short_name),
+                        brand_name,
+                        school_id
+                    ),
+                    status,
+                    post_type,
+                    fulfilled,
+                    price,
+                    discount_price
+                `, { count: 'exact' })
+                .eq('post_type', 'update');
+
+            // Apply Server-side filters
+            if (schoolId) {
+                // Filter by school: either user's school_id, or their hostel's school_id
+                // Use foreignTable option for OR on joined columns
+                query = query.or(`school_id.eq.${schoolId},hostels.school_id.eq.${schoolId}`, { foreignTable: 'unique_visitors' });
+            }
+
+            if (selectedHostel && selectedHostel !== 'all') {
+                query = query.eq('unique_visitors.hostel_id', selectedHostel);
+            }
+
+            if (selectedCategory && selectedCategory !== 'all') {
+                query = query.ilike('post_category', selectedCategory);
+            }
+
+            if (showMyProducts && currentVisitor?.id) {
+                query = query.eq('actual_user_id', currentVisitor.id);
+            }
+
+            const { data, error, count } = await query
+                .order('created_at', { ascending: false })
+                .range(from, to);
+
+            if (error) throw error;
+
+            if (!data || data.length < ITEMS_PER_PAGE) {
+                hasMoreRef.current = false;
+                setHasMore(false);
+            }
+
+            const mapped: HostelsProductUpdates[] = data.map((d: any) => ({
+                id: d.id,
+                post_description: d.post_description,
+                post_images: Array.isArray(d.post_images) ? d.post_images : [],
+                post_category: d.post_category ?? '',
+                created_at: d.created_at,
+                actual_user_id: d.actual_user_id,
+                unique_visitors: d.unique_visitors,
+                post_type: (d.post_type === 'request' ? 'request' : 'update') as 'request' | 'update',
+                search_words: Array.isArray(d.search_words) ? d.search_words : [],
+                fulfilled: d.fulfilled ?? null,
+                status: d.status as 'open' | 'fulfilled' | 'cancelled' | 'hide' | undefined,
+                price: d.price,
+                discount_price: d.discount_price
+            }));
+
+            // If we want shuffling, we do it here per batch or just skip it if it's too much.
+            // But let's keep it consistent: we just append.
+            // If the user wants shuffling, it should probably be on the whole rendered list
+            // but that causes the "jumping" the user complained about.
+            // SO: WE DISABLE DYNAMIC SHUFFLING IN THE USEMEMO AND DO IT ONLY ONCE HERE.
+
+            const orderedBatch = isLoadMore ? mapped : orderBatch(mapped);
+
+            if (isLoadMore) {
+                setFeed(prev => [...prev, ...orderedBatch]);
+                pageRef.current = currentPage;
+            } else {
+                setFeed(orderedBatch);
+            }
+        } catch (e) {
+            console.error('Failed to load feed', e);
+        } finally {
+            setLoadingFeed(false);
+            setLoadingMore(false);
+            loadingMoreRef.current = false;
+        }
+    }, [selectedSchoolId, selectedHostel, selectedCategory, showMyProducts, currentVisitor?.id]);
+
+    const loadMore = useCallback(() => {
+        loadFeed(selectedSchoolId, true);
+    }, [loadFeed, selectedSchoolId]);
+
+    /**
+     * Filters the feed based on UI selections.
+     * Since most filtering is now in SQL, we only handle access control/hide logic here.
+     */
+    const displayedFeed = useMemo(() => {
+        return feed.filter((item) => {
+            const isHidden = item.status === 'hide';
+            if (isHidden) {
+                const isAdmin = currentVisitor?.is_admin;
+                const isOwner = currentVisitor?.id === item.actual_user_id;
+                if (!isAdmin && !isOwner) return false;
+            }
+            return true;
+        });
+    }, [feed, currentVisitor?.id, currentVisitor?.is_admin]);
+
+    /**
+     * Final feed for display.
+     */
+    const orderedDisplayedFeed = useMemo(() => {
+        return displayedFeed;
     }, [displayedFeed]);
 
     return {
         feed,
         loadingFeed,
+        loadingMore,
+        hasMore,
         setLoadingFeed,
         loadFeed,
+        loadMore,
         displayedFeed,
         orderedDisplayedFeed,
-        setFeed // Expose setter for optimistic updates or deletions
+        setFeed
     };
 }

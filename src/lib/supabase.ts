@@ -35,26 +35,42 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
-let sessionPromise: Promise<{ data: { session: any }, error: any }> | null = null;
+let activeSessionCall: Promise<{ data: { session: any }, error: any }> | null = null;
 
 /**
  * Centered, lock-safe method to get the current session.
  * Prevents multiple background calls from hitting the auth lock at once (the cause of AbortError).
+ * Includes retry logic for transient navigator lock issues.
  */
 export async function getSafeSession() {
-  if (sessionPromise) return sessionPromise;
+  if (activeSessionCall) return activeSessionCall;
 
-  sessionPromise = (async () => {
-    try {
-      return await supabase.auth.getSession();
-    } finally {
-      // Small timeout to allow other simultaneous callers to use the same promise
-      // but still allow fresh checks later if needed.
-      setTimeout(() => { sessionPromise = null; }, 500);
+  activeSessionCall = (async () => {
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const result = await supabase.auth.getSession();
+        return result;
+      } catch (err: any) {
+        // Specifically handle browser lock AbortError
+        if ((err?.name === 'AbortError' || err?.message?.includes('Aborted')) && retries > 1) {
+          console.warn(`[Supabase] Auth session lock contention, retrying... (${retries - 1} left)`);
+          await new Promise(resolve => setTimeout(resolve, 200 * (4 - retries))); // Exponential backoff
+          retries--;
+          continue;
+        }
+        return { data: { session: null }, error: err };
+      }
     }
+    return { data: { session: null }, error: new Error('Max retries reached for auth session') };
   })();
 
-  return sessionPromise;
+  try {
+    return await activeSessionCall;
+  } finally {
+    // Keep it for a short duration to dedupe calls hitting at the same time, then clear.
+    setTimeout(() => { activeSessionCall = null; }, 2000);
+  }
 }
 
 export interface UniqueVisitor {

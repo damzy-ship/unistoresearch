@@ -22,15 +22,34 @@ export function useHostelPosting(
 
         try {
             setPosting(true);
+
+            // Timeout wrapper for AI calls to prevent hanging forever
+            const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+                let timeoutId: any;
+                const timeoutPromise = new Promise<T>((resolve) => {
+                    timeoutId = setTimeout(() => {
+                        console.warn(`[HostelPost] Operation timed out after ${timeoutMs}ms, using fallback.`);
+                        resolve(fallback);
+                    }, timeoutMs);
+                });
+                try {
+                    const result = await Promise.race([promise, timeoutPromise]);
+                    return result;
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+            };
+
             const uploadedUrls = images.length > 0
                 ? await Promise.all(
                     images.map((file) => uploadImageToSupabase(file, currentVisitor.id as string, 'product-images', 'hostel-updates'))
                 )
                 : [];
 
-            const postCategory = await categorizePost(text.trim(), 'hostel');
-            const postSearchWords = await extractProductKeywordsFromDescription(text.trim());
-            const extractedPrice = await extractPriceFromHostelPost(text.trim());
+            // Wrap Gemini AI calls with 10s timeout
+            const postCategory = await withTimeout(categorizePost(text.trim(), 'hostel'), 10000, 'others');
+            const postSearchWords = await withTimeout(extractProductKeywordsFromDescription(text.trim()), 10000, ['product']);
+            const extractedPrice = await withTimeout(extractPriceFromHostelPost(text.trim()), 10000, null);
 
             // Use provided merchantId or fall back to current visitor's ID
             const posterId = merchantId || currentVisitor.id;
@@ -70,6 +89,7 @@ export function useHostelPosting(
             await reloadFeed();
         } catch (e) {
             console.error('Failed to post update', e);
+            throw e; // RE-THROW so caller knows it failed
         } finally {
             setPosting(false);
         }

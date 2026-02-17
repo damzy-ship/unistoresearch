@@ -154,7 +154,7 @@ export async function generateCategoriesFromRequest(requestText: string): Promis
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
 You are a product categorization expert. Given a user's product request, generate the most likely product categories that would contain the items they're looking for.
@@ -263,7 +263,7 @@ async function findSemanticMatches(generatedCategories: string[], catalogCategor
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
 You are a semantic matching expert. Given generated categories and a catalog of existing categories, find semantic matches.
@@ -762,7 +762,7 @@ export async function extractProductInfoFromText(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
 Extract product information from the following title and description. Return ONLY a JSON object with the extracted information.
@@ -836,7 +836,7 @@ export async function extractPriceFromHostelPost(description: string): Promise<n
   if (!genAI) return null;
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
     Extract the price from this text. Return ONLY the number.
@@ -866,7 +866,7 @@ export async function extractPriceFromHostelPost(description: string): Promise<n
 export async function categorizePost(post: string, mode: string = 'store'): Promise<string> {
   if (!genAI) return 'others'
 
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   // const post_description = await transformDescriptionForEmbedding(post);
 
@@ -968,7 +968,7 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
 
   try {
     const result = await generativeModel.generateContent({
-      contents: [{ parts: [{ text: categorizationPrompt }] }],
+      contents: [{ role: 'user', parts: [{ text: categorizationPrompt }] }],
       generationConfig: {
         responseMimeType: 'application/json'
       }
@@ -994,7 +994,7 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
 export async function extractProductKeywordsFromDescription(description: string): Promise<string[]> {
   if (!genAI) return ['product'];
 
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   // Adjusted Prompt
   const extractionPrompt = `
@@ -1035,7 +1035,7 @@ export async function extractProductKeywordsFromDescription(description: string)
 
   try {
     const result = await generativeModel.generateContent({
-      contents: [{ parts: [{ text: extractionPrompt }] }],
+      contents: [{ role: 'user', parts: [{ text: extractionPrompt }] }],
       generationConfig: {
         responseMimeType: 'application/json'
       }

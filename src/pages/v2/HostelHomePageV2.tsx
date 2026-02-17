@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { V2Layout } from '../../components/v2/V2Layout';
 import { ProductDetailSheetV2 } from '../../components/v2/ProductDetailSheetV2';
 import { RequestDetailsSheetV2 } from '../../components/v2/RequestDetailsSheetV2';
-import { supabase, UniqueVisitor, Hostel, getSafeSession } from '../../lib/supabase';
+import { supabase, UniqueVisitor, Hostel } from '../../lib/supabase';
 import { useHostelFeed } from '../../hooks/hostel/useHostelFeed';
 import { motion } from 'framer-motion';
 import { LiveActivityHubV2 } from '../../components/v2/LiveActivityHubV2';
 import { MerchantCatalogSheetV2 } from '../../components/v2/MerchantCatalogSheetV2';
 import { LiveRequestResponseSheetV2 } from '../../components/v2/LiveRequestResponseSheetV2';
 import { SchoolSelectionModalV2 } from '../../components/v2/SchoolSelectionModalV2';
-import { toast } from 'sonner';
 
 export const HostelHomePageV2: React.FC = () => {
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -28,37 +27,48 @@ export const HostelHomePageV2: React.FC = () => {
     const [hostels, setHostels] = useState<Hostel[]>([]);
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
 
-    const { feed, loadingFeed, loadFeed } = useHostelFeed(selectedSchoolId, selectedHostel, selectedCategory, false, currentVisitor);
+    const {
+        loadingFeed,
+        loadingMore,
+        hasMore,
+        loadFeed,
+        loadMore,
+        orderedDisplayedFeed
+    } = useHostelFeed(selectedSchoolId, selectedHostel, selectedCategory, false, currentVisitor);
+
+    const observer = React.useRef<IntersectionObserver | null>(null);
+    const lastElementRef = React.useCallback((node: HTMLDivElement | null) => {
+        if (loadingFeed || loadingMore) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                console.log('[HostelHomePageV2] Bottom reached, loading more...');
+                loadMore();
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [loadingFeed, loadingMore, hasMore, loadMore]);
 
     useEffect(() => {
         const handleAuthChange = (e: any) => {
-            console.log('HostelHomePageV2 reacting to auth change:', e.detail);
-            if (e.detail?.visitor) {
-                setCurrentVisitor(e.detail.visitor);
-                loadFeed();
-            } else {
-                setCurrentVisitor(null);
-                loadFeed();
+            console.log('[HostelHomePageV2] auth-state-changed:', e.detail);
+            const visitor = e.detail?.visitor;
+            setCurrentVisitor(visitor || null);
+
+            // AUTO-SYNC SCHOOL ID: If current user has a school and we don't have one selected,
+            // or if the current one is just a placeholder, sync it.
+            if (visitor?.school_id && (!selectedSchoolId || selectedSchoolName === 'Select University')) {
+                console.log('[HostelHomePageV2] Auto-syncing school from profile:', visitor.school_id);
+                setSelectedSchoolId(visitor.school_id);
+                localStorage.setItem('selectedSchoolId', visitor.school_id);
+                // The fetchHostelsAndSchool useEffect will handle the name update
             }
+
+            loadFeed();
         };
         window.addEventListener('auth-state-changed', handleAuthChange);
-
-        // Initial check if V2Layout already has it
-        const checkInitial = async () => {
-            const { data: { session } } = await getSafeSession();
-            if (session?.user?.id && !currentVisitor) {
-                const { data: visitor } = await supabase
-                    .from('unique_visitors')
-                    .select('*, hostels(*), schools(*)')
-                    .eq('auth_user_id', session.user.id)
-                    .maybeSingle();
-                if (visitor) setCurrentVisitor(visitor as unknown as UniqueVisitor);
-            }
-        };
-        checkInitial();
-
         return () => window.removeEventListener('auth-state-changed', handleAuthChange);
-    }, []);
+    }, [selectedSchoolId, selectedSchoolName, loadFeed]);
 
     useEffect(() => {
         const fetchHostelsAndSchool = async () => {
@@ -83,10 +93,11 @@ export const HostelHomePageV2: React.FC = () => {
         fetchHostelsAndSchool();
     }, [selectedSchoolId]);
 
-    // Added useEffect to trigger feed load
+    // Unified feed loader that only triggers on filter/school changes
     useEffect(() => {
+        console.log('[HostelHomePageV2] Filters changed, resetting feed...');
         loadFeed();
-    }, [loadFeed, selectedSchoolId, selectedHostel, selectedCategory]);
+    }, [selectedSchoolId, selectedHostel, selectedCategory]);
 
     useEffect(() => {
         const handleRefresh = () => {
@@ -156,7 +167,6 @@ export const HostelHomePageV2: React.FC = () => {
         };
     }, []);
 
-    const productItems = feed.filter(item => item.post_type !== 'request');
 
     const openProductDetail = (product: any) => {
         setSelectedProduct(product);
@@ -353,59 +363,79 @@ export const HostelHomePageV2: React.FC = () => {
 
             {/* Product Feed */}
             <div className="p-4 grid grid-cols-1 gap-8 mb-20 relative">
-                {loadingFeed ? (
+                {(loadingFeed && orderedDisplayedFeed.length === 0) ? (
                     Array(3).fill(0).map((_, k) => (
                         <div key={k} className="bg-zinc-100 dark:bg-white/5 rounded-[2.5rem] aspect-[4/5] animate-pulse" />
                     ))
-                ) : productItems.length > 0 ? (
-                    productItems.map((product, i) => (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.01 }}
-                            key={`product-${product.id}`}
-                            onClick={() => openProductDetail(product)}
-                            className="bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden shadow-sm border border-black/5 dark:border-white/10 flex flex-col group transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] cursor-pointer relative"
-                        >
-                            <div className="relative aspect-[4/5] overflow-hidden m-2.5 rounded-[2rem]">
-                                <img
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    src={product.post_images?.[0] || FALLBACK_SPEAKER}
-                                    onError={(e: any) => e.target.src = FALLBACK_SPEAKER}
-                                    alt={product.post_description}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <button className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/40 dark:bg-black/40 flex items-center justify-center text-white backdrop-blur-xl shadow-lg ring-1 ring-white/20 transition-all hover:bg-primary hover:scale-110 active:scale-90 z-20">
-                                    <span className="material-symbols-outlined text-lg">favorite</span>
-                                </button>
-                            </div>
-                            <div className="p-6 pt-2 flex flex-col gap-3 flex-1">
-                                <h4 className="text-lg font-bold line-clamp-1 text-[#1a2a40] dark:text-zinc-100 tracking-tight group-hover:text-primary transition-colors">{product.post_description}</h4>
-                                <div className="flex items-end justify-between">
-                                    <div className="flex flex-col">
-                                        <span className="text-primary font-black text-2xl leading-none">₦{product.price?.toLocaleString() || '0'}</span>
-                                        {product.discount_price && <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium mt-1">₦{product.discount_price.toLocaleString()}</span>}
-                                    </div>
-                                    <div className="bg-primary text-white p-3.5 rounded-2xl shadow-lg shadow-primary/20 scale-100 group-hover:scale-110 transition-all duration-300">
-                                        <span className="material-symbols-outlined text-2xl font-bold">shopping_bag</span>
-                                    </div>
+                ) : orderedDisplayedFeed.length > 0 ? (
+                    <>
+                        {orderedDisplayedFeed.map((product, i) => (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.01 }}
+                                key={`product-${product.id}`}
+                                onClick={() => openProductDetail(product)}
+                                className="bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden shadow-sm border border-black/5 dark:border-white/10 flex flex-col group transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] cursor-pointer relative"
+                            >
+                                <div className="relative aspect-[4/5] overflow-hidden m-2.5 rounded-[2rem]">
+                                    <img
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        src={product.post_images?.[0] || FALLBACK_SPEAKER}
+                                        onError={(e: any) => {
+                                            (e.target as HTMLImageElement).src = FALLBACK_SPEAKER;
+                                        }}
+                                        alt={product.post_description}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    <button className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/40 dark:bg-black/40 flex items-center justify-center text-white backdrop-blur-xl shadow-lg ring-1 ring-white/20 transition-all hover:bg-primary hover:scale-110 active:scale-90 z-20">
+                                        <span className="material-symbols-outlined text-lg">favorite</span>
+                                    </button>
                                 </div>
-
-                                <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5 overflow-hidden">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                            <span className="material-symbols-outlined text-sm text-primary">person</span>
+                                <div className="p-6 pt-2 flex flex-col gap-3 flex-1">
+                                    <h4 className="text-lg font-bold line-clamp-1 text-[#1a2a40] dark:text-zinc-100 tracking-tight group-hover:text-primary transition-colors">{product.post_description}</h4>
+                                    <div className="flex items-end justify-between">
+                                        <div className="flex flex-col">
+                                            <span className="text-primary font-black text-2xl leading-none">₦{product.price?.toLocaleString() || '0'}</span>
+                                            {product.discount_price && <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium mt-1">₦{product.discount_price.toLocaleString()}</span>}
                                         </div>
-                                        <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate">{product.unique_visitors?.full_name?.split(' ')[0] || 'Merchant'}</span>
+                                        <div className="bg-primary text-white p-3.5 rounded-2xl shadow-lg shadow-primary/20 scale-100 group-hover:scale-110 transition-all duration-300">
+                                            <span className="material-symbols-outlined text-2xl font-bold">shopping_bag</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1 text-zinc-300 font-bold">
-                                        <span className="material-symbols-outlined text-xs fill-1 text-yellow-500">star</span>
-                                        <span className="text-xs text-zinc-500 dark:text-zinc-400">4.8</span>
+
+                                    <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 overflow-hidden">
+                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                                <span className="material-symbols-outlined text-sm text-primary">person</span>
+                                            </div>
+                                            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate">{product.unique_visitors?.full_name?.split(' ')[0] || 'Merchant'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-zinc-300 font-bold">
+                                            <span className="material-symbols-outlined text-xs fill-1 text-yellow-500">star</span>
+                                            <span className="text-xs text-zinc-500 dark:text-zinc-400">4.8</span>
+                                        </div>
                                     </div>
                                 </div>
+                            </motion.div>
+                        ))}
+
+                        {/* Improved Infinite Scroll Trigger & loadingMore Indicator */}
+                        {hasMore && (
+                            <div
+                                ref={lastElementRef as any}
+                                className="col-span-1 flex justify-center py-10 min-h-[100px]"
+                            >
+                                {loadingMore && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                                    </div>
+                                )}
                             </div>
-                        </motion.div>
-                    ))
+                        )}
+                    </>
                 ) : (
                     <div className="col-span-2 text-center py-20 text-zinc-400 font-bold uppercase tracking-widest text-xs">No products in this category</div>
                 )}
