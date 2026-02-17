@@ -35,6 +35,10 @@ export const HostelHomePageV2: React.FC = () => {
             console.log('HostelHomePageV2 reacting to auth change:', e.detail);
             if (e.detail?.visitor) {
                 setCurrentVisitor(e.detail.visitor);
+                loadFeed();
+            } else {
+                setCurrentVisitor(null);
+                loadFeed();
             }
         };
         window.addEventListener('auth-state-changed', handleAuthChange);

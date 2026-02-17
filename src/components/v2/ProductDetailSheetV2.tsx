@@ -165,7 +165,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                                     if (!error) {
                                                         alert('Post hidden');
                                                         onClose();
-                                                        window.location.reload(); // Refresh to hide
+                                                        window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
                                                     }
                                                 }}
                                                 className="px-5 py-2 rounded-full bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest border border-red-500/20 shadow-sm hover:bg-red-500 hover:text-white transition-all"

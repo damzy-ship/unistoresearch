@@ -41,6 +41,13 @@ export const OrdersPageV2: React.FC = () => {
         };
 
         fetchUserRequests();
+
+        const handleAuthChange = () => {
+            fetchUserRequests();
+        };
+
+        window.addEventListener('auth-state-changed', handleAuthChange);
+        return () => window.removeEventListener('auth-state-changed', handleAuthChange);
     }, []);
 
     const filteredRequests = requests.filter(request =>

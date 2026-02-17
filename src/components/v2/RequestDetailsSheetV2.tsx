@@ -222,7 +222,7 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
                                         if (!error) {
                                             alert('Request cancelled');
                                             onClose();
-                                            window.location.reload();
+                                            window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
                                         }
                                     }}
                                     className="w-full h-16 rounded-[2rem] bg-red-500 text-white font-black text-sm shadow-xl shadow-red-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"

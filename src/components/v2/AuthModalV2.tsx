@@ -64,7 +64,6 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
 
             toast.success('Successfully signed in');
             onClose();
-            window.location.reload();
         } catch (err: any) {
             setError(err.message || 'Failed to sign in');
             toast.error(err.message || 'Login failed');
@@ -129,7 +128,6 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
 
             toast.success('Account created! Welcome.');
             onClose();
-            window.location.reload();
         } catch (err: any) {
             setError(err.message || 'Signup failed');
             toast.error(err.message || 'Signup failed');

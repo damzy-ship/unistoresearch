@@ -30,7 +30,9 @@ export const ProfilePageV2: React.FC = () => {
             if (!isMounted) return;
 
             if (!session) {
+                // Wait a bit or check getUser specifically to be sure
                 const { data: { user: authUser } } = await supabase.auth.getUser();
+                console.log('[ProfilePageV2] checkAuth getUser:', !!authUser);
                 if (!authUser && isMounted) {
                     toast.error('Please sign in to view your profile');
                     navigate('/v2/hostel');
@@ -55,8 +57,8 @@ export const ProfilePageV2: React.FC = () => {
 
         checkAuth();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (!session && isMounted) {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (!session && isMounted && event === 'SIGNED_OUT') {
                 navigate('/v2/hostel');
             } else if (session && isMounted) {
                 checkAuth();

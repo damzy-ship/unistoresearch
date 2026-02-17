@@ -142,8 +142,6 @@ export async function signOut(): Promise<void> {
 
   if (couponId) localStorage.setItem('hostel_coupon_id', couponId);
   if (lastPlayed) localStorage.setItem('hostel_coupon_last_played', lastPlayed);
-
-  window.location.reload();
 }
 
 export async function getUserRequestCount(): Promise<number> {

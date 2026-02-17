@@ -20,7 +20,13 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     const [isActionOpen, setIsActionOpen] = useState(false);
     const [actionMode, setActionMode] = useState<'request' | 'post'>('request');
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
-    const [userIsAuthenticated, setUserIsAuthenticated] = useState(false);
+    const [userIsAuthenticated, setUserIsAuthenticated] = useState<boolean | null>(() => {
+        try {
+            return localStorage.getItem('unistore_auth_token') ? null : false;
+        } catch {
+            return false;
+        }
+    });
     const [hostelMode, setHostelMode] = useState(true);
     const navigate = useNavigate();
     const { currentTheme, changeTheme } = useTheme();
@@ -31,27 +37,37 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
         const initUser = async () => {
             try {
                 const { data: { session } } = await getSafeSession();
-                setUserIsAuthenticated(!!session);
+                console.log('[V2Layout] initUser session:', !!session);
+
+                // Only update if not already set significantly (prevents overriding onAuthStateChange)
+                setUserIsAuthenticated(prev => {
+                    if (prev === true) return true;
+                    return !!session;
+                });
 
                 if (session?.user?.id) {
                     const { data: visitor } = await supabase
                         .from('unique_visitors')
                         .select('*, hostels(*), schools(*)')
                         .eq('auth_user_id', session.user.id)
-                        .single();
-                    setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                        .maybeSingle();
+
+                    if (visitor) {
+                        setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                        window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor } }));
+                    }
                     return { session, visitor };
                 }
             } catch (err) {
                 console.warn('Supabase session init failed/aborted:', err);
+                setUserIsAuthenticated(false);
             }
             return { session: null, visitor: null };
         };
 
         initUser();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('Auth state change event:', event);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setUserIsAuthenticated(!!session);
             if (session?.user?.id) {
                 const { data: visitor } = await supabase
@@ -64,6 +80,9 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             } else {
                 setCurrentVisitor(null);
                 window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session: null, visitor: null } }));
+                if (activeTab === 'profile' || activeTab === 'orders' || activeTab === 'messages') {
+                    navigate('/v2/hostel');
+                }
             }
         });
 
@@ -75,10 +94,15 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     };
 
     const handleActionClick = (mode: 'request' | 'post') => {
-        if (!userIsAuthenticated) {
+        if (userIsAuthenticated === false) {
             setIsAuthOpen(true);
             return;
         }
+        // If still loading (null), we could either show a loader or just wait.
+        // For now, let's treat it as authenticated if it's null to avoid the immediate prompt, 
+        // or better, check the session again if null.
+        if (userIsAuthenticated === null) return;
+
         setActionMode(mode);
         setIsActionOpen(true);
     };
@@ -89,10 +113,12 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             return;
         }
 
-        if (!userIsAuthenticated) {
+        if (userIsAuthenticated === false) {
             setIsAuthOpen(true);
             return;
         }
+
+        if (userIsAuthenticated === null) return;
 
         if (tab === 'profile') navigate('/v2/profile');
         if (tab === 'orders') navigate('/v2/orders');
