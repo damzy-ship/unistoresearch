@@ -122,11 +122,13 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                     <div className="flex justify-between items-start gap-4">
                                         <div className="flex-1">
                                             <h1 className="text-2xl lg:text-3xl font-bold text-[#1a2a40] dark:text-white leading-tight">{productTitle}</h1>
-                                            <p className="text-sm text-zinc-500 font-bold mt-1 tracking-wider uppercase">{productCategory}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-2xl lg:text-3xl font-black text-primary">₦{productPrice}</p>
-                                            {productDiscount && <p className="text-sm text-zinc-400 line-through font-bold">₦{productDiscount}</p>}
+                                            {product?.price > 0 && (
+                                                <div className="mt-2 flex items-baseline gap-2">
+                                                    <p className="text-2xl lg:text-3xl font-black text-primary">₦{productPrice}</p>
+                                                    {productDiscount && <p className="text-sm text-zinc-400 line-through font-bold">₦{productDiscount}</p>}
+                                                </div>
+                                            )}
+                                            <p className="text-sm text-zinc-500 font-bold mt-2 tracking-wider uppercase">{productCategory}</p>
                                         </div>
                                     </div>
 
@@ -185,7 +187,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                         </div>
                                     </div>
 
-                                    {/* Pickup Location Snippet */}
+                                    {/* Pickup Location Snippet - Commented out for now
                                     <div className="mt-8 mb-8">
                                         <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-3">Pickup Location</h3>
                                         <div className="h-44 w-full rounded-[2rem] bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
@@ -197,6 +199,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                             </div>
                                         </div>
                                     </div>
+                                    */}
                                 </div>
 
                                 {/* Sticky Bottom Action Bar within scroll container or absolute */}

@@ -399,8 +399,14 @@ export const HostelHomePageV2: React.FC = () => {
                                     <h4 className="text-lg font-bold line-clamp-1 text-[#1a2a40] dark:text-zinc-100 tracking-tight group-hover:text-primary transition-colors">{product.post_description}</h4>
                                     <div className="flex items-end justify-between">
                                         <div className="flex flex-col">
-                                            <span className="text-primary font-black text-2xl leading-none">₦{product.price?.toLocaleString() || '0'}</span>
-                                            {product.discount_price && <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium mt-1">₦{product.discount_price.toLocaleString()}</span>}
+                                            {product.price > 0 ? (
+                                                <>
+                                                    <span className="text-primary font-black text-2xl leading-none">₦{product.price?.toLocaleString()}</span>
+                                                    {product.discount_price && <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium mt-1">₦{product.discount_price.toLocaleString()}</span>}
+                                                </>
+                                            ) : (
+                                                <span className="text-zinc-400 font-bold text-sm h-6">Contact for price</span>
+                                            )}
                                         </div>
                                         <div className="bg-primary text-white p-3.5 rounded-2xl shadow-lg shadow-primary/20 scale-100 group-hover:scale-110 transition-all duration-300">
                                             <span className="material-symbols-outlined text-2xl font-bold">shopping_bag</span>

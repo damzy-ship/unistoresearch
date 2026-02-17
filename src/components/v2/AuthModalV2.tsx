@@ -173,9 +173,10 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                     <div className="bg-primary/10 p-2 rounded-lg">
                         <span className="material-symbols-outlined text-primary text-2xl">shopping_bag</span>
                     </div>
-                    <span className="font-bold text-2xl tracking-tight">
-                        <span className="text-primary">uni</span>
-                        <span className="text-blue-700">store.</span>
+                    <span className="font-black text-2xl tracking-tighter">
+                        <span className="text-primary">Uni</span>
+                        <span className="text-[#0c6eed] dark:text-blue-400">Store</span>
+                        <span className="text-primary">.</span>
                     </span>
                 </div>
                 <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">Sign In</h1>
@@ -289,13 +290,13 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
 
             {/* Social Buttons */}
             <div className="grid grid-cols-2 gap-4 mb-8">
-                <button className="flex items-center justify-center h-12 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors gap-2 rounded-lg">
-                    <img className="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVS4mok1zudI81j2YvmuheY-FiTwceOlvSVdUv6gysVS5dJj1xohYZDeR3PnzdhWYprdr4EOUOS-vw8NQUkrYMG1sVUotdY6T8cUerU_SGHDAHXwYeENDPT3d9k251dNSIVo4uEfWD2y0JVoZ4VDB4AS7CaYpvaKa52MwcQ6devwcxPtqcbuK8P85hBBrv5R0Aeu5-u5X__JREbTj1pg1UkJ7eP0uoWu0J3UjHdGWwHXu02fn9RqBFHJZPjk6aXyXT4fWSTeYWM3k" alt="Google" />
-                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Google</span>
+                <button className="flex items-center justify-center h-14 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-white/5 transition-all gap-3 rounded-xl active:scale-95 group">
+                    <img className="w-6 h-6 object-contain group-hover:scale-110 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVS4mok1zudI81j2YvmuheY-FiTwceOlvSVdUv6gysVS5dJj1xohYZDeR3PnzdhWYprdr4EOUOS-vw8NQUkrYMG1sVUotdY6T8cUerU_SGHDAHXwYeENDPT3d9k251dNSIVo4uEfWD2y0JVoZ4VDB4AS7CaYpvaKa52MwcQ6devwcxPtqcbuK8P85hBBrv5R0Aeu5-u5X__JREbTj1pg1UkJ7eP0uoWu0J3UjHdGWwHXu02fn9RqBFHJZPjk6aXyXT4fWSTeYWM3k" alt="Google" />
+                    <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">Google</span>
                 </button>
-                <button className="flex items-center justify-center h-12 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors gap-2 rounded-lg">
-                    <img className="w-5 h-5 dark:invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbnFXkORREwyJsZfzHHje5uTfU7XKR7tx-cd6FCCZhxpOzykmVrKcw_wFR78_knlQsNahIWHm_Aa_F-KW0hAUpIAMQzvAmkVJ-Qlv-ptoyf_SPoRKvUk6z0pQDoq6pfYTKHRTfoEw7uMxS9IwDKr-Z5olvWLT5wW-kY2rCJ9FgrxxUnyfcSEVHLeNRu0c7mpYa0p3x4y-LcCjcNGHIq9w1l5NIwR9kTxkskmIfdYmusQjGeNd19slqcs7CwZZanijkN2DwDWtKx1o" alt="Apple" />
-                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Apple</span>
+                <button className="flex items-center justify-center h-14 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-white/5 transition-all gap-3 rounded-xl active:scale-95 group">
+                    <img className="w-6 h-6 object-contain dark:invert group-hover:scale-110 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbnFXkORREwyJsZfzHHje5uTfU7XKR7tx-cd6FCCZhxpOzykmVrKcw_wFR78_knlQsNahIWHm_Aa_F-KW0hAUpIAMQzvAmkVJ-Qlv-ptoyf_SPoRKvUk6z0pQDoq6pfYTKHRTfoEw7uMxS9IwDKr-Z5olvWLT5wW-kY2rCJ9FgrxxUnyfcSEVHLeNRu0c7mpYa0p3x4y-LcCjcNGHIq9w1l5NIwR9kTxkskmIfdYmusQjGeNd19slqcs7CwZZanijkN2DwDWtKx1o" alt="Apple" />
+                    <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">Apple</span>
                 </button>
             </div>
 
@@ -318,8 +319,8 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
             </div>
 
             <header className="pb-6">
-                <h1 className="text-[#221610] dark:text-white tracking-tight text-3xl font-extrabold leading-tight mb-2">
-                    Join <span className="text-primary">uni</span><span className="text-blue-600">store.</span>
+                <h1 className="text-[#221610] dark:text-white tracking-tighter text-3xl font-black leading-tight mb-2">
+                    Join <span className="text-primary">Uni</span><span className="text-[#0c6eed] dark:text-blue-400">Store</span><span className="text-primary">.</span>
                 </h1>
                 <p className="text-[#221610]/70 dark:text-white/70 text-base font-normal leading-relaxed">
                     Create an account to contact sellers and track your requests.
@@ -458,9 +459,9 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                 </button>
                 <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
-                        <span className="text-white text-[10px] font-bold">U</span>
+                        <span className="text-white text-[10px] font-black">U</span>
                     </div>
-                    <h2 className="text-[#181311] dark:text-white text-lg font-bold leading-tight tracking-tight">unistore</h2>
+                    <h2 className="text-[#181311] dark:text-white text-lg font-black leading-tight tracking-tighter">UniStore.</h2>
                 </div>
                 <div className="size-10"></div>
             </div>
