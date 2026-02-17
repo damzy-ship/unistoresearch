@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModalV2 } from './AuthModalV2';
 import { CreateActionSheetV2 } from './CreateActionSheetV2';
+import { V2Sidebar } from './V2Sidebar';
+import { V2DesktopHeader } from './V2DesktopHeader';
+import { V2ActivitySidebar } from './V2ActivitySidebar';
 import { useTheme } from '../../hooks/useTheme.tsx';
 import { supabase, UniqueVisitor, getSafeSession } from '../../lib/supabase';
 
@@ -120,9 +123,6 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             setIsAuthOpen(true);
             return;
         }
-        // If still loading (null), we could either show a loader or just wait.
-        // For now, let's treat it as authenticated if it's null to avoid the immediate prompt, 
-        // or better, check the session again if null.
         if (userIsAuthenticated === null) return;
 
         setActionMode(mode);
@@ -147,49 +147,72 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     };
 
     return (
-        <div className="min-h-screen transition-colors duration-500 selection:bg-primary/20 bg-[#f8f6f5] dark:bg-[#221610] text-[#1a2a40] dark:text-white">
-            {/* Header Section */}
-            <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between border-b border-primary/5 bg-[#f8f6f5]/80 dark:bg-[#221610]/80 backdrop-blur-xl transition-colors duration-500">
-                <div onClick={() => navigate('/v2/hostel')} className="cursor-pointer flex items-center gap-3 group">
-                    <div className="bg-primary w-11 h-11 rounded-full flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform flex-shrink-0">
-                        <span className="material-symbols-outlined text-2xl font-bold">storefront</span>
+        <div className="flex min-h-screen transition-colors duration-500 selection:bg-primary/20 bg-[#f8f6f5] dark:bg-[#221610] text-[#1a2a40] dark:text-white">
+
+            {/* Desktop Left Sidebar (Visible for all, but internal states handled by component) */}
+            <div className="hidden lg:block">
+                <V2Sidebar
+                    activeTab={activeTab}
+                    hostelMode={hostelMode}
+                    setHostelMode={setHostelMode}
+                    onActionClick={handleActionClick}
+                    onTabChange={handleTabChange}
+                    visitor={currentVisitor}
+                    isAuthenticated={!!userIsAuthenticated}
+                />
+            </div>
+
+            {/* Application Content Wrapper */}
+            <div className="flex-1 flex flex-col min-w-0 lg:ml-64 xl:mr-80">
+
+                {/* Mobile Header (Hidden on LG and above) */}
+                <header className="lg:hidden sticky top-0 z-50 px-4 py-3 flex items-center justify-between border-b border-primary/5 bg-[#f8f6f5]/80 dark:bg-[#221610]/80 backdrop-blur-xl transition-colors duration-500">
+                    <div onClick={() => navigate('/v2/hostel')} className="cursor-pointer flex items-center gap-3 group">
+                        <div className="bg-primary w-11 h-11 rounded-full flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform flex-shrink-0">
+                            <span className="material-symbols-outlined text-2xl font-bold">storefront</span>
+                        </div>
+                        <h1 className="text-xl font-bold tracking-tight dark:text-white leading-none">Unistore</h1>
                     </div>
-                    <h1 className="text-xl font-bold tracking-tight dark:text-white leading-none">Unistore</h1>
-                </div>
 
-                <div className="flex items-center gap-2">
-                    {/* Theme Toggle */}
-                    <button
-                        onClick={toggleTheme}
-                        className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 hover:scale-110 transition-all text-zinc-500 dark:text-zinc-400"
-                    >
-                        <span className="material-symbols-outlined text-xl fill-0">
-                            {isDark ? 'light_mode' : 'dark_mode'}
-                        </span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={toggleTheme}
+                            className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 hover:scale-110 transition-all text-zinc-500 dark:text-zinc-400"
+                        >
+                            <span className="material-symbols-outlined text-xl fill-0">
+                                {isDark ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
 
-                    {/* Hostel Mode Toggle */}
-                    <div
-                        onClick={() => setHostelMode(!hostelMode)}
-                        className="flex items-center gap-3 bg-zinc-100 dark:bg-white/5 pl-4 pr-1.5 py-1.5 rounded-full border border-zinc-200 dark:border-white/10 cursor-pointer hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
-                    >
-                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Hostel</span>
-                        <div className={`w-11 h-6 rounded-full relative flex items-center px-1 transition-colors duration-300 ${hostelMode ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
-                            <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${hostelMode ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                        <div
+                            onClick={() => setHostelMode(!hostelMode)}
+                            className="flex items-center gap-3 bg-zinc-100 dark:bg-white/5 pl-4 pr-1.5 py-1.5 rounded-full border border-zinc-200 dark:border-white/10 cursor-pointer hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Hostel</span>
+                            <div className={`w-11 h-6 rounded-full relative flex items-center px-1 transition-colors duration-300 ${hostelMode ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
+                                <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${hostelMode ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                            </div>
                         </div>
                     </div>
+                </header>
+
+                {/* Desktop Top Header (Hidden on Mobile) */}
+                <div className="hidden lg:block">
+                    <V2DesktopHeader
+                        visitor={currentVisitor}
+                        onToggleTheme={toggleTheme}
+                        isDark={!!isDark}
+                    />
                 </div>
-            </header>
 
-            {/* Main Content */}
-            <main className="max-w-md mx-auto">
-                {children}
-            </main>
+                {/* Main Content Area */}
+                <main className="flex-1 w-full max-w-7xl mx-auto">
+                    {children}
+                </main>
 
-            {/* Floating Actions & Navigation */}
-            {!hideBottomNav && (
-                <>
-                    <div className="fixed bottom-8 left-0 right-0 z-50 px-6">
+                {/* Mobile Bottom Nav (Hidden on LG and above) */}
+                {!hideBottomNav && (
+                    <div className="lg:hidden fixed bottom-8 left-0 right-0 z-50 px-6">
                         <div className="bg-white/95 dark:bg-[#1a110c]/95 backdrop-blur-3xl max-w-lg mx-auto rounded-[2.5rem] py-3 px-4 flex items-center justify-around shadow-2xl border border-black/5 dark:border-white/10 ring-1 ring-black/5">
                             <button
                                 onClick={() => handleTabChange('home')}
@@ -205,22 +228,6 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                             >
                                 <span className={`material-symbols-outlined text-2xl ${activeTab === 'orders' ? 'fill-1 scale-110' : ''}`}>receipt_long</span>
                                 <span className="text-[10px] font-bold">Orders</span>
-                            </button>
-
-                            <button
-                                onClick={() => handleActionClick('request')}
-                                className="flex flex-col items-center gap-1 text-zinc-400 dark:text-zinc-500 hover:text-primary transition-all"
-                            >
-                                <span className="material-symbols-outlined text-2xl">pending_actions</span>
-                                <span className="text-[10px] font-bold">Request</span>
-                            </button>
-
-                            <button
-                                onClick={() => handleActionClick('post')}
-                                className="flex flex-col items-center gap-1 text-zinc-400 dark:text-zinc-500 hover:text-primary transition-all"
-                            >
-                                <span className="material-symbols-outlined text-2xl">add_circle</span>
-                                <span className="text-[10px] font-bold">Post</span>
                             </button>
 
                             <button
@@ -240,24 +247,26 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                             </button>
                         </div>
                     </div>
-                </>
-            )}
+                )}
+            </div>
 
-            {/* Auth Modal Container */}
+            {/* Desktop Right Activity Sidebar */}
+            <div className="hidden xl:block">
+                <V2ActivitySidebar />
+            </div>
+
+            {/* Shared Components */}
             <AuthModalV2
                 isOpen={isAuthOpen}
                 onClose={() => setIsAuthOpen(false)}
             />
 
-            {/* Create Action Sheet */}
             <CreateActionSheetV2
                 isOpen={isActionOpen}
                 onClose={() => setIsActionOpen(false)}
                 mode={actionMode}
                 currentVisitor={currentVisitor}
                 onSuccess={() => {
-                    // Refresh feed if needed, though V2 pages usually handle their own state
-                    // or use a shared state / event bus
                     window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
                 }}
             />

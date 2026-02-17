@@ -68,34 +68,42 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                         onClick={onClose}
                     />
 
-                    {/* The Sheet */}
+                    {/* The Sheet/Modal Container */}
                     <motion.div
-                        drag="y"
+                        drag={window.innerWidth < 1024 ? "y" : false}
                         dragConstraints={{ top: 0, bottom: 0 }}
                         dragElastic={0.2}
                         onDragEnd={handleDragEnd}
-                        initial={{ y: '100%' }}
-                        animate={controls}
-                        exit={{ y: '100%' }}
+                        initial={window.innerWidth < 1024 ? { y: '100%' } : { opacity: 0, scale: 0.9, y: 0 }}
+                        animate={window.innerWidth < 1024 ? controls : { opacity: 1, scale: 1, y: 0 }}
+                        exit={window.innerWidth < 1024 ? { y: '100%' } : { opacity: 0, scale: 0.9 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative flex h-[85vh] w-full flex-col rounded-t-[3rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10"
+                        className="relative flex h-[85vh] lg:h-auto lg:max-h-[85vh] w-full lg:max-w-4xl flex-col lg:flex-row rounded-t-[3rem] lg:rounded-[3rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t lg:border border-white/20 z-10 lg:m-auto"
                     >
-                        {/* Handle Bar Area - Explicitly for dragging */}
-                        <div className="flex h-12 w-full items-center justify-center pt-2 cursor-grab active:cursor-grabbing shrink-0">
+                        {/* Close Button - Desktop Only */}
+                        <button
+                            onClick={onClose}
+                            className="absolute top-6 right-6 z-50 size-10 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-md hidden lg:flex items-center justify-center text-white hover:bg-primary transition-colors active:scale-95"
+                        >
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+
+                        {/* Handle Bar Area - Mobile Only dragging */}
+                        <div className="flex h-12 w-full items-center justify-center pt-2 cursor-grab active:cursor-grabbing shrink-0 lg:hidden">
                             <div className="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
                         </div>
 
                         {/* Scrollable Content Area */}
-                        <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
-                            {/* Image Carousel Section */}
-                            <div className="px-4">
+                        <div className="flex-1 lg:flex lg:flex-row overflow-hidden flex-col">
+                            {/* Image Section - Take Left side on Desktop */}
+                            <div className="w-full lg:w-1/2 p-4 lg:p-6 flex-shrink-0">
                                 <Swiper
                                     modules={[Autoplay, Pagination]}
                                     autoplay={{ delay: 3000, disableOnInteraction: false }}
                                     pagination={{ clickable: true }}
                                     spaceBetween={12}
                                     loop={productImages.length > 1}
-                                    className="w-full aspect-[4/5] rounded-[2.5rem] !pb-10"
+                                    className="w-full aspect-[4/5] rounded-[2.5rem] !pb-10 h-full"
                                 >
                                     {productImages.map((img: string, i: number) => (
                                         <SwiperSlide key={i}>
@@ -108,133 +116,135 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 </Swiper>
                             </div>
 
-                            {/* Product Info */}
-                            <div className="px-6 pt-4">
-                                <div className="flex justify-between items-start gap-4">
-                                    <div className="flex-1">
-                                        <h1 className="text-2xl font-bold text-[#1a2a40] dark:text-white leading-tight">{productTitle}</h1>
-                                        <p className="text-sm text-zinc-500 font-bold mt-1 tracking-wider uppercase">{productCategory}</p>
+                            {/* Info Section - Scrollable on Desktop Column */}
+                            <div className="flex-1 overflow-y-auto no-scrollbar lg:max-h-[80vh] flex flex-col">
+                                <div className="px-6 pt-4 lg:pt-8 flex-1">
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="flex-1">
+                                            <h1 className="text-2xl lg:text-3xl font-bold text-[#1a2a40] dark:text-white leading-tight">{productTitle}</h1>
+                                            <p className="text-sm text-zinc-500 font-bold mt-1 tracking-wider uppercase">{productCategory}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-2xl lg:text-3xl font-black text-primary">₦{productPrice}</p>
+                                            {productDiscount && <p className="text-sm text-zinc-400 line-through font-bold">₦{productDiscount}</p>}
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-2xl font-black text-primary">₦{productPrice}</p>
-                                        {productDiscount && <p className="text-sm text-zinc-400 line-through font-bold">₦{productDiscount}</p>}
-                                    </div>
-                                </div>
 
-                                {/* Seller Card */}
-                                <div className="mt-8 flex items-center justify-between p-4 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 shadow-sm">
-                                    <div className="flex items-center gap-3">
-                                        {sellerPhoto ? (
-                                            <img src={sellerPhoto} alt="Seller" className="h-12 w-12 rounded-full border-2 border-primary/20 object-cover" />
-                                        ) : (
-                                            <div className="h-12 w-12 rounded-full border-2 border-[#f8f6f5] dark:border-zinc-800 shadow-sm bg-zinc-100 flex items-center justify-center text-zinc-400 font-bold uppercase">
-                                                {sellerName.charAt(0)}
+                                    {/* Seller Card */}
+                                    <div className="mt-8 flex items-center justify-between p-4 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            {sellerPhoto ? (
+                                                <img src={sellerPhoto} alt="Seller" className="h-12 w-12 rounded-full border-2 border-primary/20 object-cover" />
+                                            ) : (
+                                                <div className="h-12 w-12 rounded-full border-2 border-[#f8f6f5] dark:border-zinc-800 shadow-sm bg-zinc-100 flex items-center justify-center text-zinc-400 font-bold uppercase">
+                                                    {sellerName.charAt(0)}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <p className="text-sm font-bold text-[#1a2a40] dark:text-zinc-100">{sellerName}</p>
+                                                <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                                                    <span className="material-symbols-outlined text-[14px]">location_on</span>
+                                                    <span>{sellerLocation}</span>
+                                                </div>
                                             </div>
-                                        )}
-                                        <div>
-                                            <p className="text-sm font-bold text-[#1a2a40] dark:text-zinc-100">{sellerName}</p>
-                                            <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                                                <span className="material-symbols-outlined text-[14px]">location_on</span>
-                                                <span>{sellerLocation}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full">
+                                            <span className="material-symbols-outlined text-primary text-sm fill-1">star</span>
+                                            <span className="text-xs font-bold text-primary">{productRating}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    <div className="mt-8">
+                                        <h3 className="text-sm font-black text-[#1a2a40] dark:text-white uppercase tracking-widest mb-3">About this product</h3>
+                                        <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-sm font-medium">
+                                            {productTitle}
+                                        </p>
+                                        <div className="mt-6 flex flex-wrap gap-2">
+                                            <span className="px-5 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-wider border border-black/5 dark:border-white/10 shadow-sm">Verified</span>
+                                            <span className="px-5 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-wider border border-black/5 dark:border-white/10 shadow-sm">Campus Delivery</span>
+                                            {isAdmin && (
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!confirm('Hide this post as Admin?')) return;
+                                                        const { error } = await supabase
+                                                            .from('hostel_product_updates')
+                                                            .update({ status: 'hide' })
+                                                            .eq('id', product.id);
+                                                        if (!error) {
+                                                            alert('Post hidden');
+                                                            onClose();
+                                                            window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                                        }
+                                                    }}
+                                                    className="px-5 py-2 rounded-full bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest border border-red-500/20 shadow-sm hover:bg-red-500 hover:text-white transition-all"
+                                                >
+                                                    Hide (Admin)
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Pickup Location Snippet */}
+                                    <div className="mt-8 mb-8">
+                                        <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-3">Pickup Location</h3>
+                                        <div className="h-44 w-full rounded-[2rem] bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
+                                            <img className="w-full h-full object-cover opacity-60 dark:opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7-GaqwsyUCErSKiAV_I5Lukji5va4cNJ1JBu4D2Sa_6jXMtHElAPLX9eMQxKWDeN48PDZ8b3feacGUd7rxyHz1jl-Ioj9SAreYctYUrcGu90oQlU60AQqrs1NZaMBlaRe5Z48sxNJ-5sOHVSTX137QUg-QKzIuLJJOvIlROzsrHDS_FX2Wn477tNbgebn-ssisbIdGBZlAlT2FhGJxGjN00Z-AzVx36kWTS1dLyLVf8vY8V013_BanRlZGOSv1tlsIIuMTZW1C4I" alt="Map" />
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="h-12 w-12 bg-primary rounded-full flex items-center justify-center border-4 border-white dark:border-[#221610] shadow-2xl">
+                                                    <span className="material-symbols-outlined text-white text-xl">location_on</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full">
-                                        <span className="material-symbols-outlined text-primary text-sm fill-1">star</span>
-                                        <span className="text-xs font-bold text-primary">{productRating}</span>
-                                    </div>
                                 </div>
 
-                                {/* Description */}
-                                <div className="mt-8">
-                                    <h3 className="text-sm font-black text-[#1a2a40] dark:text-white uppercase tracking-widest mb-3">About this product</h3>
-                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-sm font-medium">
-                                        {productTitle}
-                                    </p>
-                                    <div className="mt-6 flex flex-wrap gap-2">
-                                        <span className="px-5 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-wider border border-black/5 dark:border-white/10 shadow-sm">Verified</span>
-                                        <span className="px-5 py-2 rounded-full bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-black uppercase tracking-wider border border-black/5 dark:border-white/10 shadow-sm">Campus Delivery</span>
-                                        {isAdmin && (
-                                            <button
-                                                onClick={async () => {
-                                                    if (!confirm('Hide this post as Admin?')) return;
-                                                    const { error } = await supabase
-                                                        .from('hostel_product_updates')
-                                                        .update({ status: 'hide' })
-                                                        .eq('id', product.id);
-                                                    if (!error) {
-                                                        alert('Post hidden');
-                                                        onClose();
-                                                        window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                {/* Sticky Bottom Action Bar within scroll container or absolute */}
+                                <div className="px-6 py-6 lg:py-8 bg-[#f8f6f5]/90 dark:bg-[#221610]/95 backdrop-blur-3xl border-t border-black/5 dark:border-white/5 flex items-center gap-4 shrink-0 mt-auto">
+                                    <button className="h-14 w-14 rounded-full border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-primary transition-all active:scale-95">
+                                        <span className="material-symbols-outlined text-[28px]">favorite</span>
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            const phone = product?.unique_visitors?.phone_number;
+                                            if (!phone) {
+                                                alert('Contact not available');
+                                                return;
+                                            }
+                                            const msg = `hi there, i'm interested in your ${product.post_description || ''} for ₦${product.price?.toLocaleString() || '0'}`;
+                                            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+                                            window.open(whatsappUrl, '_blank');
+
+                                            // Log Analytics (V1 Parity)
+                                            try {
+                                                const userId = await getUserId();
+                                                // Log research/contact action
+                                                try {
+                                                    await supabase
+                                                        .from('merchant_analytics')
+                                                        .insert([{
+                                                            merchant_id: product.actual_user_id || null,
+                                                            product_id: product.id || null,
+                                                            event_type: 'profile_contacted',
+                                                            user_id: userId
+                                                        }]);
+                                                } catch (e: any) {
+                                                    // Ignore 409 Conflict errors (duplicate entry)
+                                                    if (e.code !== '23505') { // '23505' is the PostgreSQL error code for unique_violation
+                                                        console.warn('Analytics log failed (likely conflict):', e);
                                                     }
-                                                }}
-                                                className="px-5 py-2 rounded-full bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest border border-red-500/20 shadow-sm hover:bg-red-500 hover:text-white transition-all"
-                                            >
-                                                Hide (Admin)
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Campus Map Snippet */}
-                                <div className="mt-8">
-                                    <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-3">Pickup Location</h3>
-                                    <div className="h-44 w-full rounded-[2rem] bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
-                                        <img className="w-full h-full object-cover opacity-60 dark:opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7-GaqwsyUCErSKiAV_I5Lukji5va4cNJ1JBu4D2Sa_6jXMtHElAPLX9eMQxKWDeN48PDZ8b3feacGUd7rxyHz1jl-Ioj9SAreYctYUrcGu90oQlU60AQqrs1NZaMBlaRe5Z48sxNJ-5sOHVSTX137QUg-QKzIuLJJOvIlROzsrHDS_FX2Wn477tNbgebn-ssisbIdGBZlAlT2FhGJxGjN00Z-AzVx36kWTS1dLyLVf8vY8V013_BanRlZGOSv1tlsIIuMTZW1C4I" alt="Map" />
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="h-12 w-12 bg-primary rounded-full flex items-center justify-center border-4 border-white dark:border-[#221610] shadow-2xl">
-                                                <span className="material-symbols-outlined text-white text-xl">location_on</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                }
+                                            } catch (err) {
+                                                console.warn('Failed to log contact analytics:', err);
+                                            }
+                                        }}
+                                        className="flex-1 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95"
+                                    >
+                                        <span className="material-symbols-outlined">chat</span>
+                                        Contact Seller
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Sticky Bottom Action Bar */}
-                        <div className="px-6 py-8 bg-[#f8f6f5]/90 dark:bg-[#221610]/95 backdrop-blur-3xl border-t border-black/5 dark:border-white/5 flex items-center gap-4 shrink-0">
-                            <button className="h-14 w-14 rounded-full border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-primary transition-all active:scale-95">
-                                <span className="material-symbols-outlined text-[28px]">favorite</span>
-                            </button>
-                            <button
-                                onClick={async () => {
-                                    const phone = product?.unique_visitors?.phone_number;
-                                    if (!phone) {
-                                        alert('Contact not available');
-                                        return;
-                                    }
-                                    const msg = `hi there, i'm interested in your ${product.post_description || ''} for ₦${product.price?.toLocaleString() || '0'}`;
-                                    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-                                    window.open(whatsappUrl, '_blank');
-
-                                    // Log Analytics (V1 Parity)
-                                    try {
-                                        const userId = await getUserId();
-                                        // Log research/contact action
-                                        try {
-                                            await supabase
-                                                .from('merchant_analytics')
-                                                .insert([{
-                                                    merchant_id: product.actual_user_id || null,
-                                                    product_id: product.id || null,
-                                                    event_type: 'profile_contacted',
-                                                    user_id: userId
-                                                }]);
-                                        } catch (e: any) {
-                                            // Ignore 409 Conflict errors (duplicate entry)
-                                            if (e.code !== '23505') { // '23505' is the PostgreSQL error code for unique_violation
-                                                console.warn('Analytics log failed (likely conflict):', e);
-                                            }
-                                        }
-                                    } catch (err) {
-                                        console.warn('Failed to log contact analytics:', err);
-                                    }
-                                }}
-                                className="flex-1 h-14 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95"
-                            >
-                                <span className="material-symbols-outlined">chat</span>
-                                Contact Seller
-                            </button>
                         </div>
                     </motion.div>
                 </div>

@@ -39,45 +39,51 @@ function App() {
   const { currentTheme } = useTheme();
 
   return (
+    <Router>
+      <AppContent currentTheme={currentTheme} />
+    </Router>
+  );
+}
+
+function AppContent({ currentTheme }: { currentTheme: any }) {
+  const isV2 = window.location.pathname.startsWith('/v2');
+
+  return (
     <div
       className="min-h-screen transition-colors duration-300"
-      style={!window.location.pathname.startsWith('/v2') ? { backgroundColor: currentTheme.background } : {}}
+      style={!isV2 ? { backgroundColor: currentTheme.background } : {}}
     >
-      <Router>
-        <div className="lg:pl-64">{/* push content right on larger screens to avoid the fixed sidebar */}
-          {/* analytics loader registers global handlers and records page views */}
-          <AnalyticsLoader />
-          <UserMenu />
-          <Toaster position="top-center" richColors />
-          {!window.location.pathname.startsWith('/v2') && <AnnouncementBar />}
-          <Routes>
-            <Route path="/" element={<HostelHomePage />} />
-            <Route path="/hostel" element={<HostelHomePage />} />
-            <Route path="/landing-page" element={<LandingPage />} />
-            <Route path="/past-requests" element={<PastRequestsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/sellers" element={<SellersPage />} />
-            <Route path="/merchants" element={<PublicMerchantsPage />} />
-            <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
-            <Route path="/test-categories" element={<CategoryTest />} />
-            <Route path="/payment/:merchantId" element={<PaymentPage />} />
-            <Route path="/invoices" element={<InvoicesPage />} />
-            <Route path="/pay-merchant" element={<PayMerchantPage />} />
-            <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
-            <Route path="/search-results" element={<SearchResultsPage />} />
-            <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
-            <Route path="/all-products" element={<AllProductsPage />} />
-            <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
-            <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
-            <Route path="/update-password" element={<UpdatePasswordPage />} />
-            <Route path="/admin-coupons" element={<AdminCouponsPage />} />
-            <Route path="/v2/hostel" element={<HostelHomePageV2 />} />
-            <Route path="/v2/profile" element={<ProfilePageV2 />} />
-            <Route path="/v2/orders" element={<OrdersPageV2 />} />
-            <Route path="/v2/payments" element={<PaymentsPageV2 />} />
-          </Routes>
-        </div>
-      </Router>
+      <div className={!isV2 ? "lg:pl-64" : ""}>
+        <AnalyticsLoader />
+        {!isV2 && <UserMenu />}
+        <Toaster position="top-center" richColors />
+        {!isV2 && <AnnouncementBar />}
+        <Routes>
+          <Route path="/" element={<HostelHomePage />} />
+          <Route path="/hostel" element={<HostelHomePage />} />
+          <Route path="/landing-page" element={<LandingPage />} />
+          <Route path="/past-requests" element={<PastRequestsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/sellers" element={<SellersPage />} />
+          <Route path="/merchants" element={<PublicMerchantsPage />} />
+          <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
+          <Route path="/test-categories" element={<CategoryTest />} />
+          <Route path="/payment/:merchantId" element={<PaymentPage />} />
+          <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/pay-merchant" element={<PayMerchantPage />} />
+          <Route path="/view-invoice/:invoiceId" element={<ViewInvoicePage />} />
+          <Route path="/search-results" element={<SearchResultsPage />} />
+          <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
+          <Route path="/all-products" element={<AllProductsPage />} />
+          <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
+          <Route path="/update-password" element={<UpdatePasswordPage />} />
+          <Route path="/admin-coupons" element={<AdminCouponsPage />} />
+          <Route path="/v2/hostel" element={<HostelHomePageV2 />} />
+          <Route path="/v2/profile" element={<ProfilePageV2 />} />
+          <Route path="/v2/orders" element={<OrdersPageV2 />} />
+          <Route path="/v2/payments" element={<PaymentsPageV2 />} />
+        </Routes>
+      </div>
     </div>
   );
 }

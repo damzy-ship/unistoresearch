@@ -237,7 +237,7 @@ export const HostelHomePageV2: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex gap-4 overflow-x-auto px-6 no-scrollbar pb-4 min-h-[140px] items-center">
+                <div className="flex gap-4 overflow-x-auto px-6 lg:px-8 no-scrollbar pb-6 min-h-[140px] items-center">
                     {realLiveRequests.length > 0 ? (
                         realLiveRequests.map((item, idx) => (
                             <motion.div
@@ -294,21 +294,24 @@ export const HostelHomePageV2: React.FC = () => {
             </section>
 
             {/* Delicious Deals Hero */}
-            <section className="px-4 py-6">
-                <div className="relative w-full h-60 rounded-[2.5rem] overflow-hidden group shadow-2xl">
-                    <img className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" src={HERO_IMAGE} alt="Deals" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex flex-col justify-end p-8">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg shadow-primary/30 tracking-widest uppercase">Hot Deal</span>
+            <section className="px-4 lg:px-8 py-6">
+                <div className="relative w-full h-[320px] lg:h-[400px] rounded-[3rem] overflow-hidden group shadow-2xl">
+                    <img className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src={HERO_IMAGE} alt="Deals" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center p-8 lg:p-16">
+                        <div className="max-w-md">
+                            <span className="inline-block px-4 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6 shadow-lg shadow-primary/20">Hostel Special</span>
+                            <h2 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-[0.9] tracking-tighter">Delicious Deals <br />delivered to <br />your door.</h2>
+                            <p className="text-white/80 mb-8 text-sm lg:text-base font-bold leading-relaxed max-w-sm">Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.</p>
+                            <div className="flex gap-4">
+                                <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-white font-black rounded-2xl transition-all text-sm shadow-xl shadow-primary/20 active:scale-95">Order Now</button>
+                                <button className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-black rounded-2xl transition-all text-sm border border-white/20 active:scale-95">View Menu</button>
+                            </div>
                         </div>
-                        <h4 className="text-white text-3xl font-bold tracking-tight leading-none mb-1">Fresh Bread <span className="text-primary">₦350</span></h4>
-                        <p className="text-white/80 text-sm font-medium tracking-wide">Zully's Bakery • Limited Stock!</p>
-
-                        <div className="mt-4 flex gap-1.5">
-                            <div className="w-10 h-1.5 bg-primary rounded-full shadow-lg shadow-primary/40"></div>
-                            <div className="w-3 h-1.5 bg-white/20 rounded-full"></div>
-                            <div className="w-3 h-1.5 bg-white/20 rounded-full"></div>
-                        </div>
+                    </div>
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                        <div className="w-8 h-1.5 bg-primary rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-white/50 rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-white/50 rounded-full"></div>
                     </div>
                 </div>
             </section>
@@ -320,8 +323,8 @@ export const HostelHomePageV2: React.FC = () => {
                         { icon: 'grid_view', label: 'All', id: 'all' },
                         { icon: 'restaurant', label: 'Food', id: 'food & snacks' },
                         { icon: 'apparel', label: 'Clothing', id: 'clothing' },
-                        { icon: 'ice_skating', label: 'Shoes', id: 'shoes' },
-                        { icon: 'hat_off', label: 'Caps', id: 'caps' },
+                        { icon: 'hiking', label: 'Shoes', id: 'shoes' },
+                        { icon: 'sports_baseball', label: 'Caps', id: 'caps' },
                         { icon: 'devices', label: 'Gadgets', id: 'gadgets' },
                         { icon: 'smartphone', label: 'Phones', id: 'phones' },
                         { icon: 'diamond', label: 'Jewelry', id: 'jeweleries' }
@@ -362,7 +365,7 @@ export const HostelHomePageV2: React.FC = () => {
             </section>
 
             {/* Product Feed */}
-            <div className="p-4 grid grid-cols-1 gap-8 mb-20 relative">
+            <div className="p-4 lg:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-10 mb-20 relative">
                 {(loadingFeed && orderedDisplayedFeed.length === 0) ? (
                     Array(3).fill(0).map((_, k) => (
                         <div key={k} className="bg-zinc-100 dark:bg-white/5 rounded-[2.5rem] aspect-[4/5] animate-pulse" />
@@ -424,7 +427,7 @@ export const HostelHomePageV2: React.FC = () => {
                         {hasMore && (
                             <div
                                 ref={lastElementRef as any}
-                                className="col-span-1 flex justify-center py-10 min-h-[100px]"
+                                className="col-span-full flex justify-center py-10 min-h-[100px]"
                             >
                                 {loadingMore && (
                                     <div className="flex items-center gap-2">
