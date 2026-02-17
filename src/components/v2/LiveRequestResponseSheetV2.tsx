@@ -5,13 +5,17 @@ interface LiveRequestResponseSheetV2Props {
     isOpen: boolean;
     onClose: () => void;
     request: any;
+    currentVisitorId?: string;
 }
 
 export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Props> = ({
     isOpen,
     onClose,
-    request
+    request,
+    currentVisitorId
 }) => {
+    const isOwner = request?.actual_user_id === currentVisitorId;
+
     const handleContactRequester = () => {
         const phone = request?.unique_visitors?.phone_number;
         if (!phone) {
@@ -60,57 +64,95 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                         </div>
 
                         {/* Request Preview */}
-                        <div className="flex gap-4 mb-8 p-4 bg-white dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm">
-                            <div className="w-20 h-20 rounded-[1.5rem] bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0 ring-4 ring-black/5 dark:ring-white/5">
-                                <img className="w-full h-full object-cover" src={request?.img} alt="Request" />
-                            </div>
+                        <div className="flex gap-4 mb-8 p-5 bg-white dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm">
                             <div className="flex-1">
-                                <h4 className="text-[#1a2a40] dark:text-white font-bold leading-tight mb-1 text-lg">{request?.text}</h4>
-                                <div className="flex items-center gap-2 mt-2">
+                                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">Item Requested</p>
+                                <h4 className="text-[#1a2a40] dark:text-white font-bold leading-tight mb-3 text-lg">
+                                    "{request?.post_description || request?.text || 'I am looking for something...'}"
+                                </h4>
+                                <div className="flex items-center gap-2">
                                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-[10px] text-primary">schedule</span>
+                                        <span className="material-symbols-outlined text-[12px] text-primary">schedule</span>
                                     </div>
-                                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{request?.time || 'Just now'}</span>
+                                    <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">
+                                        {request?.time || 'Just now'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-5 px-1">How would you like to respond?</h3>
+                        <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-5 px-1">
+                            {isOwner ? 'Manage your request' : 'How would you like to respond?'}
+                        </h3>
 
                         <div className="space-y-4">
-                            {/* Option 1: Sell */}
-                            <button
-                                onClick={handleContactRequester}
-                                className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-2xl">storefront</span>
+                            {isOwner ? (
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm('Are you sure you want to delete your request?')) return;
+                                        const { supabase } = await import('../../lib/supabase');
+                                        const { error } = await supabase
+                                            .from('hostel_product_updates')
+                                            .update({ fulfilled: true })
+                                            .eq('id', request.id);
+                                        if (!error) {
+                                            alert('Request deleted');
+                                            onClose();
+                                            window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                        } else {
+                                            alert('Failed to delete request');
+                                        }
+                                    }}
+                                    className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-2xl">delete</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-lg leading-tight text-white">Delete Request</p>
+                                            <p className="text-white/80 text-xs mt-1">Remove this from the live feed</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-lg leading-tight text-white">I have this item</p>
-                                        <p className="text-white/80 text-xs mt-1">Contact requester to sell yours</p>
-                                    </div>
-                                </div>
-                                <span className="material-symbols-outlined text-xl">arrow_forward_ios</span>
-                            </button>
+                                    <span className="material-symbols-outlined text-xl">close</span>
+                                </button>
+                            ) : (
+                                <>
+                                    {/* Option 1: Sell */}
+                                    <button
+                                        onClick={handleContactRequester}
+                                        className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                                <span className="material-symbols-outlined text-2xl">storefront</span>
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-lg leading-tight text-white">I have this item</p>
+                                                <p className="text-white/80 text-xs mt-1">Contact requester to sell yours</p>
+                                            </div>
+                                        </div>
+                                        <span className="material-symbols-outlined text-xl">arrow_forward_ios</span>
+                                    </button>
 
-                            {/* Option 2: Recommend */}
-                            <button
-                                onClick={onClose}
-                                className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/10 hover:scale-[1.02] active:scale-95 transition-all text-left shadow-sm"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
-                                        <span className="material-symbols-outlined text-2xl">recommend</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-lg leading-tight text-[#1a2a40] dark:text-white">Recommend Product</p>
-                                        <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">Suggest an existing product</p>
-                                    </div>
-                                </div>
-                                <span className="material-symbols-outlined text-zinc-400 text-xl">arrow_forward_ios</span>
-                            </button>
+                                    {/* Option 2: Recommend */}
+                                    <button
+                                        onClick={onClose}
+                                        className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/10 hover:scale-[1.02] active:scale-95 transition-all text-left shadow-sm"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+                                                <span className="material-symbols-outlined text-2xl">recommend</span>
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-lg leading-tight text-[#1a2a40] dark:text-white">Recommend Product</p>
+                                                <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">Suggest an existing product</p>
+                                            </div>
+                                        </div>
+                                        <span className="material-symbols-outlined text-zinc-400 text-xl">arrow_forward_ios</span>
+                                    </button>
+                                </>
+                            )}
                         </div>
 
                         <button

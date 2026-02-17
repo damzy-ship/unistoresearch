@@ -110,7 +110,9 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Item Requested</p>
-                                        <p className="text-2xl font-bold dark:text-white leading-tight">"{request?.request_text || 'Nike shoes'}"</p>
+                                        <p className="text-2xl font-bold dark:text-white leading-tight">
+                                            "{request?.post_description || request?.request_text || 'I am looking for something...'}"
+                                        </p>
                                     </div>
                                 </div>
 
@@ -122,7 +124,9 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Campus Location</p>
-                                            <p className="font-bold dark:text-white">{request?.university || 'Veritas University'}</p>
+                                            <p className="font-bold dark:text-white">
+                                                {request?.unique_visitors?.schools?.short_name || request?.university || 'Hostel Campus'}
+                                            </p>
                                         </div>
                                     </div>
 
@@ -203,10 +207,33 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
                         <div className="pt-8 flex gap-4">
                             {request?.actual_user_id === currentVisitorId ? (
                                 <>
-                                    <button className="flex-1 h-16 rounded-[2rem] bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white font-black text-sm active:scale-95 transition-all border border-zinc-200 dark:border-white/10">
+                                    <button
+                                        onClick={async () => {
+                                            if (!confirm('Are you sure you want to cancel your request?')) return;
+                                            const { error } = await supabase
+                                                .from('hostel_product_updates')
+                                                .update({ fulfilled: true })
+                                                .eq('id', request.id);
+                                            if (!error) {
+                                                alert('Request cancelled successfully');
+                                                onClose();
+                                                window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                            } else {
+                                                console.error('Cancel error:', error);
+                                                alert('Failed to cancel request. Please try again.');
+                                            }
+                                        }}
+                                        className="flex-1 h-16 rounded-[2rem] bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white font-black text-sm active:scale-95 transition-all border border-zinc-200 dark:border-white/10"
+                                    >
                                         Cancel Request
                                     </button>
-                                    <button className="flex-2 h-16 px-10 rounded-[2rem] bg-primary text-white font-black text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <button
+                                        onClick={() => {
+                                            alert('Request bumped! It will now appear at the top of the feed.');
+                                            onClose();
+                                        }}
+                                        className="flex-2 h-16 px-10 rounded-[2rem] bg-primary text-white font-black text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    >
                                         <span className="material-symbols-outlined">refresh</span>
                                         BUMP REQUEST
                                     </button>

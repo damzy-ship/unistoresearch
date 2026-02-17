@@ -12,6 +12,7 @@ export const OrdersPageV2: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRequest, setSelectedRequest] = useState<any>(null);
+    const [currentVisitor, setCurrentVisitor] = useState<any>(null);
 
     useEffect(() => {
         const fetchUserRequests = async () => {
@@ -40,10 +41,24 @@ export const OrdersPageV2: React.FC = () => {
             }
         };
 
+        const fetchVisitor = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user?.id) {
+                const { data: visitor } = await supabase
+                    .from('unique_visitors')
+                    .select('*')
+                    .eq('auth_user_id', session.user.id)
+                    .maybeSingle();
+                setCurrentVisitor(visitor);
+            }
+        };
+
         fetchUserRequests();
+        fetchVisitor();
 
         const handleAuthChange = () => {
             fetchUserRequests();
+            fetchVisitor();
         };
 
         window.addEventListener('auth-state-changed', handleAuthChange);
@@ -188,6 +203,8 @@ export const OrdersPageV2: React.FC = () => {
                 isOpen={!!selectedRequest}
                 onClose={() => setSelectedRequest(null)}
                 request={selectedRequest}
+                currentVisitorId={currentVisitor?.id}
+                isAdmin={currentVisitor?.is_admin}
             />
         </V2Layout>
     );
