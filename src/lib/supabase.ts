@@ -214,19 +214,7 @@ export async function deleteRequestLog(requestId: string): Promise<{ success: bo
     }
     return { success: true };
   } catch (error) {
+    console.error('Unexpected error deleting request log:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
-}
-
-export interface Coupon {
-  id: string;
-  code: string;
-  value: number;
-  claimed: boolean;
-  created_at: string;
-  claimed_by: string; // UUID of unique visitors
-  claimed_at: number;
-  school_id: string;
-  type?: 'discount' | 'product';
-  product_id?: string;
 }

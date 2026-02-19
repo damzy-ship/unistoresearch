@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme.tsx';
 // import HomePage from './pages/HomePage';
@@ -7,6 +7,7 @@ import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
 import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
+import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
 import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
@@ -30,11 +31,11 @@ import { PaymentsPageV2 } from './pages/v2/PaymentsPageV2';
 import { UpdatePasswordPageV2 } from './pages/v2/UpdatePasswordPageV2';
 // import { useHostelMode } from './hooks/useHostelMode';
 
-// function HomeEntry() {
-//   const { hostelMode } = useHostelMode();
-//   if (hostelMode) return <Navigate to="/hostel" replace />;
-//   return <HomePage />;
-// }
+function HomeEntry() {
+  const { hostelMode } = useHostelMode();
+  if (hostelMode) return <Navigate to="/hostel" replace />;
+  return <HomePage />;
+}
 
 function App() {
   const { currentTheme } = useTheme();

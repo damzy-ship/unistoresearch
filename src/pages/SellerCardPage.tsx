@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, ArrowLeft, Award, Calendar, MapPin, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, ArrowLeft, Star, Award, Calendar, MapPin, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getMerchantCategories } from '../lib/categoryService';
 import StarRating from '../components/StarRating';
@@ -148,7 +148,7 @@ export default function SellerCardPage() {
           <div className="relative bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-3xl p-1 shadow-2xl">
             {/* Inner Card */}
             <div className="bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 relative overflow-hidden">
-
+              
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-5">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-orange-500 to-blue-500"></div>
@@ -164,7 +164,7 @@ export default function SellerCardPage() {
                     {seller.school_name.replace(' University', '')}
                   </span>
                 </div>
-
+                
                 <div className="flex gap-1">
                   {/* Status Badge */}
                   {isSellerActive(seller) ? (
@@ -178,7 +178,7 @@ export default function SellerCardPage() {
                       <span className="text-xs font-bold text-red-700">INACTIVE</span>
                     </div>
                   )}
-
+                  
                   {isTopRated(seller) && (
                     <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-yellow-500 px-2 py-1 rounded-full shadow-lg animate-pulse">
                       <Award className="w-3 h-3 text-white" />

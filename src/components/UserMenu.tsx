@@ -15,7 +15,6 @@ export default function UserMenu() {
   const [userId, setUserId] = useState<string | null>(null);
   const [actualUserId, setActualUserId] = useState<string | null>(null);
   const [userType, setUserType] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const { currentTheme } = useTheme();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   // const { hostelMode, setHostelMode } = useHostelMode();
@@ -146,16 +145,6 @@ export default function UserMenu() {
               <LogOut className="w-4 h-4" />
               Sign Out
             </button>
-
-            {isAdmin && (
-              <button
-                onClick={() => { navigate('/admin-coupons'); setMobileOpen(false); }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors mt-2 border-t border-gray-100"
-              >
-                <Box className="w-4 h-4" />
-                Manage Coupons
-              </button>
-            )}
           </>
         )}
       </div>

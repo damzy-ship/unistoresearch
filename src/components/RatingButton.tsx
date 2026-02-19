@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, X } from 'lucide-react';
 import { getUserRating } from '../lib/ratingService';
 import RatingModal from './RatingModal';
 
@@ -73,7 +73,7 @@ export default function RatingButton({
             </span>
           </button>
         )}
-
+        
         {userRating && !canRate && (
           <div className="flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg">
             <Star className="w-4 h-4 fill-current" />

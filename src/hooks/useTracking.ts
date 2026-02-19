@@ -133,11 +133,6 @@ export function setPhoneAuthenticated(authenticated: boolean): void {
 
 export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
-
-  // Preserve coupon data
-  const couponId = localStorage.getItem('hostel_coupon_id');
-  const lastPlayed = localStorage.getItem('hostel_coupon_last_played');
-
   localStorage.clear();
 
   if (couponId) localStorage.setItem('hostel_coupon_id', couponId);

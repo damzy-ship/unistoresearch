@@ -1,11 +1,11 @@
 import WelcomeMessage from './WelcomeMessage';
 
 interface UserGreetingProps {
-  university?: string;
+  university: string;
   className?: string;
 }
 
-export default function UserGreeting({ className = '' }: UserGreetingProps) {
+export default function UserGreeting({ university, className = '' }: UserGreetingProps) {
   return (
     <div className={`${className}`}>
       <WelcomeMessage className="text-lg font-medium" />

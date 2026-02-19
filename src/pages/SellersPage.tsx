@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Share2, Eye, MapPin, Calendar, Tag, X, AlertCircle, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -59,7 +59,7 @@ export default function SellersPage() {
 
         // Get categories for each merchant
         const sellersWithCategories: SellerWithCategories[] = [];
-
+        
         for (const merchant of merchants || []) {
           const categories = await getMerchantCategories(merchant.id, merchant.seller_description);
           sellersWithCategories.push({
@@ -139,7 +139,7 @@ export default function SellersPage() {
 
   const handleShareProfile = async (seller: SellerWithCategories) => {
     const shareUrl = `${window.location.origin}/seller-card/${seller.seller_id}`;
-
+    
     if (navigator.share) {
       try {
         await navigator.share({
@@ -148,7 +148,6 @@ export default function SellersPage() {
           url: shareUrl
         });
       } catch (error) {
-        console.error(error)
         // If sharing fails, fall back to copying to clipboard
         try {
           await navigator.clipboard.writeText(shareUrl);
@@ -230,10 +229,11 @@ export default function SellersPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${showFilters || activeFiltersCount > 0
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                showFilters || activeFiltersCount > 0
                   ? 'bg-orange-100 text-orange-700 border border-orange-200'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+              }`}
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -294,7 +294,7 @@ export default function SellersPage() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No sellers found</h3>
             <p className="text-gray-600">
-              {activeFiltersCount > 0
+              {activeFiltersCount > 0 
                 ? 'Try adjusting your filters or search terms'
                 : 'No sellers are currently registered'
               }
@@ -312,16 +312,16 @@ export default function SellersPage() {
                   <div className={`w-16 h-16 rounded-full ${getInitialsColor(seller.full_name)} flex items-center justify-center text-white font-bold text-lg mx-auto mb-3 shadow-lg`}>
                     {getInitials(seller.full_name)}
                   </div>
-
+                  
                   {/* Seller ID */}
                   <p className="text-xs font-mono text-gray-500 mb-2">{seller.seller_id}</p>
-
+                  
                   <h3 className="font-bold text-gray-900 text-lg mb-1">{seller.full_name}</h3>
                   <div className="flex items-center justify-center gap-1 text-sm text-gray-600 mb-2">
                     <MapPin className="w-3 h-3" />
                     {seller.school_name}
                   </div>
-
+                  
                   {/* Status Badge */}
                   <div className="mb-2">
                     {isSellerActive(seller) ? (
@@ -336,7 +336,7 @@ export default function SellersPage() {
                       </span>
                     )}
                   </div>
-
+                  
                   {(seller.total_ratings || 0) > 0 && (
                     <StarRating
                       rating={seller.average_rating || 0}
@@ -347,7 +347,7 @@ export default function SellersPage() {
                   )}
                 </div>
 
-                {/* Categories */}
+                {/* Categories */}       
                 {seller.categories.length > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center gap-1 mb-2">
