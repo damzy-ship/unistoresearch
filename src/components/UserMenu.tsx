@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, LogOut, History, FileText, Box, X, LogIn } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, getSafeSession } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from '../hooks/useTracking';
 import { useTheme } from '../hooks/useTheme';
@@ -25,22 +25,29 @@ export default function UserMenu() {
   useEffect(() => {
 
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session?.user);
+      try {
+        const { data: { session } } = await getSafeSession();
+        setIsAuthenticated(!!session?.user);
 
-      if (session?.user) {
-        setUserId(session.user.id);
-        const { data: visitorData } = await supabase
-          .from('unique_visitors')
-          .select('user_type, full_name, auth_user_id, id')
-          .eq('auth_user_id', session.user.id)
-          .single();
+        if (session?.user) {
+          setUserId(session.user.id);
+          const { data: visitorData } = await supabase
+            .from('unique_visitors')
+            .select('user_type, full_name, auth_user_id, id, is_admin')
+            .eq('auth_user_id', session.user.id)
+            .single();
 
-        const typedVisitor = visitorData as { user_type?: string; full_name?: string; id?: string } | null;
-        setUserType(typedVisitor?.user_type || null);
-        setActualUserId(typedVisitor?.id || null);
-        const name = typedVisitor?.full_name || session.user.user_metadata?.full_name || '';
-        setUserName(name);
+          const typedVisitor = visitorData as { user_type?: string; full_name?: string; id?: string, is_admin?: boolean } | null;
+          setUserType(typedVisitor?.user_type || null);
+          setActualUserId(typedVisitor?.id || null);
+          setIsAdmin(typedVisitor?.is_admin || false);
+          const name = typedVisitor?.full_name || session.user.user_metadata?.full_name || '';
+          setUserName(name);
+        }
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          console.warn('UserMenu checkAuth failed:', err);
+        }
       }
     };
 

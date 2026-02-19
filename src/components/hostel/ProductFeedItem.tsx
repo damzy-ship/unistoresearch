@@ -1,8 +1,9 @@
 import { Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { HostelsProductUpdates, UniqueVisitor, supabase } from '../../lib/supabase';
 import ContactSellerButton from '../ContactSellerButton';
 import AuthModal from '../AuthModal';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
 const formatTimeAgo = (timestamp: string): string => {
@@ -54,55 +55,43 @@ const renderImageGrid = (images: string[], openModal: (images: string[], startIn
 
 interface ProductFeedItemProps {
     item: HostelsProductUpdates;
-    currentVisitor?: UniqueVisitor;
+    currentVisitor?: UniqueVisitor | null;
     userIsHostelMerchant?: boolean;
     userIsAuthenticated?: boolean;
     openImageModal: (images: string[], startIndex: number) => void;
     onDelete?: (id: string) => void;
+    discountValue?: number;
+    onContactMerchant?: (item: HostelsProductUpdates) => void;
+    onRecommend?: (item: HostelsProductUpdates) => void;
+    onUserClick?: (user: UniqueVisitor) => void;
+    onEdit?: (item: HostelsProductUpdates) => void;
 }
 
-export default function ProductFeedItem({ item, currentVisitor, openImageModal, onDelete, userIsHostelMerchant, userIsAuthenticated }: ProductFeedItemProps) {
-    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+export default function ProductFeedItem({
+    item,
+    currentVisitor,
+    openImageModal,
+    onDelete,
+    userIsHostelMerchant,
+    userIsAuthenticated,
+    discountValue,
+    onContactMerchant,
+    onRecommend,
+    onUserClick,
+    onEdit
+}: ProductFeedItemProps) {
     const [isFulfillModalOpen, setIsFulfillModalOpen] = useState(false);
-    const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
-    const [showSignInModal, setShowSignInModal] = useState(false);
-    const [showAuthModal, setShowAuthModal] = useState(false);
     const { currentTheme } = useTheme();
-    const [signInContext, setSignInContext] = useState<'merchant' | 'recommend'>('merchant');
 
     // Local state to track fulfilled status, initialized from prop
     const [isFulfilled, setIsFulfilled] = useState(item.fulfilled || false);
 
     const handleIHaveIt = () => {
-        if (!userIsAuthenticated) {
-            setSignInContext('merchant');
-            setShowSignInModal(true);
-            return;
-        }
-
-        if (userIsHostelMerchant) {
-            const phone = visitor?.phone_number;
-            if (!phone) return;
-            const msg = `hi there, i have ${item.post_description || ''}`;
-            const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-            window.open(whatsappUrl, '_blank');
-        } else {
-            setShowBecomeMerchantModal(true);
-        }
+        onContactMerchant?.(item);
     };
 
     const handleRecommend = () => {
-        if (!userIsAuthenticated) {
-            setSignInContext('recommend');
-            setShowSignInModal(true);
-            return;
-        }
-
-        const phone = visitor?.phone_number;
-        if (!phone) return;
-        const msg = `hi there, i have a recommendation for ${item.post_description || ''}`;
-        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-        window.open(whatsappUrl, '_blank');
+        onRecommend?.(item);
     };
 
     const handleMarkFulfilled = async () => {
@@ -154,20 +143,24 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
         }
     }
 
-    const handleDeleteConfirm = () => {
-        if (onDelete) {
-            onDelete(item.id);
+    const handleProfileClick = () => {
+        if (visitor && onUserClick) {
+            onUserClick(visitor);
         }
-        setIsConfirmModalOpen(false);
     };
 
-    // useEffect(() => {
-    //     // Reset modals when item changes
-    //     console.log(visitor)
-    // }, []);
+    const handleEdit = () => {
+        onEdit?.(item);
+    };
 
     return (
-        <article className={articleClass}>
+        <motion.article
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
+            className={articleClass}
+        >
             {/* Request Badge positioned at top-right with pop effect */}
             {isRequest && !isFulfilled && (
                 <div className="absolute top-4 right-4 text-[11px] font-extrabold px-3 py-1 rounded-full bg-amber-400 text-gray-900 shadow-lg shadow-amber-500/30 z-10 animate-pulse-once">
@@ -182,7 +175,10 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
 
             <div className="flex gap-3">
                 <div className="flex-shrink-0">
-                    <div className={`w-12 h-12 rounded-full ${avatarBgClass} flex items-center justify-center overflow-hidden`}>
+                    <div
+                        onClick={handleProfileClick}
+                        className={`w-12 h-12 rounded-full ${avatarBgClass} flex items-center justify-center overflow-hidden cursor-pointer`}
+                    >
                         {visitor?.profile_picture ? (
                             <img src={visitor.profile_picture} alt="avatar" className="w-full h-full object-cover" />
                         ) : (
@@ -194,7 +190,7 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 flex-wrap text-sm">
-                            <span className={nameClass}>{isRequest ? name.split(' ')[0] : visitor?.brand_name || name}</span>
+                            <span onClick={handleProfileClick} className={nameClass}>{isRequest ? name.split(' ')[0] : visitor?.brand_name || name}</span>
 
                             {/* Original badge removed, new one is absolute position */}
 
@@ -217,6 +213,36 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                         </p>
                     )}
 
+                    {item.price != null && (
+                        <div className="mt-2 text-sm font-medium">
+                            <div className="flex items-center gap-2">
+                                {item.discount_price && item.discount_price > 0 ? (
+                                    <>
+                                        <span className="text-gray-400 line-through text-xs">
+                                            ₦{Number(item.price).toLocaleString()}
+                                        </span>
+                                        <span className="text-emerald-400 font-bold text-base">
+                                            ₦{Math.max(0, Number(item.discount_price) - (discountValue || 0)).toLocaleString()}
+                                        </span>
+                                    </>
+                                ) : discountValue && discountValue > 0 ? (
+                                    <>
+                                        <span className="text-gray-400 line-through text-xs">
+                                            ₦{Number(item.price).toLocaleString()}
+                                        </span>
+                                        <span className="text-emerald-400 font-bold text-base">
+                                            ₦{Math.max(0, Number(item.price) - discountValue).toLocaleString()}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-emerald-400">
+                                        ₦{Number(item.price).toLocaleString()}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {renderImageGrid(item.post_images, openImageModal)}
 
                     {!isOwnPost && !isRequest && <div className="mt-3">
@@ -226,6 +252,8 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                                 phone_number: visitor?.phone_number || '',
                                 school_short_name: visitor?.schools?.short_name,
                                 merchant_id: visitor?.id,
+                                discount_price: item.discount_price?.toString(),
+                                full_name: visitor?.brand_name || visitor?.full_name || 'Seller',
                             }}
                         >
                             Contact Seller
@@ -246,81 +274,6 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                             >
                                 Recommend
                             </button>
-
-                            {/* Modals */}
-                            {showBecomeMerchantModal && (
-                                <div
-                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
-                                    onClick={() => setShowBecomeMerchantModal(false)}
-                                >
-                                    <div
-                                        className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <h3 className="text-xl font-bold text-white mb-2">Become a hostel merchant</h3>
-                                        <p className="text-gray-400 mb-6 text-sm">Hi {currentVisitor?.full_name}, you need to become a hostel merchant to be able to contact users.</p>
-
-                                        <div className="flex justify-end gap-3">
-                                            <button
-                                                onClick={() => setShowBecomeMerchantModal(false)}
-                                                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    const whatsappUrl = `https://wa.me/2349082753819?text=${encodeURIComponent('hi, dami, i want to become a hostel merchant.')}`;
-                                                    window.open(whatsappUrl, '_blank');
-                                                }}
-                                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
-                                            >
-                                                Continue
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {showSignInModal && (
-                                <div
-                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
-                                    onClick={() => setShowSignInModal(false)}
-                                >
-                                    <div
-                                        className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <h3 className="text-xl font-bold text-white mb-2">
-                                            {signInContext === 'recommend' ? 'Sign in to recommend' : 'Sign in to contact'}
-                                        </h3>
-                                        <p className="text-gray-400 mb-6 text-sm">
-                                            {signInContext === 'recommend'
-                                                ? 'Sign in to include your recommendation.'
-                                                : 'Sign in as a merchant to be able to contact users.'}
-                                        </p>
-
-                                        <div className="flex justify-end gap-3">
-                                            <button
-                                                onClick={() => setShowSignInModal(false)}
-                                                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setShowSignInModal(false);
-                                                    setShowAuthModal(true);
-                                                }}
-                                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition-colors"
-                                            >
-                                                Sign in
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />
                         </div>
                     )}
 
@@ -333,6 +286,17 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                                     aria-label="Mark as fulfilled"
                                 >
                                     ✓ Fulfilled
+                                </button>
+                            )}
+
+                            {/* Edit Button for Updates */}
+                            {(isAdmin || isOwnPost) && !isRequest && onEdit && (
+                                <button
+                                    onClick={handleEdit}
+                                    className="flex items-center gap-1.5 px-3 py-1 text-sm font-semibold rounded-lg text-blue-400 border border-blue-400/30 hover:bg-blue-400/10 transition-colors"
+                                    aria-label="Edit post"
+                                >
+                                    Edit
                                 </button>
                             )}
 
@@ -351,40 +315,6 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                 </div>
             </div>
 
-            {isConfirmModalOpen && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
-                    onClick={() => setIsConfirmModalOpen(false)} // Close when clicking outside
-                >
-                    <div
-                        className="bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4 transform transition-all"
-                        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-                    >
-                        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                            <Trash2 className="w-5 h-5 text-red-500" />
-                            Confirm Deletion
-                        </h3>
-                        <p className="text-gray-400 mb-6 text-sm">
-                            Are you sure you want to delete this post? This action cannot be undone.
-                        </p>
-
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => setIsConfirmModalOpen(false)}
-                                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleDeleteConfirm}
-                                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20"
-                            >
-                                Delete Permanently
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
             {isFulfillModalOpen && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity"
@@ -418,6 +348,6 @@ export default function ProductFeedItem({ item, currentVisitor, openImageModal, 
                     </div>
                 </div>
             )}
-        </article>
+        </motion.article>
     );
 }

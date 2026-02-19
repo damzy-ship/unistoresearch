@@ -19,7 +19,14 @@ const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({ product, chil
     const { currentTheme } = useTheme();
 
 
-    const message = `Hi! I'm looking for the following from ${product.school_short_name || ''} University: ${product.product_description || ''}`;
+    const [randomCode] = useState(() => `UNISTORE-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
+
+    let message = `Hi! I'm looking for the following from ${product.school_short_name || ''} University: ${product.product_description || ''}`;
+
+    // Check if product has discount price (ensure it's not "0" or empty)
+    if (product.discount_price && parseFloat(product.discount_price) > 0) {
+        message = `Hi, ${product.full_name || 'Merchant'}, I have a unistore discount code ${randomCode}, and I want to use it to get your product: "${product.product_description || ''}" at a discount price of ₦${parseFloat(product.discount_price).toLocaleString()}`;
+    }
     const contactSeller = async (p: Partial<Product>) => {
         if (!p.phone_number) return;
         const whatsappUrl = `https://wa.me/${p.phone_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;

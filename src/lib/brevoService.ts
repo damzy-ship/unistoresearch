@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { getBaseEmailTemplate } from './emailTemplates';
 
 const BREVO_API_KEY = import.meta.env.VITE_BREVO_API_KEY;
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
@@ -94,155 +95,28 @@ export async function sendMassVendorNotification(requestData: {
         }
 
         const subject = `New Product Request: ${requestData.university}`;
-        const htmlContent = `
-      <!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <style>
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f9fafb;
-            padding: 20px;
-        }
-
-        .card {
-            background-color: #ffffff;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-        }
-
-        .header {
-            padding: 20px 24px;
-            text-align: left;
-            /* background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); */
-        }
-
-        .logo-text {
-            font-size: 28px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .uni {
-            color: #f97316;
-        }
-
-        .store {
-            color: #2563eb;
-        }
-
-        .dot {
-            color: #2563eb;
-        }
-
-        .content {
-            padding: 32px 24px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            background-color: #eff6ff;
-            color: #2563eb;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 16px;
-        }
-
-        .title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 12px 0;
-        }
-
-        .description {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #4b5563;
-            margin: 0 0 24px 0;
-        }
-
-        .request-box {
-            background-color: #f8fafc;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 32px;
-        }
-
-        .request-text {
-            font-size: 18px;
-            font-style: italic;
-            color: #1e293b;
-            margin: 0;
-        }
-
-        .cta-container {
-            text-align: center;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 14px 32px;
-            background-color: #2563eb;
-            color: #ffffff !important;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: background-color 0.2s;
-        }
-
-        .footer {
-            padding: 24px;
-            text-align: center;
-            font-size: 14px;
-            color: #9ca3af;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="email-container">
-        <div class="card">
-            <div class="header">
-                <h1 class="logo-text">
-                    <span class="uni">uni</span><span class="store">store</span><span class="dot">.</span>
-                </h1>
-            </div>
-            <div class="content">
-                <h2 class="title">New Request Alert! 🚀</h2>
-                <p class="description">
-                    A student at <strong>${requestData.university}</strong> is looking for something:
-                </p>
-
-                <div class="request-box">
-                    <p class="request-text">"${requestData.request_text}"</p>
-                </div>
-
-                <p class="description">
-                    Log into your dashboard to see more details and contact the buyer.
-                </p>
-
-                <div class="cta-container">
-                    <a href="https://search.unistore.ng" class="button">View Request</a>
-                </div>
-            </div>
-        </div>
+        const getNotificationHtml = (requestData: { university: string; request_text: string }) => getBaseEmailTemplate(`
+    <div style="display: inline-flex; width: 80px; height: 80px; background-color: #f0f7ff; border-radius: 24px; margin-bottom: 32px; align-items: center; justify-content: center;">
+        <span style="font-size: 40px;">🚀</span>
     </div>
-</body>
+    
+    <h2 style="font-size: 28px; font-weight: 800; color: #1a2a40; margin: 0 0 16px 0; letter-spacing: -0.02em;">New Request Alert!</h2>
+    <p style="font-size: 16px; line-height: 1.6; color: #64748b; margin: 0 0 24px 0;">
+        A student at <strong>${requestData.university}</strong> is looking for something:
+    </p>
 
-</html>
-    `;
+    <div style="background-color: #f8fafc; border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid #f1f5f9;">
+        <p style="font-size: 18px; font-style: italic; color: #1e293b; margin: 0; line-height: 1.5;">"${requestData.request_text}"</p>
+    </div>
+
+    <p style="font-size: 16px; line-height: 1.6; color: #64748b; margin: 0 0 40px 0;">
+        Log into your dashboard to see more details and contact the buyer.
+    </p>
+
+    <div style="margin-bottom: 20px;">
+        <a href="https://search.unistore.ng" style="display: inline-block; padding: 18px 48px; background-color: #0c6eed; color: #ffffff !important; text-decoration: none; border-radius: 20px; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: 0 10px 20px -5px rgba(12, 110, 237, 0.3);">View Request</a>
+    </div>
+`);
 
         const BATCH_SIZE = 100;
         const batches: BrevoRecipient[][] = [];
@@ -259,7 +133,7 @@ export async function sendMassVendorNotification(requestData: {
                     to: [batch[0]],
                     bcc: batch.slice(1),
                     subject,
-                    htmlContent,
+                    htmlContent: getNotificationHtml(requestData),
                 };
 
                 console.log(`[Brevo] Firing batch of ${batch.length} recipients...`);
@@ -288,5 +162,48 @@ export async function sendMassVendorNotification(requestData: {
 
     } catch (err) {
         console.error('Failed to send mass notifications:', err);
+    }
+}
+
+export async function sendForgotPasswordEmail(email: string, resetLink: string) {
+    if (!BREVO_API_KEY) return;
+
+    const htmlContent = getBaseEmailTemplate(`
+        <div style="display: inline-flex; width: 80px; height: 80px; background-color: #fffaf7; border-radius: 24px; margin-bottom: 32px; align-items: center; justify-content: center;">
+            <span style="font-size: 40px;">🔑</span>
+        </div>
+        
+        <h2 style="font-size: 28px; font-weight: 800; color: #1a2a40; margin: 0 0 16px 0; letter-spacing: -0.02em;">Reset Your Password</h2>
+        <p style="font-size: 16px; line-height: 1.6; color: #64748b; margin: 0 0 40px 0;">
+            Forgot your password? No worries! Click the button below to safely create a new one and get back to UniStore.
+        </p>
+
+        <div style="margin-bottom: 40px;">
+            <a href="${resetLink}" style="display: inline-block; padding: 18px 48px; background-color: #f97316; color: #ffffff !important; text-decoration: none; border-radius: 20px; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.3);">Reset Password</a>
+        </div>
+
+        <p style="font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.5;">
+            This link will expire in 60 minutes. <br>
+            If you didn't request this email, you can safely ignore it.
+        </p>
+    `);
+
+    try {
+        await fetch(BREVO_API_URL, {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': BREVO_API_KEY,
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                sender: { name: 'UniStore', email: 'alfrederic371@gmail.com' },
+                to: [{ email }],
+                subject: 'Reset Your Password - UniStore',
+                htmlContent
+            }),
+        });
+    } catch (err) {
+        console.error('Failed to send forgot password email:', err);
     }
 }

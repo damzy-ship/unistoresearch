@@ -1,5 +1,5 @@
 // import { useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, getSafeSession } from '../lib/supabase';
 
 const USER_ID_STORAGE_KEY = 'unistore_user_id';
 const ACTUAL_USER_ID_STORAGE_KEY = 'unistore_actual_user_id';
@@ -10,54 +10,107 @@ export function generateUniqueId(): string {
   return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
+let userIdPromise: Promise<string> | null = null;
+
 export async function getUserId(): Promise<string> {
-  // First check if user is authenticated with Supabase
-  const { data: { session } } = await supabase.auth.getSession();
-  const user_data_id = localStorage.getItem(ACTUAL_USER_ID_STORAGE_KEY);
+  if (userIdPromise) return userIdPromise;
 
-  if (session?.user?.id) {
-    // If authenticated, use the Supabase user ID
-    const userId = session.user.id;
+  userIdPromise = (async (): Promise<string> => {
+    try {
+      // First check if user is authenticated with Supabase
+      const { data: { session } } = await getSafeSession();
+      const user_data_id = localStorage.getItem(ACTUAL_USER_ID_STORAGE_KEY);
 
-    if (!user_data_id) {
-      const { data: user_data } = await supabase.from('unique_visitors').select('id').eq('user_id', session?.user?.id).single();
+      if (session?.user?.id) {
+        const userId = session.user.id;
+        localStorage.setItem(USER_ID_STORAGE_KEY, userId);
 
-      // console.log(userId) 
-      localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
+        if (!user_data_id || user_data_id === 'undefined') {
+          // Fetch or create visitor for this auth user
+          const { data: visitor } = await supabase
+            .from('unique_visitors')
+            .select('id')
+            .eq('auth_user_id', userId)
+            .maybeSingle();
+
+          if (visitor) {
+            localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, visitor.id);
+            return userId;
+          } else {
+            // Check if there's an existing guest record to link
+            const guestUserId = localStorage.getItem(USER_ID_STORAGE_KEY);
+            if (guestUserId && guestUserId !== userId) {
+              const { data: updated } = await supabase
+                .from('unique_visitors')
+                .update({ auth_user_id: userId })
+                .eq('user_id', guestUserId)
+                .select('id')
+                .maybeSingle();
+
+              if (updated) {
+                localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, updated.id);
+                return userId;
+              }
+            }
+
+            // Create new visitor record linked to auth
+            const school_id = localStorage.getItem('selectedSchoolId');
+            const { data: newVisitor } = await supabase
+              .from('unique_visitors')
+              .insert({
+                auth_user_id: userId,
+                user_id: userId,
+                last_visit: new Date().toISOString(),
+                visit_count: 1,
+                school_id: school_id
+              })
+              .select('id')
+              .single();
+
+            if (newVisitor) {
+              localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, newVisitor.id);
+            }
+          }
+        }
+        return userId;
+      }
+
+      // If not authenticated, use the stored guest ID or generate a new one
+      let userId = localStorage.getItem(USER_ID_STORAGE_KEY);
+
+      if (!userId || !user_data_id || user_data_id === 'undefined' || user_data_id === 'null') {
+        const school_id = localStorage.getItem('selectedSchoolId');
+        userId = generateUniqueId();
+        localStorage.setItem(USER_ID_STORAGE_KEY, userId);
+
+        const { data: user_data, error: insertError } = await supabase
+          .from('unique_visitors')
+          .insert({
+            user_id: userId,
+            last_visit: new Date().toISOString(),
+            visit_count: 1,
+            school_id: school_id
+          })
+          .select('id')
+          .single();
+
+        if (insertError) {
+          console.error('Error creating visitor record:', insertError);
+        } else if (user_data?.id) {
+          localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data.id);
+        }
+      }
+
+      return userId || generateUniqueId();
+    } catch (err) {
+      console.warn('getUserId encountered error:', err);
+      return localStorage.getItem(USER_ID_STORAGE_KEY) || generateUniqueId();
+    } finally {
+      userIdPromise = null;
     }
-    localStorage.setItem(USER_ID_STORAGE_KEY, userId);
-    return userId;
-  }
+  })();
 
-  // If not authenticated, use the stored ID or generate a new one
-  let userId = localStorage.getItem(USER_ID_STORAGE_KEY);
-
-
-  if (!userId || !user_data_id) {
-    const school_id = localStorage.getItem('selectedSchoolId');
-    userId = generateUniqueId();
-    
-    localStorage.setItem(USER_ID_STORAGE_KEY, userId);
-    const { data: user_data, error: insertError } = await supabase
-      .from('unique_visitors')
-      .insert({
-        user_id: userId,
-        last_visit: new Date().toISOString(),
-        visit_count: 1,
-        school_id: school_id
-      })
-      .select('id')
-      .single();
-
-    if (insertError) {
-      console.error('Error creating visitor record on login:', insertError);
-    } else{
-      localStorage.setItem(ACTUAL_USER_ID_STORAGE_KEY, user_data?.id);
-    }
-
-  }
-
-  return userId;
+  return userIdPromise;
 }
 
 export function setUserId(newUserId: string, actualUserId: string): void {
@@ -66,7 +119,7 @@ export function setUserId(newUserId: string, actualUserId: string): void {
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await getSafeSession();
   return !!session?.user;
 }
 
@@ -81,7 +134,9 @@ export function setPhoneAuthenticated(authenticated: boolean): void {
 export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   localStorage.clear();
-  window.location.reload();
+
+  if (couponId) localStorage.setItem('hostel_coupon_id', couponId);
+  if (lastPlayed) localStorage.setItem('hostel_coupon_last_played', lastPlayed);
 }
 
 export async function getUserRequestCount(): Promise<number> {
