@@ -6,7 +6,7 @@ import { Trash2, CheckCircle } from 'lucide-react';
 const formatTimeAgo = (timestamp: string): string => {
     try {
         const date = new Date(timestamp);
-        if (isNaN(date.getTime())) return 'Now';
+        if (isNaN(date.getTime())) return 'Just now';
 
         const now = new Date();
         const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -14,22 +14,22 @@ const formatTimeAgo = (timestamp: string): string => {
         if (diffInSeconds < 60) return 'Just now';
 
         const diffInMinutes = Math.floor(diffInSeconds / 60);
-        if (diffInMinutes < 60) return `${diffInMinutes}m`;
+        if (diffInMinutes < 60) return `${diffInMinutes} ${diffInMinutes === 1 ? 'min' : 'mins'} ago`;
 
         const diffInHours = Math.floor(diffInMinutes / 60);
-        if (diffInHours < 24) return `${diffInHours}h`;
+        if (diffInHours < 24) return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
 
         const diffInDays = Math.floor(diffInHours / 24);
-        if (diffInDays < 7) return `${diffInDays}d`;
+        if (diffInDays < 7) return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
 
         const diffInWeeks = Math.floor(diffInDays / 7);
-        if (diffInWeeks < 4) return `${diffInWeeks}w`;
+        if (diffInWeeks < 4) return `${diffInWeeks} ${diffInWeeks === 1 ? 'week' : 'weeks'} ago`;
 
         const diffInMonths = Math.floor(diffInDays / 30);
-        if (diffInMonths < 12) return `${diffInMonths}mo`;
+        if (diffInMonths < 12) return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
 
         const diffInYears = Math.floor(diffInDays / 365);
-        return `${diffInYears}y`;
+        return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
     } catch {
         return 'Recently';
     }
@@ -110,7 +110,7 @@ export default function RequestCard({ item, onClick, currentVisitor, onContact, 
                             {name}
                         </p>
                         <p className="text-[10px] text-gray-400 font-medium tracking-wide uppercase">
-                            {formatTimeAgo(item.created_at)} AGO
+                            {formatTimeAgo(item.created_at)}
                         </p>
                     </div>
                 </div>

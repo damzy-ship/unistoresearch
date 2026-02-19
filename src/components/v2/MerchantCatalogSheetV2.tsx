@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, UniqueVisitor } from '../../lib/supabase';
 import { useTheme } from '../../hooks/useTheme';
+import { ProductCardV2 } from './ProductCardV2';
 import { toast } from 'sonner';
 import { MessageCircle, Phone, MapPin, Package, X, ArrowRight } from 'lucide-react';
 
@@ -25,9 +26,18 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
                     console.log('[MerchantCatalog] Fetching products for visitor (post_type=update):', merchant.id);
                     const { data, error } = await supabase
                         .from('hostel_product_updates')
-                        .select('*')
+                        .select(`
+                            id,
+                            post_description,
+                            post_images,
+                            price,
+                            discount_price,
+                            created_at,
+                            actual_user_id,
+                            post_type
+                        `)
                         .eq('actual_user_id', merchant.id)
-                        .eq('post_type', 'update') // Corrected from 'product'
+                        .eq('post_type', 'update')
                         .order('created_at', { ascending: false });
 
                     if (error) throw error;
@@ -166,30 +176,16 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
                                 ) : products.length > 0 ? (
                                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
                                         {products.map((p, idx) => (
-                                            <motion.div
+                                            <ProductCardV2
                                                 key={`p-${p.id}`}
-                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: idx * 0.03 }}
+                                                index={idx}
+                                                product={{
+                                                    ...p,
+                                                    unique_visitors: merchant // Inject merchant info for the card
+                                                }}
+                                                fallbackImage="/v2/assets/niacinamide_serum_product_1771272568186.png"
                                                 onClick={() => onProductClick && onProductClick(p)}
-                                                className="group relative aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-white dark:bg-white/5 border border-zinc-100 dark:border-white/10 cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
-                                            >
-                                                <img
-                                                    src={p.post_images?.[0]}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    onError={(e: any) => e.target.src = '/v2/assets/niacinamide_serum_product_1771272568186.png'}
-                                                    alt="product"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent flex flex-col justify-end p-4">
-                                                    <p className="text-[9px] font-black text-white/70 uppercase tracking-tighter line-clamp-1 mb-0.5">{p.post_description}</p>
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-primary font-black text-sm">₦{p.price?.toLocaleString() || '0'}</p>
-                                                        <div className="w-6 h-6 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
-                                                            <ArrowRight size={12} className="text-primary group-hover:text-white" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
+                                            />
                                         ))}
                                     </div>
                                 ) : (

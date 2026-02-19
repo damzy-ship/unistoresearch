@@ -16,7 +16,8 @@ interface RequestsCarouselProps {
 }
 
 export default function RequestsCarousel({ requests, onItemClick, onContact, currentVisitor, onDelete, onFulfill }: RequestsCarouselProps) {
-    if (!requests || requests.length === 0) return null;
+    const activeRequests = requests?.filter(r => !r.fulfilled) || [];
+    if (activeRequests.length === 0) return null;
 
     return (
         <div className="py-4">
@@ -25,7 +26,7 @@ export default function RequestsCarousel({ requests, onItemClick, onContact, cur
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     Live Requests
                 </h3>
-                <span className="text-xs text-gray-500 font-medium">{requests.length} active</span>
+                <span className="text-xs text-gray-500 font-medium">{activeRequests.length} active</span>
             </div>
 
             <Swiper
@@ -40,7 +41,7 @@ export default function RequestsCarousel({ requests, onItemClick, onContact, cur
                 className="px-4 !pl-4 pb-2"
                 slidesOffsetAfter={16}
             >
-                {requests.map((item, idx) => (
+                {activeRequests.map((item, idx) => (
                     <SwiperSlide key={item.id} className="!w-auto">
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
