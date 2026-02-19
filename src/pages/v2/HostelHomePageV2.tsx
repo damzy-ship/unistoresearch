@@ -11,6 +11,7 @@ import { LiveRequestResponseSheetV2 } from '../../components/v2/LiveRequestRespo
 import { SchoolSelectionModalV2 } from '../../components/v2/SchoolSelectionModalV2';
 import BannerSlider from '../../components/hostel/BannerSlider';
 import { ProductCardV2 } from '../../components/v2/ProductCardV2';
+import { formatTimeAgo } from '../../lib/utils';
 
 export const HostelHomePageV2: React.FC = () => {
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -272,8 +273,8 @@ export const HostelHomePageV2: React.FC = () => {
                                                 <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest leading-none mt-0.5">{item.unique_visitors?.hostels?.name || 'UniStore User'}</p>
                                             </div>
                                         </div>
-                                        <div className="bg-primary/10 text-primary text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest">
-                                            Live
+                                        <div className="bg-primary/10 text-primary text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap">
+                                            {formatTimeAgo(item.created_at)}
                                         </div>
                                     </div>
 

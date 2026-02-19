@@ -65,7 +65,7 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[110] flex items-end">
+                <div className="fixed inset-0 z-[110] flex items-end lg:items-center lg:justify-center">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -77,20 +77,20 @@ export const RequestDetailsSheetV2: React.FC<RequestDetailsSheetV2Props> = ({
 
                     {/* The Sheet */}
                     <motion.div
-                        drag="y"
+                        drag={window.innerWidth < 1024 ? "y" : false}
                         dragConstraints={{ top: 0, bottom: 0 }}
                         dragElastic={0.2}
                         onDragEnd={(_, info) => {
                             if (info.offset.y > 100) onClose();
                         }}
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
+                        initial={{ y: window.innerWidth < 1024 ? '100%' : 20, opacity: window.innerWidth < 1024 ? 1 : 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: window.innerWidth < 1024 ? '100%' : 20, opacity: 0 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative flex w-full flex-col rounded-t-[2.5rem] bg-white dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10 p-6 pb-12 h-[75vh]"
+                        className="relative flex w-full lg:max-w-xl flex-col rounded-t-[2.5rem] lg:rounded-[3rem] bg-white dark:bg-[#221610] shadow-2xl overflow-hidden border-t lg:border border-white/20 z-10 p-6 pb-12 h-[75vh] lg:h-auto lg:max-h-[90vh]"
                     >
-                        {/* Handle */}
-                        <div className="flex justify-center mb-8">
+                        {/* Handle - Mobile Only */}
+                        <div className="flex justify-center mb-8 lg:hidden">
                             <div className="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
                         </div>
 

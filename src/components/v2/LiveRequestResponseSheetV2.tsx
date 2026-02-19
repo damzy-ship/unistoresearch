@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatTimeAgo } from '../../lib/utils';
 
 interface LiveRequestResponseSheetV2Props {
     isOpen: boolean;
@@ -34,7 +35,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[110] flex items-end">
+                <div className="fixed inset-0 z-[110] flex items-end lg:items-center lg:justify-center">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -46,20 +47,20 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
 
                     {/* The Sheet */}
                     <motion.div
-                        drag="y"
+                        drag={window.innerWidth < 1024 ? "y" : false}
                         dragConstraints={{ top: 0, bottom: 0 }}
                         dragElastic={0.2}
                         onDragEnd={(_, info) => {
                             if (info.offset.y > 100) onClose();
                         }}
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
+                        initial={{ y: window.innerWidth < 1024 ? '100%' : 20, opacity: window.innerWidth < 1024 ? 1 : 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: window.innerWidth < 1024 ? '100%' : 20, opacity: 0 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative flex w-full flex-col rounded-t-[3rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10 p-6 pb-12"
+                        className="relative flex w-full lg:max-w-xl flex-col rounded-t-[3rem] lg:rounded-[3rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t lg:border border-white/20 z-10 p-6 pb-12"
                     >
-                        {/* Handle */}
-                        <div className="flex justify-center mb-6">
+                        {/* Handle - Mobile Only */}
+                        <div className="flex justify-center mb-6 lg:hidden">
                             <div className="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
                         </div>
 
@@ -75,7 +76,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                                         <span className="material-symbols-outlined text-[12px] text-primary">schedule</span>
                                     </div>
                                     <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">
-                                        {request?.time || 'Just now'}
+                                        {request?.created_at ? formatTimeAgo(request.created_at) : 'Just now'}
                                     </span>
                                 </div>
                             </div>

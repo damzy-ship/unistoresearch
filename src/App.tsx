@@ -27,6 +27,7 @@ import { HostelHomePageV2 } from './pages/v2/HostelHomePageV2';
 import { ProfilePageV2 } from './pages/v2/ProfilePageV2';
 import { OrdersPageV2 } from './pages/v2/OrdersPageV2';
 import { PaymentsPageV2 } from './pages/v2/PaymentsPageV2';
+import { UpdatePasswordPageV2 } from './pages/v2/UpdatePasswordPageV2';
 // import { useHostelMode } from './hooks/useHostelMode';
 
 // function HomeEntry() {
@@ -82,6 +83,9 @@ function AppContent({ currentTheme }: { currentTheme: any }) {
           <Route path="/v2/profile" element={<ProfilePageV2 />} />
           <Route path="/v2/orders" element={<OrdersPageV2 />} />
           <Route path="/v2/payments" element={<PaymentsPageV2 />} />
+          <Route path="/v2/update-password" element={<UpdatePasswordPageV2 />} />
+          {/* Handle the weird doubled path appearing in user's browser */}
+          <Route path="/v2/update-password/update-password" element={<UpdatePasswordPageV2 />} />
         </Routes>
       </div>
     </div>
