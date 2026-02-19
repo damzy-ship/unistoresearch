@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Camera, Search, Upload, X } from 'lucide-react';
-import { UniqueVisitor } from '../../lib/supabase';
+import { useState, useEffect } from 'react';
+import { Camera, Search, Upload, X, ChevronDown, Check } from 'lucide-react';
+import { UniqueVisitor, supabase } from '../../lib/supabase';
 
 interface PostComposerProps {
     currentVisitor: UniqueVisitor | null;
     userIsHostelMerchant: boolean;
     isSearchView: boolean;
     onToggleView: (isSearch: boolean) => void;
-    onPost: (text: string, images: File[], request: boolean) => Promise<void>;
+    onPost: (text: string, images: File[], request: boolean, merchantId?: string) => Promise<void>;
     onSearch: (text: string) => Promise<void>;
     posting: boolean;
     onImageSearchPrompt: () => void;
@@ -34,6 +34,64 @@ export default function PostComposerVuna({
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
     // Removed local isExpanded state
 
+    // Admin Merchant Selection State
+    const [merchants, setMerchants] = useState<UniqueVisitor[]>([]);
+    const [filteredMerchants, setFilteredMerchants] = useState<UniqueVisitor[]>([]);
+    const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
+    const [merchantSearchTerm, setMerchantSearchTerm] = useState('');
+    const [showMerchantDropdown, setShowMerchantDropdown] = useState(false);
+    const [loadingMerchants, setLoadingMerchants] = useState(false);
+
+    const isAdmin = currentVisitor?.is_admin === true;
+
+    // Fetch merchants for admin
+    useEffect(() => {
+        const fetchMerchants = async () => {
+            if (!isAdmin || !currentVisitor?.schools?.id) return;
+
+            try {
+                setLoadingMerchants(true);
+                const { data, error } = await supabase
+                    .from('unique_visitors')
+                    .select('id, full_name, brand_name, phone_number, email, profile_picture, school_id')
+                    .eq('is_hostel_merchant', true)
+                    .eq('school_id', currentVisitor.schools.id);
+
+                if (error) throw error;
+
+                if (data) {
+                    setMerchants(data as UniqueVisitor[]);
+                    setFilteredMerchants(data as UniqueVisitor[]);
+                }
+            } catch (err) {
+                console.error('Error fetching merchants:', err);
+            } finally {
+                setLoadingMerchants(false);
+            }
+        };
+
+        if (isAdmin && isExpanded && !isSearchView) { // Only fetch when expanding post view
+            fetchMerchants();
+        }
+    }, [isAdmin, isExpanded, isSearchView, currentVisitor?.schools?.id]);
+
+    // Filter merchants based on search
+    useEffect(() => {
+        if (!merchantSearchTerm.trim()) {
+            setFilteredMerchants(merchants);
+            return;
+        }
+
+        const term = merchantSearchTerm.toLowerCase();
+        const filtered = merchants.filter(merchant =>
+            (merchant.full_name?.toLowerCase() || '').includes(term) ||
+            (merchant.brand_name?.toLowerCase() || '').includes(term) ||
+            (merchant.phone_number?.toLowerCase() || '').includes(term) ||
+            (merchant.email?.toLowerCase() || '').includes(term)
+        );
+        setFilteredMerchants(filtered);
+    }, [merchantSearchTerm, merchants]);
+
 
     const onSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -48,10 +106,12 @@ export default function PostComposerVuna({
 
     const handleSubmit = async () => {
         if (userIsAuthenticated) {
-            await onPost(composerText, composerImages, isSearchView);
+            await onPost(composerText, composerImages, isSearchView, selectedMerchant?.id);
             setComposerText('');
             setComposerImages([]);
             setIsExpanded(false);
+            setSelectedMerchant(null);
+            setMerchantSearchTerm('');
         } else {
             setShowAuthModal(true)
         }
@@ -60,6 +120,8 @@ export default function PostComposerVuna({
     const resetComposer = () => {
         setComposerText('');
         setComposerImages([]);
+        setSelectedMerchant(null);
+        setMerchantSearchTerm('');
     };
 
     if (!isExpanded) {
@@ -78,7 +140,7 @@ export default function PostComposerVuna({
                     </button>
                     <button
                         onClick={() => {
-                            if (userIsHostelMerchant) {
+                            if (userIsHostelMerchant || isAdmin) {
                                 onToggleView(false);
                                 setIsExpanded(true);
                             } else {
@@ -153,6 +215,97 @@ export default function PostComposerVuna({
                 </div>
             </div>
             <div className="flex-1">
+                {/* Admin Merchant Selector */}
+                {isAdmin && !isSearchView && (
+                    <div className="mb-3 relative">
+                        <button
+                            onClick={() => setShowMerchantDropdown(!showMerchantDropdown)}
+                            className="flex items-center gap-2 text-sm font-medium text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-lg hover:bg-emerald-400/20 transition-colors"
+                        >
+                            <span>Posting as: <span className="text-white">{selectedMerchant ? (selectedMerchant.brand_name || selectedMerchant.full_name) : 'Myself'}</span></span>
+                            <ChevronDown className={`w-4 h-4 transition-transform ${showMerchantDropdown ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {showMerchantDropdown && (
+                            <>
+                                <div className="fixed inset-0 z-10" onClick={() => setShowMerchantDropdown(false)} />
+                                <div className="absolute top-full left-0 mt-2 w-72 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-20 flex flex-col max-h-80">
+                                    <div className="p-2 border-b border-gray-700 sticky top-0 bg-gray-800 rounded-t-xl z-30">
+                                        <div className="relative">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                                            <input
+                                                type="text"
+                                                value={merchantSearchTerm}
+                                                onChange={(e) => setMerchantSearchTerm(e.target.value)}
+                                                placeholder="Search merchants..."
+                                                className="w-full bg-gray-900 text-white text-sm py-2 pl-9 pr-3 rounded-lg border border-gray-700 focus:border-emerald-500 outline-none"
+                                                autoFocus
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="overflow-y-auto flex-1 p-1 custom-scrollbar">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedMerchant(null);
+                                                setShowMerchantDropdown(false);
+                                            }}
+                                            className={`w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700/50 transition-colors ${!selectedMerchant ? 'bg-emerald-500/10' : ''}`}
+                                        >
+                                            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                {currentVisitor?.profile_picture ? (
+                                                    <img src={currentVisitor.profile_picture} alt="me" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <span className="text-xs font-bold text-gray-400">ME</span>
+                                                )}
+                                            </div>
+                                            <div className="text-left flex-1 min-w-0">
+                                                <div className="text-white text-sm font-medium truncate">Myself</div>
+                                                <div className="text-gray-500 text-xs truncate">Post as Admin</div>
+                                            </div>
+                                            {!selectedMerchant && <Check className="w-4 h-4 text-emerald-500" />}
+                                        </button>
+
+                                        {loadingMerchants && (
+                                            <div className="p-4 text-center text-gray-500 text-sm">Loading merchants...</div>
+                                        )}
+
+                                        {!loadingMerchants && filteredMerchants.length === 0 && (
+                                            <div className="p-4 text-center text-gray-500 text-sm">No merchants found</div>
+                                        )}
+
+                                        {filteredMerchants.map((merchant) => (
+                                            <button
+                                                key={merchant.id}
+                                                onClick={() => {
+                                                    setSelectedMerchant(merchant);
+                                                    setShowMerchantDropdown(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700/50 transition-colors ${selectedMerchant?.id === merchant.id ? 'bg-emerald-500/10' : ''}`}
+                                            >
+                                                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                    {merchant.profile_picture ? (
+                                                        <img src={merchant.profile_picture} alt={merchant.brand_name || 'merchant'} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-xs font-bold text-gray-400">
+                                                            {(merchant.brand_name || merchant.full_name || 'M')[0].toUpperCase()}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="text-left flex-1 min-w-0">
+                                                    <div className="text-white text-sm font-medium truncate">{merchant.brand_name || merchant.full_name}</div>
+                                                    <div className="text-gray-500 text-xs truncate">{merchant.phone_number || merchant.email || 'No contact info'}</div>
+                                                </div>
+                                                {selectedMerchant?.id === merchant.id && <Check className="w-4 h-4 text-emerald-500" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+
                 <div className="flex items-start justify-between">
                     <textarea
                         value={composerText}
