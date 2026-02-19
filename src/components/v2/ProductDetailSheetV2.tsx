@@ -142,7 +142,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                         </div>
 
                         {/* Navigation Arrows - Desktop Only */}
-                        <div className="absolute inset-y-0 left-0 right-0 z-20 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none hidden lg:flex">
+                        <div className="absolute inset-y-0 left-0 right-0 z-20 hidden lg:flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                             <button className="swiper-button-prev-custom w-12 h-12 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/40 transition-all pointer-events-auto active:scale-90">
                                 <span className="material-symbols-outlined !text-3xl">chevron_left</span>
                             </button>
