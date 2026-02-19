@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
+import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import { supabase } from '../../lib/supabase';
 import { getUserId } from '../../hooks/useTracking';
 import { toggleProductLike, getProductLikeInfo } from '../../lib/merchantAnalytics';
@@ -113,9 +114,13 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                     {/* Left: Product Images (Scrollable on mobile, Left side on desktop) */}
                     <div className="w-full lg:w-[60%] h-[40%] lg:h-full relative group">
                         <Swiper
-                            modules={[Pagination]}
+                            modules={[Pagination, Navigation]}
                             pagination={{ clickable: true }}
-                            className="w-full h-full product-swiper"
+                            navigation={{
+                                prevEl: '.swiper-button-prev-custom',
+                                nextEl: '.swiper-button-next-custom',
+                            }}
+                            className="w-full h-full product-swiper group/swiper"
                         >
                             {productImages.map((img: string, i: number) => (
                                 <SwiperSlide key={i}>
@@ -133,6 +138,16 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 className="w-10 h-10 rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg flex items-center justify-center text-white ring-1 ring-white/20 transition-all hover:bg-white hover:text-primary active:scale-95"
                             >
                                 <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        {/* Navigation Arrows - Desktop Only */}
+                        <div className="absolute inset-y-0 left-0 right-0 z-20 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none hidden lg:flex">
+                            <button className="swiper-button-prev-custom w-12 h-12 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/40 transition-all pointer-events-auto active:scale-90">
+                                <span className="material-symbols-outlined !text-3xl">chevron_left</span>
+                            </button>
+                            <button className="swiper-button-next-custom w-12 h-12 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/40 transition-all pointer-events-auto active:scale-90">
+                                <span className="material-symbols-outlined !text-3xl">chevron_right</span>
                             </button>
                         </div>
                     </div>
