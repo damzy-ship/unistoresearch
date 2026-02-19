@@ -12,12 +12,16 @@ interface V2LayoutProps {
     children: React.ReactNode;
     activeTab?: 'home' | 'orders' | 'messages' | 'profile';
     hideBottomNav?: boolean;
+    selectedCategory?: string;
+    onCategorySelect?: (category: string) => void;
 }
 
 export const V2Layout: React.FC<V2LayoutProps> = ({
     children,
     activeTab = 'home',
     hideBottomNav = false,
+    selectedCategory,
+    onCategorySelect
 }) => {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [isActionOpen, setIsActionOpen] = useState(false);
@@ -159,6 +163,8 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     onTabChange={handleTabChange}
                     visitor={currentVisitor}
                     isAuthenticated={!!userIsAuthenticated}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={onCategorySelect}
                 />
             </div>
 

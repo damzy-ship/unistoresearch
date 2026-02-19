@@ -10,6 +10,8 @@ interface V2SidebarProps {
     onTabChange: (tab: 'home' | 'orders' | 'messages' | 'profile') => void;
     visitor?: UniqueVisitor | null;
     isAuthenticated?: boolean;
+    selectedCategory?: string;
+    onCategorySelect?: (category: string) => void;
 }
 
 export const V2Sidebar: React.FC<V2SidebarProps> = ({
@@ -19,7 +21,9 @@ export const V2Sidebar: React.FC<V2SidebarProps> = ({
     onActionClick,
     onTabChange,
     visitor,
-    isAuthenticated
+    isAuthenticated,
+    selectedCategory,
+    onCategorySelect
 }) => {
     const navItems = [
         { id: 'home', label: 'Home', icon: 'grid_view' },
@@ -96,17 +100,27 @@ export const V2Sidebar: React.FC<V2SidebarProps> = ({
                 <nav className="mt-8 space-y-1">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">Categories</p>
                     {[
-                        { icon: 'restaurant', label: 'Food' },
-                        { icon: 'apparel', label: 'Clothing' },
-                        { icon: 'devices', label: 'Tech' }
-                    ].map((cat, idx) => (
+                        { icon: 'restaurant', label: 'Food & Snacks', id: 'food & snacks' },
+                        { icon: 'apparel', label: 'Clothing', id: 'clothing' },
+                        { icon: 'hiking', label: 'Shoes', id: 'shoes' },
+                        { icon: 'sports_baseball', label: 'Caps', id: 'caps' },
+                        { icon: 'devices', label: 'Gadgets', id: 'gadgets' },
+                        { icon: 'smartphone', label: 'Phones', id: 'phones' },
+                        { icon: 'diamond', label: 'Jewelry', id: 'jeweleries' },
+                        { icon: 'shopping_bag', label: 'Bags', id: 'bags' },
+                        { icon: 'local_florist', label: 'Fragrances', id: 'fragrances' },
+                        { icon: 'face', label: 'Beauty & Skincare', id: 'beauty & skincare' },
+                        { icon: 'content_cut', label: 'Hair Accessories', id: 'hair accessories' },
+                        { icon: 'more_horiz', label: 'Others', id: 'others' }
+                    ].map((cat) => (
                         <motion.button
-                            key={idx}
+                            key={cat.id}
                             whileHover={{ x: 4 }}
-                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-left"
+                            onClick={() => onCategorySelect && onCategorySelect(cat.id)}
+                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-bold transition-all text-left relative group ${selectedCategory === cat.id ? 'text-primary bg-primary/5' : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">{cat.icon}</span>
-                            {cat.label}
+                            <span className={`material-symbols-outlined text-[18px] ${selectedCategory === cat.id ? 'fill-1' : ''}`}>{cat.icon}</span>
+                            <span className="truncate">{cat.label}</span>
                         </motion.button>
                     ))}
                 </nav>

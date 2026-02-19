@@ -9,6 +9,7 @@ import { LiveActivityHubV2 } from '../../components/v2/LiveActivityHubV2';
 import { MerchantCatalogSheetV2 } from '../../components/v2/MerchantCatalogSheetV2';
 import { LiveRequestResponseSheetV2 } from '../../components/v2/LiveRequestResponseSheetV2';
 import { SchoolSelectionModalV2 } from '../../components/v2/SchoolSelectionModalV2';
+import BannerSlider from '../../components/hostel/BannerSlider';
 
 export const HostelHomePageV2: React.FC = () => {
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -140,7 +141,7 @@ export const HostelHomePageV2: React.FC = () => {
                 .eq('post_type', 'request')
                 .or('fulfilled.is.null,fulfilled.eq.false')
                 .order('created_at', { ascending: false })
-                .limit(20);
+                .limit(40);
 
             if (data) {
                 console.log('Fetched realLiveRequests:', data.length, data);
@@ -187,7 +188,11 @@ export const HostelHomePageV2: React.FC = () => {
     const FALLBACK_SPEAKER = '/v2/assets/portable_speaker_product_1771272581168.png';
 
     return (
-        <V2Layout activeTab="home">
+        <V2Layout
+            activeTab="home"
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
+        >
             <LiveActivityHubV2 onUserClick={(user) => {
                 setSelectedMerchant(user);
                 setIsCatalogOpen(true);
@@ -293,31 +298,50 @@ export const HostelHomePageV2: React.FC = () => {
                 </div>
             </section>
 
-            {/* Delicious Deals Hero */}
+            {/* Banner Slider */}
             <section className="px-4 lg:px-8 py-6">
-                <div className="relative w-full h-[320px] lg:h-[400px] rounded-[3rem] overflow-hidden group shadow-2xl">
-                    <img className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src={HERO_IMAGE} alt="Deals" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center p-8 lg:p-16">
-                        <div className="max-w-md">
-                            <span className="inline-block px-4 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-6 shadow-lg shadow-primary/20">Hostel Special</span>
-                            <h2 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-[0.9] tracking-tighter">Delicious Deals <br />delivered to <br />your door.</h2>
-                            <p className="text-white/80 mb-8 text-sm lg:text-base font-bold leading-relaxed max-w-sm">Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.</p>
-                            <div className="flex gap-4">
-                                <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-white font-black rounded-2xl transition-all text-sm shadow-xl shadow-primary/20 active:scale-95">Order Now</button>
-                                <button className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-black rounded-2xl transition-all text-sm border border-white/20 active:scale-95">View Menu</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-                        <div className="w-8 h-1.5 bg-primary rounded-full"></div>
-                        <div className="w-1.5 h-1.5 bg-white/50 rounded-full"></div>
-                        <div className="w-1.5 h-1.5 bg-white/50 rounded-full"></div>
-                    </div>
-                </div>
+                <BannerSlider
+                    slides={
+                        selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' ? [
+                            {
+                                id: 'vuna-1',
+                                image: '/images/banner_food.png',
+                                title: 'Delicious Deals delivered to your door.',
+                                subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.'
+                            },
+                            {
+                                id: 'vuna-2',
+                                image: '/images/banner_discounts.png',
+                                title: 'Special Offers',
+                                subtitle: 'Exclusive discounts just for you.'
+                            }
+                        ] : selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' ? [
+                            {
+                                id: 'bhu-1',
+                                image: '/images/benner_fashion.png',
+                                title: 'Fashion & Discounts Day',
+                                subtitle: 'Upgrade your style with amazing deals!'
+                            },
+                            {
+                                id: 'bhu-2',
+                                image: '/images/banner_discounts.png',
+                                title: 'Special Offers',
+                                subtitle: 'Grab the best prices on top brands.'
+                            }
+                        ] : [
+                            {
+                                id: 'default',
+                                image: HERO_IMAGE,
+                                title: 'Delicious Deals delivered to your door.',
+                                subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer.'
+                            }
+                        ]
+                    }
+                />
             </section>
 
-            {/* Categories */}
-            <section className="py-4">
+            {/* Categories - Mobile Only */}
+            <section className="py-4 md:hidden">
                 <div className="flex gap-8 overflow-x-auto px-8 no-scrollbar">
                     {[
                         { icon: 'grid_view', label: 'All', id: 'all' },
@@ -327,7 +351,8 @@ export const HostelHomePageV2: React.FC = () => {
                         { icon: 'sports_baseball', label: 'Caps', id: 'caps' },
                         { icon: 'devices', label: 'Gadgets', id: 'gadgets' },
                         { icon: 'smartphone', label: 'Phones', id: 'phones' },
-                        { icon: 'diamond', label: 'Jewelry', id: 'jeweleries' }
+                        { icon: 'diamond', label: 'Jewelry', id: 'jeweleries' },
+                        { icon: 'face', label: 'Beauty', id: 'beauty & skincare' }
                     ].map((cat) => (
                         <div
                             key={cat.id}
@@ -399,13 +424,13 @@ export const HostelHomePageV2: React.FC = () => {
                                     <h4 className="text-lg font-bold line-clamp-1 text-[#1a2a40] dark:text-zinc-100 tracking-tight group-hover:text-primary transition-colors">{product.post_description}</h4>
                                     <div className="flex items-end justify-between">
                                         <div className="flex flex-col">
-                                            {product.price > 0 ? (
+                                            {Number(product.price) > 0 ? (
                                                 <>
                                                     <span className="text-primary font-black text-2xl leading-none">₦{product.price?.toLocaleString()}</span>
                                                     {product.discount_price && <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium mt-1">₦{product.discount_price.toLocaleString()}</span>}
                                                 </>
                                             ) : (
-                                                <span className="text-zinc-400 font-bold text-sm h-6">Contact for price</span>
+                                                <span className="text-zinc-400 font-black text-[10px] uppercase tracking-widest h-6">Contact for Price</span>
                                             )}
                                         </div>
                                         <div className="bg-primary text-white p-3.5 rounded-2xl shadow-lg shadow-primary/20 scale-100 group-hover:scale-110 transition-all duration-300">

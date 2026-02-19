@@ -151,9 +151,8 @@ export function useHostelFeed(
 
             // Apply Server-side filters
             if (schoolId) {
-                // Filter by school: either user's school_id, or their hostel's school_id
-                // Use foreignTable option for OR on joined columns
-                query = query.or(`school_id.eq.${schoolId},hostels.school_id.eq.${schoolId}`, { foreignTable: 'unique_visitors' });
+                // Filter by school: use the school_id from the unique_visitors join
+                query = query.eq('unique_visitors.school_id', schoolId);
             }
 
             if (selectedHostel && selectedHostel !== 'all') {
@@ -168,7 +167,7 @@ export function useHostelFeed(
                 query = query.eq('actual_user_id', currentVisitor.id);
             }
 
-            const { data, error, count } = await query
+            const { data, error } = await query
                 .order('created_at', { ascending: false })
                 .range(from, to);
 

@@ -93,10 +93,10 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             <div className="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
                         </div>
 
-                        {/* Scrollable Content Area */}
-                        <div className="flex-1 lg:flex lg:flex-row overflow-hidden flex-col">
-                            {/* Image Section - Take Left side on Desktop */}
-                            <div className="w-full lg:w-1/2 p-4 lg:p-6 flex-shrink-0">
+                        {/* Content Area - Scrollable on Mobile, Responsive layout on Desktop */}
+                        <div className="flex-1 overflow-y-auto lg:overflow-hidden no-scrollbar flex flex-col lg:flex-row">
+                            {/* Image Section */}
+                            <div className="w-full lg:w-1/2 p-4 lg:p-6 flex-shrink-0 lg:h-full lg:overflow-hidden">
                                 <Swiper
                                     modules={[Autoplay, Pagination]}
                                     autoplay={{ delay: 3000, disableOnInteraction: false }}
@@ -122,7 +122,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                     <div className="flex justify-between items-start gap-4">
                                         <div className="flex-1">
                                             <h1 className="text-2xl lg:text-3xl font-bold text-[#1a2a40] dark:text-white leading-tight">{productTitle}</h1>
-                                            {product?.price > 0 && (
+                                            {Number(product?.price) > 0 && (
                                                 <div className="mt-2 flex items-baseline gap-2">
                                                     <p className="text-2xl lg:text-3xl font-black text-primary">₦{productPrice}</p>
                                                     {productDiscount && <p className="text-sm text-zinc-400 line-through font-bold">₦{productDiscount}</p>}
