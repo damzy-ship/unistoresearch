@@ -317,22 +317,30 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
     );
 
     const renderSignUp = () => (
-        <div className="w-full max-w-md bg-white dark:bg-[#2d1e16] rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh] p-6 animate-in slide-in-from-right duration-300 border border-primary/10 no-scrollbar">
-            <div className="flex items-center mb-6">
-                <button onClick={() => setView('signin')} className="text-[#221610] dark:text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
-                    <span className="material-symbols-outlined">arrow_back</span>
-                </button>
-                <h2 className="text-[#221610] dark:text-white text-lg font-bold flex-1 text-center pr-10">Create Account</h2>
-            </div>
-
-            <header className="pb-6">
-                <h1 className="text-[#221610] dark:text-white tracking-tighter text-3xl font-black leading-tight mb-2">
-                    Join <span className="text-primary">Uni</span><span className="text-[#0c6eed] dark:text-blue-400">Store</span><span className="text-primary">.</span>
-                </h1>
-                <p className="text-[#221610]/70 dark:text-white/70 text-base font-normal leading-relaxed">
-                    Create an account to contact sellers and track your requests.
+        <div className="w-full max-w-[480px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-6 md:p-10 border border-primary/10 animate-in slide-in-from-right duration-300 overflow-y-auto max-h-[90vh] no-scrollbar">
+            {/* Header Section */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <div className="bg-primary/10 p-2 rounded-lg">
+                            <span className="material-symbols-outlined text-primary text-2xl">shopping_bag</span>
+                        </div>
+                        <span className="font-black text-2xl tracking-tighter">
+                            <span className="text-primary">Uni</span>
+                            <span className="text-[#0c6eed] dark:text-blue-400">Store</span>
+                            <span className="text-primary">.</span>
+                        </span>
+                    </div>
+                    <button onClick={() => setView('signin')} className="text-zinc-400 hover:text-primary transition-colors flex items-center gap-1 group text-sm font-bold">
+                        <span className="material-symbols-outlined text-base transition-transform group-hover:-translate-x-1">arrow_back</span>
+                        Back
+                    </button>
+                </div>
+                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">Create Account</h1>
+                <p className="text-zinc-500 dark:text-zinc-400 text-base leading-relaxed">
+                    Join our community to start shopping and selling.
                 </p>
-            </header>
+            </div>
 
             {error && (
                 <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -342,38 +350,38 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
 
             <div className="space-y-6 mb-8">
                 <div>
-                    <label className="text-zinc-900 dark:text-white text-sm font-bold tracking-wide mb-3 block px-1">University</label>
-                    <div className="flex gap-2">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1 mb-2 block">University</label>
+                    <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
                         <button
                             type="button"
                             onClick={() => setSelectedSchoolId("684c03a5-a18d-4df9-b064-0aaeee2a5f01")}
-                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${selectedSchoolId === "684c03a5-a18d-4df9-b064-0aaeee2a5f01" ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                            className={`flex-1 py-2 text-sm font-semibold transition-all rounded-lg ${selectedSchoolId === "684c03a5-a18d-4df9-b064-0aaeee2a5f01" ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
                         >
                             Bingham
                         </button>
                         <button
                             type="button"
                             onClick={() => setSelectedSchoolId("a7741870-1798-466f-87d2-748446b404f2")}
-                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${selectedSchoolId === "a7741870-1798-466f-87d2-748446b404f2" ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                            className={`flex-1 py-2 text-sm font-semibold transition-all rounded-lg ${selectedSchoolId === "a7741870-1798-466f-87d2-748446b404f2" ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
                         >
                             Veritas
                         </button>
                     </div>
                 </div>
                 <div>
-                    <label className="text-zinc-900 dark:text-white text-sm font-bold tracking-wide mb-3 block px-1">Account Type</label>
-                    <div className="flex gap-2">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1 mb-2 block">Account Type</label>
+                    <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
                         <button
                             type="button"
                             onClick={() => setUserType('user')}
-                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${userType === 'user' ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                            className={`flex-1 py-2 text-sm font-semibold transition-all rounded-lg ${userType === 'user' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
                         >
                             User
                         </button>
                         <button
                             type="button"
                             onClick={() => setUserType('merchant')}
-                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${userType === 'merchant' ? 'bg-primary text-white shadow-sm border border-primary' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'}`}
+                            className={`flex-1 py-2 text-sm font-semibold transition-all rounded-lg ${userType === 'merchant' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
                         >
                             Merchant
                         </button>
@@ -382,72 +390,93 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
             </div>
 
             <form className="space-y-4" onSubmit={handleSignUp}>
-                <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary group-focus-within:text-primary">person</span>
-                    <input
-                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
-                        placeholder="Full Name"
-                        type="text"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">mail</span>
-                    <input
-                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
-                        placeholder="Email Address"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">phone_iphone</span>
-                    <input
-                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
-                        placeholder="Phone Number"
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                    />
-                </div>
-                {userType === 'merchant' && (
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Full Name</label>
                     <div className="relative group">
-                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">store</span>
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors font-light">person</span>
                         <input
-                            className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-6 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
-                            placeholder="Brand Name"
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                            placeholder="Enter your full name"
                             type="text"
-                            value={brandName}
-                            onChange={(e) => setBrandName(e.target.value)}
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
                             required
                         />
                     </div>
-                )}
-                <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">lock</span>
-                    <input
-                        className="w-full bg-white dark:bg-[#2d1e16] border-2 border-transparent focus:border-primary focus:ring-0 py-4 pl-12 pr-12 text-[#221610] dark:text-white placeholder:text-gray-400 shadow-sm transition-all rounded-xl outline-none font-medium"
-                        placeholder="Password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
                 </div>
 
-                <div className="pt-6 space-y-3">
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Email</label>
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors font-light">mail</span>
+                        <input
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                            placeholder="Enter your email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Phone Number</label>
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors font-light">phone_iphone</span>
+                        <input
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                            placeholder="Enter your phone number"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                {userType === 'merchant' && (
+                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Brand Name</label>
+                        <div className="relative group">
+                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors font-light">store</span>
+                            <input
+                                className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                                placeholder="Enter your business name"
+                                type="text"
+                                value={brandName}
+                                onChange={(e) => setBrandName(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </div>
+                )}
+
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Password</label>
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors font-light">lock</span>
+                        <input
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                            placeholder="Create a password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="pt-6 flex flex-col gap-3">
                     <button
                         disabled={loading}
-                        className="w-full bg-primary text-white font-bold py-4 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-lg rounded-lg disabled:opacity-50"
+                        className="w-full h-14 bg-primary text-white font-bold hover:bg-primary/90 hover:scale-[0.99] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Creating Account...' : 'Create Account'}
                     </button>
-                    <button onClick={onClose} type="button" className="w-full bg-transparent text-[#221610] dark:text-white font-semibold py-4 hover:bg-primary/5 transition-all text-base border border-primary/20 rounded-lg">Cancel</button>
+                    <button onClick={onClose} type="button" className="w-full h-14 bg-transparent text-zinc-600 dark:text-zinc-400 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all rounded-lg">
+                        Cancel
+                    </button>
                 </div>
             </form>
 
@@ -459,9 +488,9 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
     );
 
     const renderOTP = () => (
-        <div className="w-full max-w-md bg-white dark:bg-[#2d1e16] rounded-2xl shadow-2xl border border-primary/10 overflow-hidden animate-in fade-in slide-in-from-bottom duration-300 max-h-[90vh] overflow-y-auto no-scrollbar">
-            <div className="flex items-center px-6 py-4 justify-between border-b border-gray-100 dark:border-white/5 sticky top-0 bg-white dark:bg-[#2d1e16] z-10">
-                <button onClick={() => setView('signup')} className="text-[#181311] dark:text-white flex size-10 shrink-0 items-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors justify-center">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-primary/10 overflow-hidden animate-in fade-in slide-in-from-bottom duration-300 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div className="flex items-center px-6 py-4 justify-between border-b border-gray-100 dark:border-white/5 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+                <button onClick={() => setView('signup')} className="text-zinc-600 dark:text-zinc-400 flex size-10 shrink-0 items-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors justify-center">
                     <span className="material-symbols-outlined text-2xl">arrow_back</span>
                 </button>
                 <div className="flex items-center gap-2">

@@ -115,8 +115,18 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             }
         });
 
-        return () => subscription.unsubscribe();
-    }, []);
+        const handleTriggerAction = (e: any) => {
+            const { mode } = e.detail || { mode: 'request' };
+            handleActionClick(mode);
+        };
+
+        window.addEventListener('trigger-v2-action', handleTriggerAction);
+
+        return () => {
+            subscription.unsubscribe();
+            window.removeEventListener('trigger-v2-action', handleTriggerAction);
+        };
+    }, [userIsAuthenticated]);
 
     const toggleTheme = () => {
         changeTheme(isDark ? 'default' : 'dark');
@@ -147,7 +157,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
         if (userIsAuthenticated === null) return;
 
         if (tab === 'profile') navigate('/v2/profile');
-        if (tab === 'orders') navigate('/v2/orders');
+        if (tab === 'orders' || tab === 'messages') navigate('/v2/orders');
     };
 
     return (

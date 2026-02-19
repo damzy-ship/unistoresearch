@@ -92,6 +92,14 @@ export const OrdersPageV2: React.FC = () => {
                         <h1 className="text-3xl font-black tracking-tight text-[#1a2a40] dark:text-white leading-none">Your Requests</h1>
                         <p className="text-sm font-medium text-zinc-500 dark:text-zinc-500 tracking-wide mt-2">Activity History</p>
                     </div>
+
+                    <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('trigger-v2-action', { detail: { mode: 'request' } }))}
+                        className="hidden lg:flex items-center gap-2 bg-primary text-white px-6 py-3.5 rounded-2xl font-black text-xs shadow-xl shadow-primary/20 active:scale-95 transition-all uppercase tracking-widest"
+                    >
+                        <span className="material-symbols-outlined text-lg">add_circle</span>
+                        Make Live Request
+                    </button>
                 </div>
 
                 {/* Request Summary Slider/Grid */}

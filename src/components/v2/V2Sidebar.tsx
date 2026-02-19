@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UniqueVisitor } from '../../lib/supabase';
+import { supabase, UniqueVisitor } from '../../lib/supabase';
 
 interface V2SidebarProps {
     activeTab: 'home' | 'orders' | 'messages' | 'profile';
@@ -149,18 +149,33 @@ export const V2Sidebar: React.FC<V2SidebarProps> = ({
                             </button>
                         </motion.div>
                     ) : (
-                        <motion.button
-                            key="auth-button"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => onActionClick('post')}
-                            className="w-full bg-primary text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
-                        >
-                            <span className="material-symbols-outlined text-[20px]">add_circle</span>
-                            Post an Item
-                        </motion.button>
+                        <div className="space-y-3">
+                            <motion.button
+                                key="auth-button"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => onActionClick('post')}
+                                className="w-full bg-primary text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                            >
+                                <span className="material-symbols-outlined text-[20px]">add_circle</span>
+                                Post an Item
+                            </motion.button>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={async () => {
+                                    await supabase.auth.signOut();
+                                    window.location.reload();
+                                }}
+                                className="w-full bg-white dark:bg-white/5 text-red-500 font-extrabold py-3 rounded-xl border border-red-500/20 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">logout</span>
+                                Logout
+                            </motion.button>
+                        </div>
                     )}
                 </AnimatePresence>
             </div>

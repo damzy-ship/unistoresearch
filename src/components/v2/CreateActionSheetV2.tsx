@@ -74,7 +74,7 @@ export const CreateActionSheetV2: React.FC<CreateActionSheetV2Props> = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[120] flex items-end">
+                <div className="fixed inset-0 z-[120] flex items-end lg:items-center lg:justify-center p-0 lg:p-6">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -84,13 +84,13 @@ export const CreateActionSheetV2: React.FC<CreateActionSheetV2Props> = ({
                         onClick={!isPosting ? onClose : undefined}
                     />
 
-                    {/* The Sheet */}
+                    {/* The Modal/Sheet */}
                     <motion.div
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
+                        initial={window.innerWidth >= 1024 ? { opacity: 0, scale: 0.95 } : { y: '100%' }}
+                        animate={window.innerWidth >= 1024 ? { opacity: 1, scale: 1 } : { y: 0 }}
+                        exit={window.innerWidth >= 1024 ? { opacity: 0, scale: 0.95 } : { y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative flex w-full flex-col rounded-t-[2.5rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t border-white/20 z-10 p-6 pb-12 min-h-[60vh] max-h-[90vh]"
+                        className="relative flex w-full lg:max-w-xl flex-col rounded-t-[2.5rem] lg:rounded-[2.5rem] bg-[#f8f6f5] dark:bg-[#221610] shadow-2xl overflow-hidden border-t lg:border border-white/20 z-10 p-6 pb-12 lg:pb-8 min-h-[60vh] lg:min-h-0 max-h-[90vh]"
                     >
                         {/* Handle */}
                         <div className="flex justify-center mb-6">
