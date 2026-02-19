@@ -6,12 +6,19 @@ import { toast } from 'sonner';
 interface AuthModalV2Props {
     isOpen: boolean;
     onClose: () => void;
+    initialView?: AuthView;
 }
 
-type AuthView = 'signin' | 'signup' | 'otp' | 'forgot' | 'check-email';
+type AuthView = 'signin' | 'signup' | 'otp' | 'forgot' | 'check-email' | 'update-password';
 
-export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => {
-    const [view, setView] = useState<AuthView>('signin');
+export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose, initialView }) => {
+    const [view, setView] = useState<AuthView>(initialView || 'signin');
+
+    useEffect(() => {
+        if (initialView) {
+            setView(initialView);
+        }
+    }, [initialView]);
     const [method, setMethod] = useState<'email' | 'phone'>('email');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -21,6 +28,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('+234');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [userType, setUserType] = useState<'user' | 'merchant'>('user');
     const [brandName, setBrandName] = useState('');
     const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>("684c03a5-a18d-4df9-b064-0aaeee2a5f01"); // Default Bingham
@@ -136,6 +144,38 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
         }
     };
 
+    const handleUpdatePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const { error: updateError } = await supabase.auth.updateUser({ password: password });
+            if (updateError) throw updateError;
+
+            toast.success('Password updated successfully');
+            setTimeout(() => {
+                onClose();
+                window.location.href = '/v2/hostel';
+            }, 1500);
+        } catch (err: any) {
+            setError(err.message || 'Failed to update password');
+            toast.error(err.message || 'Update failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email.includes('@')) {
@@ -148,7 +188,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
 
         try {
             const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                redirectTo: `${window.location.origin}/update-password`
+                redirectTo: `${window.location.origin}/v2/update-password`
             });
 
             if (resetError) throw resetError;
@@ -602,20 +642,79 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
     const renderCheckEmail = () => (
         <div className="w-full max-w-[480px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-6 md:p-10 border border-primary/10 animate-in fade-in zoom-in duration-300 text-center">
             <div className="mb-8 flex justify-center">
-                <div className="bg-primary/10 p-6 rounded-full text-primary scale-125">
-                    <span className="material-symbols-outlined text-5xl">mark_email_read</span>
+                <div className="inline-flex items-center justify-center bg-primary/10 p-4 rounded-full mb-6">
+                    <span className="material-symbols-outlined text-primary text-4xl">mark_email_read</span>
                 </div>
             </div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">Check your email</h1>
-            <p className="text-zinc-500 dark:text-zinc-400 text-base leading-relaxed mb-8">
-                {checkEmailMessage || 'We sent a password reset link to your email.'}
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">Check your email</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
+                {checkEmailMessage || "We've sent a password reset link to your email."}
             </p>
-            <button
-                onClick={() => setView('signin')}
-                className="w-full h-14 bg-primary text-white font-bold hover:bg-primary/90 hover:scale-[0.99] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 rounded-lg"
-            >
+            <button onClick={() => setView('signin')} className="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-all">
                 Return to Sign In
             </button>
+        </div>
+    );
+
+    const renderUpdatePassword = () => (
+        <div className="w-full max-w-[480px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-6 md:p-10 border border-primary/10 animate-in fade-in zoom-in duration-300">
+            <div className="mb-8 text-center">
+                <div className="inline-flex items-center justify-center bg-primary/10 p-4 rounded-full mb-4">
+                    <span className="material-symbols-outlined text-primary text-4xl">lock_reset</span>
+                </div>
+                <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Set New Password</h1>
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm">Secure your account with a new password.</p>
+            </div>
+
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium text-center">{error}</p>
+                </div>
+            )}
+
+            <form onSubmit={handleUpdatePassword} className="space-y-5">
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">New Password</label>
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors">lock</span>
+                        <input
+                            type="password"
+                            placeholder="Min. 6 characters"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Confirm Password</label>
+                    <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors">verified_user</span>
+                        <input
+                            type="password"
+                            placeholder="Repeat your password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            className="w-full pl-12 pr-4 h-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-lg outline-none"
+                        />
+                    </div>
+                </div>
+
+                <div className="pt-4 flex flex-col gap-3">
+                    <button
+                        disabled={loading}
+                        className="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+                    >
+                        {loading ? 'Updating...' : 'Update Password'}
+                    </button>
+                    <button onClick={onClose} type="button" className="w-full h-14 bg-transparent text-zinc-600 dark:text-zinc-400 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all rounded-lg">
+                        Not now
+                    </button>
+                </div>
+            </form>
         </div>
     );
 
@@ -628,6 +727,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose }) => 
                 {view === 'otp' && renderOTP()}
                 {view === 'forgot' && renderForgotPassword()}
                 {view === 'check-email' && renderCheckEmail()}
+                {view === 'update-password' && renderUpdatePassword()}
             </div>
         </div>
     );

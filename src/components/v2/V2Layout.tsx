@@ -24,6 +24,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     onCategorySelect
 }) => {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [authInitialView, setAuthInitialView] = useState<'signin' | 'signup' | 'otp' | 'forgot' | 'check-email' | 'update-password'>('signin');
     const [isActionOpen, setIsActionOpen] = useState(false);
     const [actionMode, setActionMode] = useState<'request' | 'post'>('request');
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
@@ -142,6 +143,26 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
         setActionMode(mode);
         setIsActionOpen(true);
     };
+
+    // Handle initial auth mode from URL
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const authMode = params.get('auth_mode');
+
+        // Also check for supabase recovery flow in the hash
+        const hash = window.location.hash;
+
+        if (authMode === 'signup') {
+            setAuthInitialView('signup');
+            setIsAuthOpen(true);
+        } else if (authMode === 'signin') {
+            setAuthInitialView('signin');
+            setIsAuthOpen(true);
+        } else if (authMode === 'reset' || hash.includes('type=recovery')) {
+            setAuthInitialView('update-password');
+            setIsAuthOpen(true);
+        }
+    }, []);
 
     const handleTabChange = (tab: 'home' | 'orders' | 'messages' | 'profile') => {
         if (tab === 'home') {
@@ -272,10 +293,13 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             </div>
 
             {/* Shared Components */}
-            <AuthModalV2
-                isOpen={isAuthOpen}
-                onClose={() => setIsAuthOpen(false)}
-            />
+            {isAuthOpen && (
+                <AuthModalV2
+                    isOpen={isAuthOpen}
+                    onClose={() => setIsAuthOpen(false)}
+                    initialView={authInitialView}
+                />
+            )}
 
             <CreateActionSheetV2
                 isOpen={isActionOpen}
