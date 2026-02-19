@@ -234,7 +234,7 @@ export async function sendMassVendorNotification(requestData: {
                 </p>
 
                 <div class="cta-container">
-                    <a href="https://search.unistore.ng" class="button">View Request</a>
+                    <a href="https://unistore.ng" class="button">View Request</a>
                 </div>
             </div>
         </div>
