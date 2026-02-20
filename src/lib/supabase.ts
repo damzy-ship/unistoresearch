@@ -200,6 +200,17 @@ export interface ProductCategory {
   created_at: string;
 }
 
+export interface Coupon {
+  id: string;
+  code: string;
+  type: string;
+  value: number;
+  claimed: boolean;
+  claimed_at?: string | null;
+  claimed_by?: string | null;
+  school_id: string;
+}
+
 // Add function to delete a request log
 export async function deleteRequestLog(requestId: string): Promise<{ success: boolean; error?: string }> {
   try {
