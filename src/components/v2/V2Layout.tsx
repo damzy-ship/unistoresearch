@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AuthModalV2 } from './AuthModalV2';
 import { CreateActionSheetV2 } from './CreateActionSheetV2';
 import { V2Sidebar } from './V2Sidebar';
@@ -37,6 +38,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     });
     const [hostelMode, setHostelMode] = useState(true);
     const navigate = useNavigate();
+    const [isFabOpen, setIsFabOpen] = useState(false);
     const { currentTheme, changeTheme } = useTheme();
 
     const isDark = currentTheme.isDark;
@@ -249,41 +251,92 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
                 {/* Mobile Bottom Nav (Hidden on LG and above) */}
                 {!hideBottomNav && (
-                    <div className="lg:hidden fixed bottom-8 left-0 right-0 z-50 px-6">
-                        <div className="bg-white/95 dark:bg-[#1a110c]/95 backdrop-blur-3xl max-w-lg mx-auto rounded-[2.5rem] py-3 px-4 flex items-center justify-around shadow-2xl border border-black/5 dark:border-white/10 ring-1 ring-black/5">
-                            <button
-                                onClick={() => handleTabChange('home')}
-                                className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
-                            >
-                                <span className={`material-symbols-outlined text-2xl ${activeTab === 'home' ? 'fill-1 scale-110' : ''}`}>home</span>
-                                <span className="text-[10px] font-bold">Home</span>
-                            </button>
+                    <>
+                        {/* Mobile FAB Menu */}
+                        <div className="lg:hidden fixed bottom-28 right-6 z-[60] flex flex-col items-end gap-3">
+                            <AnimatePresence>
+                                {isFabOpen && (
+                                    <>
+                                        <motion.button
+                                            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                                            onClick={() => {
+                                                handleActionClick('post');
+                                                setIsFabOpen(false);
+                                            }}
+                                            className="flex items-center gap-3 bg-white dark:bg-[#2a1a14] px-5 py-3 rounded-2xl shadow-xl border border-black/5 dark:border-white/10 active:scale-95 translate-all"
+                                        >
+                                            <span className="text-xs font-black uppercase tracking-widest text-[#1a2a40] dark:text-white">Post Product</span>
+                                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                                <span className="material-symbols-outlined text-xl">add_shopping_cart</span>
+                                            </div>
+                                        </motion.button>
+
+                                        <motion.button
+                                            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                                            transition={{ delay: 0.05 }}
+                                            onClick={() => {
+                                                handleActionClick('request');
+                                                setIsFabOpen(false);
+                                            }}
+                                            className="flex items-center gap-3 bg-white dark:bg-[#2a1a14] px-5 py-3 rounded-2xl shadow-xl border border-black/5 dark:border-white/10 active:scale-95 translate-all"
+                                        >
+                                            <span className="text-xs font-black uppercase tracking-widest text-[#1a2a40] dark:text-white">Make Request</span>
+                                            <div className="w-10 h-10 rounded-xl bg-[#1e293b]/10 flex items-center justify-center text-[#1e293b] dark:text-accent-blue">
+                                                <span className="material-symbols-outlined text-xl">campaign</span>
+                                            </div>
+                                        </motion.button>
+                                    </>
+                                )}
+                            </AnimatePresence>
 
                             <button
-                                onClick={() => handleTabChange('orders')}
-                                className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'orders' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
+                                onClick={() => setIsFabOpen(!isFabOpen)}
+                                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90 ${isFabOpen ? 'bg-[#1e293b] text-white rotate-45' : 'bg-primary text-white'}`}
                             >
-                                <span className={`material-symbols-outlined text-2xl ${activeTab === 'orders' ? 'fill-1 scale-110' : ''}`}>receipt_long</span>
-                                <span className="text-[10px] font-bold">Orders</span>
-                            </button>
-
-                            <button
-                                onClick={() => handleTabChange('messages')}
-                                className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'messages' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
-                            >
-                                <span className={`material-symbols-outlined text-2xl ${activeTab === 'messages' ? 'fill-1 scale-110' : ''}`}>forum</span>
-                                <span className="text-[10px] font-bold">Inbox</span>
-                            </button>
-
-                            <button
-                                onClick={() => handleTabChange('profile')}
-                                className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'profile' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
-                            >
-                                <span className={`material-symbols-outlined text-2xl ${activeTab === 'profile' ? 'fill-1 scale-110' : ''}`}>person</span>
-                                <span className="text-[10px] font-bold">Profile</span>
+                                <span className="material-symbols-outlined text-3xl font-bold">add</span>
                             </button>
                         </div>
-                    </div>
+
+                        <div className="lg:hidden fixed bottom-8 left-0 right-0 z-50 px-6 pointer-events-none">
+                            <div className="bg-white/95 dark:bg-[#1a110c]/95 backdrop-blur-3xl max-w-lg mx-auto rounded-[2.5rem] py-3 px-4 flex items-center justify-around shadow-2xl border border-black/5 dark:border-white/10 ring-1 ring-black/5 pointer-events-auto">
+                                <button
+                                    onClick={() => handleTabChange('home')}
+                                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
+                                >
+                                    <span className={`material-symbols-outlined text-2xl ${activeTab === 'home' ? 'fill-1 scale-110' : ''}`}>home</span>
+                                    <span className="text-[10px] font-bold">Home</span>
+                                </button>
+
+                                <button
+                                    onClick={() => handleTabChange('orders')}
+                                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'orders' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
+                                >
+                                    <span className={`material-symbols-outlined text-2xl ${activeTab === 'orders' ? 'fill-1 scale-110' : ''}`}>receipt_long</span>
+                                    <span className="text-[10px] font-bold">Orders</span>
+                                </button>
+
+                                <button
+                                    onClick={() => handleTabChange('messages')}
+                                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'messages' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
+                                >
+                                    <span className={`material-symbols-outlined text-2xl ${activeTab === 'messages' ? 'fill-1 scale-110' : ''}`}>forum</span>
+                                    <span className="text-[10px] font-bold">Inbox</span>
+                                </button>
+
+                                <button
+                                    onClick={() => handleTabChange('profile')}
+                                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'profile' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
+                                >
+                                    <span className={`material-symbols-outlined text-2xl ${activeTab === 'profile' ? 'fill-1 scale-110' : ''}`}>person</span>
+                                    <span className="text-[10px] font-bold">Profile</span>
+                                </button>
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
 
