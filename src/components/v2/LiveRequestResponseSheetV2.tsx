@@ -65,20 +65,38 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                         </div>
 
                         {/* Request Preview */}
-                        <div className="flex gap-4 mb-8 p-5 bg-white dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm">
-                            <div className="flex-1">
-                                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">Item Requested</p>
-                                <h4 className="text-[#1a2a40] dark:text-white font-bold leading-tight mb-3 text-lg">
-                                    "{request?.post_description || request?.text || 'I am looking for something...'}"
-                                </h4>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-[12px] text-primary">schedule</span>
-                                    </div>
-                                    <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">
-                                        {request?.created_at ? formatTimeAgo(request.created_at) : 'Just now'}
-                                    </span>
+                        <div className="flex flex-col gap-4 mb-8 p-5 bg-white dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm">
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">Item Requested</p>
+                                    <h4 className="text-[#1a2a40] dark:text-white font-bold leading-tight mb-3 text-lg">
+                                        "{request?.post_description || request?.text || 'I am looking for something...'}"
+                                    </h4>
                                 </div>
+                                {request?.post_images?.length > 0 && (
+                                    <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 border border-black/5">
+                                        <img src={request.post_images[0]} alt="" className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {request?.post_images?.length > 1 && (
+                                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                                    {request.post_images.slice(1).map((img: string, i: number) => (
+                                        <div key={i} className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-black/5">
+                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-[12px] text-primary">schedule</span>
+                                </div>
+                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">
+                                    {request?.created_at ? formatTimeAgo(request.created_at) : 'Just now'}
+                                </span>
                             </div>
                         </div>
 

@@ -113,6 +113,10 @@ export const HostelHomePageV2: React.FC = () => {
 
     useEffect(() => {
         const fetchRealLiveRequests = async () => {
+            if (!selectedSchoolId) {
+                setRealLiveRequests([]);
+                return;
+            }
             const { data } = await supabase
                 .from('hostel_product_updates')
                 .select(`
@@ -122,7 +126,7 @@ export const HostelHomePageV2: React.FC = () => {
                     created_at,
                     post_category,
                     actual_user_id,
-                    unique_visitors:actual_user_id (
+                    unique_visitors!inner (
                         id,
                         full_name,
                         profile_picture,
@@ -132,7 +136,8 @@ export const HostelHomePageV2: React.FC = () => {
                         hostel_id,
                         hostels (id, name, school_id),
                         schools (id, short_name),
-                        brand_name
+                        brand_name,
+                        school_id
                     ),
                     status,
                     post_type,
@@ -141,6 +146,7 @@ export const HostelHomePageV2: React.FC = () => {
                     discount_price
                 `)
                 .eq('post_type', 'request')
+                .eq('unique_visitors.school_id', selectedSchoolId)
                 .or('fulfilled.is.null,fulfilled.eq.false')
                 .order('created_at', { ascending: false })
                 .limit(40);
@@ -168,7 +174,7 @@ export const HostelHomePageV2: React.FC = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [selectedSchoolId]);
 
 
     const openProductDetail = (product: any) => {
@@ -195,10 +201,13 @@ export const HostelHomePageV2: React.FC = () => {
             selectedCategory={selectedCategory}
             onCategorySelect={setSelectedCategory}
         >
-            <LiveActivityHubV2 onUserClick={(user) => {
-                setSelectedMerchant(user);
-                setIsCatalogOpen(true);
-            }} />
+            <LiveActivityHubV2
+                selectedSchoolId={selectedSchoolId}
+                onUserClick={(user) => {
+                    setSelectedMerchant(user);
+                    setIsCatalogOpen(true);
+                }}
+            />
 
             {/* University Selection Tag */}
             <div className="px-5 pt-2 flex items-center justify-between">
@@ -278,9 +287,16 @@ export const HostelHomePageV2: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <p className="text-sm font-bold text-[#1a2a40] dark:text-white/90 line-clamp-2 leading-tight mb-4 min-h-[40px]">
-                                        {item.post_description || "I'm looking for something..."}
-                                    </p>
+                                    <div className="flex gap-3 mb-4">
+                                        <p className={`text-sm font-bold text-[#1a2a40] dark:text-white/90 leading-tight ${item.post_images?.length > 0 ? 'line-clamp-2 flex-1' : 'line-clamp-3'}`}>
+                                            {item.post_description || "I'm looking for something..."}
+                                        </p>
+                                        {item.post_images?.length > 0 && (
+                                            <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-black/5">
+                                                <img src={item.post_images[0]} alt="" className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                    </div>
 
                                     <div className="flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/5">
                                         <div className="flex items-center gap-1.5">
@@ -307,26 +323,26 @@ export const HostelHomePageV2: React.FC = () => {
                         selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' ? [
                             {
                                 id: 'vuna-1',
-                                image: '/images/banner_food.png',
+                                image: '/v2/assets/banner_food_v2.png',
                                 title: 'Delicious Deals delivered to your door.',
                                 subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.'
                             },
                             {
                                 id: 'vuna-2',
-                                image: '/images/banner_discounts.png',
+                                image: '/v2/assets/banner_discounts_v2.png',
                                 title: 'Special Offers',
                                 subtitle: 'Exclusive discounts just for you.'
                             }
                         ] : selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' ? [
                             {
                                 id: 'bhu-1',
-                                image: '/images/benner_fashion.png',
+                                image: '/v2/assets/banner_fashion_v2.png',
                                 title: 'Fashion & Discounts Day',
                                 subtitle: 'Upgrade your style with amazing deals!'
                             },
                             {
                                 id: 'bhu-2',
-                                image: '/images/banner_discounts.png',
+                                image: '/v2/assets/banner_discounts_v2.png',
                                 title: 'Special Offers',
                                 subtitle: 'Grab the best prices on top brands.'
                             }
