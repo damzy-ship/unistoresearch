@@ -29,6 +29,7 @@ export const HostelHomePageV2: React.FC = () => {
     const [realLiveRequests, setRealLiveRequests] = useState<any[]>([]);
     const [hostels, setHostels] = useState<Hostel[]>([]);
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
+    const [banners, setBanners] = useState<any[]>([]);
 
     const {
         loadingFeed,
@@ -92,6 +93,15 @@ export const HostelHomePageV2: React.FC = () => {
                 .eq('school_id', selectedSchoolId)
                 .order('name', { ascending: true });
             setHostels(hostelData || []);
+
+            // Fetch custom banners
+            const { data: bannerData } = await supabase
+                .from('school_banners')
+                .select('*')
+                .eq('school_id', selectedSchoolId)
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+            setBanners(bannerData || []);
         };
         fetchHostelsAndSchool();
     }, [selectedSchoolId]);
@@ -320,40 +330,47 @@ export const HostelHomePageV2: React.FC = () => {
             <section className="px-4 lg:px-8 py-6">
                 <BannerSlider
                     slides={
-                        selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' ? [
-                            {
-                                id: 'vuna-1',
-                                image: '/v2/assets/banner_food_v2.png',
-                                title: 'Delicious Deals delivered to your door.',
-                                subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.'
-                            },
-                            {
-                                id: 'vuna-2',
-                                image: '/v2/assets/banner_discounts_v2.png',
-                                title: 'Special Offers',
-                                subtitle: 'Exclusive discounts just for you.'
-                            }
-                        ] : selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' ? [
-                            {
-                                id: 'bhu-1',
-                                image: '/v2/assets/banner_fashion_v2.png',
-                                title: 'Fashion & Discounts Day',
-                                subtitle: 'Upgrade your style with amazing deals!'
-                            },
-                            {
-                                id: 'bhu-2',
-                                image: '/v2/assets/banner_discounts_v2.png',
-                                title: 'Special Offers',
-                                subtitle: 'Grab the best prices on top brands.'
-                            }
-                        ] : [
-                            {
-                                id: 'default',
-                                image: HERO_IMAGE,
-                                title: 'Delicious Deals delivered to your door.',
-                                subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer.'
-                            }
-                        ]
+                        banners.length > 0
+                            ? banners.map(b => ({
+                                id: b.id,
+                                image: b.image_url,
+                                title: b.title || undefined,
+                                subtitle: b.subtitle || undefined
+                            }))
+                            : selectedSchoolId === '1724171a-6664-44fd-aa1e-f509b124ab51' ? [
+                                {
+                                    id: 'vuna-1',
+                                    image: '/v2/assets/banner_food_v2.png',
+                                    title: 'Delicious Deals delivered to your door.',
+                                    subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.'
+                                },
+                                {
+                                    id: 'vuna-2',
+                                    image: '/v2/assets/banner_discounts_v2.png',
+                                    title: 'Special Offers',
+                                    subtitle: 'Exclusive discounts just for you.'
+                                }
+                            ] : selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' ? [
+                                {
+                                    id: 'bhu-1',
+                                    image: '/v2/assets/banner_fashion_v2.png',
+                                    title: 'Fashion & Discounts Day',
+                                    subtitle: 'Upgrade your style with amazing deals!'
+                                },
+                                {
+                                    id: 'bhu-2',
+                                    image: '/v2/assets/banner_discounts_v2.png',
+                                    title: 'Special Offers',
+                                    subtitle: 'Grab the best prices on top brands.'
+                                }
+                            ] : [
+                                {
+                                    id: 'default',
+                                    image: HERO_IMAGE,
+                                    title: 'Delicious Deals delivered to your door.',
+                                    subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer.'
+                                }
+                            ]
                     }
                 />
             </section>
