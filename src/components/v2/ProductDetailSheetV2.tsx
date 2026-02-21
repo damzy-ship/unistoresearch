@@ -25,6 +25,19 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
 }) => {
     const controls = useAnimation();
     const [likeInfo, setLikeInfo] = React.useState({ likeCount: 0, isLiked: false });
+    const [selectedImageIndex, setSelectedImageIndex] = React.useState<number | null>(null);
+
+    // Prevent body scroll when image viewer is open
+    useEffect(() => {
+        if (selectedImageIndex !== null) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [selectedImageIndex]);
 
     useEffect(() => {
         if (isOpen && product?.id) {
@@ -116,7 +129,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
 
                     {/* Left: Product Images (Scrollable on mobile, Left side on desktop) */}
                     <div className="w-full lg:w-[60%] h-[45%] lg:h-full relative group p-2.5 lg:p-0">
-                        <div className="w-full h-full rounded-[2.5rem] lg:rounded-none overflow-hidden relative shadow-lg lg:shadow-none">
+                        <div className="w-full h-full relative [&_.swiper-pagination]:!bottom-0 lg:[&_.swiper-pagination]:!bottom-[2rem]">
                             <Swiper
                                 modules={[Pagination, Navigation]}
                                 pagination={{ clickable: true }}
@@ -127,12 +140,15 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 className="w-full h-full product-swiper group/swiper"
                             >
                                 {productImages.map((img: string, i: number) => (
-                                    <SwiperSlide key={i}>
-                                        <img
-                                            src={img}
-                                            className="w-full h-full object-cover lg:object-center"
-                                            alt={`Product ${i + 1}`}
-                                        />
+                                    <SwiperSlide key={i} className="pb-8 lg:pb-0">
+                                        <div className="w-full h-full rounded-[2.5rem] lg:rounded-none overflow-hidden shadow-lg lg:shadow-none bg-zinc-100 dark:bg-[#1a110c]">
+                                            <img
+                                                src={img}
+                                                className="w-full h-full object-cover lg:object-center cursor-pointer active:scale-[0.98] transition-transform"
+                                                onClick={() => setSelectedImageIndex(i)}
+                                                alt={`Product ${i + 1}`}
+                                            />
+                                        </div>
                                     </SwiperSlide>
                                 ))}
                             </Swiper>
@@ -268,6 +284,87 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                     </div>
                 </motion.div>
             </div>
+
+            {/* Fullscreen Image Viewer Modal */}
+            {selectedImageIndex !== null && productImages && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-0">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+                        onClick={() => setSelectedImageIndex(null)}
+                    />
+
+                    {productImages.length > 1 && (
+                        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[210] bg-black/40 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold tracking-widest border border-white/10">
+                            {selectedImageIndex + 1} / {productImages.length}
+                        </div>
+                    )}
+
+                    <button
+                        onClick={() => setSelectedImageIndex(null)}
+                        className="absolute top-6 right-6 z-[210] w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white backdrop-blur-md transition-colors border border-white/10"
+                    >
+                        <span className="material-symbols-outlined text-2xl">close</span>
+                    </button>
+
+                    {productImages.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImageIndex((prev) =>
+                                        prev !== null ? (prev > 0 ? prev - 1 : productImages.length - 1) : null
+                                    );
+                                }}
+                                className="hidden lg:flex absolute left-8 z-[210] w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 items-center justify-center text-white backdrop-blur-md transition-all border border-white/10"
+                            >
+                                <span className="material-symbols-outlined text-3xl">chevron_left</span>
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImageIndex((prev) =>
+                                        prev !== null ? (prev < productImages.length - 1 ? prev + 1 : 0) : null
+                                    );
+                                }}
+                                className="hidden lg:flex absolute right-8 z-[210] w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 items-center justify-center text-white backdrop-blur-md transition-all border border-white/10"
+                            >
+                                <span className="material-symbols-outlined text-3xl">chevron_right</span>
+                            </button>
+                        </>
+                    )}
+
+                    <motion.div
+                        key={selectedImageIndex}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="relative z-[205] w-full max-w-5xl max-h-[100vh]"
+                        drag={window.innerWidth < 1024 ? "x" : false}
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.8}
+                        onDragEnd={(_, info) => {
+                            if (info.offset.x < -50 && selectedImageIndex < productImages.length - 1) {
+                                setSelectedImageIndex(selectedImageIndex + 1);
+                            } else if (info.offset.x > 50 && selectedImageIndex > 0) {
+                                setSelectedImageIndex(selectedImageIndex - 1);
+                            } else if (Math.abs(info.offset.y) > 100) {
+                                setSelectedImageIndex(null); // Optional: swipe down to close
+                            }
+                        }}
+                    >
+                        <img
+                            src={productImages[selectedImageIndex]}
+                            alt={`Fullscreen ${selectedImageIndex + 1}`}
+                            className="w-full h-full max-h-[85vh] object-contain drop-shadow-2xl"
+                            draggable={false}
+                        />
+                    </motion.div>
+                </div>
+            )}
         </AnimatePresence>
     );
 };
