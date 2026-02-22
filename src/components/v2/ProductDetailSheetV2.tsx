@@ -5,6 +5,8 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import { supabase } from '../../lib/supabase';
+import { toast } from 'sonner';
 
 interface ProductDetailSheetV2Props {
     isOpen: boolean;
@@ -16,7 +18,8 @@ interface ProductDetailSheetV2Props {
 export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     isOpen,
     onClose,
-    product
+    product,
+    isAdmin
 }) => {
     const controls = useAnimation();
     const [selectedImageIndex, setSelectedImageIndex] = React.useState<number | null>(null);
@@ -157,6 +160,31 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             >
                                 <span className="material-symbols-outlined">close</span>
                             </button>
+                            {isAdmin && (
+                                <button
+                                    onClick={async (e) => {
+                                        e.stopPropagation();
+                                        if (!confirm('Are you sure you want to delete this product?')) return;
+
+                                        const { error } = await supabase
+                                            .from('merchant_products')
+                                            .delete()
+                                            .eq('id', product.id);
+
+                                        if (error) {
+                                            toast.error('Failed to delete product');
+                                        } else {
+                                            toast.success('Product deleted successfully');
+                                            onClose();
+                                            window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                        }
+                                    }}
+                                    className="w-10 h-10 rounded-full bg-red-500/80 backdrop-blur-xl shadow-lg flex items-center justify-center text-white ring-1 ring-red-500/20 transition-all hover:bg-red-600 active:scale-95"
+                                    title="Delete product (Admin)"
+                                >
+                                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                                </button>
+                            )}
                         </div>
 
                         {/* Navigation Arrows - Desktop Only */}

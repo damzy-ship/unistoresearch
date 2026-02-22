@@ -486,6 +486,7 @@ export const HostelHomePageV2: React.FC = () => {
                 onClose={() => setIsResponseOpen(false)}
                 request={selectedRequest}
                 currentVisitorId={currentVisitor?.id}
+                isAdmin={currentVisitor?.is_admin}
             />
 
             {/* Merchant Catalog Sheet */}

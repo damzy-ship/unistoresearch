@@ -8,15 +8,18 @@ interface LiveRequestResponseSheetV2Props {
     onClose: () => void;
     request: any;
     currentVisitorId?: string;
+    isAdmin?: boolean;
 }
 
 export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Props> = ({
     isOpen,
     onClose,
     request,
-    currentVisitorId
+    currentVisitorId,
+    isAdmin
 }) => {
     const isOwner = request?.actual_user_id === currentVisitorId;
+    const isOwnerOrAdmin = isOwner || isAdmin;
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
     // Prevent body scroll when image viewer is open
@@ -137,18 +140,18 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                             </div>
 
                             <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-5 px-1">
-                                {isOwner ? 'Manage your request' : 'How would you like to respond?'}
+                                {isOwnerOrAdmin ? 'Manage your request' : 'How would you like to respond?'}
                             </h3>
 
                             <div className="space-y-4">
-                                {isOwner ? (
+                                {isOwnerOrAdmin ? (
                                     <button
                                         onClick={async () => {
                                             if (!confirm('Are you sure you want to delete your request?')) return;
                                             const { supabase } = await import('../../lib/supabase');
                                             const { error } = await supabase
                                                 .from('hostel_product_updates')
-                                                .update({ fulfilled: true })
+                                                .delete()
                                                 .eq('id', request.id);
                                             if (!error) {
                                                 alert('Request deleted');
