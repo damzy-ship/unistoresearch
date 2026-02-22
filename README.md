@@ -1,6 +1,6 @@
 # UniStore - University Marketplace
 
-UniStore is a comprehensive marketplace platform that connects university students with local vendors and suppliers. The platform uses AI-powered matching to help students find products and services from verified merchants within their university ecosystem.
+UniStore is a comprehensive marketplace platform that connects university students with local vendors and suppliers. The platform uses AI-powered matching to help students find products and services from verified merchants within their university ecosystem..
 
 ## 🌟 Recent Updates
 
