@@ -341,34 +341,34 @@ export const HostelHomePageV2: React.FC = () => {
                                 {
                                     id: 'vuna-1',
                                     image: '/v2/assets/banner_food_v2.png',
-                                    title: 'Delicious Deals delivered to your door.',
-                                    subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer for the final exam week.'
+                                    title: 'Find food delivered to your door.',
+                                    subtitle: 'Browse restaurants and get your favorite meals delivered quickly.'
                                 },
                                 {
                                     id: 'vuna-2',
                                     image: '/v2/assets/banner_discounts_v2.png',
-                                    title: 'Special Offers',
-                                    subtitle: 'Exclusive discounts just for you.'
+                                    title: 'Find Products',
+                                    subtitle: 'Get answers quickly from local sellers.'
                                 }
                             ] : selectedSchoolId === '684c03a5-a18d-4df9-b064-0aaeee2a5f01' ? [
                                 {
                                     id: 'bhu-1',
                                     image: '/v2/assets/banner_fashion_v2.png',
-                                    title: 'Fashion & Discounts Day',
-                                    subtitle: 'Upgrade your style with amazing deals!'
+                                    title: 'Find Fashion',
+                                    subtitle: 'Browse clothing and accessories from local shops.'
                                 },
                                 {
                                     id: 'bhu-2',
                                     image: '/v2/assets/banner_discounts_v2.png',
-                                    title: 'Special Offers',
-                                    subtitle: 'Grab the best prices on top brands.'
+                                    title: 'Find Products',
+                                    subtitle: 'Get answers quickly from local sellers.'
                                 }
                             ] : [
                                 {
                                     id: 'default',
                                     image: HERO_IMAGE,
-                                    title: 'Delicious Deals delivered to your door.',
-                                    subtitle: 'Get 50% off on all hostel deliveries tonight. Limited time offer.'
+                                    title: 'Find products near you.',
+                                    subtitle: 'Get answers quickly from local sellers.'
                                 }
                             ]
                     }
