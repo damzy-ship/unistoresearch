@@ -7,9 +7,7 @@ import SellersPage from './pages/SellersPage';
 import SellerCardPage from './pages/SellerCardPage';
 import PublicMerchantsPage from './pages/PublicMerchantsPage';
 import LandingPage from './pages/LandingPage';
-import AdminDashboard from './components/AdminDashboard';
 import CategoryTest from './components/CategoryTest';
-import ProfilePage from './pages/ProfilePage';
 import PaymentPage from './pages/PaymentPage';
 import InvoicesPage from './pages/InvoicesPage';
 import ViewInvoicePage from './pages/ViewInvoicePage';
@@ -20,9 +18,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import MerchantProductPage from './pages/MerchantProductPage';
 import AllProductsPage from './pages/AllProductsPage';
 import CategoryProductsPage from './pages/CategoryProductsPage';
-import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import UserMenu from './components/UserMenu';
-import HostelHomePage from './pages/HostelHomePage';
 import { HostelHomePageV2 } from './pages/v2/HostelHomePageV2';
 import { ProfilePageV2 } from './pages/v2/ProfilePageV2';
 import { OrdersPageV2 } from './pages/v2/OrdersPageV2';
@@ -30,11 +26,7 @@ import { PaymentsPageV2 } from './pages/v2/PaymentsPageV2';
 import { UpdatePasswordPageV2 } from './pages/v2/UpdatePasswordPageV2';
 // import { useHostelMode } from './hooks/useHostelMode';
 
-function HomeEntry() {
-  const { hostelMode } = useHostelMode();
-  if (hostelMode) return <Navigate to="/hostel" replace />;
-  return <HomePage />;
-}
+
 
 function App() {
   const { currentTheme } = useTheme();
@@ -47,7 +39,15 @@ function App() {
 }
 
 function AppContent({ currentTheme }: { currentTheme: any }) {
-  const isV2 = window.location.pathname.startsWith('/v2');
+  const pathname = window.location.pathname;
+  const isV2 =
+    pathname === '/' ||
+    pathname === '/hostel' ||
+    pathname === '/profile' ||
+    pathname === '/orders' ||
+    pathname === '/payments' ||
+    pathname === '/update-password' ||
+    pathname.startsWith('/v2/');
 
   return (
     <div
@@ -60,11 +60,11 @@ function AppContent({ currentTheme }: { currentTheme: any }) {
         <Toaster position="top-center" richColors />
         {!isV2 && <AnnouncementBar />}
         <Routes>
-          <Route path="/" element={<HostelHomePage />} />
-          <Route path="/hostel" element={<HostelHomePage />} />
+          <Route path="/" element={<HostelHomePageV2 />} />
+          <Route path="/hostel" element={<HostelHomePageV2 />} />
           <Route path="/landing-page" element={<LandingPage />} />
           <Route path="/past-requests" element={<PastRequestsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePageV2 />} />
           <Route path="/sellers" element={<SellersPage />} />
           <Route path="/merchants" element={<PublicMerchantsPage />} />
           <Route path="/seller-card/:sellerId" element={<SellerCardPage />} />
@@ -77,14 +77,17 @@ function AppContent({ currentTheme }: { currentTheme: any }) {
           <Route path="/merchant/:actual_merchant_id/:merchantId/:merchantName" element={<MerchantProductPage />} />
           <Route path="/all-products" element={<AllProductsPage />} />
           <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
-          <Route path="/update-password" element={<UpdatePasswordPage />} />
-          <Route path="/v2/hostel" element={<HostelHomePageV2 />} />
-          <Route path="/v2/profile" element={<ProfilePageV2 />} />
-          <Route path="/v2/orders" element={<OrdersPageV2 />} />
-          <Route path="/v2/payments" element={<PaymentsPageV2 />} />
-          <Route path="/v2/update-password" element={<UpdatePasswordPageV2 />} />
+          <Route path="/update-password" element={<UpdatePasswordPageV2 />} />
+          <Route path="/orders" element={<OrdersPageV2 />} />
+          <Route path="/payments" element={<PaymentsPageV2 />} />
+          {/* Redirect legacy /v2 paths to root */}
+          <Route path="/v2/hostel" element={<Navigate to="/hostel" replace />} />
+          <Route path="/v2/profile" element={<Navigate to="/profile" replace />} />
+          <Route path="/v2/orders" element={<Navigate to="/orders" replace />} />
+          <Route path="/v2/payments" element={<Navigate to="/payments" replace />} />
+          <Route path="/v2/update-password" element={<Navigate to="/update-password" replace />} />
           {/* Handle the weird doubled path appearing in user's browser */}
-          <Route path="/v2/update-password/update-password" element={<UpdatePasswordPageV2 />} />
+          <Route path="/v2/update-password/update-password" element={<Navigate to="/update-password" replace />} />
         </Routes>
       </div>
     </div>

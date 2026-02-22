@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import imageCompression from 'browser-image-compression';
 
 /**
  * Inserts the provided JSON data into the 'merchant_product_categories' table.
@@ -28,8 +29,25 @@ export async function insertMerchantProductCategories(categoriesData: Array<{ na
 }
 
 // Reusable function to handle image upload, inspired by ProductGallery
-export const uploadImageToSupabase = async (file, uniqueId: string, bucketName: string, folderName?: string) => {
-  const fileExt = file.name.split('.').pop();
+export const uploadImageToSupabase = async (file: File, uniqueId: string, bucketName: string, folderName?: string) => {
+  let fileToUpload = file;
+  let fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+
+  if (file.type.startsWith('image/')) {
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: 'image/webp'
+      };
+      fileToUpload = await imageCompression(file, options);
+      fileExt = 'webp';
+    } catch (error) {
+      console.error('Error compressing image:', error);
+    }
+  }
+
   // Ensure unique file name to prevent conflicts
   const fileName = `${uniqueId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `${folderName ? folderName + '/' : ''}${fileName}`;
@@ -37,11 +55,11 @@ export const uploadImageToSupabase = async (file, uniqueId: string, bucketName: 
   // Upload file to Supabase storage
   const { error: uploadError } = await supabase.storage
     .from(bucketName)
-    .upload(filePath, file);
+    .upload(filePath, fileToUpload);
 
   if (uploadError) {
+    console.error('Error uploading image:', uploadError);
     throw new Error(`Error uploading image: ${uploadError.message}`);
-    console.log('Error uploading image:', uploadError);
   }
 
 
@@ -153,11 +171,11 @@ export async function updateSchoolForNullAuthVisitors() {
   console.log('Starting bulk update of unique_visitors where auth_user_id is NULL...');
 
   try {
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from('unique_visitors')
       .update({ school_id: null }) // Set school_id to NULL
       .is('auth_user_id', null)    // Filter where auth_user_id is NULL
-      .select('id', { count: 'exact' }); // Select ID and request an exact count of updated rows
+      .select('id'); // Select ID
 
     if (error) {
       console.error('Error during bulk user_type update:', error.message);
@@ -168,7 +186,7 @@ export async function updateSchoolForNullAuthVisitors() {
       };
     }
 
-    const updatedCount = count || 0;
+    const updatedCount = data ? data.length : 0;
     console.log(`Successfully updated user_type to NULL for ${updatedCount} visitor records.`);
 
     return {
@@ -191,11 +209,11 @@ export async function updateUserTypeForNullAuthVisitors() {
   console.log('Starting bulk update of unique_visitors where auth_user_id is NULL...');
 
   try {
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from('unique_visitors')
       .update({ user_type: 'visitor' })
       .is('auth_user_id', null)
-      .select('id', { count: 'exact' });
+      .select('id');
 
     if (error) {
       console.error('Error during bulk user_type update:', error.message);
@@ -206,7 +224,7 @@ export async function updateUserTypeForNullAuthVisitors() {
       };
     }
 
-    const updatedCount = count || 0;
+    const updatedCount = data ? data.length : 0;
     console.log(`Successfully updated user_type to 'visitor' for ${updatedCount} visitor records.`);
 
     return {
@@ -244,14 +262,14 @@ export async function migrateMerchantProductIDs(): Promise<MigrationResult> {
     // We use .eq() to filter the rows, and .update() to set the new values.
     // We also use .select('*', { count: 'exact' }) to ensure we get the
     // exact count of affected rows in the 'count' property.
-    const { error, count } = await supabase
+    const { data, error } = await supabase
       .from('merchant_products')
       .update({
         merchant_id: NEW_MERCHANT_ID,
         actual_merchant_id: NEW_ACTUAL_MERCHANT_ID,
       })
       .eq('merchant_id', OLD_MERCHANT_ID)
-      .select('id', { count: 'exact' }); // Select 'id' just to capture the count efficiently
+      .select('id'); // Select 'id' just to capture the count efficiently
 
     if (error) {
       console.error('Bulk update failed:', error.message);
@@ -262,7 +280,7 @@ export async function migrateMerchantProductIDs(): Promise<MigrationResult> {
       };
     }
 
-    const updatedCount = count || 0;
+    const updatedCount = data ? data.length : 0;
     console.log(`Migration successful! Updated ${updatedCount} merchant products.`);
 
     return {

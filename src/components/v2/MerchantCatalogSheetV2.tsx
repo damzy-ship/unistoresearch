@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, UniqueVisitor } from '../../lib/supabase';
-import { useTheme } from '../../hooks/useTheme';
+
 import { ProductCardV2 } from './ProductCardV2';
 import { toast } from 'sonner';
-import { MessageCircle, Phone, MapPin, Package, X, ArrowRight } from 'lucide-react';
+import { MessageCircle, Phone, MapPin, Package, X } from 'lucide-react';
 
 interface MerchantCatalogSheetV2Props {
     isOpen: boolean;
@@ -16,7 +16,6 @@ interface MerchantCatalogSheetV2Props {
 export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ isOpen, onClose, merchant, onProductClick }) => {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const { currentTheme } = useTheme();
 
     useEffect(() => {
         if (isOpen && merchant?.id) {
@@ -168,13 +167,13 @@ export const MerchantCatalogSheetV2: React.FC<MerchantCatalogSheetV2Props> = ({ 
                                 </div>
 
                                 {loading ? (
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6">
                                         {[1, 2, 3, 4, 5, 6].map(i => (
                                             <div key={i} className="aspect-[4/5] bg-black/[0.03] dark:bg-white/[0.03] rounded-3xl animate-pulse" />
                                         ))}
                                     </div>
                                 ) : products.length > 0 ? (
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
+                                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 pb-10">
                                         {products.map((p, idx) => (
                                             <ProductCardV2
                                                 key={`p-${p.id}`}

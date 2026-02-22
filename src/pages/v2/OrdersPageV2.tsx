@@ -152,7 +152,7 @@ export const OrdersPageV2: React.FC = () => {
                         <h3 className="text-xl font-black dark:text-white mb-2">No items found</h3>
                         <p className="text-sm text-zinc-400 font-medium max-w-[240px]">You haven't made any requests or orders yet.</p>
                         <button
-                            onClick={() => navigate('/v2/hostel')}
+                            onClick={() => navigate('/hostel')}
                             className="mt-8 bg-primary text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/20 active:scale-95 transition-all uppercase tracking-widest"
                         >
                             Request Something

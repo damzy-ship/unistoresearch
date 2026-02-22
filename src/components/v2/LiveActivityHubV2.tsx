@@ -3,17 +3,24 @@ import { supabase, UniqueVisitor } from '../../lib/supabase';
 import { motion } from 'framer-motion';
 
 interface LiveActivityHubV2Props {
+    selectedSchoolId: string | null;
     onUserClick?: (user: UniqueVisitor) => void;
 }
 
-export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ onUserClick }) => {
+export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ selectedSchoolId, onUserClick }) => {
     const [activeUsers, setActiveUsers] = useState<UniqueVisitor[]>([]);
 
     useEffect(() => {
         const fetchActiveUsers = async () => {
+            if (!selectedSchoolId) {
+                setActiveUsers([]);
+                return;
+            }
+
             const { data } = await supabase
                 .from('hostel_product_updates')
-                .select('actual_user_id, unique_visitors(id, full_name, profile_picture, brand_name, phone_number, hostels(name))')
+                .select('actual_user_id, unique_visitors!inner(id, full_name, profile_picture, brand_name, phone_number, school_id, hostels(name))')
+                .eq('unique_visitors.school_id', selectedSchoolId)
                 .order('created_at', { ascending: false })
                 .limit(20);
 
@@ -29,7 +36,7 @@ export const LiveActivityHubV2: React.FC<LiveActivityHubV2Props> = ({ onUserClic
         };
 
         fetchActiveUsers();
-    }, []);
+    }, [selectedSchoolId]);
 
     // Stabilize rendering: Always return the container to prevent React hydration/removeChild crashes
     const hasUsers = activeUsers.length > 0;

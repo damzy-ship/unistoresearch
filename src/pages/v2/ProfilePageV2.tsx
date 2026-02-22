@@ -8,6 +8,7 @@ import { useHostelFeed } from '../../hooks/hostel/useHostelFeed';
 import EditBrandNameModal from '../../components/EditBrandNameModal';
 import VerifyIDModal from '../../components/VerifyIdModal';
 import EditEmailModal from '../../components/EditEmailModal';
+import { BannerManagementSheetV2 } from '../../components/v2/BannerManagementSheetV2';
 
 export const ProfilePageV2: React.FC = () => {
     const navigate = useNavigate();
@@ -19,6 +20,7 @@ export const ProfilePageV2: React.FC = () => {
     const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
     const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [isBannerManagementOpen, setIsBannerManagementOpen] = useState(false);
 
     const { feed, loadFeed, setFeed } = useHostelFeed(null, 'all', 'all', true, user);
 
@@ -59,7 +61,7 @@ export const ProfilePageV2: React.FC = () => {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (!session && isMounted && event === 'SIGNED_OUT') {
-                navigate('/v2/hostel');
+                navigate('/hostel');
             } else if (session && isMounted) {
                 checkAuth();
             }
@@ -81,7 +83,7 @@ export const ProfilePageV2: React.FC = () => {
         try {
             await supabase.auth.signOut();
             toast.success('Signed out successfully');
-            navigate('/v2/hostel');
+            navigate('/hostel');
         } catch (error) {
             toast.error('Error signing out');
         }
@@ -417,10 +419,10 @@ export const ProfilePageV2: React.FC = () => {
                             <span className="material-symbols-outlined text-sm">shield_person</span>
                             Admin Controls
                         </h3>
-                        <div className="bg-purple-500/5 dark:bg-purple-500/10 rounded-[2.5rem] border border-purple-500/20 shadow-sm overflow-hidden">
+                        <div className="bg-purple-500/5 dark:bg-purple-500/10 rounded-[2.5rem] border border-purple-500/20 shadow-sm overflow-hidden flex flex-col">
                             <button
                                 onClick={() => navigate('/admin-coupons')}
-                                className="w-full flex items-center gap-4 p-5 hover:bg-purple-500/10 transition-colors group"
+                                className="w-full flex items-center gap-4 p-5 hover:bg-purple-500/10 transition-colors group border-b border-purple-500/10 last:border-0"
                             >
                                 <div className="bg-purple-500/20 p-2.5 rounded-xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-all duration-300">
                                     <span className="material-symbols-outlined text-2xl">confirmation_number</span>
@@ -428,6 +430,20 @@ export const ProfilePageV2: React.FC = () => {
                                 <div className="flex-1 text-left">
                                     <p className="font-bold dark:text-white text-base leading-none mb-1">Coupon Management</p>
                                     <p className="text-[11px] text-purple-400/70 font-medium">Create and manage viral coupons</p>
+                                </div>
+                                <span className="material-symbols-outlined text-purple-300 dark:text-purple-800 group-hover:translate-x-1 transition-transform">chevron_right</span>
+                            </button>
+
+                            <button
+                                onClick={() => setIsBannerManagementOpen(true)}
+                                className="w-full flex items-center gap-4 p-5 hover:bg-purple-500/10 transition-colors group border-b border-purple-500/10 last:border-0"
+                            >
+                                <div className="bg-orange-500/20 p-2.5 rounded-xl text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-all duration-300">
+                                    <span className="material-symbols-outlined text-2xl">view_carousel</span>
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <p className="font-bold dark:text-white text-base leading-none mb-1">Manage Banners</p>
+                                    <p className="text-[11px] text-purple-400/70 font-medium">Manage university custom banners</p>
                                 </div>
                                 <span className="material-symbols-outlined text-purple-300 dark:text-purple-800 group-hover:translate-x-1 transition-transform">chevron_right</span>
                             </button>
@@ -483,6 +499,8 @@ export const ProfilePageV2: React.FC = () => {
                     currentTheme={currentTheme}
                 />
             )}
+
+            <BannerManagementSheetV2 isOpen={isBannerManagementOpen} onClose={() => setIsBannerManagementOpen(false)} />
         </V2Layout>
     );
 };
