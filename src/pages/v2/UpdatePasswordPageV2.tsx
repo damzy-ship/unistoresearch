@@ -43,7 +43,7 @@ export const UpdatePasswordPageV2: React.FC = () => {
 
             toast.success('Password updated successfully');
             setTimeout(() => {
-                navigate('/v2/hostel', { replace: true });
+                navigate('/hostel', { replace: true });
             }, 1500);
         } catch (err: any) {
             setError(err.message || 'Failed to update password');
@@ -130,7 +130,7 @@ export const UpdatePasswordPageV2: React.FC = () => {
 
                         <button
                             type="button"
-                            onClick={() => navigate('/v2/hostel')}
+                            onClick={() => navigate('/hostel')}
                             className="w-full h-16 mt-4 bg-transparent text-zinc-400 font-bold hover:text-primary transition-colors uppercase tracking-widest text-xs"
                         >
                             Cancel & Return

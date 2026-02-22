@@ -166,7 +166,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose, initi
             toast.success('Password updated successfully');
             setTimeout(() => {
                 onClose();
-                window.location.href = '/v2/hostel';
+                window.location.href = '/hostel';
             }, 1500);
         } catch (err: any) {
             setError(err.message || 'Failed to update password');
@@ -188,7 +188,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose, initi
 
         try {
             const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                redirectTo: `${window.location.origin}/v2/update-password`
+                redirectTo: `${window.location.origin}/update-password`
             });
 
             if (resetError) throw resetError;

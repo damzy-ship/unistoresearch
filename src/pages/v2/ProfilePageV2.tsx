@@ -61,7 +61,7 @@ export const ProfilePageV2: React.FC = () => {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (!session && isMounted && event === 'SIGNED_OUT') {
-                navigate('/v2/hostel');
+                navigate('/hostel');
             } else if (session && isMounted) {
                 checkAuth();
             }
@@ -83,7 +83,7 @@ export const ProfilePageV2: React.FC = () => {
         try {
             await supabase.auth.signOut();
             toast.success('Signed out successfully');
-            navigate('/v2/hostel');
+            navigate('/hostel');
         } catch (error) {
             toast.error('Error signing out');
         }

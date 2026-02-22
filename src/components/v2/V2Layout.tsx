@@ -53,7 +53,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                 setUserIsAuthenticated(false);
                 window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session: null, visitor: null } }));
                 if (activeTab === 'profile' || activeTab === 'orders' || activeTab === 'messages') {
-                    navigate('/v2/hostel');
+                    navigate('/hostel');
                 }
                 return;
             }
@@ -123,11 +123,15 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             handleActionClick(mode);
         };
 
+        const handleOpenAuth = () => setIsAuthOpen(true);
+
         window.addEventListener('trigger-v2-action', handleTriggerAction);
+        window.addEventListener('open-auth-modal', handleOpenAuth);
 
         return () => {
             subscription.unsubscribe();
             window.removeEventListener('trigger-v2-action', handleTriggerAction);
+            window.removeEventListener('open-auth-modal', handleOpenAuth);
         };
     }, [userIsAuthenticated]);
 
@@ -168,7 +172,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
     const handleTabChange = (tab: 'home' | 'orders' | 'messages' | 'profile') => {
         if (tab === 'home') {
-            navigate('/v2/hostel');
+            navigate('/hostel');
             return;
         }
 
@@ -179,8 +183,8 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
         if (userIsAuthenticated === null) return;
 
-        if (tab === 'profile') navigate('/v2/profile');
-        if (tab === 'orders' || tab === 'messages') navigate('/v2/orders');
+        if (tab === 'profile') navigate('/profile');
+        if (tab === 'orders' || tab === 'messages') navigate('/orders');
     };
 
     return (
@@ -206,7 +210,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
                 {/* Mobile Header (Hidden on LG and above) */}
                 <header className="lg:hidden sticky top-0 z-50 px-4 py-3 flex items-center justify-between border-b border-primary/5 bg-[#f8f6f5]/80 dark:bg-[#221610]/80 backdrop-blur-xl transition-colors duration-500">
-                    <div onClick={() => navigate('/v2/hostel')} className="cursor-pointer flex items-center gap-3 group">
+                    <div onClick={() => navigate('/hostel')} className="cursor-pointer flex items-center gap-3 group">
                         <div className="bg-primary w-11 h-11 rounded-full flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform flex-shrink-0">
                             <span className="material-symbols-outlined text-2xl font-bold">storefront</span>
                         </div>

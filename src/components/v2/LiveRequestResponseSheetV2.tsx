@@ -32,6 +32,11 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
     }, [selectedImageIndex]);
 
     const handleContactRequester = () => {
+        if (!currentVisitorId) {
+            window.dispatchEvent(new CustomEvent('open-auth-modal'));
+            return;
+        }
+
         const phone = request?.unique_visitors?.phone_number;
         if (!phone) {
             alert('Contact not available for this requester');
@@ -189,13 +194,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                                         <button
                                             onClick={() => {
                                                 if (!currentVisitorId) {
-                                                    toast.error('Please sign in to recommend a product', {
-                                                        description: 'You need an account to interact with requests.',
-                                                        action: {
-                                                            label: 'Sign In',
-                                                            onClick: () => window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { action: 'open-auth' } }))
-                                                        }
-                                                    });
+                                                    window.dispatchEvent(new CustomEvent('open-auth-modal'));
                                                     return;
                                                 }
                                                 // Handle recommend logic (can be expanded later)
