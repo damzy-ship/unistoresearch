@@ -65,7 +65,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                             drag={window.innerWidth < 1024 ? "y" : false}
                             dragConstraints={{ top: 0, bottom: 0 }}
                             dragElastic={0.2}
-                            onDragEnd={(_, info) => {
+                            onDragEnd={(_e: any, info: any) => {
                                 if (info.offset.y > 100) onClose();
                             }}
                             initial={{ y: window.innerWidth < 1024 ? '100%' : 20, opacity: window.innerWidth < 1024 ? 1 : 0 }}
@@ -264,7 +264,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                                             prev !== null ? (prev > 0 ? prev - 1 : request.post_images.length - 1) : null
                                         );
                                     }}
-                                    className="hidden lg:flex absolute left-8 z-[210] w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white backdrop-blur-md transition-all border border-white/10"
+                                    className="hidden lg:flex absolute left-8 z-[210] w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 items-center justify-center text-white backdrop-blur-md transition-all border border-white/10"
                                 >
                                     <span className="material-symbols-outlined text-3xl">chevron_left</span>
                                 </button>
@@ -275,7 +275,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                                             prev !== null ? (prev < request.post_images.length - 1 ? prev + 1 : 0) : null
                                         );
                                     }}
-                                    className="hidden lg:flex absolute right-8 z-[210] w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white backdrop-blur-md transition-all border border-white/10"
+                                    className="hidden lg:flex absolute right-8 z-[210] w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 items-center justify-center text-white backdrop-blur-md transition-all border border-white/10"
                                 >
                                     <span className="material-symbols-outlined text-3xl">chevron_right</span>
                                 </button>
@@ -292,7 +292,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                             drag={window.innerWidth < 1024 ? "x" : false}
                             dragConstraints={{ left: 0, right: 0 }}
                             dragElastic={0.8}
-                            onDragEnd={(_, info) => {
+                            onDragEnd={(_e: any, info: any) => {
                                 if (info.offset.x < -50 && selectedImageIndex < request.post_images.length - 1) {
                                     setSelectedImageIndex(selectedImageIndex + 1);
                                 } else if (info.offset.x > 50 && selectedImageIndex > 0) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, School } from '../../lib/supabase';
 import { toast } from 'sonner';
+import imageCompression from 'browser-image-compression';
 
 interface Banner {
     id: string;
@@ -92,14 +93,29 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
         toast.loading('Uploading banner...', { id: 'upload-banner' });
 
         try {
-            const fileExt = file.name.split('.').pop();
+            let fileToUpload: File | Blob = file;
+            let fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+
+            try {
+                const options = {
+                    maxSizeMB: 1,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    fileType: 'image/webp'
+                };
+                fileToUpload = await imageCompression(file, options);
+                fileExt = 'webp';
+            } catch (err) {
+                console.error("Compression error:", err);
+            }
+
             const fileName = `${selectedSchoolId}-${Date.now()}.${fileExt}`;
             const filePath = `banners/${fileName}`;
 
             // Upload image using the post_images bucket
             const { error: uploadError } = await supabase.storage
                 .from('post_images')
-                .upload(filePath, file);
+                .upload(filePath, fileToUpload);
 
             if (uploadError) throw uploadError;
 

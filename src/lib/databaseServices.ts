@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import imageCompression from 'browser-image-compression';
 
 /**
  * Inserts the provided JSON data into the 'merchant_product_categories' table.
@@ -29,7 +30,24 @@ export async function insertMerchantProductCategories(categoriesData: Array<{ na
 
 // Reusable function to handle image upload, inspired by ProductGallery
 export const uploadImageToSupabase = async (file, uniqueId: string, bucketName: string, folderName?: string) => {
-  const fileExt = file.name.split('.').pop();
+  let fileToUpload = file;
+  let fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+
+  if (file.type.startsWith('image/')) {
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: 'image/webp'
+      };
+      fileToUpload = await imageCompression(file, options);
+      fileExt = 'webp';
+    } catch (error) {
+      console.error('Error compressing image:', error);
+    }
+  }
+
   // Ensure unique file name to prevent conflicts
   const fileName = `${uniqueId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `${folderName ? folderName + '/' : ''}${fileName}`;
@@ -37,11 +55,11 @@ export const uploadImageToSupabase = async (file, uniqueId: string, bucketName: 
   // Upload file to Supabase storage
   const { error: uploadError } = await supabase.storage
     .from(bucketName)
-    .upload(filePath, file);
+    .upload(filePath, fileToUpload);
 
   if (uploadError) {
+    console.error('Error uploading image:', uploadError);
     throw new Error(`Error uploading image: ${uploadError.message}`);
-    console.log('Error uploading image:', uploadError);
   }
 
 

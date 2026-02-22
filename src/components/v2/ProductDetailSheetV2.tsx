@@ -5,10 +5,6 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { supabase } from '../../lib/supabase';
-import { getUserId } from '../../hooks/useTracking';
-import { toggleProductLike, getProductLikeInfo } from '../../lib/merchantAnalytics';
-import { toast } from 'sonner';
 
 interface ProductDetailSheetV2Props {
     isOpen: boolean;
@@ -20,11 +16,9 @@ interface ProductDetailSheetV2Props {
 export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     isOpen,
     onClose,
-    product,
-    isAdmin
+    product
 }) => {
     const controls = useAnimation();
-    const [likeInfo, setLikeInfo] = React.useState({ likeCount: 0, isLiked: false });
     const [selectedImageIndex, setSelectedImageIndex] = React.useState<number | null>(null);
 
     // Prevent body scroll when image viewer is open
@@ -42,11 +36,12 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     useEffect(() => {
         if (isOpen && product?.id) {
             controls.start({ y: 0 });
-            // Fetch real like info
-            getProductLikeInfo(product.id).then(setLikeInfo);
+            // Fetch real like info (commented out per request)
+            // getProductLikeInfo(product.id).then(setLikeInfo);
         }
     }, [isOpen, controls, product?.id]);
 
+    /*
     const handleToggleLike = async () => {
         if (!product?.id) return;
 
@@ -69,6 +64,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
             toast.error('Failed to update like');
         }
     };
+    */
 
     if (!isOpen) return null;
 
@@ -346,7 +342,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                         drag={window.innerWidth < 1024 ? "x" : false}
                         dragConstraints={{ left: 0, right: 0 }}
                         dragElastic={0.8}
-                        onDragEnd={(_, info) => {
+                        onDragEnd={(_e: any, info: any) => {
                             if (info.offset.x < -50 && selectedImageIndex < productImages.length - 1) {
                                 setSelectedImageIndex(selectedImageIndex + 1);
                             } else if (info.offset.x > 50 && selectedImageIndex > 0) {

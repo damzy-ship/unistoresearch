@@ -3,16 +3,32 @@ import { Loader, CheckCircle, AlertCircle, Image, X, Search } from 'lucide-react
 import { Product, supabase } from '../lib/supabase';
 import { useTheme } from '../hooks/useTheme';
 import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
+import imageCompression from 'browser-image-compression';
 
 // Reusable functions from your original component
 const uploadImageToSupabase = async (file, merchantId) => {
-    const fileExt = file.name.split('.').pop();
+    let fileToUpload = file;
+    let fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+
+    try {
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: 'image/webp'
+        };
+        fileToUpload = await imageCompression(file, options);
+        fileExt = 'webp';
+    } catch (err) {
+        console.error("Compression error:", err);
+    }
+
     const fileName = `${merchantId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `product-images/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, file);
+        .upload(filePath, fileToUpload);
 
     if (uploadError) {
         throw new Error(`Error uploading image: ${uploadError.message}`);

@@ -233,7 +233,7 @@ export const HostelHomePageV2: React.FC = () => {
                 </button>
             </div>
             {/* Safety Banner */}
-            <section className="p-4 pt-6">
+            {/* <section className="p-4 pt-6">
                 <div className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 border border-primary/10 dark:border-primary/20 rounded-[2rem] p-5 flex gap-5 items-center shadow-sm backdrop-blur-3xl group">
                     <div className="absolute -right-8 -top-8 text-primary/5 transform rotate-12 group-hover:rotate-0 transition-transform duration-700">
                         <span className="material-symbols-outlined text-8xl">verified_user</span>
@@ -248,7 +248,7 @@ export const HostelHomePageV2: React.FC = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Live Requests */}
             <section className="py-2">
