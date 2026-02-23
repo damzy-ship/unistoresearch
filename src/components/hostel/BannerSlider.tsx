@@ -52,34 +52,57 @@ export default function BannerSlider({ slides, interval = 5000 }: BannerSliderPr
                     {/* Content */}
                     <div className="absolute bottom-0 left-0 w-full h-full p-8 md:p-12 flex flex-col justify-center">
                         <div className="max-w-xl">
-                            {slides[currentIndex].subtitle && (
-                                <motion.span
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="inline-block px-3 py-1 mb-4 rounded-full bg-orange-600 text-white text-xs font-bold tracking-wider uppercase"
-                                >
-                                    Hostel Special
-                                </motion.span>
-                            )}
+                            {(() => {
+                                const subtitle = slides[currentIndex].subtitle || '';
+                                let promoType: 'seller' | 'product' | null = null;
+                                let cleanSubtitle = subtitle;
 
-                            <motion.h2
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.3 }}
-                                className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg"
-                            >
-                                {slides[currentIndex].title}
-                            </motion.h2>
+                                if (subtitle.startsWith('[PROMO:seller]')) {
+                                    promoType = 'seller';
+                                    cleanSubtitle = subtitle.replace('[PROMO:seller]', '');
+                                } else if (subtitle.startsWith('[PROMO:product]')) {
+                                    promoType = 'product';
+                                    cleanSubtitle = subtitle.replace('[PROMO:product]', '');
+                                }
 
-                            <motion.p
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.4 }}
-                                className="text-sm md:text-lg text-gray-200 font-medium mb-8 max-w-md drop-shadow-md"
-                            >
-                                {slides[currentIndex].subtitle}
-                            </motion.p>
+                                return (
+                                    <>
+                                        {(promoType || slides[currentIndex].subtitle) && (
+                                            <motion.span
+                                                initial={{ y: 20, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                transition={{ delay: 0.2 }}
+                                                className={`inline-block px-3 py-1 mb-4 rounded-full text-white text-[10px] font-black tracking-widest uppercase shadow-lg ${promoType === 'seller' ? 'bg-gradient-to-r from-emerald-500 to-teal-500' :
+                                                        promoType === 'product' ? 'bg-gradient-to-r from-blue-500 to-indigo-500' :
+                                                            'bg-orange-600'
+                                                    }`}
+                                            >
+                                                {promoType === 'seller' ? 'Seller of the Week' :
+                                                    promoType === 'product' ? 'Product of the Week' :
+                                                        'Hostel Special'}
+                                            </motion.span>
+                                        )}
+
+                                        <motion.h2
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.3 }}
+                                            className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg"
+                                        >
+                                            {slides[currentIndex].title}
+                                        </motion.h2>
+
+                                        <motion.p
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.4 }}
+                                            className="text-sm md:text-lg text-gray-200 font-medium mb-8 max-w-md drop-shadow-md"
+                                        >
+                                            {cleanSubtitle}
+                                        </motion.p>
+                                    </>
+                                );
+                            })()}
 
                             {/* Desktop Buttons - Hidden on Mobile */}
                             <motion.div

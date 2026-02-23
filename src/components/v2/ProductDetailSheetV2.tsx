@@ -24,6 +24,12 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     const controls = useAnimation();
     const [selectedImageIndex, setSelectedImageIndex] = React.useState<number | null>(null);
 
+    useEffect(() => {
+        if (isOpen) {
+            console.log('[ProductDetailSheetV2] Opened. isAdmin prop:', isAdmin);
+        }
+    }, [isOpen, isAdmin]);
+
     // Prevent body scroll when image viewer is open
     useEffect(() => {
         if (selectedImageIndex !== null) {
@@ -164,10 +170,11 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 <button
                                     onClick={async (e) => {
                                         e.stopPropagation();
+                                        console.log('[ProductDetailSheetV2] Delete clicked. isAdmin:', isAdmin);
                                         if (!confirm('Are you sure you want to delete this product?')) return;
 
                                         const { error } = await supabase
-                                            .from('merchant_products')
+                                            .from('hostel_product_updates')
                                             .delete()
                                             .eq('id', product.id);
 

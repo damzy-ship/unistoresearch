@@ -22,6 +22,7 @@ import UserMenu from './components/UserMenu';
 import { HostelHomePageV2 } from './pages/v2/HostelHomePageV2';
 import { ProfilePageV2 } from './pages/v2/ProfilePageV2';
 import { OrdersPageV2 } from './pages/v2/OrdersPageV2';
+import { ActivityPageV2 } from './pages/v2/ActivityPageV2';
 import { PaymentsPageV2 } from './pages/v2/PaymentsPageV2';
 import { UpdatePasswordPageV2 } from './pages/v2/UpdatePasswordPageV2';
 // import { useHostelMode } from './hooks/useHostelMode';
@@ -45,6 +46,7 @@ function AppContent({ currentTheme }: { currentTheme: any }) {
     pathname === '/hostel' ||
     pathname === '/profile' ||
     pathname === '/orders' ||
+    pathname === '/activity' ||
     pathname === '/payments' ||
     pathname === '/update-password' ||
     pathname.startsWith('/v2/');
@@ -79,6 +81,7 @@ function AppContent({ currentTheme }: { currentTheme: any }) {
           <Route path="/categories/:categoryId/products" element={<CategoryProductsPage />} />
           <Route path="/update-password" element={<UpdatePasswordPageV2 />} />
           <Route path="/orders" element={<OrdersPageV2 />} />
+          <Route path="/activity" element={<ActivityPageV2 />} />
           <Route path="/payments" element={<PaymentsPageV2 />} />
           {/* Redirect legacy /v2 paths to root */}
           <Route path="/v2/hostel" element={<Navigate to="/hostel" replace />} />

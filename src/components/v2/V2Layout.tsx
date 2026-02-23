@@ -6,12 +6,13 @@ import { CreateActionSheetV2 } from './CreateActionSheetV2';
 import { V2Sidebar } from './V2Sidebar';
 import { V2DesktopHeader } from './V2DesktopHeader';
 import { V2ActivitySidebar } from './V2ActivitySidebar';
+import { MobileActivityToast } from './MobileActivityToast';
 import { useTheme } from '../../hooks/useTheme.tsx';
 import { supabase, UniqueVisitor, getSafeSession } from '../../lib/supabase';
 
 interface V2LayoutProps {
     children: React.ReactNode;
-    activeTab?: 'home' | 'orders' | 'messages' | 'profile';
+    activeTab?: 'home' | 'orders' | 'activity' | 'profile';
     hideBottomNav?: boolean;
     selectedCategory?: string;
     onCategorySelect?: (category: string) => void;
@@ -39,20 +40,25 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     const [hostelMode, setHostelMode] = useState(true);
     const navigate = useNavigate();
     const [isFabOpen, setIsFabOpen] = useState(false);
+    const [activeNotification, setActiveNotification] = useState<any>(null);
     const { currentTheme, changeTheme } = useTheme();
 
     const isDark = currentTheme.isDark;
 
-    useEffect(() => {
-        let isInitialCheckDone = false;
+    const visitorRef = React.useRef<UniqueVisitor | null>(null);
+    const isInitialCheckDone = React.useRef(false);
 
+    useEffect(() => {
         const syncUser = async (session: any) => {
             const userId = session?.user?.id;
             if (!userId) {
                 setCurrentVisitor(null);
+                visitorRef.current = null;
                 setUserIsAuthenticated(false);
-                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session: null, visitor: null } }));
-                if (activeTab === 'profile' || activeTab === 'orders' || activeTab === 'messages') {
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session: null, visitor: null } }));
+                }, 0);
+                if (activeTab === 'profile' || activeTab === 'orders' || activeTab === 'activity') {
                     navigate('/hostel');
                 }
                 return;
@@ -61,7 +67,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             try {
                 setUserIsAuthenticated(true);
 
-                // Fetch visitor with timeout to prevent hanging the app if DB is slow
+                // Fetch visitor with timeout
                 const visitorPromise = supabase
                     .from('unique_visitors')
                     .select('*, hostels(*), schools(*)')
@@ -77,33 +83,38 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                 if (error) throw error;
 
                 if (visitor) {
+                    console.log('[V2Layout] visitor found:', visitor.full_name, 'is_admin:', visitor.is_admin);
                     setCurrentVisitor(visitor as unknown as UniqueVisitor);
+                    visitorRef.current = visitor as unknown as UniqueVisitor;
                 } else {
                     console.warn('[V2Layout] No visitor record found for auth user:', userId);
+                    setCurrentVisitor(null);
+                    visitorRef.current = null;
                 }
 
-                // ALWAYS DISPATCH to unblock children, even if visitor is null
+                // ALWAYS DISPATCH to unblock children
+                console.log('[V2Layout] Dispatching auth-state-changed with visitor:', visitor ? visitor.full_name : 'null');
                 window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: visitor || null } }));
             } catch (err) {
                 console.warn('[V2Layout] visitor sync failed or timed out:', err);
-                // Dispatch failure state to unblock children
                 window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: null } }));
             }
         };
 
         const initUser = async () => {
+            if (isInitialCheckDone.current) return;
             try {
                 const { data: { session } } = await getSafeSession();
-                if (session && !isInitialCheckDone) {
+                if (session) {
                     await syncUser(session);
-                } else if (!session) {
+                } else {
                     setUserIsAuthenticated(false);
                 }
             } catch (err) {
                 console.warn('[V2Layout] initUser failed:', err);
                 setUserIsAuthenticated(false);
             } finally {
-                isInitialCheckDone = true;
+                isInitialCheckDone.current = true;
             }
         };
 
@@ -118,6 +129,13 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
             }
         });
 
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []); // Run once on mount
+
+    // Separate effect for global window events to avoid loop
+    useEffect(() => {
         const handleTriggerAction = (e: any) => {
             const { mode } = e.detail || { mode: 'request' };
             handleActionClick(mode);
@@ -125,15 +143,62 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
         const handleOpenAuth = () => setIsAuthOpen(true);
 
+        const handleRequestState = () => {
+            console.log('[V2Layout] request-auth-state received. currentVisitor from ref:', visitorRef.current?.full_name);
+            getSafeSession().then(({ data: { session } }) => {
+                window.dispatchEvent(new CustomEvent('auth-state-changed', {
+                    detail: { session, visitor: visitorRef.current }
+                }));
+            });
+        };
+
         window.addEventListener('trigger-v2-action', handleTriggerAction);
         window.addEventListener('open-auth-modal', handleOpenAuth);
+        window.addEventListener('request-auth-state', handleRequestState);
 
         return () => {
-            subscription.unsubscribe();
             window.removeEventListener('trigger-v2-action', handleTriggerAction);
             window.removeEventListener('open-auth-modal', handleOpenAuth);
+            window.removeEventListener('request-auth-state', handleRequestState);
         };
-    }, [userIsAuthenticated]);
+    }, [userIsAuthenticated]); // Minimal dependencies
+
+    // Realtime Activity Notifications for Mobile
+    useEffect(() => {
+        const channel = supabase
+            .channel('global_v2_activity')
+            .on('postgres_changes' as any, {
+                event: 'INSERT',
+                table: 'hostel_product_updates'
+            }, async (payload: any) => {
+                // Fetch full info for the toast
+                const { data } = await supabase
+                    .from('hostel_product_updates')
+                    .select(`
+                        id,
+                        post_description,
+                        post_type,
+                        unique_visitors:actual_user_id (
+                            full_name,
+                            profile_picture,
+                            brand_name
+                        )
+                    `)
+                    .eq('id', payload.new.id)
+                    .maybeSingle();
+
+                if (data) {
+                    setActiveNotification(data);
+                    // Clear after 6 seconds
+                    setTimeout(() => setActiveNotification(null), 6000);
+                }
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
 
     const toggleTheme = () => {
         changeTheme(isDark ? 'default' : 'dark');
@@ -170,7 +235,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
         }
     }, []);
 
-    const handleTabChange = (tab: 'home' | 'orders' | 'messages' | 'profile') => {
+    const handleTabChange = (tab: 'home' | 'orders' | 'activity' | 'profile') => {
         if (tab === 'home') {
             navigate('/hostel');
             return;
@@ -184,7 +249,8 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
         if (userIsAuthenticated === null) return;
 
         if (tab === 'profile') navigate('/profile');
-        if (tab === 'orders' || tab === 'messages') navigate('/orders');
+        if (tab === 'orders') navigate('/orders');
+        if (tab === 'activity') navigate('/activity');
     };
 
     return (
@@ -324,11 +390,11 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                                 </button>
 
                                 <button
-                                    onClick={() => handleTabChange('messages')}
-                                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'messages' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
+                                    onClick={() => handleTabChange('activity')}
+                                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'activity' ? 'text-primary' : 'text-zinc-400 dark:text-zinc-500 hover:text-primary'}`}
                                 >
-                                    <span className={`material-symbols-outlined text-2xl ${activeTab === 'messages' ? 'fill-1 scale-110' : ''}`}>forum</span>
-                                    <span className="text-[10px] font-bold">Inbox</span>
+                                    <span className={`material-symbols-outlined text-2xl ${activeTab === 'activity' ? 'fill-1 scale-110' : ''}`}>notifications</span>
+                                    <span className="text-[10px] font-bold">Activity</span>
                                 </button>
 
                                 <button
@@ -367,6 +433,19 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
                 }}
             />
+
+            <AnimatePresence>
+                {activeNotification && (
+                    <MobileActivityToast
+                        activity={activeNotification}
+                        onClose={() => setActiveNotification(null)}
+                        onClick={() => {
+                            handleTabChange('activity');
+                            setActiveNotification(null);
+                        }}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 };

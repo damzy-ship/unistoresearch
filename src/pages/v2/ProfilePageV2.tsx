@@ -25,52 +25,25 @@ export const ProfilePageV2: React.FC = () => {
     const { feed, loadFeed, setFeed } = useHostelFeed(null, 'all', 'all', true, user);
 
     useEffect(() => {
-        let isMounted = true;
+        const handleAuth = (e: any) => {
+            console.log('[ProfilePageV2] auth-state-changed received:', e.detail);
+            const visitor = e.detail?.visitor;
+            setUser(visitor || null);
+            setLoading(false);
 
-        const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!isMounted) return;
-
-            if (!session) {
-                // Wait a bit or check getUser specifically to be sure
-                const { data: { user: authUser } } = await supabase.auth.getUser();
-                console.log('[ProfilePageV2] checkAuth getUser:', !!authUser);
-                if (!authUser && isMounted) {
-                    toast.error('Please sign in to view your profile');
-                    navigate('/v2/hostel');
-                    return;
-                }
-            }
-
-            const activeUser = session?.user || (await supabase.auth.getUser()).data.user;
-            if (activeUser && isMounted) {
-                const { data: visitor } = await supabase
-                    .from('unique_visitors')
-                    .select('*, hostels(*), schools(*)')
-                    .eq('auth_user_id', activeUser.id)
-                    .single();
-
-                if (isMounted) {
-                    setUser(visitor as unknown as UniqueVisitor);
-                    setLoading(false);
-                }
-            }
-        };
-
-        checkAuth();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (!session && isMounted && event === 'SIGNED_OUT') {
+            if (!visitor && !e.detail?.session) {
+                // If definitely not logged in, redirect
+                console.log('[ProfilePageV2] No user found, redirecting to hostel');
                 navigate('/hostel');
-            } else if (session && isMounted) {
-                checkAuth();
             }
-        });
-
-        return () => {
-            isMounted = false;
-            subscription.unsubscribe();
         };
+
+        window.addEventListener('auth-state-changed', handleAuth);
+
+        // Proactively request current state
+        window.dispatchEvent(new CustomEvent('request-auth-state'));
+
+        return () => window.removeEventListener('auth-state-changed', handleAuth);
     }, [navigate]);
 
     useEffect(() => {

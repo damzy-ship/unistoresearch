@@ -106,3 +106,18 @@ CREATE TABLE public.unique_visitors (
   CONSTRAINT unique_visitors_pkey PRIMARY KEY (id),
   CONSTRAINT unique_visitors_school_id_fkey FOREIGN KEY (school_id) REFERENCES public.schools(id)
 );
+
+
+
+- [ ] Seller of the week
+- [ ] Banner change
+- [ ] Activities toast and activities page
+- [ ] Add the categories and fix the AI 
+
+
+we have quite the number of things to work on actually first of we are brainstroming how to get things done and all.
+Like doing a seller of the week kina but we don't wanna disrupt the Ui we are thinign of doing it with the bamer or so and all.
+As to why as also have banner change in the lsit of things to do right now so we need to ensure tht we can do that for stuff like any new idea we come up with lie seller of the week prduct of the wek ad all!
+
+So also the hostel activity we need to work o it for mobile, we are not showing it on mobile actually!
+And this is a problem, now we cannt just add it lie that we need a dynamc way to show it. So what i proposed was basically like a toast but a custom one that we can show it on mobile so it's gonna have like a toast witht he nae the activity and the time you get but in a nci for its swipable and ccilable and all! So they can se the detauks and we'd now change the bottom bar from inbox to activity so when they clcik ont he tpast theh can see more activities on the activity tabs actually this is the Ui concept i was able to come up but I wanna cnfirm that by you and veofy its the best method!

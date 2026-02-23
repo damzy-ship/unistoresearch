@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, UniqueVisitor } from '../../lib/supabase';
 
 interface V2SidebarProps {
-    activeTab: 'home' | 'orders' | 'messages' | 'profile';
+    activeTab: 'home' | 'orders' | 'activity' | 'profile';
     hostelMode: boolean;
     setHostelMode: (mode: boolean) => void;
     onActionClick: (mode: 'request' | 'post') => void;
-    onTabChange: (tab: 'home' | 'orders' | 'messages' | 'profile') => void;
+    onTabChange: (tab: 'home' | 'orders' | 'activity' | 'profile') => void;
     visitor?: UniqueVisitor | null;
     isAuthenticated?: boolean;
     selectedCategory?: string;
@@ -27,7 +27,7 @@ export const V2Sidebar: React.FC<V2SidebarProps> = ({
 }) => {
     const navItems = [
         { id: 'home', label: 'Home', icon: 'grid_view' },
-        { id: 'messages', label: 'Live Requests', icon: 'campaign' },
+        { id: 'activity', label: 'Activity', icon: 'notifications' },
         { id: 'orders', label: 'Orders', icon: 'shopping_cart' },
         { id: 'profile', label: 'Profile', icon: 'person' },
     ];

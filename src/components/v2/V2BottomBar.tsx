@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface V2BottomBarProps {
-    activeTab: 'home' | 'orders' | 'messages' | 'profile';
-    onTabChange: (tab: 'home' | 'orders' | 'messages' | 'profile') => void;
+    activeTab: 'home' | 'orders' | 'activity' | 'profile';
+    onTabChange: (tab: 'home' | 'orders' | 'activity' | 'profile') => void;
     onPostClick: () => void;
     onCartClick: () => void;
 }
@@ -65,13 +65,13 @@ export const V2BottomBar: React.FC<V2BottomBarProps> = ({
                     </div>
                 </div>
 
-                {/* Messages */}
+                {/* Activity */}
                 <button
-                    onClick={() => onTabChange('messages')}
-                    className={`flex flex-col items-center gap-0.5 px-3 transition-colors ${activeTab === 'messages' ? 'text-primary' : 'text-zinc-600 dark:text-zinc-300 opacity-40'}`}
+                    onClick={() => onTabChange('activity')}
+                    className={`flex flex-col items-center gap-0.5 px-3 transition-colors ${activeTab === 'activity' ? 'text-primary' : 'text-zinc-600 dark:text-zinc-300 opacity-40'}`}
                 >
-                    <span className={`material-symbols-outlined ${activeTab === 'messages' ? 'fill-1' : ''}`}>chat_bubble</span>
-                    <span className="text-[10px] font-medium">Messages</span>
+                    <span className={`material-symbols-outlined ${activeTab === 'activity' ? 'fill-1' : ''}`}>notifications</span>
+                    <span className="text-[10px] font-medium">Activity</span>
                 </button>
 
                 {/* Profile */}

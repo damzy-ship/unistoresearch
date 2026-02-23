@@ -64,6 +64,10 @@ export const OrdersPageV2: React.FC = () => {
         };
 
         window.addEventListener('auth-state-changed', handleAuthChange);
+
+        // Proactively request current state
+        window.dispatchEvent(new CustomEvent('request-auth-state'));
+
         return () => window.removeEventListener('auth-state-changed', handleAuthChange);
     }, []);
 

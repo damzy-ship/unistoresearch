@@ -55,8 +55,9 @@ export const HostelHomePageV2: React.FC = () => {
 
     useEffect(() => {
         const handleAuthChange = (e: any) => {
-            console.log('[HostelHomePageV2] auth-state-changed:', e.detail);
+            console.log('[HostelHomePageV2] auth-state-changed received:', e.detail);
             const visitor = e.detail?.visitor;
+            if (visitor) console.log('[HostelHomePageV2] visitor name:', visitor.full_name, 'is_admin:', visitor.is_admin);
             setCurrentVisitor(visitor || null);
 
             // AUTO-SYNC SCHOOL ID: If current user has a school and we don't have one selected,
@@ -71,6 +72,11 @@ export const HostelHomePageV2: React.FC = () => {
             loadFeed();
         };
         window.addEventListener('auth-state-changed', handleAuthChange);
+
+        // Proactively request current state in case we missed it
+        console.log('[HostelHomePageV2] Dispatching request-auth-state');
+        window.dispatchEvent(new CustomEvent('request-auth-state'));
+
         return () => window.removeEventListener('auth-state-changed', handleAuthChange);
     }, [selectedSchoolId, selectedSchoolName, loadFeed]);
 

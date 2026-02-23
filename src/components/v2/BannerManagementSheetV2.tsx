@@ -33,6 +33,7 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
     // Form states for new banner
     const [newTitle, setNewTitle] = useState('');
     const [newSubtitle, setNewSubtitle] = useState('');
+    const [promotionType, setPromotionType] = useState<'none' | 'seller' | 'product'>('none');
 
     useEffect(() => {
         if (isOpen) {
@@ -123,6 +124,10 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                 .from('post_images')
                 .getPublicUrl(filePath);
 
+            const encodedSubtitle = promotionType !== 'none'
+                ? `[PROMO:${promotionType}]${newSubtitle}`
+                : newSubtitle;
+
             // Create record
             const { error: insertError } = await supabase
                 .from('school_banners')
@@ -130,7 +135,7 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                     school_id: selectedSchoolId,
                     image_url: publicUrl,
                     title: newTitle || null,
-                    subtitle: newSubtitle || null,
+                    subtitle: encodedSubtitle || null,
                     is_active: true
                 });
 
@@ -139,6 +144,7 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
             toast.success('Banner added successfully', { id: 'upload-banner' });
             setNewTitle('');
             setNewSubtitle('');
+            setPromotionType('none');
             fetchBanners(selectedSchoolId); // Refresh
         } catch (error: any) {
             toast.error(error.message || 'Failed to upload banner', { id: 'upload-banner' });
@@ -246,6 +252,19 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                                         onChange={(e) => setNewSubtitle(e.target.value)}
                                         className="w-full bg-zinc-50 dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl px-4 py-2 text-sm text-[#1a2a40] dark:text-white outline-none focus:border-primary"
                                     />
+
+                                    <div className="flex gap-2">
+                                        {(['none', 'seller', 'product'] as const).map((type) => (
+                                            <button
+                                                key={type}
+                                                type="button"
+                                                onClick={() => setPromotionType(type)}
+                                                className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${promotionType === type ? 'bg-primary text-white border-primary' : 'bg-zinc-50 dark:bg-black/20 text-zinc-400 border-black/5 dark:border-white/5 hover:border-primary/50'}`}
+                                            >
+                                                {type === 'none' ? 'Standard' : type === 'seller' ? 'Seller of Week' : 'Product of Week'}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="relative border-2 border-dashed border-zinc-300 dark:border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-primary transition-colors cursor-pointer group">
@@ -287,8 +306,18 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                                                 </div>
                                                 <div className="p-4 flex items-center justify-between">
                                                     <div className="flex-1 min-w-0 pr-4">
-                                                        <p className="font-bold text-sm text-[#1a2a40] dark:text-white truncate">{banner.title || 'Untitled Banner'}</p>
-                                                        <p className="text-xs text-zinc-500 truncate">{banner.subtitle}</p>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <p className="font-bold text-sm text-[#1a2a40] dark:text-white truncate">{banner.title || 'Untitled Banner'}</p>
+                                                            {banner.subtitle?.startsWith('[PROMO:seller]') && (
+                                                                <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">Seller</span>
+                                                            )}
+                                                            {banner.subtitle?.startsWith('[PROMO:product]') && (
+                                                                <span className="px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest border border-blue-500/20">Product</span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-zinc-500 truncate">
+                                                            {banner.subtitle?.replace(/\[PROMO:(seller|product)\]/, '') || ''}
+                                                        </p>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <button

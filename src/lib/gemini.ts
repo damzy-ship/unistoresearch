@@ -17,6 +17,46 @@ export interface CategoryGenerationResult {
   error?: string;
 }
 
+/**
+ * Robustly parse JSON from AI response, handling markdown backticks and noise
+ */
+function parseJSONResponse(text: string): any {
+  try {
+    // If it's already clean JSON
+    return JSON.parse(text);
+  } catch (e) {
+    // Try to extract JSON from markdown code blocks
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (jsonMatch && jsonMatch[1]) {
+      try {
+        return JSON.parse(jsonMatch[1]);
+      } catch (e2) {
+        // Fall through
+      }
+    }
+
+    // Last ditch effort: find first '[' or '{' and last ']' or '}'
+    const startIdx = Math.min(
+      text.indexOf('{') === -1 ? Infinity : text.indexOf('{'),
+      text.indexOf('[') === -1 ? Infinity : text.indexOf('[')
+    );
+    const endIdx = Math.max(
+      text.lastIndexOf('}'),
+      text.lastIndexOf(']')
+    );
+
+    if (startIdx !== Infinity && endIdx !== -1 && endIdx > startIdx) {
+      try {
+        return JSON.parse(text.substring(startIdx, endIdx + 1));
+      } catch (e3) {
+        // Fall through
+      }
+    }
+
+    throw new Error('Could not parse JSON from response: ' + text.substring(0, 100) + '...');
+  }
+}
+
 export interface CategoryMatchResult {
   categories: string[];
   success: boolean;
@@ -71,7 +111,9 @@ export async function generateProductCategories(sellerDescription: string): Prom
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash'
+    }, { apiVersion: 'v1' });
 
     const prompt = `
 Based on the following seller description, generate relevant product categories that this seller might offer.
@@ -79,58 +121,30 @@ Based on the following seller description, generate relevant product categories 
 Seller Description: "${sellerDescription}"
 
 Requirements:
-- Return ONLY a JSON array of strings
+- Return a JSON array of strings
 - Each category should be 1-3 words maximum
 - Categories should be general product types (e.g., "Electronics", "Clothing", "Books", "Food Items")
 - Maximum 5 categories
 - Use title case (e.g., "Mobile Phones" not "mobile phones")
 - Be specific but not overly narrow
-- Don't generate categories to general like accessories, rather be more specific like, hair accessories, tech accessories, fashion accessories.
+- Don't generate categories too general like accessories, rather be more specific like, hair accessories, tech accessories, fashion accessories.
 
-Example response format:
-["Electronics", "Mobile Accessories", "Gadgets"]
-
-Generate categories now:`;
+Example response:
+["Electronics", "Mobile Accessories", "Gadgets"]`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text().trim();
+    const categories = parseJSONResponse(response.text());
 
-    // Extract JSON from markdown code blocks if present
-    let jsonText = text;
-    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (codeBlockMatch) {
-      jsonText = codeBlockMatch[1].trim();
-    } else if (text.startsWith('```') && text.endsWith('```')) {
-      jsonText = text.slice(3, -3).trim();
-    }
-
-    // Try to parse the JSON response
-    let categories: string[];
-    try {
-      categories = JSON.parse(jsonText);
-
-      if (!Array.isArray(categories) || !categories.every(cat => typeof cat === 'string')) {
-        throw new Error('Invalid response format');
-      }
-
-      categories = categories
-        .map(cat => cat.trim())
-        .filter(cat => cat.length > 0)
-        .slice(0, 5);
-
-    } catch (parseError) {
-      console.error('Failed to parse Gemini response:', jsonText);
-      console.error('Parse error:', parseError);
-      return {
-        categories: [],
-        success: false,
-        error: 'Failed to parse AI response'
-      };
+    if (!Array.isArray(categories) || !categories.every(cat => typeof cat === 'string')) {
+      throw new Error('Invalid response format');
     }
 
     return {
-      categories,
+      categories: categories
+        .map(cat => cat.trim())
+        .filter(cat => cat.length > 0)
+        .slice(0, 5),
       success: true
     };
 
@@ -154,7 +168,9 @@ export async function generateCategoriesFromRequest(requestText: string): Promis
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash'
+    }, { apiVersion: 'v1' });
 
     const prompt = `
 You are a product categorization expert. Given a user's product request, generate the most likely product categories that would contain the items they're looking for.
@@ -162,61 +178,29 @@ You are a product categorization expert. Given a user's product request, generat
 User Request: "${requestText}"
 
 Requirements:
-- Return ONLY a JSON array of category names that represent what the user is looking for
-- Generate categories based on the request content, not from any predefined list
+- Return a JSON array of category names
 - Maximum 5 categories
 - Each category should be 1-3 words maximum
 - Use title case (e.g., "Mobile Phones" not "mobile phones")
 - Be specific and relevant to the request
 - Order by relevance (most relevant first)
-- If the request is unclear or inappropriate, return an empty array
-- Don't generate categories to general like accessories, rather be more specific like, hair accessories, tech accessories, fashion accessories.
 
-Example response format:
-For request "I need a laptop for school":
-["Laptops", "Electronics", "Computers"]
-
-Generate categories for this request:`;
+Example response for "I need a laptop for school":
+["Laptops", "Electronics", "Computers"]`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text().trim();
+    const categories = parseJSONResponse(response.text());
 
-    // Extract JSON from markdown code blocks if present
-    let jsonText = text;
-    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (codeBlockMatch) {
-      jsonText = codeBlockMatch[1].trim();
-    } else if (text.startsWith('```') && text.endsWith('```')) {
-      jsonText = text.slice(3, -3).trim();
-    }
-
-    // Try to parse the JSON response
-    let categories: string[];
-    try {
-      categories = JSON.parse(jsonText);
-
-      if (!Array.isArray(categories) || !categories.every(cat => typeof cat === 'string')) {
-        throw new Error('Invalid response format');
-      }
-
-      categories = categories
-        .map(cat => cat.trim())
-        .filter(cat => cat.length > 0)
-        .slice(0, 5);
-
-    } catch (parseError) {
-      console.error('Parse error:', parseError);
-      console.error('Failed to parse Gemini response for category generation:', jsonText);
-      return {
-        categories: [],
-        success: false,
-        error: 'Failed to parse AI response'
-      };
+    if (!Array.isArray(categories) || !categories.every(cat => typeof cat === 'string')) {
+      throw new Error('Invalid response format');
     }
 
     return {
-      categories,
+      categories: categories
+        .map(cat => cat.trim())
+        .filter(cat => cat.length > 0)
+        .slice(0, 5),
       success: true
     };
 
@@ -263,58 +247,33 @@ async function findSemanticMatches(generatedCategories: string[], catalogCategor
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash'
+    }, { apiVersion: 'v1' });
 
     const prompt = `
-You are a semantic matching expert. Given generated categories and a catalog of existing categories, find semantic matches.
+Find categories from the catalog that are semantically similar to the generated categories.
 
 Generated Categories: ${JSON.stringify(generatedCategories)}
 Catalog Categories: ${JSON.stringify(catalogCategories)}
 
-Find categories from the catalog that are semantically similar to the generated categories, even if they don't share exact words.
-
 Requirements:
-- Return ONLY a JSON array of category names from the catalog
-- Only include categories that are semantically related but NOT exact word matches
-- Maximum 3 semantic matches
-- Focus on conceptual similarity (e.g., "Laptops" might semantically match "Computing Equipment")
+- Return a JSON array of category names from the catalog
+- Only include categories that are semantically related
+- Maximum 3 matches
 - Be conservative - only include strong semantic relationships
 
-Example:
-Generated: ["Laptops"]
-Catalog: ["Computing Equipment", "Tech Gadgets", "Office Supplies", "Books"]
-Response: ["Computing Equipment", "Tech Gadgets"]
-
-Return semantic matches:`;
+Example Response:
+["Computing Equipment", "Tech Gadgets"]`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text().trim();
+    let semanticMatches = parseJSONResponse(response.text());
 
-    let jsonText = text;
-    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (codeBlockMatch) {
-      jsonText = codeBlockMatch[1].trim();
-    } else if (text.startsWith('```') && text.endsWith('```')) {
-      jsonText = text.slice(3, -3).trim();
-    }
+    if (!Array.isArray(semanticMatches)) return [];
 
-    let semanticMatches: string[];
-    try {
-      semanticMatches = JSON.parse(jsonText);
-
-      if (!Array.isArray(semanticMatches) || !semanticMatches.every(cat => typeof cat === 'string')) {
-        return [];
-      }
-
-      // Validate that returned categories exist in catalog
-      semanticMatches = semanticMatches.filter(match => catalogCategories.includes(match));
-
-    } catch (parseError) {
-      console.error('Parse error:', parseError);
-      console.error('Failed to parse semantic matching response:', jsonText);
-      return [];
-    }
+    // Validate that returned categories exist in catalog
+    semanticMatches = semanticMatches.filter(match => catalogCategories.includes(match));
 
     console.log('Semantic matches found:', semanticMatches);
     return semanticMatches;
@@ -762,63 +721,34 @@ export async function extractProductInfoFromText(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash'
+    }, { apiVersion: 'v1' });
 
     const prompt = `
-Extract product information from the following title and description. Return ONLY a JSON object with the extracted information.
+Extract product information from the following title and description.
 
 Title: "${title}"
 Description: "${description}"
 
 Requirements:
-- Return ONLY a JSON object with these fields:
-  - price: number (extract price in NGN, if mentioned)
-  - location: string (extract location if mentioned, e.g., "Campus Hostel", "Block A")
-  - category: string (extract product category, e.g., "Electronics", "Clothing", "Books")
-  - contact_phone: string (extract phone number if mentioned)
-
-- If a field is not found, set it to null
-- Price should be a number (remove currency symbols)
-- Category should be 1-3 words maximum
-- Location should be specific but concise
-- Phone should be in format like "+234..." or "080..."
-
-Example response format:
-{
-  "price": 50000,
-  "location": "Campus Hostel Block A",
-  "category": "Electronics",
-  "contact_phone": null
-}
-
-Extract information now:`;
+- Return a JSON object with these fields:
+  - price: number (integer in NGN, null if not found)
+  - location: string (concise location, null if not found)
+  - category: string (1-3 words, null if not found)
+  - contact_phone: string (phone number, null if not found)`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text().trim();
+    const data = parseJSONResponse(response.text());
 
-    // Extract JSON from markdown code blocks if present
-    let jsonText = text;
-    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (codeBlockMatch) {
-      jsonText = codeBlockMatch[1].trim();
-    } else if (text.startsWith('```') && text.endsWith('```')) {
-      jsonText = text.slice(3, -3).trim();
-    }
-
-    try {
-      const result = JSON.parse(jsonText);
-      return {
-        price: typeof result.price === 'number' ? result.price : undefined,
-        location: typeof result.location === 'string' ? result.location : undefined,
-        category: typeof result.category === 'string' ? result.category : undefined,
-        contact_phone: typeof result.contact_phone === 'string' ? result.contact_phone : undefined,
-        success: true
-      };
-    } catch (e) {
-      console.error('Failed to parse extraction result:', e);
-      return { success: false, error: 'Failed to parse JSON' };
-    }
+    return {
+      price: typeof data.price === 'number' ? data.price : undefined,
+      location: typeof data.location === 'string' ? data.location : undefined,
+      category: typeof data.category === 'string' ? data.category : undefined,
+      contact_phone: typeof data.contact_phone === 'string' ? data.contact_phone : undefined,
+      success: true
+    };
 
   } catch (error) {
     console.error('Error identifying product info with Gemini:', error);
@@ -836,7 +766,7 @@ export async function extractPriceFromHostelPost(description: string): Promise<n
   if (!genAI) return null;
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }, { apiVersion: 'v1' });
 
     const prompt = `
     Extract the price from this text. Return ONLY the number.
@@ -866,7 +796,7 @@ export async function extractPriceFromHostelPost(description: string): Promise<n
 export async function categorizePost(post: string, mode: string = 'store'): Promise<string> {
   if (!genAI) return 'others'
 
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }, { apiVersion: 'v1' });
 
   // const post_description = await transformDescriptionForEmbedding(post);
 
@@ -968,13 +898,10 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
 
   try {
     const result = await generativeModel.generateContent({
-      contents: [{ role: 'user', parts: [{ text: categorizationPrompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json'
-      }
+      contents: [{ role: 'user', parts: [{ text: categorizationPrompt }] }]
     });
 
-    const categorizationData = JSON.parse(result.response.text());
+    const categorizationData = parseJSONResponse(result.response.text());
     console.log('Categorization result:', categorizationData.category);
     console.log('Available categories:', categories);
     // Validate that the returned category is in our list
@@ -994,7 +921,7 @@ export async function categorizePost(post: string, mode: string = 'store'): Prom
 export async function extractProductKeywordsFromDescription(description: string): Promise<string[]> {
   if (!genAI) return ['product'];
 
-  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const generativeModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }, { apiVersion: 'v1' });
 
   // Adjusted Prompt
   const extractionPrompt = `
@@ -1035,13 +962,10 @@ export async function extractProductKeywordsFromDescription(description: string)
 
   try {
     const result = await generativeModel.generateContent({
-      contents: [{ role: 'user', parts: [{ text: extractionPrompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json'
-      }
+      contents: [{ role: 'user', parts: [{ text: extractionPrompt }] }]
     });
 
-    const extractionData = JSON.parse(result.response.text());
+    const extractionData = parseJSONResponse(result.response.text());
 
     if (Array.isArray(extractionData.keywords)) {
       // Ensure all elements are strings and lowercased before returning
