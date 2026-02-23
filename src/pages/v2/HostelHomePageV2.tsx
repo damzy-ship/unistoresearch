@@ -112,60 +112,52 @@ export const HostelHomePageV2: React.FC = () => {
         loadFeed();
     }, [selectedSchoolId, selectedHostel, selectedCategory]);
 
-    useEffect(() => {
-        const handleRefresh = () => {
-            console.log('Refreshing hostel feed from event...');
-            loadFeed();
-        };
-        window.addEventListener('hostel-feed-refresh', handleRefresh);
-        return () => window.removeEventListener('hostel-feed-refresh', handleRefresh);
-    }, [loadFeed]);
-
-    useEffect(() => {
-        const fetchRealLiveRequests = async () => {
-            if (!selectedSchoolId) {
-                setRealLiveRequests([]);
-                return;
-            }
-            const { data } = await supabase
-                .from('hostel_product_updates')
-                .select(`
+    const fetchRealLiveRequests = React.useCallback(async () => {
+        if (!selectedSchoolId) {
+            setRealLiveRequests([]);
+            return;
+        }
+        const { data } = await supabase
+            .from('hostel_product_updates')
+            .select(`
+                id,
+                post_description,
+                post_images,
+                created_at,
+                post_category,
+                actual_user_id,
+                unique_visitors!inner (
                     id,
-                    post_description,
-                    post_images,
-                    created_at,
-                    post_category,
-                    actual_user_id,
-                    unique_visitors!inner (
-                        id,
-                        full_name,
-                        profile_picture,
-                        phone_number,
-                        room,
-                        is_hostel_merchant,
-                        hostel_id,
-                        hostels (id, name, school_id),
-                        schools (id, short_name),
-                        brand_name,
-                        school_id
-                    ),
-                    status,
-                    post_type,
-                    fulfilled,
-                    price,
-                    discount_price
-                `)
-                .eq('post_type', 'request')
-                .eq('unique_visitors.school_id', selectedSchoolId)
-                .or('fulfilled.is.null,fulfilled.eq.false')
-                .order('created_at', { ascending: false })
-                .limit(40);
+                    full_name,
+                    profile_picture,
+                    phone_number,
+                    room,
+                    is_hostel_merchant,
+                    hostel_id,
+                    hostels (id, name, school_id),
+                    schools (id, short_name),
+                    brand_name,
+                    school_id
+                ),
+                status,
+                post_type,
+                fulfilled,
+                price,
+                discount_price
+            `)
+            .eq('post_type', 'request')
+            .eq('unique_visitors.school_id', selectedSchoolId)
+            .or('fulfilled.is.null,fulfilled.eq.false')
+            .order('created_at', { ascending: false })
+            .limit(40);
 
-            if (data) {
-                console.log('Fetched realLiveRequests:', data.length, data);
-                setRealLiveRequests(data);
-            }
-        };
+        if (data) {
+            console.log('Fetched realLiveRequests:', data.length, data);
+            setRealLiveRequests(data);
+        }
+    }, [selectedSchoolId]);
+
+    useEffect(() => {
         fetchRealLiveRequests();
 
         // Realtime subscription for requests
@@ -184,7 +176,17 @@ export const HostelHomePageV2: React.FC = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [selectedSchoolId]);
+    }, [selectedSchoolId, fetchRealLiveRequests]);
+
+    useEffect(() => {
+        const handleRefresh = () => {
+            console.log('Refreshing hostel feed from event...');
+            loadFeed();
+            fetchRealLiveRequests();
+        };
+        window.addEventListener('hostel-feed-refresh', handleRefresh);
+        return () => window.removeEventListener('hostel-feed-refresh', handleRefresh);
+    }, [loadFeed, fetchRealLiveRequests]);
 
 
     const openProductDetail = (product: any) => {

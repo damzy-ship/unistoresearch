@@ -46,7 +46,7 @@ export const SchoolSelectionModalV2: React.FC<SchoolSelectionModalV2Props> = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={onClose}
+                        onClick={currentSchoolId ? onClose : undefined}
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                     />
 
@@ -64,12 +64,14 @@ export const SchoolSelectionModalV2: React.FC<SchoolSelectionModalV2Props> = ({
                                     <h2 className="text-2xl font-black text-[#1a2a40] dark:text-white tracking-tight">Select University</h2>
                                     <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">Showing active campuses</p>
                                 </div>
-                                <button
-                                    onClick={onClose}
-                                    className="w-10 h-10 rounded-full bg-white dark:bg-white/5 flex items-center justify-center text-zinc-400 hover:text-primary transition-colors border border-black/5 dark:border-white/10"
-                                >
-                                    <span className="material-symbols-outlined text-xl">close</span>
-                                </button>
+                                {currentSchoolId && (
+                                    <button
+                                        onClick={onClose}
+                                        className="w-10 h-10 rounded-full bg-white dark:bg-white/5 flex items-center justify-center text-zinc-400 hover:text-primary transition-colors border border-black/5 dark:border-white/10"
+                                    >
+                                        <span className="material-symbols-outlined text-xl">close</span>
+                                    </button>
+                                )}
                             </div>
 
                             {/* Search */}
@@ -96,8 +98,8 @@ export const SchoolSelectionModalV2: React.FC<SchoolSelectionModalV2Props> = ({
                                             key={school.id}
                                             onClick={() => onSelect(school.id)}
                                             className={`w-full p-4 rounded-[2rem] flex items-center gap-4 transition-all active:scale-98 ${currentSchoolId === school.id
-                                                    ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-102 ring-4 ring-primary/10'
-                                                    : 'bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 text-[#1a2a40] dark:text-white hover:bg-zinc-50 dark:hover:bg-white/10'
+                                                ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-102 ring-4 ring-primary/10'
+                                                : 'bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 text-[#1a2a40] dark:text-white hover:bg-zinc-50 dark:hover:bg-white/10'
                                                 }`}
                                         >
                                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${currentSchoolId === school.id ? 'bg-white/20' : 'bg-primary/10'}`}>
