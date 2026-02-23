@@ -52,6 +52,24 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
         onClose();
     };
 
+    const handleRecommendProduct = () => {
+        if (!currentVisitorId) {
+            window.dispatchEvent(new CustomEvent('open-auth-modal'));
+            return;
+        }
+
+        const phone = request?.unique_visitors?.phone_number;
+        if (!phone) {
+            toast.error('Requester phone number not available');
+            return;
+        }
+
+        const message = `Hi ${request.unique_visitors.full_name}, I have a recommendation for your request on Unistore: "${request.post_description || request.text || 'an item'}"`;
+        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        onClose();
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -140,41 +158,11 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                             </div>
 
                             <h3 className="text-lg font-bold text-[#1a2a40] dark:text-white mb-5 px-1">
-                                {isOwnerOrAdmin ? 'Manage your request' : 'How would you like to respond?'}
+                                {isOwner ? 'Manage your request' : (isAdmin ? 'Manage & Respond' : 'How would you like to respond?')}
                             </h3>
 
                             <div className="space-y-4">
-                                {isOwnerOrAdmin ? (
-                                    <button
-                                        onClick={async () => {
-                                            if (!confirm('Are you sure you want to delete your request?')) return;
-                                            const { supabase } = await import('../../lib/supabase');
-                                            const { error } = await supabase
-                                                .from('hostel_product_updates')
-                                                .delete()
-                                                .eq('id', request.id);
-                                            if (!error) {
-                                                alert('Request deleted');
-                                                onClose();
-                                                window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
-                                            } else {
-                                                alert('Failed to delete request');
-                                            }
-                                        }}
-                                        className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                                                <span className="material-symbols-outlined text-2xl">delete</span>
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-lg leading-tight text-white">Delete Request</p>
-                                                <p className="text-white/80 text-xs mt-1">Remove this from the live feed</p>
-                                            </div>
-                                        </div>
-                                        <span className="material-symbols-outlined text-xl">close</span>
-                                    </button>
-                                ) : (
+                                {!isOwner && (
                                     <>
                                         {/* Option 1: Sell */}
                                         <button
@@ -195,15 +183,7 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
 
                                         {/* Option 2: Recommend */}
                                         <button
-                                            onClick={() => {
-                                                if (!currentVisitorId) {
-                                                    window.dispatchEvent(new CustomEvent('open-auth-modal'));
-                                                    return;
-                                                }
-                                                // Handle recommend logic (can be expanded later)
-                                                toast.info('Feature coming shortly!');
-                                                onClose();
-                                            }}
+                                            onClick={handleRecommendProduct}
                                             className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/10 hover:scale-[1.02] active:scale-95 transition-all text-left shadow-sm mt-4"
                                         >
                                             <div className="flex items-center gap-4">
@@ -216,6 +196,72 @@ export const LiveRequestResponseSheetV2: React.FC<LiveRequestResponseSheetV2Prop
                                                 </div>
                                             </div>
                                             <span className="material-symbols-outlined text-zinc-400 text-xl">arrow_forward_ios</span>
+                                        </button>
+                                    </>
+                                )}
+
+                                {isOwnerOrAdmin && (
+                                    <>
+                                        {/* Admin/Owner: Mark as fulfilled */}
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm('Are you sure you want to mark this request as fulfilled?')) return;
+                                                const { supabase } = await import('../../lib/supabase');
+                                                const { error } = await supabase
+                                                    .from('hostel_product_updates')
+                                                    .update({ fulfilled: true })
+                                                    .eq('id', request.id);
+                                                if (!error) {
+                                                    toast.success('Request marked as fulfilled');
+                                                    onClose();
+                                                    window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                                } else {
+                                                    toast.error('Failed to update request');
+                                                }
+                                            }}
+                                            className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                                    <span className="material-symbols-outlined text-2xl">check_circle</span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-lg leading-tight text-white">Mark Fulfilled</p>
+                                                    <p className="text-white/80 text-xs mt-1">Hide this request from the active feed</p>
+                                                </div>
+                                            </div>
+                                            <span className="material-symbols-outlined text-xl">check</span>
+                                        </button>
+
+                                        {/* Admin/Owner: Delete */}
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm('Are you sure you want to delete this request?')) return;
+                                                const { supabase } = await import('../../lib/supabase');
+                                                const { error } = await supabase
+                                                    .from('hostel_product_updates')
+                                                    .delete()
+                                                    .eq('id', request.id);
+                                                if (!error) {
+                                                    toast.success('Request deleted');
+                                                    onClose();
+                                                    window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
+                                                } else {
+                                                    toast.error('Failed to delete request');
+                                                }
+                                            }}
+                                            className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-red-500 text-white shadow-xl shadow-red-500/20 hover:scale-[1.02] active:scale-95 transition-all text-left"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                                    <span className="material-symbols-outlined text-2xl">delete</span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-lg leading-tight text-white">Delete Request</p>
+                                                    <p className="text-white/80 text-xs mt-1">Permanently remove this from the live feed</p>
+                                                </div>
+                                            </div>
+                                            <span className="material-symbols-outlined text-xl">close</span>
                                         </button>
                                     </>
                                 )}
