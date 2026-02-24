@@ -207,3 +207,58 @@ export async function sendForgotPasswordEmail(email: string, resetLink: string) 
         console.error('Failed to send forgot password email:', err);
     }
 }
+
+export async function sendSellerOfWeekEmail(merchantData: {
+    email: string;
+    full_name: string;
+    school_name: string;
+}) {
+    if (!BREVO_API_KEY) {
+        console.warn('VITE_BREVO_API_KEY not found. SOTW notification skipped.');
+        return;
+    }
+
+    const htmlContent = getBaseEmailTemplate(`
+        <div style="display: inline-flex; width: 80px; height: 80px; background-color: #ecfdf5; border-radius: 24px; margin-bottom: 32px; align-items: center; justify-content: center;">
+            <span style="font-size: 40px;">🌟</span>
+        </div>
+        
+        <h2 style="font-size: 28px; font-weight: 800; color: #065f46; margin: 0 0 16px 0; letter-spacing: -0.02em;">Seller of the Week!</h2>
+        <p style="font-size: 16px; line-height: 1.6; color: #64748b; margin: 0 0 24px 0;">
+            Congratulations, <strong>${merchantData.full_name}</strong>! You've been selected as the <strong>Seller of the Week</strong> at <strong>${merchantData.school_name}</strong>.
+        </p>
+
+        <div style="background-color: #f0fdf4; border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid #dcfce7; text-align: center;">
+            <p style="font-size: 18px; color: #166534; margin: 0; font-weight: 800;">High visibility coming your way!</p>
+            <p style="font-size: 14px; color: #15803d; margin: 8px 0 0 0;">Your products are now featured on the university's main banner slider.</p>
+        </div>
+
+        <p style="font-size: 16px; line-height: 1.6; color: #64748b; margin: 0 0 40px 0;">
+            Keep up the great work and make sure your inventory is updated to make the most of this highlight!
+        </p>
+
+        <div style="margin-bottom: 20px;">
+            <a href="https://search.unistore.ng/profile" style="display: inline-block; padding: 18px 48px; background-color: #10b981; color: #ffffff !important; text-decoration: none; border-radius: 20px; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3);">Check My Profile</a>
+        </div>
+    `);
+
+    try {
+        await fetch(BREVO_API_URL, {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': BREVO_API_KEY,
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                sender: { name: 'UniStore Highlights', email: 'alfrederic371@gmail.com' },
+                to: [{ email: merchantData.email, name: merchantData.full_name }],
+                subject: `🌟 You are the Seller of the Week at ${merchantData.school_name}!`,
+                htmlContent
+            }),
+        });
+        console.log(`[Brevo] SOTW notification sent to ${merchantData.email}`);
+    } catch (err) {
+        console.error('Failed to send SOTW notification:', err);
+    }
+}

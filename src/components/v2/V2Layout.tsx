@@ -41,6 +41,21 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     const navigate = useNavigate();
     const [isFabOpen, setIsFabOpen] = useState(false);
     const [activeNotification, setActiveNotification] = useState<any>(null);
+    const [notificationQueue, setNotificationQueue] = useState<any[]>([]);
+    const [seenActivityIds, setSeenActivityIds] = useState<Set<string>>(() => {
+        try {
+            const saved = localStorage.getItem('seen_activity_ids');
+            return saved ? new Set(JSON.parse(saved)) : new Set();
+        } catch {
+            return new Set();
+        }
+    });
+
+    const seenRef = React.useRef<Set<string>>(seenActivityIds);
+    useEffect(() => {
+        seenRef.current = seenActivityIds;
+    }, [seenActivityIds]);
+
     const { currentTheme, changeTheme } = useTheme();
 
     const isDark = currentTheme.isDark;
@@ -93,11 +108,12 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                 }
 
                 // ALWAYS DISPATCH to unblock children
-                console.log('[V2Layout] Dispatching auth-state-changed with visitor:', visitor ? visitor.full_name : 'null');
-                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: visitor || null } }));
+                const finalVisitor = visitor || visitorRef.current;
+                console.log('[V2Layout] Dispatching auth-state-changed with visitor:', finalVisitor ? finalVisitor.full_name : 'null');
+                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: finalVisitor || null } }));
             } catch (err) {
                 console.warn('[V2Layout] visitor sync failed or timed out:', err);
-                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: null } }));
+                window.dispatchEvent(new CustomEvent('auth-state-changed', { detail: { session, visitor: visitorRef.current || null } }));
             }
         };
 
@@ -163,6 +179,78 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
         };
     }, [userIsAuthenticated]); // Minimal dependencies
 
+    // Sequential Toast Processor
+    useEffect(() => {
+        if (notificationQueue.length > 0 && !activeNotification) {
+            const next = notificationQueue[0];
+
+            // If in activity tab and it's a history item, just skip it (mark as seen and pop)
+            if (activeTab === 'activity' && next.isHistory) {
+                setSeenActivityIds(prev => {
+                    const nextSet = new Set(prev).add(next.id);
+                    localStorage.setItem('seen_activity_ids', JSON.stringify(Array.from(nextSet)));
+                    return nextSet;
+                });
+                setNotificationQueue(prev => prev.slice(1));
+                return;
+            }
+
+            // Mark as seen immediately
+            setSeenActivityIds(prev => {
+                const nextSet = new Set(prev).add(next.id);
+                localStorage.setItem('seen_activity_ids', JSON.stringify(Array.from(nextSet)));
+                return nextSet;
+            });
+
+            setActiveNotification(next);
+            setNotificationQueue(prev => prev.slice(1));
+
+            // Clear after 6 seconds and Wait before next
+            const timer = setTimeout(() => {
+                setActiveNotification(null);
+            }, 6000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificationQueue, activeNotification, activeTab]);
+
+    // Fetch Unseen Activity History on Mount
+    useEffect(() => {
+        if (activeTab === 'activity') return;
+
+        const fetchHistory = async () => {
+            const { data, error } = await supabase
+                .from('hostel_product_updates')
+                .select(`
+                    id,
+                    post_description,
+                    post_type,
+                    created_at,
+                    unique_visitors:actual_user_id (
+                        full_name,
+                        profile_picture,
+                        brand_name
+                    )
+                `)
+                .order('created_at', { ascending: false })
+                .limit(15);
+
+            if (data && !error) {
+                // Filter items not seen yet
+                const unseen = data
+                    .filter(item => !seenActivityIds.has(item.id))
+                    .map(item => ({ ...item, isHistory: true }))
+                    .reverse(); // Reverse to toast oldest first
+
+                if (unseen.length > 0) {
+                    setNotificationQueue(prev => [...prev, ...unseen]);
+                }
+            }
+        };
+
+        fetchHistory();
+    }, []); // Only on mount
+
     // Realtime Activity Notifications for Mobile
     useEffect(() => {
         const channel = supabase
@@ -178,6 +266,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                         id,
                         post_description,
                         post_type,
+                        created_at,
                         unique_visitors:actual_user_id (
                             full_name,
                             profile_picture,
@@ -188,9 +277,12 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     .maybeSingle();
 
                 if (data) {
-                    setActiveNotification(data);
-                    // Clear after 6 seconds
-                    setTimeout(() => setActiveNotification(null), 6000);
+                    // Push to queue instead of setting directly
+                    setNotificationQueue(prev => {
+                        // Avoid duplicates using ref and current queue check
+                        if (prev.some(item => item.id === data.id) || seenRef.current.has(data.id)) return prev;
+                        return [...prev, data];
+                    });
                 }
             })
             .subscribe();
@@ -434,9 +526,10 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                 }}
             />
 
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
                 {activeNotification && (
                     <MobileActivityToast
+                        key={activeNotification.id}
                         activity={activeNotification}
                         onClose={() => setActiveNotification(null)}
                         onClick={() => {

@@ -59,7 +59,7 @@ export default function BannerSlider({ slides, interval = 5000 }: BannerSliderPr
 
                                 if (subtitle.startsWith('[PROMO:seller]')) {
                                     promoType = 'seller';
-                                    cleanSubtitle = subtitle.replace('[PROMO:seller]', '');
+                                    cleanSubtitle = subtitle.replace(/\[PROMO:seller\](\[SELLER_ID:[^\]]+\])?/, '');
                                 } else if (subtitle.startsWith('[PROMO:product]')) {
                                     promoType = 'product';
                                     cleanSubtitle = subtitle.replace('[PROMO:product]', '');
@@ -68,38 +68,50 @@ export default function BannerSlider({ slides, interval = 5000 }: BannerSliderPr
                                 return (
                                     <>
                                         {(promoType || slides[currentIndex].subtitle) && (
-                                            <motion.span
-                                                initial={{ y: 20, opacity: 0 }}
-                                                animate={{ y: 0, opacity: 1 }}
-                                                transition={{ delay: 0.2 }}
-                                                className={`inline-block px-3 py-1 mb-4 rounded-full text-white text-[10px] font-black tracking-widest uppercase shadow-lg ${promoType === 'seller' ? 'bg-gradient-to-r from-emerald-500 to-teal-500' :
-                                                        promoType === 'product' ? 'bg-gradient-to-r from-blue-500 to-indigo-500' :
-                                                            'bg-orange-600'
-                                                    }`}
+                                            <motion.div
+                                                initial={{ y: 20, opacity: 0, scale: 0.8 }}
+                                                animate={{ y: 0, opacity: 1, scale: 1 }}
+                                                transition={{
+                                                    delay: 0.2,
+                                                    type: "spring",
+                                                    stiffness: 260,
+                                                    damping: 20
+                                                }}
+                                                className="mb-4"
                                             >
-                                                {promoType === 'seller' ? 'Seller of the Week' :
-                                                    promoType === 'product' ? 'Product of the Week' :
-                                                        'Hostel Special'}
-                                            </motion.span>
+                                                <span
+                                                    className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-white text-[10px] font-black tracking-[0.2em] uppercase shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 backdrop-blur-md ${promoType === 'seller' ? 'bg-gradient-to-r from-emerald-500/80 to-teal-500/80' :
+                                                        promoType === 'product' ? 'bg-gradient-to-r from-blue-500/80 to-indigo-500/80' :
+                                                            'bg-orange-600/80'
+                                                        }`}
+                                                >
+                                                    {promoType === 'seller' && <span className="material-symbols-outlined text-[12px]">verified</span>}
+                                                    {promoType === 'seller' ? 'Seller of the Week' :
+                                                        promoType === 'product' ? 'Product of the Week' :
+                                                            'Hostel Special'}
+                                                </span>
+                                            </motion.div>
                                         )}
 
-                                        <motion.h2
-                                            initial={{ y: 20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: 0.3 }}
-                                            className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg"
-                                        >
-                                            {slides[currentIndex].title}
-                                        </motion.h2>
+                                        <div className="backdrop-blur-sm bg-black/10 rounded-[2rem] p-6 -ml-6 border border-white/5">
+                                            <motion.h2
+                                                initial={{ x: -20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{ delay: 0.3 }}
+                                                className="text-3xl md:text-5xl font-black text-white mb-3 leading-tight tracking-tight drop-shadow-2xl"
+                                            >
+                                                {slides[currentIndex].title}
+                                            </motion.h2>
 
-                                        <motion.p
-                                            initial={{ y: 20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: 0.4 }}
-                                            className="text-sm md:text-lg text-gray-200 font-medium mb-8 max-w-md drop-shadow-md"
-                                        >
-                                            {cleanSubtitle}
-                                        </motion.p>
+                                            <motion.p
+                                                initial={{ x: -20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{ delay: 0.4 }}
+                                                className="text-sm md:text-lg text-white/80 font-medium mb-6 max-w-md line-clamp-2"
+                                            >
+                                                {cleanSubtitle}
+                                            </motion.p>
+                                        </div>
                                     </>
                                 );
                             })()}

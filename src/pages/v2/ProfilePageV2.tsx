@@ -28,8 +28,28 @@ export const ProfilePageV2: React.FC = () => {
         const handleAuth = (e: any) => {
             console.log('[ProfilePageV2] auth-state-changed received:', e.detail);
             const visitor = e.detail?.visitor;
-            setUser(visitor || null);
-            setLoading(false);
+            const session = e.detail?.session;
+
+            if (visitor) {
+                setUser(visitor);
+                setLoading(false);
+            } else if (!session) {
+                // Definitely logged out
+                setUser(null);
+                setLoading(false);
+            } else if (session && !visitor) {
+                // We have a session but haven't found a visitor yet.
+                // If we already have a user, keep it. Otherwise, keep loading.
+                if (!user) {
+                    setLoading(true); // Keep loading if no user and session exists but visitor is null
+                }
+            } else if (loading) {
+                // This case should ideally be covered by the above, but as a fallback
+                // We have a session but haven't found a visitor yet on initial load
+                // Keep loading state until sync finishes or fails
+            }
+            // If we have a session but visitor is null, it's likely a transient sync state
+            // and we don't want to clear the 'user' if we already have one.
 
             if (!visitor && !e.detail?.session) {
                 // If definitely not logged in, redirect

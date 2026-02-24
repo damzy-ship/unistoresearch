@@ -53,70 +53,73 @@ export const HostelHomePageV2: React.FC = () => {
         if (node) observer.current.observe(node);
     }, [loadingFeed, loadingMore, hasMore, loadMore]);
 
+    // Initial auth request on mount
+    useEffect(() => {
+        console.log('[HostelHomePageV2] Mounted, requesting auth state...');
+        window.dispatchEvent(new CustomEvent('request-auth-state'));
+    }, []);
+
     useEffect(() => {
         const handleAuthChange = (e: any) => {
             console.log('[HostelHomePageV2] auth-state-changed received:', e.detail);
             const visitor = e.detail?.visitor;
-            if (visitor) console.log('[HostelHomePageV2] visitor name:', visitor.full_name, 'is_admin:', visitor.is_admin);
-            setCurrentVisitor(visitor || null);
 
-            // AUTO-SYNC SCHOOL ID: If current user has a school and we don't have one selected,
-            // or if the current one is just a placeholder, sync it.
+            // Only update if visitor actually changed (basic ID check) to prevent loops
+            setCurrentVisitor(prev => {
+                if (prev?.id === visitor?.id) return prev;
+                return visitor || null;
+            });
+
+            // AUTO-SYNC SCHOOL ID: Only if necessary
             if (visitor?.school_id && (!selectedSchoolId || selectedSchoolName === 'Select University')) {
                 console.log('[HostelHomePageV2] Auto-syncing school from profile:', visitor.school_id);
                 setSelectedSchoolId(visitor.school_id);
                 localStorage.setItem('selectedSchoolId', visitor.school_id);
-                // The fetchHostelsAndSchool useEffect will handle the name update
             }
-
-            loadFeed();
         };
+
         window.addEventListener('auth-state-changed', handleAuthChange);
-
-        // Proactively request current state in case we missed it
-        console.log('[HostelHomePageV2] Dispatching request-auth-state');
-        window.dispatchEvent(new CustomEvent('request-auth-state'));
-
         return () => window.removeEventListener('auth-state-changed', handleAuthChange);
-    }, [selectedSchoolId, selectedSchoolName, loadFeed]);
+    }, [selectedSchoolId, selectedSchoolName]); // Removed loadFeed to break loop
+
+    const fetchHostelsAndSchool = React.useCallback(async () => {
+        if (!selectedSchoolId) {
+            // Auto-open modal if no school selected
+            setIsSchoolModalOpen(true);
+            return;
+        }
+
+        // Fetch school name for display
+        const { data: schoolData } = await supabase.from('schools').select('short_name').eq('id', selectedSchoolId).maybeSingle();
+        if (schoolData) setSelectedSchoolName(schoolData.short_name);
+
+        // Fetch hostels
+        const { data: hostelData } = await supabase
+            .from('hostels')
+            .select('*')
+            .eq('school_id', selectedSchoolId)
+            .order('name', { ascending: true });
+        setHostels(hostelData || []);
+
+        // Fetch custom banners
+        const { data: bannerData } = await supabase
+            .from('school_banners')
+            .select('*')
+            .eq('school_id', selectedSchoolId)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+        setBanners(bannerData || []);
+    }, [selectedSchoolId]);
 
     useEffect(() => {
-        const fetchHostelsAndSchool = async () => {
-            if (!selectedSchoolId) {
-                // Auto-open modal if no school selected
-                setIsSchoolModalOpen(true);
-                return;
-            };
-
-            // Fetch school name for display
-            const { data: schoolData } = await supabase.from('schools').select('short_name').eq('id', selectedSchoolId).maybeSingle();
-            if (schoolData) setSelectedSchoolName(schoolData.short_name);
-
-            // Fetch hostels
-            const { data: hostelData } = await supabase
-                .from('hostels')
-                .select('*')
-                .eq('school_id', selectedSchoolId)
-                .order('name', { ascending: true });
-            setHostels(hostelData || []);
-
-            // Fetch custom banners
-            const { data: bannerData } = await supabase
-                .from('school_banners')
-                .select('*')
-                .eq('school_id', selectedSchoolId)
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
-            setBanners(bannerData || []);
-        };
         fetchHostelsAndSchool();
-    }, [selectedSchoolId]);
+    }, [fetchHostelsAndSchool]);
 
     // Unified feed loader that only triggers on filter/school changes
     useEffect(() => {
         console.log('[HostelHomePageV2] Filters changed, resetting feed...');
         loadFeed();
-    }, [selectedSchoolId, selectedHostel, selectedCategory]);
+    }, [selectedSchoolId, selectedHostel, selectedCategory, loadFeed]);
 
     const fetchRealLiveRequests = React.useCallback(async () => {
         if (!selectedSchoolId) {
@@ -186,13 +189,14 @@ export const HostelHomePageV2: React.FC = () => {
 
     useEffect(() => {
         const handleRefresh = () => {
-            console.log('Refreshing hostel feed from event...');
+            console.log('Refreshing hostel feed and banners from event...');
             loadFeed();
             fetchRealLiveRequests();
+            fetchHostelsAndSchool();
         };
         window.addEventListener('hostel-feed-refresh', handleRefresh);
         return () => window.removeEventListener('hostel-feed-refresh', handleRefresh);
-    }, [loadFeed, fetchRealLiveRequests]);
+    }, [loadFeed, fetchRealLiveRequests, fetchHostelsAndSchool]);
 
 
     const openProductDetail = (product: any) => {
