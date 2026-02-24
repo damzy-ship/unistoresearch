@@ -23,6 +23,24 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
     onClose,
     onClick
 }) => {
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    const lastClickTime = React.useRef(0);
+
+    const handleInteraction = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const now = Date.now();
+        const delay = now - lastClickTime.current;
+
+        if (delay < 300) {
+            // Double tap - Navigate
+            onClick();
+        } else {
+            // Single tap - Expand
+            setIsExpanded(!isExpanded);
+        }
+        lastClickTime.current = now;
+    };
+
     const handleDragEnd = (_e: any, info: PanInfo) => {
         // More sensitive swipe detection (offset or flick velocity)
         const threshold = 30; // Further lowered for better responsiveness
@@ -39,6 +57,7 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
 
     return (
         <motion.div
+            layout
             initial={{ y: -120, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -120, opacity: 0, scale: 0.95 }}
@@ -54,12 +73,10 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
             onDragEnd={handleDragEnd}
             className="fixed top-20 left-4 right-4 z-[101] lg:hidden cursor-grab active:cursor-grabbing"
         >
-            <div
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onClick();
-                }}
-                className="relative overflow-hidden bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4 group active:scale-[0.98] transition-all duration-300"
+            <motion.div
+                layout
+                onClick={handleInteraction}
+                className={`relative overflow-hidden bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-start gap-4 group active:scale-[0.98] transition-all duration-300 ${isExpanded ? 'min-h-[140px]' : ''}`}
             >
                 {/* Shimmer Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
@@ -88,16 +105,19 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
                             {activity.unique_visitors?.brand_name || activity.unique_visitors?.full_name?.split(' ')[0]}
                         </span>
                         {activity.post_type === 'request' ? 'is looking for' : 'just listed'}
-                        <span className="font-bold text-primary italic ml-1 line-clamp-1 block mt-0.5">
+                        <motion.span
+                            layout
+                            className={`font-bold text-primary italic ml-1 block mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}
+                        >
                             "{activity.post_description}"
-                        </span>
+                        </motion.span>
                     </p>
                 </div>
 
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm shrink-0">
-                    <span className="material-symbols-outlined text-2xl">arrow_forward</span>
+                <div className={`w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm shrink-0 self-center`}>
+                    <span className="material-symbols-outlined text-2xl">{isExpanded ? 'expand_less' : 'arrow_forward'}</span>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Drag Handle Indicator */}
             <div className="mt-2 flex justify-center opacity-30">
