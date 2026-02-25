@@ -92,8 +92,7 @@ export default function BannerSlider({ slides, interval = 5000 }: BannerSliderPr
                                                 </span>
                                             </motion.div>
                                         )}
-
-                                        <div className="backdrop-blur-sm bg-black/10 rounded-[2rem] p-6 -ml-6 border border-white/5">
+                                        <div className="p-6 -ml-6">
                                             <motion.h2
                                                 initial={{ x: -20, opacity: 0 }}
                                                 animate={{ x: 0, opacity: 1 }}

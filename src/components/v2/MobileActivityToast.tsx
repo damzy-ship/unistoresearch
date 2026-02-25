@@ -14,7 +14,7 @@ interface MobileActivityToastProps {
         created_at: string;
         isHistory?: boolean;
     };
-    onClose: () => void;
+    onClose: (wasManual?: boolean) => void;
     onClick: () => void;
 }
 
@@ -42,8 +42,7 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
     };
 
     const handleDragEnd = (_e: any, info: PanInfo) => {
-        // More sensitive swipe detection (offset or flick velocity)
-        const threshold = 30; // Further lowered for better responsiveness
+        const threshold = 30;
         const velocityThreshold = 300;
 
         const isSwipeLeft = info.offset.x < -threshold || info.velocity.x < -velocityThreshold;
@@ -51,7 +50,7 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
         const isSwipeUp = info.offset.y < -threshold || info.velocity.y < -velocityThreshold;
 
         if (isSwipeLeft || isSwipeRight || isSwipeUp) {
-            onClose();
+            onClose(true);
         }
     };
 
@@ -71,57 +70,84 @@ export const MobileActivityToast: React.FC<MobileActivityToastProps> = ({
             dragConstraints={{ top: -200, bottom: 0, left: -300, right: 300 }}
             dragElastic={0.15}
             onDragEnd={handleDragEnd}
-            className="fixed top-20 left-4 right-4 z-[101] lg:hidden cursor-grab active:cursor-grabbing"
+            className="fixed top-16 left-4 right-4 z-[101] lg:hidden cursor-grab active:cursor-grabbing"
         >
+            {/* Close Button - Smaller and more precise */}
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClose(true);
+                }}
+                className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full bg-zinc-900/90 dark:bg-zinc-800 shadow-md border border-white/20 z-[102] active:scale-90 transition-transform"
+            >
+                <span className="material-symbols-outlined text-[12px] text-white">close</span>
+            </button>
+
             <motion.div
                 layout
                 onClick={handleInteraction}
-                className={`relative overflow-hidden bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-start gap-4 group active:scale-[0.98] transition-all duration-300 ${isExpanded ? 'min-h-[140px]' : ''}`}
+                className={`relative overflow-hidden bg-white/95 dark:bg-black/80 backdrop-blur-3xl border border-zinc-200/50 dark:border-white/10 p-3 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.6)] flex items-center gap-3.5 group active:scale-[0.99] transition-all duration-300 ${isExpanded ? 'min-h-[90px]' : ''}`}
             >
                 {/* Shimmer Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none" />
 
-                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex-shrink-0 overflow-hidden border border-primary/20 shadow-inner">
+                {/* Avatar Area - Circular and perfectly aligned */}
+                <div className="relative w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 overflow-hidden border border-primary/5 flex items-center justify-center transition-all duration-300 shadow-sm">
                     {activity.unique_visitors?.profile_picture ? (
                         <img src={activity.unique_visitors.profile_picture} className="w-full h-full object-cover" alt="" />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-primary font-black uppercase text-xl">
+                        <span className="text-primary font-bold uppercase text-sm">
                             {activity.unique_visitors?.full_name?.charAt(0)}
-                        </div>
+                        </span>
                     )}
                 </div>
 
-                <div className="flex-1 min-w-0 pr-2">
-                    <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full ${activity.isHistory ? 'bg-zinc-400' : 'bg-primary animate-pulse'}`} />
+                {/* Content Area */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                        <span className="font-extrabold text-[14px] text-zinc-900 dark:text-white leading-none">
+                            {activity.unique_visitors?.brand_name || activity.unique_visitors?.full_name?.split(' ')[0]}
+                        </span>
+
+                        {!isExpanded && (
+                            <div className="flex items-center gap-1 min-w-0">
+                                <span className="text-zinc-500 font-medium text-[13px] whitespace-nowrap">{activity.post_type === 'request' ? 'needs' : 'listed'}</span>
+                                <span className="font-bold text-primary italic text-[13px] truncate">
+                                    "{activity.post_description}"
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {isExpanded && (
+                        <div className="mt-0.5">
+                            <span className="text-zinc-500 font-medium text-[13px]">{activity.post_type === 'request' ? 'is looking for' : 'just listed'}</span>
+                            <span className="font-bold text-primary italic text-[13px] block mt-0.5 leading-tight">
+                                "{activity.post_description}"
+                            </span>
                         </div>
-                        <span className="text-[10px] font-bold text-zinc-400/80">
+                    )}
+
+                    {/* Timestamp below */}
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className={`w-1 h-1 rounded-full ${activity.isHistory ? 'bg-zinc-300' : 'bg-primary animate-[pulse_2s_ease-in-out_infinite]'}`} />
+                        <span className="text-[10px] font-bold text-zinc-400">
                             {new Date(activity.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                     </div>
-                    <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300 leading-tight">
-                        <span className="font-black text-[#1a2a40] dark:text-white mr-1">
-                            {activity.unique_visitors?.brand_name || activity.unique_visitors?.full_name?.split(' ')[0]}
-                        </span>
-                        {activity.post_type === 'request' ? 'is looking for' : 'just listed'}
-                        <motion.span
-                            layout
-                            className={`font-bold text-primary italic ml-1 block mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}
-                        >
-                            "{activity.post_description}"
-                        </motion.span>
-                    </p>
                 </div>
 
-                <div className={`w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm shrink-0 self-center`}>
-                    <span className="material-symbols-outlined text-2xl">{isExpanded ? 'expand_less' : 'arrow_forward'}</span>
+                {/* Interaction Icon */}
+                <div className="w-6 h-6 rounded-full bg-zinc-50 dark:bg-white/5 flex items-center justify-center text-zinc-300 group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
+                    <span className="material-symbols-outlined text-[16px]">
+                        {isExpanded ? 'expand_less' : 'chevron_right'}
+                    </span>
                 </div>
             </motion.div>
 
-            {/* Drag Handle Indicator */}
-            <div className="mt-2 flex justify-center opacity-30">
-                <div className="w-10 h-1 bg-zinc-400 dark:bg-white/20 rounded-full" />
+            {/* Subtle drag cue */}
+            <div className="mt-1.5 flex justify-center opacity-[0.05]">
+                <div className="w-6 h-1 bg-zinc-400 dark:bg-white rounded-full" />
             </div>
         </motion.div>
     );

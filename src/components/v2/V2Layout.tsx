@@ -42,6 +42,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     const [isFabOpen, setIsFabOpen] = useState(false);
     const [activeNotification, setActiveNotification] = useState<any>(null);
     const [notificationQueue, setNotificationQueue] = useState<any[]>([]);
+    const [delayNextUntil, setDelayNextUntil] = useState<number | null>(null);
     const [seenActivityIds, setSeenActivityIds] = useState<Set<string>>(() => {
         try {
             const saved = localStorage.getItem('seen_activity_ids');
@@ -182,6 +183,14 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
     // Sequential Toast Processor
     useEffect(() => {
         if (notificationQueue.length > 0 && !activeNotification) {
+            const now = Date.now();
+            if (delayNextUntil && now < delayNextUntil) {
+                const timeout = setTimeout(() => {
+                    setDelayNextUntil(null); // Force re-evaluation when delay is up
+                }, delayNextUntil - now);
+                return () => clearTimeout(timeout);
+            }
+
             const next = notificationQueue[0];
 
             // If in activity tab and it's a history item, just skip it (mark as seen and pop)
@@ -212,13 +221,25 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
 
             return () => clearTimeout(timer);
         }
-    }, [notificationQueue, activeNotification, activeTab]);
+    }, [notificationQueue, activeNotification, activeTab, delayNextUntil]);
 
-    // Fetch Unseen Activity History on Mount
+    // Fetch Unseen Activity History on Mount or when School is Selected
     useEffect(() => {
         if (activeTab === 'activity') return;
 
-        const fetchHistory = async () => {
+        // Use a ref to track if we've successfully fetched
+        let hasFetched = false;
+
+        const attemptFetchHistory = async () => {
+            if (hasFetched) return;
+
+            const selectedSchoolId = localStorage.getItem('selectedSchoolId');
+            if (!selectedSchoolId) {
+                // Not selected yet, try again in a bit if we haven't fetched
+                setTimeout(attemptFetchHistory, 1000);
+                return;
+            }
+
             const { data, error } = await supabase
                 .from('hostel_product_updates')
                 .select(`
@@ -233,9 +254,10 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     )
                 `)
                 .order('created_at', { ascending: false })
-                .limit(15);
+                .limit(5);
 
-            if (data && !error) {
+            if (data && !error && !hasFetched) {
+                hasFetched = true;
                 // Filter items not seen yet
                 const unseen = data
                     .filter(item => !seenActivityIds.has(item.id))
@@ -243,13 +265,19 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     .reverse(); // Reverse to toast oldest first
 
                 if (unseen.length > 0) {
-                    setNotificationQueue(prev => [...prev, ...unseen]);
+                    setNotificationQueue(prev => {
+                        // Prevent duplicate queues
+                        if (prev.some(p => p.isHistory)) return prev;
+                        return [...prev, ...unseen];
+                    });
                 }
             }
         };
 
-        fetchHistory();
-    }, []); // Only on mount
+        attemptFetchHistory();
+
+        return () => { hasFetched = true; }; // Cleanup prevents memory leaks on unmount
+    }, []); // Only run once on mount, it will retry until it gets a school
 
     // Realtime Activity Notifications for Mobile
     useEffect(() => {
@@ -259,6 +287,9 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                 event: 'INSERT',
                 table: 'hostel_product_updates'
             }, async (payload: any) => {
+                const selectedSchoolId = localStorage.getItem('selectedSchoolId');
+                if (!selectedSchoolId) return;
+
                 // Fetch full info for the toast
                 const { data } = await supabase
                     .from('hostel_product_updates')
@@ -531,7 +562,12 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                     <MobileActivityToast
                         key={activeNotification.id}
                         activity={activeNotification}
-                        onClose={() => setActiveNotification(null)}
+                        onClose={(wasManual) => {
+                            setActiveNotification(null);
+                            if (wasManual) {
+                                setDelayNextUntil(Date.now() + 10000);
+                            }
+                        }}
                         onClick={() => {
                             handleTabChange('activity');
                             setActiveNotification(null);
