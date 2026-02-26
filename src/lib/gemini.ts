@@ -3,7 +3,8 @@ import { supabase } from './supabase';
 import { fetchExistingCategories } from './categoryService';
 // import { transformDescriptionForEmbedding } from './generateEmbedding';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
+  (typeof process !== 'undefined' && process.env?.VITE_GEMINI_API_KEY);
 
 if (!API_KEY) {
   console.warn('VITE_GEMINI_API_KEY not found. Category generation will be disabled.');
@@ -979,5 +980,44 @@ export async function extractProductKeywordsFromDescription(description: string)
   } catch (error) {
     console.error('Error extracting product keywords:', error);
     return ['product'];
+  }
+}
+/**
+ * Smartly determine if a product fits a specialized category title
+ */
+export async function smartMatchProductWithCategory(
+  description: string,
+  categoryTitle: string,
+  price?: number | null
+): Promise<boolean> {
+  if (!genAI) return false;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }, { apiVersion: 'v1' });
+
+    const prompt = `
+    Determine if the following product fits into the specialized row titled "${categoryTitle}".
+    
+    Product Description: "${description}"
+    ${price ? `Product Price: ${price} Naira` : ''}
+    
+    Row Title: "${categoryTitle}"
+    
+    Consider:
+    1. Direct mentions of items that fit the title.
+    2. Semantic relationships (e.g., "iPhone" fits "Gadgets").
+    3. Price constraints mentioned in the Row Title (e.g., "Under 5k" should check the Product Price).
+    4. Use your best judgment for vibe-based rows (e.g., "Friday Night" might include snacks or drinks).
+    
+    Return ONLY "YES" or "NO".
+    `;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim().toUpperCase();
+
+    return text.includes('YES');
+  } catch (error) {
+    console.error('Error in smartMatchProductWithCategory:', error);
+    return false;
   }
 }

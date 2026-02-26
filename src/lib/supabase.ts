@@ -1,7 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL);
+const supabaseAnonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY);
 
 console.log('Supabase URL:', supabaseUrl);
 console.log('Supabase Anon Key exists:', !!supabaseAnonKey);
@@ -152,6 +154,7 @@ export interface HostelsProductUpdates {
   fulfilled: boolean | null;
   price?: number | null;
   discount_price?: number | null;
+  special_category_ids?: string[];
 }
 
 export interface RequestLog {
@@ -209,6 +212,19 @@ export interface Coupon {
   claimed_at?: string | null;
   claimed_by?: string | null;
   school_id: string;
+}
+
+export interface SpecialCategory {
+  id: string;
+  school_id: string;
+  title: string;
+  subtitle: string | null;
+  rule_type: 'price' | 'ai' | 'category' | 'keyword';
+  rule_config: any;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 // Add function to delete a request log

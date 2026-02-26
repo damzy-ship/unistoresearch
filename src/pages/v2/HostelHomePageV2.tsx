@@ -12,6 +12,7 @@ import { SchoolSelectionModalV2 } from '../../components/v2/SchoolSelectionModal
 import BannerSlider from '../../components/hostel/BannerSlider';
 import { ProductCardV2 } from '../../components/v2/ProductCardV2';
 import { formatTimeAgo } from '../../lib/utils';
+import { SpecialCategoryRow } from '../../components/hostel/SpecialCategoryRow';
 
 export const HostelHomePageV2: React.FC = () => {
     const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -30,6 +31,7 @@ export const HostelHomePageV2: React.FC = () => {
     const [hostels, setHostels] = useState<Hostel[]>([]);
     const [currentVisitor, setCurrentVisitor] = useState<UniqueVisitor | null>(null);
     const [banners, setBanners] = useState<any[]>([]);
+    const [specialCategories, setSpecialCategories] = useState<any[]>([]);
 
     const {
         loadingFeed,
@@ -109,6 +111,15 @@ export const HostelHomePageV2: React.FC = () => {
             .eq('is_active', true)
             .order('created_at', { ascending: false });
         setBanners(bannerData || []);
+
+        // Fetch active special categories
+        const { data: specialCatData } = await supabase
+            .from('hostel_special_categories')
+            .select('*')
+            .eq('school_id', selectedSchoolId)
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true });
+        setSpecialCategories(specialCatData || []);
     }, [selectedSchoolId]);
 
     useEffect(() => {
@@ -435,6 +446,16 @@ export const HostelHomePageV2: React.FC = () => {
                     ))}
                 </div>
             </section>
+
+            {/* Special Categories (Horizontal Rows) */}
+            {specialCategories.map((category) => (
+                <section key={category.id}>
+                    <SpecialCategoryRow
+                        category={category}
+                        onProductClick={openProductDetail}
+                    />
+                </section>
+            ))}
 
             {/* Product Feed */}
             <div className="p-4 lg:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-10 mb-20 relative">

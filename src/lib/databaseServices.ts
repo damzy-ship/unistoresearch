@@ -299,3 +299,105 @@ export async function migrateMerchantProductIDs(): Promise<MigrationResult> {
     };
   }
 }
+
+/**
+ * Smarter algorithmic matching based on title "sense"
+ * Handles "15k", "under 10000", "vintage", etc.
+ */
+export function checkSmartHeuristics(
+  categoryTitle: string,
+  product: { post_description: string; price: number | null; post_category: string }
+): boolean | null {
+  const title = categoryTitle.toLowerCase();
+  const desc = product.post_description?.toLowerCase() || '';
+  const prodCat = product.post_category?.toLowerCase() || '';
+  const price = product.price ? Number(product.price) : 0;
+
+  // 1. Price Heuristics (e.g., "under 15k", "below 5000")
+  const kMatch = title.match(/(?:under|below|less than|within)\s*(\d+)k/);
+  const numMatch = title.match(/(?:under|below|less than|within)\s*(\d+)/);
+
+  let priceLimit = 0;
+  if (kMatch) {
+    priceLimit = parseInt(kMatch[1]) * 1000;
+  } else if (numMatch && !title.includes(`${numMatch[1]}k`)) {
+    priceLimit = parseInt(numMatch[1]);
+  }
+
+  if (priceLimit > 0) {
+    // If we have a price limit and the product has a price, we can decide firmly
+    if (price > 0) {
+      return price <= priceLimit;
+    }
+  }
+
+  // 2. Keyword/Category Heuristics
+  // If the title contains a standard category name, and the product is in that category
+  const standardCategories = ['food', 'snacks', 'clothing', 'shoes', 'gadgets', 'phones', 'beauty', 'jewelry'];
+  for (const cat of standardCategories) {
+    if (title.includes(cat) && prodCat.includes(cat)) {
+      return true;
+    }
+  }
+
+  // Direct keyword matching (e.g., "Vintage" or "Friday")
+  const titleKeywords = title.split(/\s+/).filter(w => w.length > 3 && !['under', 'below', 'with', 'from'].includes(w));
+  if (titleKeywords.length > 0) {
+    const hasMatch = titleKeywords.some(kw => desc.includes(kw) || prodCat.includes(kw));
+    // We only return 'true' if we're confident. We don't return 'false' because AI might see a semantic link.
+    if (hasMatch) return true;
+  }
+
+  return null; // Fallback to AI
+}
+
+/**
+ * Logic to determine which special categories a product belongs to.
+ */
+export function getTaggedSpecialCategoryIds(
+  product: { post_description: string; price: number | null; post_category: string },
+  categories: any[]
+): string[] {
+  const matchingIds: string[] = [];
+
+  for (const category of categories) {
+    let matches = false;
+    const config = category.rule_config || {};
+
+    if (category.rule_type === 'price') {
+      const price = Number(product.price);
+      const max = Number(config.max);
+      if (price > 0 && (isNaN(max) || price <= max)) {
+        matches = true;
+      }
+    } else if (category.rule_type === 'category') {
+      const targetCat = config.category?.toLowerCase();
+      if (product.post_category?.toLowerCase() === targetCat) {
+        matches = true;
+      }
+    } else if (category.rule_type === 'keyword') {
+      const keywords: string[] = config.keywords || [];
+      const desc = product.post_description?.toLowerCase() || '';
+      if (keywords.some(kw => desc.includes(kw.toLowerCase()))) {
+        matches = true;
+      }
+    } else if (category.rule_type === 'ai') {
+      // Use heuristics first to save AI credits
+      const heuristicMatch = checkSmartHeuristics(category.title, product);
+      if (heuristicMatch === true) {
+        matches = true;
+      } else {
+        // If false or null, we'll let the AI decide later (async)
+        continue;
+      }
+    }
+
+    if (matches) {
+      if (!matchingIds.includes(category.id)) {
+        matchingIds.push(category.id);
+      }
+    }
+  }
+
+  return matchingIds;
+}

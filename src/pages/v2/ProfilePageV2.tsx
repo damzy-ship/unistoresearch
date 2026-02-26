@@ -9,6 +9,7 @@ import EditBrandNameModal from '../../components/EditBrandNameModal';
 import VerifyIDModal from '../../components/VerifyIdModal';
 import EditEmailModal from '../../components/EditEmailModal';
 import { BannerManagementSheetV2 } from '../../components/v2/BannerManagementSheetV2';
+import { SpecialCategoryManagementSheetV2 } from '../../components/v2/SpecialCategoryManagementSheetV2';
 
 export const ProfilePageV2: React.FC = () => {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ export const ProfilePageV2: React.FC = () => {
     const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
     const [isBannerManagementOpen, setIsBannerManagementOpen] = useState(false);
+    const [isSpecialCategoryManagementOpen, setIsSpecialCategoryManagementOpen] = useState(false);
 
     const { feed, loadFeed, setFeed } = useHostelFeed(null, 'all', 'all', true, user);
 
@@ -440,6 +442,20 @@ export const ProfilePageV2: React.FC = () => {
                                 </div>
                                 <span className="material-symbols-outlined text-purple-300 dark:text-purple-800 group-hover:translate-x-1 transition-transform">chevron_right</span>
                             </button>
+
+                            <button
+                                onClick={() => setIsSpecialCategoryManagementOpen(true)}
+                                className="w-full flex items-center gap-4 p-5 hover:bg-purple-500/10 transition-colors group border-b border-purple-500/10 last:border-0"
+                            >
+                                <div className="bg-indigo-500/20 p-2.5 rounded-xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-all duration-300">
+                                    <span className="material-symbols-outlined text-2xl">stars</span>
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <p className="font-bold dark:text-white text-base leading-none mb-1">Special Categories</p>
+                                    <p className="text-[11px] text-purple-400/70 font-medium">Manage AI-powered product rows</p>
+                                </div>
+                                <span className="material-symbols-outlined text-purple-300 dark:text-purple-800 group-hover:translate-x-1 transition-transform">chevron_right</span>
+                            </button>
                         </div>
                     </div>
                 )}
@@ -465,35 +481,42 @@ export const ProfilePageV2: React.FC = () => {
                     <p className="text-[10px] font-bold text-zinc-300 dark:text-zinc-700 uppercase tracking-widest">Bingham • Veritas</p>
                 </div>
             </section>
-            {isBrandModalOpen && (
-                <EditBrandNameModal
-                    currentBrandName={user?.brand_name || ''}
-                    onClose={() => setIsBrandModalOpen(false)}
-                    onSave={handleUpdateBrandName}
-                    currentTheme={currentTheme}
-                />
-            )}
+            {
+                isBrandModalOpen && (
+                    <EditBrandNameModal
+                        currentBrandName={user?.brand_name || ''}
+                        onClose={() => setIsBrandModalOpen(false)}
+                        onSave={handleUpdateBrandName}
+                        currentTheme={currentTheme}
+                    />
+                )
+            }
 
-            {isVerifyModalOpen && (
-                <VerifyIDModal
-                    onClose={() => setIsVerifyModalOpen(false)}
-                    onSave={handleVerifyID}
-                    currentTheme={currentTheme}
-                    uniqueId={user?.full_name || 'user'}
-                    currentVerificationId={user?.verification_id}
-                />
-            )}
+            {
+                isVerifyModalOpen && (
+                    <VerifyIDModal
+                        onClose={() => setIsVerifyModalOpen(false)}
+                        onSave={handleVerifyID}
+                        currentTheme={currentTheme}
+                        uniqueId={user?.full_name || 'user'}
+                        currentVerificationId={user?.verification_id}
+                    />
+                )
+            }
 
-            {isEmailModalOpen && (
-                <EditEmailModal
-                    currentEmail={user?.email || ''}
-                    onClose={() => setIsEmailModalOpen(false)}
-                    onSave={handleUpdateEmail}
-                    currentTheme={currentTheme}
-                />
-            )}
+            {
+                isEmailModalOpen && (
+                    <EditEmailModal
+                        currentEmail={user?.email || ''}
+                        onClose={() => setIsEmailModalOpen(false)}
+                        onSave={handleUpdateEmail}
+                        currentTheme={currentTheme}
+                    />
+                )
+            }
 
             <BannerManagementSheetV2 isOpen={isBannerManagementOpen} onClose={() => setIsBannerManagementOpen(false)} />
-        </V2Layout>
+            <SpecialCategoryManagementSheetV2 isOpen={isSpecialCategoryManagementOpen} onClose={() => setIsSpecialCategoryManagementOpen(false)} />
+        </V2Layout >
     );
 };

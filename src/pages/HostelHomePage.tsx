@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
 import Header from '../components/Header';
-import { supabase, HostelsProductUpdates, UniqueVisitor } from '../lib/supabase';
+import { supabase, HostelsProductUpdates, UniqueVisitor, SpecialCategory } from '../lib/supabase';
 import { useHostelMode } from '../hooks/useHostelMode';
 // Components
 import PostComposerVuna from '../components/hostel/PostComposerVuna';
@@ -13,6 +13,8 @@ import LoadingSpinner from '../components/hostel/LoadingSpinner';
 import { HostelHeader } from '../components/hostel/HostelHeader';
 import { HostelModals } from '../components/hostel/HostelModals';
 import BannerSlider from '../components/hostel/BannerSlider';
+import { SpecialCategoryRow } from '../components/hostel/SpecialCategoryRow';
+import { SpecialCategoryManagementSheetV2 } from '../components/v2/SpecialCategoryManagementSheetV2';
 // Hooks
 import { useHostelFeed } from '../hooks/hostel/useHostelFeed';
 import { useHostelCoupons } from '../hooks/hostel/useHostelCoupons';
@@ -50,6 +52,10 @@ export default function HostelHomePage() {
     const [merchantModalOpen, setMerchantModalOpen] = useState(false);
     const [selectedMerchant, setSelectedMerchant] = useState<UniqueVisitor | null>(null);
     const [showBecomeMerchantModal, setShowBecomeMerchantModal] = useState(false);
+    const [showSpecialCategoryManagement, setShowSpecialCategoryManagement] = useState(false);
+
+    // Special Categories
+    const [specialCategories, setSpecialCategories] = useState<SpecialCategory[]>([]);
 
     // Image Modal
     const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -213,6 +219,25 @@ export default function HostelHomePage() {
             }
         };
         fetchHostels();
+    }, [selectedSchoolId]);
+
+    // Fetch Special Categories
+    useEffect(() => {
+        const fetchSpecialCategories = async () => {
+            if (!selectedSchoolId) return;
+            try {
+                const { data } = await supabase
+                    .from('hostel_special_categories')
+                    .select('*')
+                    .eq('school_id', selectedSchoolId)
+                    .eq('is_active', true)
+                    .order('sort_order', { ascending: true });
+                setSpecialCategories(data || []);
+            } catch (err) {
+                console.error('Failed to fetch special categories', err);
+            }
+        };
+        fetchSpecialCategories();
     }, [selectedSchoolId]);
 
 
@@ -462,6 +487,16 @@ export default function HostelHomePage() {
                         {!loadingFeed && !searchTerm && (
                             <>
                                 <LiveActivityHub onUserClick={handleUserClick} />
+
+                                {/* Special Categories Rows - Injected here */}
+                                {selectedCategory === 'all' && specialCategories.map(cat => (
+                                    <SpecialCategoryRow
+                                        key={cat.id}
+                                        category={cat}
+                                        onProductClick={handleProductClick}
+                                    />
+                                ))}
+
                                 <RequestsCarousel
                                     requests={requestItems}
                                     onItemClick={handleRequestClick}
@@ -567,6 +602,22 @@ export default function HostelHomePage() {
                 selectedUpdateForEdit={selectedUpdate}
                 onUpdateSuccess={handleUpdateSuccess}
             />
+
+            {/* Admin Controls */}
+            {currentVisitor?.is_admin && (
+                <div className="fixed bottom-24 right-4 z-50 flex flex-col gap-3">
+                    <button
+                        onClick={() => setShowSpecialCategoryManagement(true)}
+                        className="w-14 h-14 rounded-full bg-purple-600 text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+                    >
+                        <span className="material-symbols-outlined">stars</span>
+                    </button>
+                    <SpecialCategoryManagementSheetV2
+                        isOpen={showSpecialCategoryManagement}
+                        onClose={() => setShowSpecialCategoryManagement(false)}
+                    />
+                </div>
+            )}
 
             {/* Active Coupon Floating Timer */}
             {activeCoupon && timeRemaining !== null && (

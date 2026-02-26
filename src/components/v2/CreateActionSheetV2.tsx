@@ -82,6 +82,23 @@ export const CreateActionSheetV2: React.FC<CreateActionSheetV2Props> = ({
         setFilteredMerchants(filtered);
     }, [merchantSearchTerm, merchants]);
 
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+    const hostelCategories = [
+        'food & snacks',
+        'clothing',
+        'shoes',
+        'caps',
+        'gadgets',
+        'phones',
+        'jewelries',
+        'bags',
+        'fragrances',
+        'beauty & skincare',
+        'hair accessories',
+        'others'
+    ];
+
     // Mock reload for now, the hook needs it but we might want to trigger global refresh
     const { handlePost } = useHostelPosting(currentVisitor, async () => {
         if (onSuccess) onSuccess();
@@ -103,21 +120,22 @@ export const CreateActionSheetV2: React.FC<CreateActionSheetV2Props> = ({
     };
 
     const handleSubmit = async () => {
-        if (!text.trim() && images.length === 0 && mode === 'post') {
-            toast.error('Please add some details or an image');
+        if (!text.trim() && images.length === 0 && !selectedCategory && mode === 'post') {
+            toast.error('Please add some details, an image, or select a category');
             return;
         }
-        if (!text.trim() && mode === 'request') {
-            toast.error('Please describe what you need');
+        if (!text.trim() && !selectedCategory && mode === 'request') {
+            toast.error('Please describe what you need or select a category');
             return;
         }
 
         try {
             setIsPosting(true);
-            await handlePost(text, images, mode === 'request', selectedMerchant?.id);
+            await (handlePost as any)(text, images, mode === 'request', selectedMerchant?.id, selectedCategory || undefined);
             toast.success(mode === 'request' ? 'Request posted successfully!' : 'Product posted successfully!');
             setText('');
             setImages([]);
+            setSelectedCategory(null);
             onClose();
         } catch (error) {
             console.error('Submit error:', error);
@@ -338,13 +356,47 @@ export const CreateActionSheetV2: React.FC<CreateActionSheetV2Props> = ({
                                 multiple
                                 className="hidden"
                             />
+
+                            {/* Category Pills - Dynamic visibility */}
+                            <AnimatePresence>
+                                {!text.trim() && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="space-y-3 overflow-hidden pt-4"
+                                    >
+                                        <div className="flex items-center justify-between px-1">
+                                            <h3 className="text-xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+                                                Select Category
+                                            </h3>
+                                            <span className="text-[10px] font-bold text-primary animate-pulse">Required for quick post</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar -mx-1 px-1">
+                                            {hostelCategories.map((cat) => (
+                                                <button
+                                                    key={cat}
+                                                    type="button"
+                                                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                                                    className={`px-4 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all border ${selectedCategory === cat
+                                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                                                        : 'bg-white dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border-black/5 dark:border-white/5 hover:border-primary/30'
+                                                        }`}
+                                                >
+                                                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         {/* Submit Button */}
                         <div className="mt-8">
                             <button
                                 onClick={handleSubmit}
-                                disabled={isPosting || (!text.trim() && images.length === 0)}
+                                disabled={isPosting || (!text.trim() && images.length === 0 && !selectedCategory)}
                                 className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg shadow-2xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:active:scale-100"
                             >
                                 {isPosting ? (

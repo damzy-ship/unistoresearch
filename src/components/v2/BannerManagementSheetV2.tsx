@@ -39,6 +39,8 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
     const [foundSellers, setFoundSellers] = useState<UniqueVisitor[]>([]);
     const [selectedSeller, setSelectedSeller] = useState<UniqueVisitor | null>(null);
     const [isSearchingSellers, setIsSearchingSellers] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -115,22 +117,31 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
         }
     };
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file || !selectedSchoolId) return;
+        if (!file) return;
 
-        // Basic validation
         if (!file.type.startsWith('image/')) {
-            toast.error('Please upload an image file');
+            toast.error('Please select an image file');
+            return;
+        }
+
+        setSelectedFile(file);
+        setPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const handleSaveBanner = async () => {
+        if (!selectedFile || !selectedSchoolId) {
+            toast.error('Please select an image and university');
             return;
         }
 
         setIsUploading(true);
-        toast.loading('Uploading banner...', { id: 'upload-banner' });
+        const toastId = toast.loading('Uploading banner...');
 
         try {
-            let fileToUpload: File | Blob = file;
-            let fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+            let fileToUpload: File | Blob = selectedFile;
+            let fileExt = selectedFile.name.split('.').pop()?.toLowerCase() || 'webp';
 
             try {
                 const options = {
@@ -139,7 +150,7 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                     useWebWorker: true,
                     fileType: 'image/webp'
                 };
-                fileToUpload = await imageCompression(file, options);
+                fileToUpload = await imageCompression(selectedFile, options);
                 fileExt = 'webp';
             } catch (err) {
                 console.error("Compression error:", err);
@@ -148,15 +159,15 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
             const fileName = `${selectedSchoolId}-${Date.now()}.${fileExt}`;
             const filePath = `banners/${fileName}`;
 
-            // Upload image using the post_images bucket
+            // Upload image using the product-images bucket
             const { error: uploadError } = await supabase.storage
-                .from('post_images')
+                .from('product-images')
                 .upload(filePath, fileToUpload);
 
             if (uploadError) throw uploadError;
 
             const { data: { publicUrl } } = supabase.storage
-                .from('post_images')
+                .from('product-images')
                 .getPublicUrl(filePath);
 
             const encodedSubtitle = promotionType !== 'none'
@@ -187,7 +198,7 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                 toast.success(`Notification sent to ${selectedSeller.full_name}`);
             }
 
-            toast.success('Banner added successfully!', { id: 'upload-banner' });
+            toast.success('Banner added successfully!', { id: toastId });
             // Dispatch refresh event to update homepage
             window.dispatchEvent(new CustomEvent('hostel-feed-refresh'));
             setNewTitle('');
@@ -195,9 +206,11 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
             setPromotionType('none');
             setSelectedSeller(null);
             setSellerSearchQuery('');
+            setSelectedFile(null);
+            setPreviewUrl(null);
             fetchBanners(selectedSchoolId); // Refresh
         } catch (error: any) {
-            toast.error(error.message || 'Failed to upload banner', { id: 'upload-banner' });
+            toast.error(error.message || 'Failed to upload banner', { id: toastId });
         } finally {
             setIsUploading(false);
         }
@@ -404,24 +417,49 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                                                 )}
                                             </div>
 
-                                            <div className="relative border-2 border-dashed border-zinc-200 dark:border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-primary transition-all cursor-pointer group bg-zinc-50/50 dark:bg-black/10">
+                                            <div className="relative border-2 border-dashed border-zinc-200 dark:border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 hover:border-primary transition-all cursor-pointer group bg-zinc-50/50 dark:bg-black/10 overflow-hidden">
+                                                {previewUrl ? (
+                                                    <div className="absolute inset-0 z-0">
+                                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover opacity-40 blur-[2px]" />
+                                                        <div className="absolute inset-0 bg-white/20 dark:bg-black/40" />
+                                                    </div>
+                                                ) : null}
+
                                                 <input
                                                     type="file"
                                                     accept="image/*"
-                                                    onChange={handleFileUpload}
+                                                    onChange={handleFileSelect}
                                                     disabled={isUploading || !selectedSchoolId}
                                                     className="absolute inset-0 opacity-0 w-full h-full cursor-pointer disabled:cursor-not-allowed z-20"
                                                 />
-                                                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                                                    <span className="material-symbols-outlined text-2xl font-bold">cloud_upload</span>
+                                                <div className="relative z-10 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                                                    <span className="material-symbols-outlined text-2xl font-bold">{previewUrl ? 'edit' : 'cloud_upload'}</span>
                                                 </div>
-                                                <div className="text-center">
-                                                    <p className="text-xs font-black text-[#1a2a40] dark:text-white uppercase tracking-widest mb-1">
-                                                        {isUploading ? 'Uploading...' : 'Upload Image'}
+                                                <div className="relative z-10 text-center">
+                                                    <p className="text-[10px] font-black text-[#1a2a40] dark:text-white uppercase tracking-widest mb-1">
+                                                        {selectedFile ? 'Change Image' : 'Select Banner Image'}
                                                     </p>
-                                                    <p className="text-[10px] font-medium text-zinc-400">PNG, JPG or WebP (Max 1MB)</p>
+                                                    <p className="text-[9px] font-medium text-zinc-400">PNG, JPG or WebP (Max 1MB)</p>
                                                 </div>
                                             </div>
+
+                                            <button
+                                                onClick={handleSaveBanner}
+                                                disabled={isUploading || !selectedFile}
+                                                className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 shadow-lg ${isUploading || !selectedFile ? 'bg-zinc-200 dark:bg-white/5 text-zinc-400 cursor-not-allowed' : 'bg-primary text-white hover:brightness-110 active:scale-95 shadow-primary/20'}`}
+                                            >
+                                                {isUploading ? (
+                                                    <>
+                                                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className="material-symbols-outlined text-sm">rocket_launch</span>
+                                                        Post Banner
+                                                    </>
+                                                )}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -481,14 +519,22 @@ export const BannerManagementSheetV2: React.FC<BannerManagementSheetV2Props> = (
                                                         </div>
                                                     </div>
                                                     <div className="p-5">
-                                                        <div className="flex items-center gap-2 mb-2">
-                                                            <p className="font-black text-sm text-[#1a2a40] dark:text-white truncate">{banner.title || 'Untitled Banner'}</p>
+                                                        <div className="flex items-center gap-2 mb-2 min-h-[20px]">
+                                                            {banner.title ? (
+                                                                <p className="font-black text-sm text-[#1a2a40] dark:text-white truncate">{banner.title}</p>
+                                                            ) : (
+                                                                <p className="text-[10px] font-bold text-zinc-300 dark:text-zinc-600 uppercase tracking-widest italic">No Title</p>
+                                                            )}
                                                             {banner.subtitle?.includes('[PROMO:seller]') && (
                                                                 <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-tighter border border-emerald-500/20 shadow-sm">Merchant Highlight</span>
                                                             )}
                                                         </div>
                                                         <p className="text-[10px] font-medium text-zinc-500 truncate leading-relaxed">
-                                                            {banner.subtitle?.replace(/\[PROMO:(seller|product)\]/, '').replace(/\[SELLER_ID:[^\]]+\]/, '') || 'No description provided'}
+                                                            {banner.subtitle ? (
+                                                                banner.subtitle.replace(/\[PROMO:(seller|product)\]/, '').replace(/\[SELLER_ID:[^\]]+\]/, '')
+                                                            ) : (
+                                                                <span className="text-zinc-300 dark:text-zinc-700 italic">No description provided</span>
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>
