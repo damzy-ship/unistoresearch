@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 interface ManualCategoryProductSelectorProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
     category: SpecialCategory | null;
     schoolId: string;
 }
@@ -13,6 +14,7 @@ interface ManualCategoryProductSelectorProps {
 export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelectorProps> = ({
     isOpen,
     onClose,
+    onSuccess,
     category,
     schoolId
 }) => {
@@ -21,10 +23,14 @@ export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelect
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
     const [initialSelectedIds, setInitialSelectedIds] = useState<Set<string>>(new Set());
+    const [title, setTitle] = useState('');
+    const [subtitle, setSubtitle] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (isOpen && category && schoolId) {
+            setTitle(category.title || '');
+            setSubtitle(category.subtitle || '');
             fetchProducts();
         }
     }, [isOpen, category, schoolId]);
@@ -90,6 +96,21 @@ export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelect
         if (!category) return;
         setIsSaving(true);
         try {
+            let categoryUpdated = false;
+            if (title !== category.title || subtitle !== (category.subtitle || '')) {
+                const { error: categoryError } = await supabase
+                    .from('hostel_special_categories')
+                    .update({ title, subtitle: subtitle || null })
+                    .eq('id', category.id);
+
+                if (categoryError) {
+                    console.error('Error updating category details:', categoryError);
+                    toast.error('Failed to update category name');
+                } else {
+                    categoryUpdated = true;
+                }
+            }
+
             const addedIds = Array.from(selectedProductIds).filter(id => !initialSelectedIds.has(id));
             const removedIds = Array.from(initialSelectedIds).filter(id => !selectedProductIds.has(id));
 
@@ -124,8 +145,13 @@ export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelect
                 }
             }
 
-            toast.success('Product selection updated successfully');
-            onClose();
+            toast.success('Category and selection updated successfully');
+            if (onSuccess || categoryUpdated) {
+                if (onSuccess) onSuccess();
+                else onClose();
+            } else {
+                onClose();
+            }
         } catch (error: any) {
             console.error('Error saving manual product selection:', error);
             toast.error('Failed to save selection');
@@ -152,10 +178,10 @@ export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelect
                         <div className="flex flex-col gap-1 w-full md:w-auto">
                             <h2 className="text-lg md:text-2xl font-bold text-[#1a2a40] dark:text-white flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary text-[20px] md:text-[24px]">touch_app</span>
-                                Edit Manual Selection
+                                Edit Category & Selection
                             </h2>
                             <p className="text-[10px] md:text-sm text-zinc-500 font-medium line-clamp-1">
-                                Category: <span className="text-primary font-bold">{category.title}</span> ({selectedProductIds.size} selected)
+                                Update the category details and select products to include. ({selectedProductIds.size} selected)
                             </p>
                         </div>
                         <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end">
@@ -168,7 +194,7 @@ export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelect
                             </button>
                             <button
                                 onClick={handleSavePrimary}
-                                disabled={isSaving || (selectedProductIds.size === initialSelectedIds.size && Array.from(selectedProductIds).every(id => initialSelectedIds.has(id)))}
+                                disabled={isSaving || (selectedProductIds.size === initialSelectedIds.size && Array.from(selectedProductIds).every(id => initialSelectedIds.has(id)) && title === category.title && subtitle === (category.subtitle || ''))}
                                 className="px-4 md:px-6 py-2 bg-primary text-white rounded-xl text-xs md:text-sm font-black shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-1 md:gap-2 flex-1 md:flex-none"
                             >
                                 {isSaving ? (
@@ -183,6 +209,32 @@ export const ManualCategoryProductSelector: React.FC<ManualCategoryProductSelect
                                     </>
                                 )}
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Category Details Edit */}
+                    <div className="p-4 md:px-8 border-b border-black/5 dark:border-white/5 bg-white/30 dark:bg-black/10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest pl-1">Category Title</label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className="w-full bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm font-bold text-[#1a2a40] dark:text-white outline-none focus:border-primary transition-all shadow-sm"
+                                    placeholder="Enter category title"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest pl-1">Subtitle (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={subtitle}
+                                    onChange={(e) => setSubtitle(e.target.value)}
+                                    className="w-full bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1a2a40] dark:text-white outline-none focus:border-primary transition-all shadow-sm"
+                                    placeholder="Enter subtitle"
+                                />
+                            </div>
                         </div>
                     </div>
 

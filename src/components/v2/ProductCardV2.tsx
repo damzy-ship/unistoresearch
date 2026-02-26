@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { toggleProductLike, getProductLikeInfo } from '../../lib/merchantAnalytics';
-import { toast } from 'sonner';
 
 interface ProductCardV2Props {
     product: any;
@@ -16,37 +14,6 @@ export const ProductCardV2: React.FC<ProductCardV2Props> = ({
     fallbackImage,
     index
 }) => {
-    const [likeInfo, setLikeInfo] = useState({ likeCount: 0, isLiked: false });
-
-    useEffect(() => {
-        if (product?.id) {
-            getProductLikeInfo(product.id).then(setLikeInfo);
-        }
-    }, [product?.id]);
-
-    const handleToggleLike = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!product?.id) return;
-
-        /* Likes commented out for now
-        const wasLiked = likeInfo.isLiked;
-        const newIsLiked = !wasLiked;
-        setLikeInfo(prev => ({
-            isLiked: newIsLiked,
-            likeCount: newIsLiked ? prev.likeCount + 1 : prev.likeCount - 1
-        }));
-
-        const result = await toggleProductLike(product.id, product.actual_user_id || null);
-
-        if (!result.success) {
-            setLikeInfo(prev => ({
-                isLiked: wasLiked,
-                likeCount: wasLiked ? prev.likeCount + 1 : prev.likeCount - 1
-            }));
-            toast.error('Failed to update like');
-        }
-        */
-    };
 
     return (
         <motion.div
@@ -56,7 +23,7 @@ export const ProductCardV2: React.FC<ProductCardV2Props> = ({
             onClick={onClick}
             className="bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden shadow-sm border border-black/5 dark:border-white/10 flex flex-col group transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] cursor-pointer relative"
         >
-            <div className="relative aspect-[4/5] overflow-hidden m-2.5 rounded-[2rem]">
+            <div className="relative aspect-[4/5] overflow-hidden m-2.5 rounded-t-[2rem]">
                 <img
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     src={product.post_images?.[0] || fallbackImage}

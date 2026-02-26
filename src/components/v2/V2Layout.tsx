@@ -416,7 +416,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                             </span>
                         </button>
 
-                        <div
+                        {/* <div
                             onClick={() => setHostelMode(!hostelMode)}
                             className="flex items-center gap-3 bg-zinc-100 dark:bg-white/5 pl-4 pr-1.5 py-1.5 rounded-full border border-zinc-200 dark:border-white/10 cursor-pointer hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
                         >
@@ -424,7 +424,7 @@ export const V2Layout: React.FC<V2LayoutProps> = ({
                             <div className={`w-11 h-6 rounded-full relative flex items-center px-1 transition-colors duration-300 ${hostelMode ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
                                 <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${hostelMode ? 'translate-x-5' : 'translate-x-0'}`}></div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </header>
 

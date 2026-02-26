@@ -28,6 +28,18 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
     const [keywords, setKeywords] = useState('');
     const [categoryValue, setCategoryValue] = useState('');
     const [editingManualCategory, setEditingManualCategory] = useState<SpecialCategory | null>(null);
+    const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+    // Close options menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (activeMenuId && !(e.target as Element).closest('.options-menu')) {
+                setActiveMenuId(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [activeMenuId]);
 
     useEffect(() => {
         if (isOpen) {
@@ -409,31 +421,69 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{cat.subtitle || 'No subtitle'}</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    {cat.rule_type === 'manual' && (
-                                                        <button
-                                                            onClick={() => setEditingManualCategory(cat)}
-                                                            className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold uppercase"
-                                                        >
-                                                            <span className="material-symbols-outlined text-[14px]">edit_square</span>
-                                                        </button>
-                                                    )}
+                                                <div className="relative options-menu ml-2">
                                                     <button
-                                                        onClick={() => toggleCategoryStatus(cat.id, cat.is_active)}
-                                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${cat.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}
+                                                        onClick={() => setActiveMenuId(activeMenuId === cat.id ? null : cat.id)}
+                                                        className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center"
                                                     >
-                                                        <span className="material-symbols-outlined text-[18px]">{cat.is_active ? 'visibility' : 'visibility_off'}</span>
+                                                        <span className="material-symbols-outlined text-lg">more_vert</span>
                                                     </button>
-                                                    <button
-                                                        onClick={() => deleteCategory(cat.id)}
-                                                        className="w-8 h-8 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[18px]">delete</span>
-                                                    </button>
+
+                                                    <AnimatePresence>
+                                                        {activeMenuId === cat.id && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#2a1a14] border border-black/5 dark:border-white/10 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] z-50 overflow-hidden"
+                                                            >
+                                                                <div className="flex flex-col py-2 p-1 gap-1">
+                                                                    {cat.rule_type === 'manual' && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setEditingManualCategory(cat);
+                                                                                setActiveMenuId(null);
+                                                                            }}
+                                                                            className="w-full px-4 py-2 text-left rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors flex items-center gap-3 text-sm font-bold text-[#1a2a40] dark:text-white"
+                                                                        >
+                                                                            <span className="material-symbols-outlined text-[18px] text-blue-500">edit_square</span>
+                                                                            Edit Selection
+                                                                        </button>
+                                                                    )}
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            toggleCategoryStatus(cat.id, cat.is_active);
+                                                                            setActiveMenuId(null);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors flex items-center gap-3 text-sm font-bold text-[#1a2a40] dark:text-white"
+                                                                    >
+                                                                        <span className={`material-symbols-outlined text-[18px] ${cat.is_active ? 'text-zinc-400' : 'text-emerald-500'}`}>
+                                                                            {cat.is_active ? 'visibility_off' : 'visibility'}
+                                                                        </span>
+                                                                        {cat.is_active ? 'Hide Row' : 'Show Row'}
+                                                                    </button>
+                                                                    <div className="h-px bg-black/5 dark:bg-white/5 my-1" />
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            deleteCategory(cat.id);
+                                                                            setActiveMenuId(null);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex items-center gap-3 text-sm font-bold text-red-500"
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                                                                        Delete Row
+                                                                    </button>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
                                                 </div>
                                             </div>
-                                            <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5 pl-10">
-                                                <code className="text-[9px] text-zinc-400 block truncate">CONFIG: {JSON.stringify(cat.rule_config)}</code>
+                                            <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5 pl-8 md:pl-10">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="material-symbols-outlined text-[12px] text-zinc-400">code</span>
+                                                    <code className="text-[9px] text-zinc-500 dark:text-zinc-400 block truncate">CONFIG: {JSON.stringify(cat.rule_config)}</code>
+                                                </div>
                                             </div>
                                         </Reorder.Item>
                                     ))}
@@ -446,6 +496,10 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                 <ManualCategoryProductSelector
                     isOpen={!!editingManualCategory}
                     onClose={() => setEditingManualCategory(null)}
+                    onSuccess={() => {
+                        setEditingManualCategory(null);
+                        if (selectedSchoolId) fetchCategories(selectedSchoolId);
+                    }}
                     category={editingManualCategory}
                     schoolId={selectedSchoolId}
                 />

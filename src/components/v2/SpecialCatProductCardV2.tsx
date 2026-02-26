@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { toggleProductLike, getProductLikeInfo } from '../../lib/merchantAnalytics';
-import { toast } from 'sonner';
+// import {  getProductLikeInfo } from '../../lib/merchantAnalytics';
+// import { toast } from 'sonner';
 
 interface SpecialCatProductCardV2Props {
     product: any;
@@ -16,37 +16,37 @@ export const SpecialCatProductCardV2: React.FC<SpecialCatProductCardV2Props> = (
     fallbackImage,
     index
 }) => {
-    const [likeInfo, setLikeInfo] = useState({ likeCount: 0, isLiked: false });
+    // const [likeInfo, setLikeInfo] = useState({ likeCount: 0, isLiked: false });
 
-    useEffect(() => {
-        if (product?.id) {
-            getProductLikeInfo(product.id).then(setLikeInfo);
-        }
-    }, [product?.id]);
+    // useEffect(() => {
+    //     if (product?.id) {
+    //         getProductLikeInfo(product.id).then(setLikeInfo);
+    //     }
+    // }, [product?.id]);
 
-    const handleToggleLike = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!product?.id) return;
+    // const handleToggleLike = async (e: React.MouseEvent) => {
+    //     e.stopPropagation();
+    //     if (!product?.id) return;
 
-        /* Likes commented out for now
-        const wasLiked = likeInfo.isLiked;
-        const newIsLiked = !wasLiked;
-        setLikeInfo(prev => ({
-            isLiked: newIsLiked,
-            likeCount: newIsLiked ? prev.likeCount + 1 : prev.likeCount - 1
-        }));
+    //     /* Likes commented out for now
+    //     const wasLiked = likeInfo.isLiked;
+    //     const newIsLiked = !wasLiked;
+    //     setLikeInfo(prev => ({
+    //         isLiked: newIsLiked,
+    //         likeCount: newIsLiked ? prev.likeCount + 1 : prev.likeCount - 1
+    //     }));
 
-        const result = await toggleProductLike(product.id, product.actual_user_id || null);
+    //     const result = await toggleProductLike(product.id, product.actual_user_id || null);
 
-        if (!result.success) {
-            setLikeInfo(prev => ({
-                isLiked: wasLiked,
-                likeCount: wasLiked ? prev.likeCount + 1 : prev.likeCount - 1
-            }));
-            toast.error('Failed to update like');
-        }
-        */
-    };
+    //     if (!result.success) {
+    //         setLikeInfo(prev => ({
+    //             isLiked: wasLiked,
+    //             likeCount: wasLiked ? prev.likeCount + 1 : prev.likeCount - 1
+    //         }));
+    //         toast.error('Failed to update like');
+    //     }
+    //     */
+    // };
 
     return (
         <motion.div
