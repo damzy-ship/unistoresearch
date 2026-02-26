@@ -50,7 +50,7 @@ async function processImages(tableName: string, urlColumn: string, isArray: bool
     let totalImagesProcessed = 0;
     let totalRecordsUpdated = 0;
 
-    for (const record of records) {
+    for (const record of (records as any[])) {
         const imageUrls: string[] = isArray ? (record[urlColumn] || []) : [record[urlColumn]];
         let hasChanges = false;
         const newUrls: string[] = [];

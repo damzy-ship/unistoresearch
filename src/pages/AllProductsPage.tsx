@@ -6,7 +6,7 @@ import { generateAndEmbedSingleProduct } from '../lib/generateEmbedding';
 import imageCompression from 'browser-image-compression';
 
 // Reusable functions from your original component
-const uploadImageToSupabase = async (file, merchantId) => {
+const uploadImageToSupabase = async (file: File, merchantId: string) => {
     let fileToUpload = file;
     let fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
 
@@ -41,7 +41,7 @@ const uploadImageToSupabase = async (file, merchantId) => {
     return publicUrl;
 };
 
-const deleteImageFromSupabase = async (imageUrl) => {
+const deleteImageFromSupabase = async (imageUrl: string) => {
     const urlParts = imageUrl.split('/');
     const fileName = urlParts.slice(urlParts.indexOf('product-images') + 1).join('/');
 
@@ -109,7 +109,7 @@ export default function AllProductsPage() {
             if (error) {
                 throw error;
             }
-            setSchools(data || []);
+            setSchools(data?.map(s => ({ ...s, name: s.short_name })) || []);
             // Default to first school if available
         } catch (err) {
             console.error('Error fetching schools:', err);
@@ -141,7 +141,7 @@ export default function AllProductsPage() {
             setTotalPages(pagination.total_pages);
         } catch (err) {
             console.error('Error fetching paginated products:', err);
-            setError('Failed to load products. ' + err.message);
+            setError('Failed to load products. ' + (err instanceof Error ? err.message : String(err)));
         } finally {
             setLoading(false);
         }
@@ -159,9 +159,9 @@ export default function AllProductsPage() {
         }
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
         return allProducts.filter(product =>
-            product.product_description.toLowerCase().includes(lowerCaseSearchTerm) ||
-            product.search_description.toLowerCase().includes(lowerCaseSearchTerm) ||
-            product.merchant_id.toLowerCase().includes(lowerCaseSearchTerm)
+            (product.product_description || '').toLowerCase().includes(lowerCaseSearchTerm) ||
+            (product.search_description || '').toLowerCase().includes(lowerCaseSearchTerm) ||
+            (product.merchant_id || '').toLowerCase().includes(lowerCaseSearchTerm)
         );
     }, [allProducts, searchTerm]);
 
@@ -169,7 +169,7 @@ export default function AllProductsPage() {
         setEditingProduct(product);
         setProductDescription(product.product_description);
         setProductPrice(product.product_price);
-        setSearchDescription(product.search_description);
+        setSearchDescription(product.search_description || '');
         setIsAvailable(product.is_available);
         setNewFiles([]);
         setShowForm(true);
@@ -222,7 +222,7 @@ export default function AllProductsPage() {
             }
 
             setUploadingImages(true);
-            const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, editingProduct.merchant_id))) : [];
+            const newUrls = newFiles.length > 0 ? await Promise.all(newFiles.map(file => uploadImageToSupabase(file, editingProduct.merchant_id || 'anonymous'))) : [];
             setUploadingImages(false);
 
             const updatedImageUrls = [...(editingProduct?.image_urls || []), ...newUrls];

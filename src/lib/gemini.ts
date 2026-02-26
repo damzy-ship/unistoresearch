@@ -4,6 +4,7 @@ import { fetchExistingCategories } from './categoryService';
 // import { transformDescriptionForEmbedding } from './generateEmbedding';
 
 const API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
+  // @ts-ignore - process might not exist in browser but exists in node scripts
   (typeof process !== 'undefined' && process.env?.VITE_GEMINI_API_KEY);
 
 if (!API_KEY) {

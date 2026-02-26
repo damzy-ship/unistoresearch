@@ -3,7 +3,10 @@ import { supabase } from './supabase'; // Assuming this path is correct
 import predefinedCategories from '../data/product_categories.json';
 import predefinedFeatures from '../data/product_features.json';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// @ts-ignore
+const API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
+  // @ts-ignore
+  (typeof process !== 'undefined' && process.env?.VITE_GEMINI_API_KEY);
 
 if (!API_KEY) {
   console.error('VITE_GEMINI_API_KEY is not defined. Cannot generate embeddings.');
@@ -41,7 +44,7 @@ export async function updateMerchantProductAttributes(productsToUpdate: Merchant
         continue;
       }
 
-      console.log(`Updating product ID: ${id}`);
+      console.log(`Updating product ID: ${id} `);
       const { error } = await supabase
         .from('merchant_products')
         .update({
@@ -51,14 +54,14 @@ export async function updateMerchantProductAttributes(productsToUpdate: Merchant
         .eq('id', id);
 
       if (error) {
-        console.error(`Error updating product ${id}:`, error.message);
+        console.error(`Error updating product ${id}: `, error.message);
         results.push({ id, status: 'failed', error: error.message });
       } else {
         console.log(`Successfully updated product ${id}.`);
         results.push({ id, status: 'success' });
       }
     } catch (err) {
-      console.error(`Unexpected error for product ${product.id}:`, err);
+      console.error(`Unexpected error for product ${product.id}: `, err);
       results.push({ id: product.id, status: 'error', error: 'Unexpected error' });
     }
   }
@@ -82,30 +85,27 @@ export async function transformDescriptionForEmbedding(originalText: string): Pr
 
   // Step 1: Generate categories and features from the original text
   const extractionPrompt = `
-    Analyze the following product description and extract the main product categories and key features (like color, size, material).
-    Return the result as a JSON object with two keys: "categories" (an array of strings) and "features" (an object with key-value pairs).
+    Analyze the following product description and extract the main product categories and key features(like color, size, material).
+    Return the result as a JSON object with two keys: "categories"(an array of strings) and "features"(an object with key - value pairs).
 
     Product Description: "${originalText}"
 
     Example output format:
-    {
-      "categories": ["clothing", "luxury fashion"],
-      "features": {
-        "color": "blue",
-        "material": "cotton"
-      }
-    }
-    `;
+{
+  "categories": ["clothing", "luxury fashion"],
+    "features": {
+    "color": "blue",
+      "material": "cotton"
+  }
+}
+`;
 
   let categories = [];
   let features = {};
 
   try {
     const extractionResult = await generativeModel.generateContent({
-      contents: [{ parts: [{ text: extractionPrompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json'
-      }
+      contents: [{ role: 'user', parts: [{ text: extractionPrompt }] }],
     });
 
     const extractionData = JSON.parse(extractionResult.response.text());
@@ -120,35 +120,35 @@ export async function transformDescriptionForEmbedding(originalText: string): Pr
   }
 
   // Step 2: Use the generated categories and features to create the final description
-  const categoriesText = categories.length > 0 ? `Categories: ${categories.join(', ')}` : '';
-  const featuresText = Object.keys(features).length > 0 ? `Features: ${Object.entries(features).map(([key, value]) => `${key}: ${value}`).join(', ')}` : '';
+  const categoriesText = categories.length > 0 ? `Categories: ${categories.join(', ')} ` : '';
+  const featuresText = Object.keys(features).length > 0 ? `Features: ${Object.entries(features).map(([key, value]) => `${key}: ${value}`).join(', ')} ` : '';
 
   const descriptionPrompt = `
-  Please act as a friendly guide describing a product to someone who cannot see it, like a child or a person who is blind. The description should be simple, clear, and focused on helping them understand what the product is and what it's for.
+  Please act as a friendly guide describing a product to someone who cannot see it, like a child or a person who is blind.The description should be simple, clear, and focused on helping them understand what the product is and what it's for.
 
   Your description should:
-  - State the main product category first (e.g., shoe, electronic device, kitchen appliance).
+- State the main product category first(e.g., shoe, electronic device, kitchen appliance).
   - Use simple words and a natural, conversational tone.
   - Explain the purpose or use of the product.
   - Be no longer than 30 words.
 
   Follow these examples:
-  Original: nike shoes size 42
-  New: This is a pair of shoes, specifically Nike footwear, for someone looking for a size 42.
+Original: nike shoes size 42
+New: This is a pair of shoes, specifically Nike footwear, for someone looking for a size 42.
 
   Original: coffee machine with grinder
   New: This is a kitchen appliance, a coffee machine, that can grind fresh beans for you.
 
   Original: sony wireless headphones with noise cancelling
-  New: This is an electronic device, a pair of headphones, that lets you listen to music without wires and blocks out sound.
+New: This is an electronic device, a pair of headphones, that lets you listen to music without wires and blocks out sound.
 
   Product Information:
-  - Original Description: ${originalText}
+- Original Description: ${originalText}
   ${categoriesText}
   ${featuresText}
 
   Please ensure the output is only the new description text and nothing else.
- `;
+`;
 
   try {
     const result = await generativeModel.generateContent(descriptionPrompt);
@@ -214,12 +214,12 @@ export async function generateProductEmbeddings() {
           .eq('id', product.id);
 
         if (updateError) {
-          console.error(`Error updating embedding for product ID ${product.id}:`, updateError.message);
+          console.error(`Error updating embedding for product ID ${product.id}: `, updateError.message);
         } else {
-          console.log(`Successfully embedded and stored for product ID ${product.id}`);
+          console.log(`Successfully embedded and stored for product ID ${product.id} `);
         }
       } catch (embeddingError) {
-        console.error(`Error generating or updating embedding for product ID ${product.id}:`, embeddingError);
+        console.error(`Error generating or updating embedding for product ID ${product.id}: `, embeddingError);
       }
     }
 
@@ -262,25 +262,25 @@ export async function getMatchingCategoriesAndFeatures(originalText: string): Pr
   // Step 1: Generate categories and features from the original text
   const extractionPrompt = `
     Analyze the following product description.
-    - **Categories**: Extract the most relevant categories and match them against this provided list: ${JSON.stringify(predefinedCategories)}. Limit the output to the top 5 most relevant categories.
-    - **Features**: Extract key features (like color, size, material) and also include gender-based categories as a feature (e.g., gender: "men's", "women's"). Match features against this provided list: ${JSON.stringify(predefinedFeatures)}.
+    - ** Categories **: Extract the most relevant categories and match them against this provided list: ${JSON.stringify(predefinedCategories)}. Limit the output to the top 5 most relevant categories.
+    - ** Features **: Extract key features(like color, size, material) and also include gender - based categories as a feature(e.g., gender: "men's", "women's").Match features against this provided list: ${JSON.stringify(predefinedFeatures)}.
 
-    Return the results as a single JSON object with two keys: "categories" and "features". Both values should be arrays of strings in "key: value" format.
+    Return the results as a single JSON object with two keys: "categories" and "features".Both values should be arrays of strings in "key: value" format.
 
     Product Description: "${originalText}"
 
     Example output format:
-    {
-      "categories": [
-        "clothing",
-        "luxury fashion"
-      ],
-      "features": [
-        "blue",
-        "cotton",
-        "women's"
-      ]
-    }
+{
+  "categories": [
+    "clothing",
+    "luxury fashion"
+  ],
+    "features": [
+      "blue",
+      "cotton",
+      "women's"
+    ]
+}
 `;
 
   let categories = [];
@@ -288,10 +288,7 @@ export async function getMatchingCategoriesAndFeatures(originalText: string): Pr
 
   try {
     const extractionResult = await generativeModel.generateContent({
-      contents: [{ parts: [{ text: extractionPrompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json'
-      }
+      contents: [{ role: 'user', parts: [{ text: extractionPrompt }] }],
     });
 
     const extractionData = JSON.parse(extractionResult.response.text());

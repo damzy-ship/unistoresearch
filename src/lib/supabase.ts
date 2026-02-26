@@ -1,8 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
+// @ts-ignore
 const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  // @ts-ignore
   (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL);
+// @ts-ignore
 const supabaseAnonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  // @ts-ignore
   (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY);
 
 console.log('Supabase URL:', supabaseUrl);
