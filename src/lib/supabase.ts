@@ -223,7 +223,7 @@ export interface SpecialCategory {
   school_id: string;
   title: string;
   subtitle: string | null;
-  rule_type: 'price' | 'ai' | 'category' | 'keyword';
+  rule_type: 'price' | 'ai' | 'category' | 'keyword' | 'manual';
   rule_config: any;
   is_active: boolean;
   sort_order: number;

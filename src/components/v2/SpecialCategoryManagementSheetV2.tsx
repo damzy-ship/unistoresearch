@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { supabase, School, SpecialCategory } from '../../lib/supabase';
 import { toast } from 'sonner';
+import { ManualCategoryProductSelector } from './ManualCategoryProductSelector';
 
 interface SpecialCategoryManagementSheetV2Props {
     isOpen: boolean;
@@ -17,6 +18,7 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
     const [categories, setCategories] = useState<SpecialCategory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isReordering, setIsReordering] = useState(false);
 
     // Form states
     const [title, setTitle] = useState('');
@@ -25,6 +27,7 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
     const [maxPrice, setMaxPrice] = useState('');
     const [keywords, setKeywords] = useState('');
     const [categoryValue, setCategoryValue] = useState('');
+    const [editingManualCategory, setEditingManualCategory] = useState<SpecialCategory | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -87,6 +90,8 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                 parsedConfig = { category: categoryValue };
             } else if (ruleType === 'ai') {
                 parsedConfig = { smart: true };
+            } else if (ruleType === 'manual') {
+                parsedConfig = { manual: true };
             }
 
             const { error } = await supabase
@@ -97,7 +102,8 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                     subtitle: subtitle || null,
                     rule_type: ruleType,
                     rule_config: parsedConfig,
-                    is_active: true
+                    is_active: true,
+                    sort_order: categories.length
                 });
 
             if (error) throw error;
@@ -109,6 +115,14 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
             setKeywords('');
             setCategoryValue('');
             fetchCategories(selectedSchoolId);
+
+            // If it's a manual category, open the product selector immediately
+            if (ruleType === 'manual') {
+                const newCategory = (await supabase.from('hostel_special_categories').select('*').eq('school_id', selectedSchoolId).order('created_at', { ascending: false }).limit(1).single()).data;
+                if (newCategory) {
+                    setEditingManualCategory(newCategory);
+                }
+            }
         } catch (error: any) {
             toast.error(error.message || 'Failed to create category');
         } finally {
@@ -145,6 +159,50 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
             toast.success('Category deleted');
         } catch (error: any) {
             toast.error('Failed to delete category');
+        }
+    };
+
+    const handleReorder = (newOrder: SpecialCategory[]) => {
+        setCategories(newOrder);
+    };
+
+    const saveNewOrder = async () => {
+        setIsReordering(true);
+        try {
+            const updates = categories.map((cat, index) => ({
+                id: cat.id,
+                sort_order: index
+            }));
+
+            // Supabase doesn't easily support bulk updates of different values, so we loop for now
+            // Ensure you have RLS policies permitting this or handle serverlessly if large scale
+            for (const update of updates) {
+                const { error, data } = await supabase
+                    .from('hostel_special_categories')
+                    .update({ sort_order: update.sort_order })
+                    .eq('id', update.id)
+                    .select();
+
+                console.log(`Update Result for ${update.id}:`, data, error);
+                if (error) throw error;
+            }
+
+            // Immediately check what the DB thinks the order is
+            const { data: verifyData } = await supabase
+                .from('hostel_special_categories')
+                .select('id, title, sort_order')
+                .eq('school_id', selectedSchoolId)
+                .order('sort_order', { ascending: true });
+
+            console.log('Database verify order:', verifyData);
+
+            toast.success('Order saved successfully');
+        } catch (error: any) {
+            console.error('Failed to save order in Postgres:', error);
+            toast.error('Failed to save new order - check DB column exists');
+            if (selectedSchoolId) fetchCategories(selectedSchoolId); // revert on fail
+        } finally {
+            setIsReordering(false);
         }
     };
 
@@ -222,8 +280,8 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                                             className="w-full bg-zinc-50 dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#1a2a40] dark:text-white outline-none focus:border-primary transition-all shadow-inner"
                                         />
 
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {(['ai', 'price', 'category', 'keyword'] as const).map((type) => (
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                            {(['ai', 'price', 'category', 'keyword', 'manual'] as const).map((type) => (
                                                 <button
                                                     key={type}
                                                     type="button"
@@ -241,6 +299,15 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                                                     <p className="text-[10px] text-primary font-bold uppercase tracking-[0.1em] mb-1">How it works</p>
                                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
                                                         The AI will automatically scan product titles and descriptions to find matches for <strong>"{title || 'your title'}"</strong>.
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {ruleType === 'manual' && (
+                                                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4">
+                                                    <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-[0.1em] mb-1">How it works</p>
+                                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                                        You will manually select individual products to include in this category. After creation, you'll be prompted to select products.
                                                     </p>
                                                 </div>
                                             )}
@@ -306,26 +373,51 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                             {/* Active Rows */}
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between px-2">
-                                    <h3 className="font-bold text-[#1a2a40] dark:text-white">Defined Rows</h3>
-                                    <span className="text-[10px] font-black bg-zinc-100 dark:bg-white/10 px-3 py-1 rounded-full text-zinc-500 uppercase tracking-widest">
-                                        {categories.length} Active
-                                    </span>
+                                    <div className="flex flex-col gap-1">
+                                        <h3 className="font-bold text-[#1a2a40] dark:text-white">Defined Rows</h3>
+                                        <p className="text-[10px] text-zinc-500 font-medium">Drag the handle to reorder</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={saveNewOrder}
+                                            disabled={isReordering || categories.length === 0}
+                                            className="text-[10px] font-black bg-primary/10 text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-full uppercase tracking-widest transition-all disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            {isReordering ? 'SAVING...' : 'SAVE ORDER'}
+                                        </button>
+                                        <span className="text-[10px] font-black bg-zinc-100 dark:bg-white/10 px-3 py-1.5 rounded-full text-zinc-500 uppercase tracking-widest">
+                                            {categories.length} Active
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div className="space-y-4 pb-20">
+                                <Reorder.Group axis="y" values={categories} onReorder={handleReorder} className="space-y-4 pb-20">
                                     {categories.map(cat => (
-                                        <div key={cat.id} className="bg-white dark:bg-[#1a110c] border border-black/5 dark:border-white/10 rounded-[2rem] p-6 shadow-sm">
+                                        <Reorder.Item key={cat.id} value={cat} className="bg-white dark:bg-[#1a110c] border border-black/5 dark:border-white/10 rounded-[2rem] p-6 shadow-sm relative group">
                                             <div className="flex items-start justify-between">
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <p className="font-black text-sm text-[#1a2a40] dark:text-white">{cat.title}</p>
-                                                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${cat.rule_type === 'ai' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
-                                                            {cat.rule_type}
-                                                        </span>
+                                                <div className="flex items-start gap-4">
+                                                    <div className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-primary transition-colors mt-1" title="Drag to reorder">
+                                                        <span className="material-symbols-outlined">drag_indicator</span>
                                                     </div>
-                                                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{cat.subtitle || 'No subtitle'}</p>
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <p className="font-black text-sm text-[#1a2a40] dark:text-white">{cat.title}</p>
+                                                            <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${cat.rule_type === 'ai' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                                                                {cat.rule_type}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{cat.subtitle || 'No subtitle'}</p>
+                                                    </div>
                                                 </div>
                                                 <div className="flex gap-2">
+                                                    {cat.rule_type === 'manual' && (
+                                                        <button
+                                                            onClick={() => setEditingManualCategory(cat)}
+                                                            className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center gap-1 text-[10px] font-bold uppercase"
+                                                        >
+                                                            <span className="material-symbols-outlined text-[14px]">edit_square</span>
+                                                        </button>
+                                                    )}
                                                     <button
                                                         onClick={() => toggleCategoryStatus(cat.id, cat.is_active)}
                                                         className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${cat.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}
@@ -340,16 +432,23 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5">
+                                            <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5 pl-10">
                                                 <code className="text-[9px] text-zinc-400 block truncate">CONFIG: {JSON.stringify(cat.rule_config)}</code>
                                             </div>
-                                        </div>
+                                        </Reorder.Item>
                                     ))}
-                                </div>
+                                </Reorder.Group>
                             </div>
                         </div>
                     </div>
                 </motion.div>
+
+                <ManualCategoryProductSelector
+                    isOpen={!!editingManualCategory}
+                    onClose={() => setEditingManualCategory(null)}
+                    category={editingManualCategory}
+                    schoolId={selectedSchoolId}
+                />
             </div>
         </AnimatePresence>
     );

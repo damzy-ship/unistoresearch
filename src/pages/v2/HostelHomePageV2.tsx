@@ -447,15 +447,7 @@ export const HostelHomePageV2: React.FC = () => {
                 </div>
             </section>
 
-            {/* Special Categories (Horizontal Rows) */}
-            {specialCategories.map((category) => (
-                <section key={category.id}>
-                    <SpecialCategoryRow
-                        category={category}
-                        onProductClick={openProductDetail}
-                    />
-                </section>
-            ))}
+            {/* Special Categories are now interleaved in the feed below */}
 
             {/* Product Feed */}
             <div className="p-4 lg:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-10 mb-20 relative">
@@ -465,15 +457,33 @@ export const HostelHomePageV2: React.FC = () => {
                     ))
                 ) : orderedDisplayedFeed.length > 0 ? (
                     <>
-                        {orderedDisplayedFeed.map((product, i) => (
-                            <ProductCardV2
-                                key={`product-${product.id}`}
-                                product={product}
-                                index={i}
-                                fallbackImage={FALLBACK_SPEAKER}
-                                onClick={() => openProductDetail(product)}
-                            />
-                        ))}
+                        {orderedDisplayedFeed.map((product, i) => {
+                            const SPECIAL_CATEGORY_INTERVAL = 5;
+                            // Calculate if a special category should be inserted BEFORE this product (at 0, 10, 20...)
+                            const shouldInsertCategory = i % SPECIAL_CATEGORY_INTERVAL === 0;
+                            // Calculate which category to pick based on the index position
+                            const categoryIndex = i / SPECIAL_CATEGORY_INTERVAL;
+                            const specialCategoryToInsert = shouldInsertCategory ? specialCategories[categoryIndex] : null;
+
+                            return (
+                                <React.Fragment key={`product-group-${product.id}`}>
+                                    {specialCategoryToInsert && (
+                                        <div className="col-span-full -mx-4 lg:-mx-8 my-2">
+                                            <SpecialCategoryRow
+                                                category={specialCategoryToInsert}
+                                                onProductClick={openProductDetail}
+                                            />
+                                        </div>
+                                    )}
+                                    <ProductCardV2
+                                        product={product}
+                                        index={i}
+                                        fallbackImage={FALLBACK_SPEAKER}
+                                        onClick={() => openProductDetail(product)}
+                                    />
+                                </React.Fragment>
+                            );
+                        })}
 
                         {/* Improved Infinite Scroll Trigger & loadingMore Indicator */}
                         {hasMore && (
@@ -490,6 +500,21 @@ export const HostelHomePageV2: React.FC = () => {
                                 )}
                             </div>
                         )}
+                        {/* If we've reached the end of the feed, show any remaining special categories */}
+                        {(() => {
+                            const SPECIAL_CATEGORY_INTERVAL = 5;
+                            return !hasMore && specialCategories.length > Math.ceil(orderedDisplayedFeed.length / SPECIAL_CATEGORY_INTERVAL) && (
+                                <div className="col-span-full -mx-4 lg:-mx-8 mt-10">
+                                    {specialCategories.slice(Math.ceil(orderedDisplayedFeed.length / SPECIAL_CATEGORY_INTERVAL)).map(cat => (
+                                        <SpecialCategoryRow
+                                            key={`trailing-cat-${cat.id}`}
+                                            category={cat}
+                                            onProductClick={openProductDetail}
+                                        />
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </>
                 ) : (
                     <div className="col-span-2 text-center py-20 text-zinc-400 font-bold uppercase tracking-widest text-xs">No products in this category</div>

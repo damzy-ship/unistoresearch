@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase, HostelsProductUpdates, SpecialCategory } from '../../lib/supabase';
 import { ProductCardV2 } from '../v2/ProductCardV2';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SpecialCatProductCardV2 } from '../v2/SpecialCatProductCardV2';
 
 interface SpecialCategoryRowProps {
     category: SpecialCategory;
@@ -65,11 +66,11 @@ export const SpecialCategoryRow: React.FC<SpecialCategoryRowProps> = ({
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-[100px]" />
 
             <div className="relative z-10">
-                <div className="px-6 mb-6 flex items-end justify-between">
+                <div className="px-6 mb-6 flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-3">
                             <div className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_15px_rgba(255,107,0,0.5)]" />
-                            <h3 className="text-2xl font-black text-[#1a2a40] dark:text-white tracking-tight uppercase">
+                            <h3 className="text-lg md:text-2xl font-black text-[#1a2a40] dark:text-white tracking-tight uppercase">
                                 {category.title}
                             </h3>
                         </div>
@@ -106,9 +107,9 @@ export const SpecialCategoryRow: React.FC<SpecialCategoryRowProps> = ({
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="min-w-[290px] w-[290px] relative"
+                                    className="min-w-[200px] w-[200px] relative"
                                 >
-                                    <ProductCardV2
+                                    <SpecialCatProductCardV2
                                         product={product}
                                         onClick={() => onProductClick(product)}
                                         fallbackImage="/images/placeholder.png"
