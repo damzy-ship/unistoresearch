@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase, HostelsProductUpdates, SpecialCategory } from '../../lib/supabase';
 import { ProductCardV2 } from '../v2/ProductCardV2';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { SpecialCatProductCardV2 } from '../v2/SpecialCatProductCardV2';
 
 interface SpecialCategoryRowProps {
@@ -61,7 +62,7 @@ export const SpecialCategoryRow: React.FC<SpecialCategoryRowProps> = ({
     if (!loading && products.length === 0) return null;
 
     return (
-        <section className="py-10 my-6 border-y-2 border-primary/20 dark:border-white/5 bg-gradient-to-r from-orange-50/80 via-white to-orange-50/80 dark:from-[#1a110c] dark:via-black dark:to-[#1a110c] overflow-hidden relative shadow-sm">
+        <section className="py-10 border-primary/20 dark:border-white/5 bg-gradient-to-r from-orange-50/80 via-white to-orange-50/80 dark:from-[#1a110c] dark:via-black dark:to-[#1a110c] overflow-hidden relative shadow-sm">
             {/* High-visibility animated shimmer to make it pop */}
             <motion.div
                 animate={{ x: ["-150%", "300%"] }}
@@ -102,11 +103,16 @@ export const SpecialCategoryRow: React.FC<SpecialCategoryRowProps> = ({
                             </motion.p>
                         )}
                     </div>
-                    {/* 
-                    <button className="flex items-center gap-2 group cursor-pointer">
+                    {/* <button className="flex items-center gap-2 group cursor-pointer">
                         <span className="text-[10px] font-black text-primary uppercase tracking-widest group-hover:mr-1 transition-all">View All</span>
                         <span className="material-symbols-outlined text-primary text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
-                    </button> */}
+                    </button>  */}
+                    <div className="flex items-center gap-3" onClick={()=>window.scrollTo(0,0)}>
+                        <Link to={`/special-category/${category.id}`} className="flex items-center gap-2 group cursor-pointer">
+                            <span className="text-[10px] font-black text-primary uppercase tracking-widest group-hover:mr-1 transition-all">View All</span>
+                            <span className="material-symbols-outlined text-primary text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-5 overflow-x-auto pb-8 px-6 no-scrollbar">

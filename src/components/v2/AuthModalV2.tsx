@@ -328,7 +328,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose, initi
                 </div>
             </div>
 
-            {/* Social Buttons */}
+            {/* Social Buttons
             <div className="grid grid-cols-2 gap-4 mb-8">
                 <button className="flex items-center justify-center h-14 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-white/5 transition-all gap-3 rounded-xl active:scale-95 group">
                     <svg className="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -345,7 +345,7 @@ export const AuthModalV2: React.FC<AuthModalV2Props> = ({ isOpen, onClose, initi
                     </svg>
                     <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">Apple</span>
                 </button>
-            </div>
+            </div> */}
 
             <div className="text-center pb-2">
                 <p className="text-zinc-500 dark:text-zinc-400 text-sm">

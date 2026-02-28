@@ -450,7 +450,7 @@ export const HostelHomePageV2: React.FC = () => {
             {/* Special Categories are now interleaved in the feed below */}
 
             {/* Product Feed */}
-            <div className="p-4 lg:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-10 mb-20 relative">
+            <div className="py-2 sm:p-4 lg:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-y-2 sm:gap-6 lg:gap-10 mb-20 relative">
                 {(loadingFeed && orderedDisplayedFeed.length === 0) ? (
                     Array(3).fill(0).map((_, k) => (
                         <div key={k} className="bg-zinc-100 dark:bg-white/5 rounded-[2.5rem] aspect-[4/5] animate-pulse" />
@@ -468,7 +468,7 @@ export const HostelHomePageV2: React.FC = () => {
                             return (
                                 <React.Fragment key={`product-group-${product.id}`}>
                                     {specialCategoryToInsert && (
-                                        <div className="col-span-full -mx-4 lg:-mx-8 my-2">
+                                        <div className="col-span-full lg:-mx-8">
                                             <SpecialCategoryRow
                                                 category={specialCategoryToInsert}
                                                 onProductClick={openProductDetail}

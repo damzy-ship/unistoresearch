@@ -30,7 +30,6 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
         }
     }, [isOpen, isAdmin]);
 
-    // Prevent body scroll when image viewer is open
     useEffect(() => {
         if (selectedImageIndex !== null) {
             document.body.style.overflow = 'hidden';
@@ -45,35 +44,8 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     useEffect(() => {
         if (isOpen && product?.id) {
             controls.start({ y: 0 });
-            // Fetch real like info (commented out per request)
-            // getProductLikeInfo(product.id).then(setLikeInfo);
         }
     }, [isOpen, controls, product?.id]);
-
-    /*
-    const handleToggleLike = async () => {
-        if (!product?.id) return;
-
-        // Optimistic update
-        const wasLiked = likeInfo.isLiked;
-        const newIsLiked = !wasLiked;
-        setLikeInfo(prev => ({
-            isLiked: newIsLiked,
-            likeCount: newIsLiked ? prev.likeCount + 1 : prev.likeCount - 1
-        }));
-
-        const result = await toggleProductLike(product.id, product.actual_user_id || null);
-
-        // If failed, revert
-        if (!result.success) {
-            setLikeInfo(prev => ({
-                isLiked: wasLiked,
-                likeCount: wasLiked ? prev.likeCount + 1 : prev.likeCount - 1
-            }));
-            toast.error('Failed to update like');
-        }
-    };
-    */
 
     if (!isOpen) return null;
 
@@ -89,18 +61,31 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     const sellerLocation = product?.unique_visitors?.hostels?.name || product?.unique_visitors?.schools?.short_name || 'Campus';
     const sellerPhoto = product?.unique_visitors?.profile_picture;
 
-    // Handle multiple images correctly
     const productImages = product?.post_images && product.post_images.length > 0
         ? product.post_images
         : ['/v2/assets/niacinamide_serum_product_1771272568186.png'];
 
-    const handleWhatsApp = () => {
+    // PROTECTED ACTION
+    const handleWhatsApp = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            window.dispatchEvent(new CustomEvent('open-auth-modal'));
+            return;
+        }
+
         if (!product?.unique_visitors?.phone_number) return;
         const msg = encodeURIComponent(`Hi ${sellerName}, I'm interested in your ${product.post_description} on UniStore!`);
         window.open(`https://wa.me/${product.unique_visitors.phone_number.replace(/[^0-9]/g, '')}?text=${msg}`, '_blank');
     };
 
-    const handleCall = () => {
+    // PROTECTED ACTION
+    const handleCall = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            window.dispatchEvent(new CustomEvent('open-auth-modal'));
+            return;
+        }
+
         if (!product?.unique_visitors?.phone_number) return;
         window.location.href = `tel:${product.unique_visitors.phone_number}`;
     };
@@ -108,7 +93,6 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-[100] flex items-end lg:items-center lg:justify-center">
-                {/* Backdrop */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -117,7 +101,6 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                     className="absolute inset-0 bg-black/40 backdrop-blur-md cursor-pointer"
                 />
 
-                {/* Sheet/Modal */}
                 <motion.div
                     drag="y"
                     dragConstraints={{ top: 0, bottom: 0 }}
@@ -129,10 +112,9 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
                     className="relative w-full lg:max-w-5xl h-[92vh] lg:h-[750px] bg-[#f8f6f5] dark:bg-[#1a110c] rounded-t-[3rem] lg:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row z-10"
                 >
-                    {/* Drag Handle - Mobile Only */}
                     <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-white/40 dark:bg-white/20 rounded-full z-[30] lg:hidden" />
 
-                    {/* Left: Product Images (Scrollable on mobile, Left side on desktop) */}
+                    {/* Left: Product Images */}
                     <div className="w-full lg:w-[60%] h-[45%] lg:h-full relative group p-2.5 lg:p-0">
                         <div className="w-full h-full relative [&_.swiper-pagination]:!bottom-0 lg:[&_.swiper-pagination]:!bottom-[2rem]">
                             <Swiper
@@ -170,7 +152,6 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 <button
                                     onClick={async (e) => {
                                         e.stopPropagation();
-                                        console.log('[ProductDetailSheetV2] Delete clicked. isAdmin:', isAdmin);
                                         if (!confirm('Are you sure you want to delete this product?')) return;
 
                                         const { error } = await supabase
@@ -194,7 +175,6 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             )}
                         </div>
 
-                        {/* Navigation Arrows - Desktop Only */}
                         <div className="absolute inset-y-0 left-0 right-0 z-20 hidden lg:flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                             <button className="swiper-button-prev-custom w-12 h-12 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/40 transition-all pointer-events-auto active:scale-90">
                                 <span className="material-symbols-outlined !text-3xl">chevron_left</span>
@@ -205,11 +185,11 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                         </div>
                     </div>
 
-                    {/* Right: Product Details (Scrollable content) */}
+                    {/* Right: Product Details */}
                     <div className="w-full lg:w-[40%] h-[55%] lg:h-full flex flex-col bg-white/40 dark:bg-white/[0.02] backdrop-blur-3xl lg:border-l border-black/5 dark:border-white/5 relative">
-                        {/* Scrollable Area */}
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10 pb-32 lg:pb-40">
-                            {/* Seller & Rating Header */}
+                            
+                            {/* Seller Header */}
                             <div className="flex items-start justify-between mb-8 gap-4">
                                 <div className="flex items-center gap-3 group cursor-pointer">
                                     <div className="w-12 h-12 rounded-full ring-2 ring-primary ring-offset-4 ring-offset-[#f8f6f5] dark:ring-offset-[#1a110c] overflow-hidden bg-zinc-100 transition-transform group-hover:scale-105">
@@ -230,15 +210,9 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                         </div>
                                     </div>
                                 </div>
-                                {/* Likes hidden per user request
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors ${likeInfo.isLiked ? 'bg-red-500/10 text-red-500' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'}`}>
-                                    <span className={`material-symbols-outlined text-sm ${likeInfo.isLiked ? 'fill-1' : ''}`}>favorite</span>
-                                    <span className="text-xs font-black">{likeInfo.likeCount}</span>
-                                </div>
-                                */}
                             </div>
 
-                            {/* Product Title & Category */}
+                            {/* Product Title */}
                             <div className="mb-8">
                                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-3 block">Premium Update</span>
                                 <h2 className="text-2xl lg:text-4xl font-black text-[#1a2a40] dark:text-white leading-tight tracking-tight mb-2 underline decoration-primary/20 decoration-8 underline-offset-[-2px]">{product.post_description}</h2>
@@ -248,7 +222,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 </div>
                             </div>
 
-                            {/* Price Section */}
+                            {/* Price */}
                             <div className="mb-8 p-6 bg-primary/5 dark:bg-primary/20 rounded-[2rem] border border-primary/10">
                                 <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest mb-1.5">Best Price</p>
                                 <div className="flex items-end gap-3 flex-wrap">
@@ -263,7 +237,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 </div>
                             </div>
 
-                            {/* Features/Stats Grid */}
+                            {/* Stats */}
                             <div className="grid grid-cols-2 gap-4 mb-8">
                                 <div className="p-4 bg-zinc-50 dark:bg-white/5 rounded-3xl border border-black/[0.03] dark:border-white/5">
                                     <span className="material-symbols-outlined text-primary mb-2">schedule</span>
@@ -277,7 +251,6 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 </div>
                             </div>
 
-                            {/* Description placeholder if needed */}
                             {product.post_description_detailed && (
                                 <div className="mb-10">
                                     <h4 className="text-xs font-black text-[#1a2a40]/40 dark:text-white/40 uppercase tracking-[0.2em] mb-4">About the item</h4>
@@ -287,16 +260,8 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                                 </div>
                             )}
 
-                            {/* Sticky Bottom Action Bar within scroll container or absolute */}
+                            {/* Actions */}
                             <div className="px-6 py-6 lg:py-8 bg-[#f8f6f5]/90 dark:bg-[#221610]/95 backdrop-blur-3xl border-t border-black/5 dark:border-white/5 flex items-center gap-4 shrink-0 mt-auto">
-                                {/* Likes hidden per user request
-                                <button
-                                    onClick={handleToggleLike}
-                                    className={`h-14 w-14 rounded-full border-2 flex items-center justify-center transition-all active:scale-95 ${likeInfo.isLiked ? 'border-red-500 text-red-500 bg-red-500/5' : 'border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-red-500'}`}
-                                >
-                                    <span className={`material-symbols-outlined text-[28px] ${likeInfo.isLiked ? 'fill-1' : ''}`}>favorite</span>
-                                </button>
-                                */}
                                 <button
                                     onClick={handleWhatsApp}
                                     className="h-14 flex-1 bg-primary text-white font-black rounded-3xl flex items-center justify-center gap-3 shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:bg-primary/90 transition-all active:scale-95 uppercase tracking-widest text-xs"
@@ -316,7 +281,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                 </motion.div>
             </div>
 
-            {/* Fullscreen Image Viewer Modal */}
+            {/* Fullscreen Viewer */}
             {selectedImageIndex !== null && productImages && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-0">
                     <motion.div
@@ -383,7 +348,7 @@ export const ProductDetailSheetV2: React.FC<ProductDetailSheetV2Props> = ({
                             } else if (info.offset.x > 50 && selectedImageIndex > 0) {
                                 setSelectedImageIndex(selectedImageIndex - 1);
                             } else if (Math.abs(info.offset.y) > 100) {
-                                setSelectedImageIndex(null); // Optional: swipe down to close
+                                setSelectedImageIndex(null);
                             }
                         }}
                     >

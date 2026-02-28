@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { supabase } from '../../lib/supabase'; // Ensure supabase is imported
 
 interface ProductCardV2Props {
     product: any;
@@ -14,74 +15,145 @@ export const ProductCardV2: React.FC<ProductCardV2Props> = ({
     fallbackImage,
     index
 }) => {
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const images = product.post_images?.length > 0 ? product.post_images : [fallbackImage];
+
+    const handleScroll = () => {
+        if (!scrollContainerRef.current) return;
+        const scrollLeft = scrollContainerRef.current.scrollLeft;
+        const width = scrollContainerRef.current.clientWidth;
+        const newIndex = Math.round(scrollLeft / width);
+        if (newIndex !== activeImageIndex) {
+            setActiveImageIndex(newIndex);
+        }
+    };
+
+    const handleGetNow = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevents the card click from opening the detail sheet
+        
+        // 1. Check Authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            window.dispatchEvent(new CustomEvent('open-auth-modal'));
+            return;
+        }
+
+        // 2. Proceed to WhatsApp if authenticated
+        const sellerName = product?.unique_visitors?.brand_name || product?.unique_visitors?.full_name || 'Verified Merchant';
+        const phoneNumber = product?.unique_visitors?.phone_number;
+        
+        if (!phoneNumber) {
+            // Fallback: If no phone number is found, open the detail sheet
+            onClick();
+            return;
+        }
+        
+        const msg = encodeURIComponent(`Hi ${sellerName}, I'm interested in your ${product.post_description} on UniStore!`);
+        window.open(`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${msg}`, '_blank');
+    };
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.01 }}
-            onClick={onClick}
-            className="bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden shadow-sm border border-black/5 dark:border-white/10 flex flex-col group transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] cursor-pointer relative"
+            className="bg-white dark:bg-white/5 sm:rounded-2xl overflow-hidden sm:shadow-sm border-b sm:border border-black/5 dark:border-white/10 flex flex-col group transition-all duration-300 sm:hover:shadow-xl w-full pb-4 sm:pb-0"
         >
-            <div className="relative aspect-[4/5] overflow-hidden m-2.5 rounded-t-[2rem]">
-                <img
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src={product.post_images?.[0] || fallbackImage}
-                    onError={(e: any) => {
-                        (e.target as HTMLImageElement).src = fallbackImage;
-                    }}
-                    alt={product.post_description}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                {/* Commenting out like button per user request
-                <button
-                    onClick={handleToggleLike}
-                    className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-xl shadow-lg ring-1 ring-white/20 transition-all z-20 hover:scale-110 active:scale-90 ${likeInfo.isLiked ? 'bg-red-500 text-white' : 'bg-white/40 dark:bg-black/40 text-white hover:bg-red-500'}`}
-                >
-                    <span className={`material-symbols-outlined text-lg ${likeInfo.isLiked ? 'fill-1' : ''}`}>favorite</span>
-                </button>
-                */}
-            </div>
-            <div className="p-6 pt-2 flex flex-col gap-3 flex-1">
-                <h4 className="text-lg font-bold line-clamp-1 text-[#1a2a40] dark:text-zinc-100 tracking-tight group-hover:text-primary transition-colors">{product.post_description}</h4>
-                <div className="flex items-end justify-between">
-                    <div className="flex flex-col">
-                        {Number(product.price) > 0 ? (
-                            <>
-                                {product.discount_price ? (
-                                    <>
-                                        <span className="text-primary font-black text-2xl leading-none">₦{Number(product.discount_price).toLocaleString()}</span>
-                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium mt-1">₦{Number(product.price).toLocaleString()}</span>
-                                    </>
-                                ) : (
-                                    <span className="text-primary font-black text-2xl leading-none">₦{Number(product.price).toLocaleString()}</span>
-                                )}
-                            </>
+            {/* Header: Merchant Info */}
+            <div 
+                className="flex items-center justify-between p-3 sm:p-4 cursor-pointer active:opacity-70"
+                onClick={onClick}
+            >
+                <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        {product.unique_visitors?.profile_picture ? (
+                            <img src={product.unique_visitors.profile_picture} alt="" className="w-full h-full rounded-full object-cover" />
                         ) : (
-                            <span className="text-zinc-400 font-black text-[10px] uppercase tracking-widest h-6">Contact for Price</span>
+                            <span className="material-symbols-outlined text-sm text-primary">person</span>
                         )}
                     </div>
-                    {/* Redundant shopping bag removed per user request
-                    <div className="bg-primary text-white p-3.5 rounded-2xl shadow-lg shadow-primary/20 scale-100 group-hover:scale-110 transition-all duration-300">
-                        <span className="material-symbols-outlined text-2xl font-bold">shopping_bag</span>
-                    </div>
-                    */}
+                    <span className="text-sm font-bold text-[#1a2a40] dark:text-zinc-100 truncate">
+                        {product.unique_visitors?.full_name || 'Merchant'}
+                    </span>
+                </div>
+                <span className="material-symbols-outlined text-zinc-400">more_horiz</span>
+            </div>
+
+            {/* Image Slider */}
+            <div className="relative w-full aspect-[4/5] sm:aspect-square overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                <div 
+                    ref={scrollContainerRef}
+                    onScroll={handleScroll}
+                    className="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                    {images.map((img: string, idx: number) => (
+                        <div key={idx} className="w-full h-full flex-shrink-0 snap-center relative">
+                            <img
+                                className="w-full h-full object-cover"
+                                src={img}
+                                onError={(e: any) => {
+                                    (e.target as HTMLImageElement).src = fallbackImage;
+                                }}
+                                alt={`${product.post_description} - ${idx + 1}`}
+                            />
+                            <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
+                        </div>
+                    ))}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 overflow-hidden">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                            <span className="material-symbols-outlined text-sm text-primary">person</span>
-                        </div>
-                        <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate">{product.unique_visitors?.full_name?.split(' ')[0] || 'Merchant'}</span>
+                {images.length > 1 && (
+                    <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
+                        {images.map((_, idx) => (
+                            <div
+                                key={idx}
+                                className={`transition-all duration-300 rounded-full shadow-sm ${
+                                    activeImageIndex === idx
+                                        ? 'w-4 h-1.5 bg-white'
+                                        : 'w-1.5 h-1.5 bg-white/50'
+                                }`}
+                            />
+                        ))}
                     </div>
-                    {/* Commenting out like counter per user request
-                    <div className={`flex items-center gap-1 font-bold ${likeInfo.isLiked ? 'text-red-500' : 'text-zinc-400'}`}>
-                        <span className={`material-symbols-outlined text-xs ${likeInfo.isLiked ? 'fill-1' : ''}`}>favorite</span>
-                        <span className="text-xs">{likeInfo.likeCount}</span>
+                )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-3 flex flex-col gap-1.5 flex-1">
+                <div className="cursor-pointer active:opacity-70" onClick={onClick}>
+                    <h4 className="text-sm font-medium line-clamp-2 text-[#1a2a40] dark:text-zinc-100 leading-snug">
+                        <span className="font-bold mr-2">{product.unique_visitors?.full_name?.split(' ')[0] || 'Merchant'}</span>
+                        {product.post_description}
+                    </h4>
+                    
+                    <div className="flex flex-col mt-1">
+                        {Number(product.price) > 0 ? (
+                            <div className="flex items-baseline gap-2">
+                                {product.discount_price ? (
+                                    <>
+                                        <span className="text-[#1a2a40] dark:text-white font-bold text-base leading-none">₦{Number(product.discount_price).toLocaleString()}</span>
+                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 line-through font-medium">₦{Number(product.price).toLocaleString()}</span>
+                                    </>
+                                ) : (
+                                    <span className="text-[#1a2a40] dark:text-white font-bold text-base leading-none">₦{Number(product.price).toLocaleString()}</span>
+                                )}
+                            </div>
+                        ) : (
+                            <span className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest h-5 flex items-center">Contact for Price</span>
+                        )}
                     </div>
-                    */}
                 </div>
+
+                {/* Secure Get Now Button */}
+                <button
+                    onClick={handleGetNow}
+                    className="w-full mt-3 bg-primary text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-95 transition-all shadow-sm"
+                >
+                    <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
+                    Get Now
+                </button>
             </div>
         </motion.div>
     );

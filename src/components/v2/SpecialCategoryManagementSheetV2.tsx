@@ -174,6 +174,17 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
         }
     };
 
+    const copyCategoryLink = async (id: string) => {
+        try {
+            const url = `${window.location.origin}/special-category/${id}`;
+            await navigator.clipboard.writeText(url);
+            toast.success('Category link copied to clipboard');
+        } catch (error: any) {
+            console.error('Failed to copy link', error);
+            toast.error('Failed to copy link');
+        }
+    };
+
     const handleReorder = (newOrder: SpecialCategory[]) => {
         setCategories(newOrder);
     };
@@ -462,6 +473,18 @@ export const SpecialCategoryManagementSheetV2: React.FC<SpecialCategoryManagemen
                                                                         </span>
                                                                         {cat.is_active ? 'Hide Row' : 'Show Row'}
                                                                     </button>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                copyCategoryLink(cat.id);
+                                                                                setActiveMenuId(null);
+                                                                            }}
+                                                                            className="w-full px-4 py-2 text-left rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors flex items-center gap-3 text-sm font-bold text-[#1a2a40] dark:text-white"
+                                                                        >
+                                                                            <span className={`material-symbols-outlined text-[18px] text-zinc-400`}>
+                                                                                link
+                                                                            </span>
+                                                                            Copy Link
+                                                                        </button>
                                                                     <div className="h-px bg-black/5 dark:bg-white/5 my-1" />
                                                                     <button
                                                                         onClick={() => {
